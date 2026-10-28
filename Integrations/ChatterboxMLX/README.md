@@ -20,6 +20,20 @@ profile conversion releases unused pooled buffers. Resource checks include
 initial3GiB headroom, Low Power Mode and serious/critical thermal stops. Mac
 free+inactive-memory estimates and iOS process headroom are different evidence.
 
+Long narration hosts must explicitly bound MLX's reusable buffer pool before
+loading, for example `ChatterboxMLXRenderer.configureBufferCache(maximumBytes:
+64 * 1024 * 1024)`. This process-wide policy must be coordinated with other MLX
+users; it does not cap live weights or weaken the existing headroom guards.
+The renderer releases each unit's KV/input tensors before acoustic synthesis
+and trims unused buffers at phase boundaries, including failure/cancellation.
+When unloading, release both narrator and renderer handles, then call the static
+`ChatterboxMLXRenderer.trimUnusedMemory()` to return freed weights to the OS.
+`memorySnapshot()` reports numeric headroom/active/cache/peak metrics; a
+`RendererError.resourceGuard(details)` carries the exact stop reason and its
+snapshot. Hosts should preserve those details rather than retry a resource stop
+as an ordinary synthesis error. A 64 MiB cache is an initial host policy, not a
+measured phone optimum or proof of sustained iPhone narration.
+
 Create `ChatterboxMLXRenderer` with local verified assets, a saved default voice
 and explicit acoustic compute policy. `makeNarrator()` returns the shared SDK
 facade. The direct path awaits a complete bounded unit and holds its busy lease

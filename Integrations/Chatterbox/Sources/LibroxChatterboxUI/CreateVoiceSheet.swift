@@ -5,6 +5,7 @@ import LibroxChatterbox
 /// Native recording -> quality check -> generated preview -> named saved voice.
 /// The host supplies preview rendering and audio-session coordination.
 @MainActor public struct ChatterboxCreateVoiceSheet: View {
+    public enum Operation: String, Sendable { case recording, conditioning, preview, playback, saving }
     private enum Stage { case ready, recording, preparing, preview, saving, saved }
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
@@ -17,6 +18,7 @@ import LibroxChatterbox
     private let activatePreview: @MainActor () throws -> Void
     private let restoreSession: @MainActor () -> Void
     private let onSaved: @MainActor (ChatterboxSavedVoice) -> Void
+    private let onFailure: @MainActor (Operation, Error) -> Void
     @State private var stage = Stage.ready
     @State private var useRecording = false
     @State private var voiceName = "My Voice"
@@ -35,9 +37,11 @@ import LibroxChatterbox
                 makePreview: @escaping @Sendable (ChatterboxVoiceDraft, URL) async throws -> Void,
                 activatePreviewSession: @escaping @MainActor () throws -> Void,
                 restoreListeningSession: @escaping @MainActor () -> Void,
+                onFailure: @escaping @MainActor (Operation, Error) -> Void = { _, _ in },
                 onSaved: @escaping @MainActor (ChatterboxSavedVoice) -> Void) {
         self.recorder = recorder; self.creation = creation; self.language = language; self.makePreview = makePreview
         activatePreview = activatePreviewSession; restoreSession = restoreListeningSession; self.onSaved = onSaved
+        self.onFailure = onFailure
     }
 
     public var body: some View {
@@ -69,7 +73,7 @@ import LibroxChatterbox
                     Text("You can now choose this voice for narration.")
                     Button("Done") { dismiss() }
                 }
-                if let errorMessage { Text(errorMessage).foregroundStyle(.red).accessibilityLabel("Recording issue: " + errorMessage) }
+                if let errorMessage { Text(errorMessage).foregroundStyle(.red).accessibilityLabel("Voice creation issue: " + errorMessage) }
             }
             .navigationTitle("Create Your Voice")
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismissed = true; cancel(); dismiss() }.disabled(stage == .saving) } }
@@ -86,15 +90,18 @@ import LibroxChatterbox
         task = Task {
             var recording: URL?
             var preparedID: UUID?
+            var operation = Operation.recording
             defer { if let recording { try? FileManager.default.removeItem(at: recording) } }
             do {
                 let file = try await recorder.record(); recording = file
                 try Task.checkCancellation(); stage = .preparing
+                operation = .conditioning
                 let value = try await creation.prepare(recording: file, language: language, useMyRecording: useRecording)
                 preparedID = value.id
                 draft = value
                 try Task.checkCancellation()
                 let preview = value.conditioningFile.deletingLastPathComponent().appendingPathComponent("preview.wav")
+                operation = .preview
                 try await makePreview(value, preview)
                 try Task.checkCancellation()
                 let properties = try preview.resourceValues(forKeys: [.isRegularFileKey, .isSymbolicLinkKey, .fileSizeKey])
@@ -109,7 +116,8 @@ import LibroxChatterbox
                 stage = .ready
             }
             catch {
-                errorMessage = message(error); stage = .preparing
+                onFailure(operation, error)
+                errorMessage = message(error, operation: operation); stage = .preparing
                 if let preparedID { try? await creation.discard(preparedID) }
                 if draft?.id == preparedID { draft = nil }
                 stage = .ready
@@ -125,6 +133,7 @@ import LibroxChatterbox
                 self.draft = nil; stage = .saved
                 if !dismissed { onSaved(value) }
             } catch {
+                onFailure(.saving, error)
                 if dismissed { try? await creation.discard(draft.id); self.draft = nil }
                 else { errorMessage = error.localizedDescription; stage = .preview }
             }
@@ -176,20 +185,30 @@ import LibroxChatterbox
             }
             previewDelegate = callbacks; player?.delegate = callbacks; player?.currentTime = 0
             guard player?.play() == true else { throw ChatterboxNarrationError.invalidAudio }
-        } catch { stopPreview(); errorMessage = error.localizedDescription }
+        } catch { onFailure(.playback, error); stopPreview(); errorMessage = error.localizedDescription }
     }
     private func stopPreview() {
         playbackID = nil; player?.stop(); previewDelegate = nil
         if previewActive { previewActive = false; restoreSession() }
     }
-    private func message(_ error: Error) -> String {
+    private func message(_ error: Error, operation: Operation) -> String {
         if case ChatterboxVoiceCreation.CreationError.rejectedRecording(let report) = error {
             if report.issues.contains(.tooShort) { return "Record at least six seconds. Read the whole passage and try again." }
             if report.issues.contains(.clipping) { return "The recording is distorted. Move a little farther from the microphone and try again." }
             return "The recording is too quiet or contains too little sound. Move closer to the microphone and try again."
         }
         if case ChatterboxVoiceRecorder.RecorderError.permissionDenied = error { return "Allow microphone access in Settings, then try again." }
-        return "Unable to create this voice. Check that the voice models are installed and try again."
+        // The host renderer can provide an actionable memory/thermal message.
+        if operation == .preview, let description = (error as? any LocalizedError)?.errorDescription {
+            return description
+        }
+        switch operation {
+        case .recording: return "The recording couldn’t be completed. Please record again."
+        case .conditioning: return "Your recording finished, but voice preparation failed. Please try again."
+        case .preview: return "Your voice was prepared, but its audio preview couldn’t be generated. Please try again."
+        case .playback: return "The voice preview couldn’t be played. Please try again."
+        case .saving: return "Your voice couldn’t be saved. Please try again."
+        }
     }
 }
 

@@ -11,7 +11,46 @@ import Darwin
 /// owns foreground eligibility and global MLX memory/cache budgets.
 public actor ChatterboxMLXRenderer {
     public static let profile = "native-mlx-mixed-f16-accurate-1"
-    public enum RendererError: Error { case precisionPolicy, identityMismatch, oracleMismatch, busy, resourceGuard, missingVoice, generationLimit }
+    public enum RendererError: Error {
+        case precisionPolicy, identityMismatch, oracleMismatch, busy
+        case resourceGuard(ResourceGuardDetails)
+        case missingVoice, generationLimit
+    }
+
+    /// Numeric diagnostics only: contains no book text, audio or voice identity.
+    public struct MemorySnapshot: Sendable, Codable {
+        public let availableBytes: UInt64?
+        public let activeBytes: Int
+        public let cacheBytes: Int
+        public let peakBytes: Int
+        public let lowPowerMode: Bool
+        public let thermalState: Int
+    }
+
+    public struct ResourceGuardDetails: Sendable, Codable {
+        public enum Reason: String, Sendable, Codable {
+            case memory, memoryQuery, lowPowerMode, thermal
+        }
+        public let reason: Reason
+        public let minimumAvailableBytes: Int
+        public let memory: MemorySnapshot
+    }
+
+    /// Process-wide MLX buffer pool policy; the host coordinates other MLX users.
+    /// This limits reusable buffers, not live model allocations or safety guards.
+    public nonisolated static func configureBufferCache(maximumBytes: Int) {
+        precondition(maximumBytes >= 0)
+        Memory.cacheLimit = maximumBytes
+    }
+
+    public nonisolated static func trimUnusedMemory() { Memory.clearCache() }
+
+    public nonisolated static func memorySnapshot() -> MemorySnapshot {
+        let info = ProcessInfo.processInfo
+        return .init(availableBytes: availableMemory(), activeBytes: Memory.activeMemory,
+                     cacheBytes: Memory.cacheMemory, peakBytes: Memory.peakMemory,
+                     lowPowerMode: info.isLowPowerModeEnabled, thermalState: info.thermalState.rawValue)
+    }
     private let decoder: SpeechDecoder
     private let frontend: ChatterboxMultilingualPromptBuilder
     private let synth: ChatterboxTokenSynthesizer
@@ -34,6 +73,9 @@ public actor ChatterboxMLXRenderer {
             try Self.verify(model, fixture: loadArrays(url: oracleFile))
             return model
         }
+        // Verification allocates its own KV caches and oracle tensors. None are
+        // needed by the acoustic models; return unused buffers before loading them.
+        Self.trimUnusedMemory()
         decoder = model
         frontend = try await ChatterboxMultilingualPromptBuilder(modelDirectory: modelDirectory)
         try ChatterboxVoiceFile.validate(at: defaultVoice)
@@ -51,9 +93,35 @@ public actor ChatterboxMLXRenderer {
     public func render(_ request: ChatterboxRequest) async throws -> ChatterboxAudioChunk {
         guard !occupied else { throw RendererError.busy }
         occupied = true; defer { occupied = false }
+        // ARC releases the decode helper's arrays before this phase boundary.
+        // On failure the helper has also unwound before this deferred trim runs.
+        defer { Self.trimUnusedMemory() }
+        Self.trimUnusedMemory()
         try Self.healthy()
         let voice = request.conditioningFile ?? defaultVoice
         try ChatterboxVoiceFile.validate(at: voice)
+        let decoded = try decode(request, voice: voice)
+        Self.trimUnusedMemory()
+        try Self.healthy()
+        let synthBegan = Date()
+        let samples = try await synth.render(tokens: decoded.tokens, conditioningFile: voice)
+        try Task.checkCancellation()
+        return try .init(samples: samples, timings: .init(prefillSeconds: decoded.prefillSeconds,
+            decodeSeconds: decoded.decodeSeconds, synthSeconds: Date().timeIntervalSince(synthBegan), watermarkSeconds: 0,
+            speechTokens: decoded.tokens.count, decodeBackend: Self.profile, hostAssemblySeconds: decoded.assemblySeconds))
+    }
+
+    /// Keep all GPU tensors/KV storage in a synchronous scope. Only CPU token
+    /// IDs and timing scalars survive into the Core ML acoustic phase.
+    private struct DecodedSpeech {
+        let tokens: [Int]
+        let prefillSeconds: Double
+        let decodeSeconds: Double
+        let assemblySeconds: Double
+    }
+
+    @inline(never)
+    private func decode(_ request: ChatterboxRequest, voice: URL) throws -> DecodedSpeech {
         let assemblyBegan = Date()
         let prefix = try frontend.prepare(text: request.text, language: request.language, conditioningFile: voice,
             exaggeration: request.exaggeration, guidance: request.guidance, maxTokens: request.maxTokens)
@@ -82,13 +150,8 @@ public actor ChatterboxMLXRenderer {
         guard stopped else { throw RendererError.generationLimit }
         let decodeSeconds = Date().timeIntervalSince(began) - prefillSeconds
         let valid = tokens.filter { $0 < 6561 }
-        try Self.healthy()
-        let synthBegan = Date()
-        let samples = try await synth.render(tokens: valid, conditioningFile: voice)
-        try Task.checkCancellation()
-        return try .init(samples: samples, timings: .init(prefillSeconds: prefillSeconds,
-            decodeSeconds: decodeSeconds, synthSeconds: Date().timeIntervalSince(synthBegan), watermarkSeconds: 0,
-            speechTokens: valid.count, decodeBackend: Self.profile, hostAssemblySeconds: assemblySeconds))
+        return .init(tokens: valid, prefillSeconds: prefillSeconds,
+                     decodeSeconds: decodeSeconds, assemblySeconds: assemblySeconds)
     }
 
     private func predict(_ input: MLXArray, cache: [KVCache]) -> [Float] {
@@ -101,11 +164,20 @@ public actor ChatterboxMLXRenderer {
 
     private static func healthy(minimumAvailable: Int = 256 * 1_024 * 1_024) throws {
         try Task.checkCancellation()
-        let info = ProcessInfo.processInfo
-        guard !info.isLowPowerModeEnabled, info.thermalState != .serious, info.thermalState != .critical,
-              try availableMemory() >= UInt64(minimumAvailable) else { throw RendererError.resourceGuard }
+        let snapshot = memorySnapshot()
+        let reason: ResourceGuardDetails.Reason?
+        if snapshot.lowPowerMode { reason = .lowPowerMode }
+        else if snapshot.thermalState == ProcessInfo.ThermalState.serious.rawValue ||
+                    snapshot.thermalState == ProcessInfo.ThermalState.critical.rawValue { reason = .thermal }
+        else if let available = snapshot.availableBytes {
+            reason = available < UInt64(minimumAvailable) ? .memory : nil
+        } else { reason = .memoryQuery }
+        if let reason {
+            throw RendererError.resourceGuard(.init(reason: reason,
+                minimumAvailableBytes: minimumAvailable, memory: snapshot))
+        }
     }
-    private static func availableMemory() throws -> UInt64 {
+    private static func availableMemory() -> UInt64? {
         #if os(macOS) || targetEnvironment(macCatalyst)
         // A system free+inactive estimate on the Mac (Catalyst too: there
         // os_proc_available_memory() is 0 because no jetsam limit applies).
@@ -117,7 +189,7 @@ public actor ChatterboxMLXRenderer {
             }
         }
         var page: vm_size_t = 0
-        guard result == KERN_SUCCESS, host_page_size(mach_host_self(), &page) == KERN_SUCCESS else { throw RendererError.resourceGuard }
+        guard result == KERN_SUCCESS, host_page_size(mach_host_self(), &page) == KERN_SUCCESS else { return nil }
         return (UInt64(stats.free_count) + UInt64(stats.inactive_count)) * UInt64(page)
         #else
         return UInt64(os_proc_available_memory())

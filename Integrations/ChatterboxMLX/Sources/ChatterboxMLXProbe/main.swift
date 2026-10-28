@@ -22,10 +22,16 @@ import LibroxChatterboxMLX
             conditioningFiles: [saved.id.uuidString: voice], seed: 42)
         guard !units.isEmpty else { throw Failure.arguments }
         try FileManager.default.createDirectory(at: out, withIntermediateDirectories: false)
+        if let value = ProcessInfo.processInfo.environment["CHATTERBOX_MLX_CACHE_BYTES"],
+           let bytes = Int(value), bytes >= 0 {
+            ChatterboxMLXRenderer.configureBufferCache(maximumBytes: bytes)
+        }
         let renderer = try await ChatterboxMLXRenderer(weightsFile: urls[0], oracleFile: urls[1],
             modelDirectory: urls[2], defaultVoice: voice, watermarkDirectory: urls[3],
             acousticComputeUnits: .init(encoder: .cpuOnly, cfm: .cpuOnly, vocoder: .cpuOnly, watermark: .cpuOnly))
         let narrator = await renderer.makeNarrator()
+        let memoryAfterLoad = memoryReport()
+        var memoryWindows: [[String: Any]] = []
         let cache = try ChatterboxLookaheadCache(directory: out.appendingPathComponent("pcm-cache"))
         var cadence = ChatterboxConversationSession()
         var full: [Float] = [], reports: [[String: Any]] = []
@@ -37,6 +43,7 @@ import LibroxChatterboxMLX
                     rendererProfile: ChatterboxMLXRenderer.profile + ":" + ChatterboxBookDirector.revision)
             }
             let ready = try await cache.prepareWindow(window, using: narrator)
+            memoryWindows.append(["last_unit": ready.last!.unit.index, "memory": memoryReport()])
             for value in ready {
                 let index = value.unit.index, planned = units[index]
                 guard var samples = try await cache.samples(for: value.unit) else { throw Failure.invalidAudio }
@@ -67,9 +74,18 @@ import LibroxChatterboxMLX
             "director_revision": ChatterboxBookDirector.revision, "voice": saved.name, "voice_id": saved.id.uuidString,
             "conditioning_sha256": saved.conditioningSHA256, "units": reports, "duration_seconds": Double(full.count) / 24_000,
             "peak": full.reduce(Float.zero) { max($0, abs($1)) }, "model_oracle_checked": true,
+            "memory_after_load": memoryAfterLoad, "memory_windows": memoryWindows,
             "source_preserved": true, "quality_accepted": false,
             "scope": "Actual saved voice + Librox director/semantic cadence/current-plus-two cache + optional native MLX SDK; Mac CPU acoustics only"]
         try JSONSerialization.data(withJSONObject: report, options: [.prettyPrinted, .sortedKeys])
             .write(to: out.appendingPathComponent("report.json"), options: .atomic)
+    }
+
+    private static func memoryReport() -> [String: Any] {
+        let memory = ChatterboxMLXRenderer.memorySnapshot()
+        return ["available_bytes": memory.availableBytes.map { NSNumber(value: $0) } as Any? ?? NSNull(),
+                "mlx_active_bytes": memory.activeBytes, "mlx_cache_bytes": memory.cacheBytes,
+                "mlx_peak_bytes": memory.peakBytes, "low_power_mode": memory.lowPowerMode,
+                "thermal_state": memory.thermalState]
     }
 }
