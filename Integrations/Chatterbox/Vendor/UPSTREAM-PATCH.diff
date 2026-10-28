@@ -1,0 +1,1143 @@
+--- a/Package.swift
++++ b/Package.swift
+@@ -57,19 +57,5 @@
+             name: "ChatterboxCLI",
+             dependencies: ["ChatterboxCoreML"]
+         ),
+-        .testTarget(
+-            name: "ChatterboxCoreMLTests",
+-            dependencies: [
+-                "ChatterboxCoreML",
+-                // Used by the (opt-in, network) Hub incremental-download test.
+-                .product(name: "Hub", package: "swift-transformers"),
+-                // The opt-in end-to-end watermark test detects with `PerthWatermarker`.
+-                .product(name: "PerthCoreML", package: "perth-coreml"),
+-            ],
+-            // Test fixtures loaded by path (`#filePath`), not as SwiftPM resources —
+-            // some committed, some generated locally and gitignored. Excluding
+-            // silences the "unhandled files" build warning.
+-            exclude: ["Fixtures"]
+-        ),
+     ]
+ )
+--- /dev/null
++++ b/Sources/ChatterboxCoreML/BatchPipeline.swift
+@@ -0,0 +1,107 @@
++import Foundation
++
++/// Single producer / single consumer only. The channel holds at most two decoded
++/// values; the producer can additionally own one value awaiting a free slot.
++/// No audio is queued here. Shutdown wakes both continuation slots.
++actor BoundedBatchChannel<Value: Sendable> {
++    private let capacity: Int
++    private var buffer: [Value] = []
++    private var finished = false
++    private var failure: Error?
++    private var sender: CheckedContinuation<Void, Never>?
++    private var receiver: CheckedContinuation<Value?, Error>?
++
++    init(capacity: Int) {
++        precondition((1...2).contains(capacity))
++        self.capacity = capacity
++    }
++
++    func send(_ value: Value) async throws {
++        try Task.checkCancellation()
++        while buffer.count >= capacity && failure == nil && !finished {
++            await withCheckedContinuation { sender = $0 }
++        }
++        if let failure { throw failure }
++        guard !finished else { throw CancellationError() }
++        try Task.checkCancellation()
++        if let waiting = receiver {
++            receiver = nil
++            waiting.resume(returning: value)
++        } else {
++            buffer.append(value)
++        }
++    }
++
++    func receive() async throws -> Value? {
++        try Task.checkCancellation()
++        if let failure { throw failure }
++        if !buffer.isEmpty {
++            let value = buffer.removeFirst()
++            sender?.resume(); sender = nil
++            return value
++        }
++        if finished { return nil }
++        return try await withCheckedThrowingContinuation { receiver = $0 }
++    }
++
++    func finish() {
++        finished = true
++        receiver?.resume(returning: nil); receiver = nil
++        sender?.resume(); sender = nil
++    }
++
++    func fail(_ error: Error) {
++        if failure == nil { failure = error }
++        buffer.removeAll()
++        receiver?.resume(throwing: failure!); receiver = nil
++        sender?.resume(); sender = nil
++    }
++}
++
++/// Structured tasks join before returning, including error and cancellation.
++/// Cancellation cannot interrupt an in-flight synchronous Core ML call, but it
++/// wakes channel waits immediately and is checked before the next piece of work.
++enum BoundedBatchPipeline<Value: Sendable> {
++    static func run(
++        capacity: Int = 2,
++        produce: @escaping @Sendable (BoundedBatchChannel<Value>) async throws -> Void,
++        consume: @escaping @Sendable (Value) async throws -> Void
++    ) async throws {
++        let channel = BoundedBatchChannel<Value>(capacity: capacity)
++        try await withTaskCancellationHandler {
++            try Task.checkCancellation()
++            try await withThrowingTaskGroup(of: Void.self) { group in
++                group.addTask(priority: .userInitiated) {
++                    do {
++                        try await produce(channel)
++                        await channel.finish()
++                    } catch {
++                        await channel.fail(error)
++                        throw error
++                    }
++                }
++                group.addTask(priority: .utility) {
++                    do {
++                        while let value = try await channel.receive() {
++                            try Task.checkCancellation()
++                            try await consume(value)
++                        }
++                    } catch {
++                        await channel.fail(error)
++                        throw error
++                    }
++                }
++                // Observe failure before waiting for a sibling outside the channel.
++                do { while try await group.next() != nil {} }
++                catch {
++                    group.cancelAll()
++                    await channel.fail(error)
++                    throw error
++                }
++            }
++            try Task.checkCancellation()
++        } onCancel: {
++            Task { await channel.fail(CancellationError()) }
++        }
++    }
++}
+--- /dev/null
++++ b/Sources/ChatterboxCoreML/CanonicalMTLPrefillPacker.swift
+@@ -0,0 +1,44 @@
++import Foundation
++
++/// Official regular multilingual T3 inference layout. Conditioning construction
++/// is separate; this function packs supplied FP32 rows without Core ML or MLX.
++enum CanonicalMTLPrefillPacker {
++    struct Packed {
++        let inputsEmbeds: [Float]
++        let positionIds: [Int32]
++        let logitsSelectMask: [Float]
++        let realLength: Int
++    }
++
++    static func pack(conditioning: [Float], lexicalText: [Float], textPositions: [Float],
++                     bos: [Float], window: Int, hidden: Int, useCFG: Bool) -> Packed {
++        precondition(hidden > 0 && conditioning.count % hidden == 0)
++        precondition(lexicalText.count % hidden == 0 && textPositions.count == lexicalText.count)
++        precondition(bos.count == hidden)
++        let condRows = conditioning.count / hidden
++        let textRows = lexicalText.count / hidden
++        let real = condRows + textRows + 2
++        precondition(real <= window)
++        let stride = window * hidden
++        var values = [Float](repeating: 0, count: 2 * stride)
++        for lane in 0..<2 {
++            let base = lane * stride
++            for i in conditioning.indices { values[base + i] = conditioning[i] }
++            for i in lexicalText.indices {
++                // Official zero_() affects lexical rows BEFORE positions are added.
++                let lexical: Float = lane == 1 && useCFG ? 0 : lexicalText[i]
++                values[base + conditioning.count + i] = lexical + textPositions[i]
++            }
++            for row in 0..<2 {
++                let start = base + (condRows + textRows + row) * hidden
++                for i in 0..<hidden { values[start + i] = bos[i] }
++            }
++        }
++        var positions = [Int32](repeating: 0, count: window)
++        var select = [Float](repeating: 0, count: window)
++        for i in 0..<real { positions[i] = Int32(i) }
++        select[real - 1] = 1
++        return Packed(inputsEmbeds: values, positionIds: positions,
++                      logitsSelectMask: select, realLength: real)
++    }
++}
+--- a/Sources/ChatterboxCoreML/ChatterboxCoreMLModel.swift
++++ b/Sources/ChatterboxCoreML/ChatterboxCoreMLModel.swift
+@@ -66,6 +66,16 @@
+     /// load), regardless of what the caller selected. `nonisolated` so UI can read
+     /// it synchronously. (`variant` is an immutable `Sendable` `let`.)
+     public nonisolated var loadedVariant: ModelRepository.Variant { variant }
++    /// Successful T3 load configuration, NOT proof of operation/device residency.
++    public nonisolated var selectedT3ComputeUnits: String {
++        switch backend.selectedComputeUnits {
++        case .cpuOnly: "cpuOnly"
++        case .cpuAndGPU: "cpuAndGPU"
++        case .cpuAndNeuralEngine: "cpuAndNeuralEngine"
++        case .all: "all"
++        @unknown default: "unknown"
++        }
++    }
+ 
+     /// Nano's T3 hidden width — the only thing that tells a nano model directory
+     /// apart from a turbo one (identical file names, identical everything else).
+@@ -286,7 +296,8 @@
+         from modelDirectory: URL,
+         russianStress: RussianStressing = ManualRussianStress(),
+         watermarker: AudioWatermarking? = nil,
+-        computeUnits: PipelineComputeUnits = .init()
++        computeUnits: PipelineComputeUnits = .init(),
++        padFlowToMaximum: Bool? = nil
+     ) async throws -> ChatterboxCoreMLModel {
+         let fm = FileManager.default
+         func require(_ relative: String) throws -> URL {
+@@ -388,7 +399,8 @@
+                 encoderURL: try await compiledModel(at: encURL),
+                 cfmURL: try await compiledModel(at: cfmURL),
+                 vocoderURL: try await compiledModel(at: vocURL),
+-                computeUnits: computeUnits
++                computeUnits: computeUnits,
++                padFlowToMaximum: padFlowToMaximum
+             )
+         }
+         step("synth (S3Encoder+S3CFM+S3Vocoder) load", t)
+@@ -474,7 +486,9 @@
+         if pause > 0 { s.append(contentsOf: repeatElement(0, count: Int(pause * sr))) }
+         return AudioChunk(samples: s, prefillTime: chunk.prefillTime, decodeTime: chunk.decodeTime,
+                           synthTime: chunk.synthTime, watermarkTime: chunk.watermarkTime,
+-                          tokenCount: chunk.tokenCount, decodeBackend: chunk.decodeBackend)
++                          tokenCount: chunk.tokenCount, decodeBackend: chunk.decodeBackend,
++                          hostAssemblyTime: chunk.hostAssemblyTime,
++                          conditioningCacheHit: chunk.conditioningCacheHit, decodeStepTimings: chunk.decodeStepTimings)
+     }
+ 
+     /// Whether to overlap chunk N+1 decode (ANE) with chunk N synth (GPU) —
+@@ -512,6 +526,9 @@
+         public let tokenCount: Int
+         /// Engine that ran prefill+decode for this chunk (always `.coreml` now).
+         public let decodeBackend: DecodeBackend
++        public var hostAssemblyTime: TimeInterval = 0
++        public var conditioningCacheHit: Bool? = nil
++        public var decodeStepTimings: DecodeStepTimings? = nil
+ 
+         /// Combined decode + synth time.
+         public var onnxTime: TimeInterval { decodeTime + synthTime }
+@@ -561,6 +578,7 @@
+         // inter-sentence silence: Perth gates on the loudest frame of whatever it
+         // is handed, and digital silence carries no mark to begin with.
+         let tMark = Date()
++        try Task.checkCancellation()
+         let marked = watermarker.watermark(samples)
+         let watermarkTime = Date().timeIntervalSince(tMark)
+         Log.pipeline.debug("[timing] prefill \(decoded.result.prefillTime, format: .fixed(precision: 3), privacy: .public)s · decode[CoreML] \(decoded.result.decodeTime, format: .fixed(precision: 3), privacy: .public)s (\(speechTokens.count, privacy: .public) tok) · synth \(synthTime, format: .fixed(precision: 3), privacy: .public)s · watermark \(watermarkTime, format: .fixed(precision: 3), privacy: .public)s")
+@@ -571,7 +589,10 @@
+             synthTime: synthTime,
+             watermarkTime: watermarkTime,
+             tokenCount: speechTokens.count,
+-            decodeBackend: .coreml
++            decodeBackend: .coreml,
++            hostAssemblyTime: decoded.result.hostAssemblyTime,
++            conditioningCacheHit: decoded.result.conditioningCacheHit,
++            decodeStepTimings: decoded.result.decodeStepTimings
+         )
+     }
+ 
+@@ -622,6 +643,74 @@
+         }
+     }
+ 
++    /// One unchanged natural-text unit in an opt-in bounded batch. This API does
++    /// not combine texts or inject pauses; pacing must remain disabled here.
++    public struct BatchRequest: Sendable {
++        public let text: String
++        public let voice: URL?
++        public let options: GenerationOptions
++        public init(text: String, voice: URL? = nil, options: GenerationOptions) {
++            self.text = text; self.voice = voice; self.options = options
++        }
++    }
++
++    public struct BatchAudioChunk: Sendable {
++        public let requestIndex: Int
++        public let chunkIndex: Int
++        public let isFinalChunk: Bool
++        public let audio: AudioChunk
++    }
++
++    private struct BatchDecoded: Sendable {
++        let requestIndex: Int
++        let chunkIndex: Int
++        let isFinalChunk: Bool
++        let decoded: DecodedChunk
++    }
++
++    /// One T3 producer overlaps one synth consumer across request boundaries.
++    /// The callback is awaited inside the synth leg: no unbounded PCM stream or
++    /// extra engine exists. A failed batch may have delivered only a prefix;
++    /// callers must not advance an undelivered unit's source position.
++    public nonisolated func generateBatch(
++        _ requests: [BatchRequest],
++        receive: @escaping @Sendable (BatchAudioChunk) async throws -> Void
++    ) async throws {
++        guard (1...8).contains(requests.count),
++              requests.allSatisfy({ $0.text.utf8.count <= 8_000 }),
++              requests.reduce(0, { $0 + $1.text.utf8.count }) <= 32_768,
++              requests.allSatisfy({ !$0.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
++                  && $0.options.sentencePause == 0 && $0.options.commaPause == 0 }) else {
++            throw ChatterboxError.invalidModelOutput("batch requires 1...8 bounded, nonempty, unpaced requests")
++        }
++        try await BoundedBatchPipeline<BatchDecoded>.run { channel in
++            var sequence = 0
++            for (requestIndex, request) in requests.enumerated() {
++                try Task.checkCancellation()
++                let conds = try self.resolveConds(request.voice)
++                let segments = self.chunkSegments(request.text, conds: conds, options: request.options)
++                guard !segments.isEmpty else { throw ChatterboxError.tokenizer("empty batch unit") }
++                for (chunkIndex, segment) in segments.enumerated() {
++                    try Task.checkCancellation()
++                    let decoded = try self.decodeChunkParts(index: sequence, tokens: segment.tokens,
++                                                           conds: conds, options: request.options)
++                    guard decoded.result.tokens.count < request.options.maxTokens else {
++                        throw ChatterboxError.invalidModelOutput("batch speech-token limit reached at unit \(requestIndex)")
++                    }
++                    try await channel.send(BatchDecoded(requestIndex: requestIndex, chunkIndex: chunkIndex,
++                        isFinalChunk: chunkIndex == segments.count - 1, decoded: decoded))
++                    sequence += 1
++                }
++            }
++        } consume: { value in
++            try Task.checkCancellation()
++            let audio = try self.synthesizeChunkParts(value.decoded)
++            try Task.checkCancellation()
++            try await receive(BatchAudioChunk(requestIndex: value.requestIndex, chunkIndex: value.chunkIndex,
++                isFinalChunk: value.isFinalChunk, audio: audio))
++        }
++    }
++
+     /// The single pipeline path behind both `generate` and `generateStream`.
+     ///
+     /// `nonisolated` is **load-bearing**: the two child tasks must NOT be pinned to
+--- /dev/null
++++ b/Sources/ChatterboxCoreML/ConditioningBlockCache.swift
+@@ -0,0 +1,38 @@
++import Synchronization
++
++/// One immutable T3 voice prefix per loaded runner. The runner's embedding and
++/// projection tables never change, so only reference content and exaggeration
++/// participate in the key. Exact float bits distinguish signed zero and NaNs.
++///
++/// Holding the mutex through construction makes a concurrent first request
++/// single-flight. No asynchronous work, MLState, or Core ML prediction occurs
++/// under this lock. Returned arrays use Swift copy-on-write value semantics.
++final class ConditioningBlockCache: Sendable {
++    struct Key: Equatable, Sendable {
++        let speakerBits: [UInt32]
++        let promptTokens: [Int32]
++        let exaggerationBits: UInt32
++
++        init(speaker: [Float], promptTokens: [Int32], exaggeration: Float) {
++            speakerBits = speaker.map(\.bitPattern)
++            self.promptTokens = promptTokens
++            exaggerationBits = exaggeration.bitPattern
++        }
++    }
++
++    private struct Entry: Sendable {
++        let key: Key
++        let values: [Float]
++    }
++
++    private let entry = Mutex<Entry?>(nil)
++
++    func value(for key: Key, build: () -> [Float]) -> (values: [Float], hit: Bool) {
++        entry.withLock { stored in
++            if let stored, stored.key == key { return (stored.values, true) }
++            let values = build()
++            stored = Entry(key: key, values: values)
++            return (values, false)
++        }
++    }
++}
+--- /dev/null
++++ b/Sources/ChatterboxCoreML/DecodeStepTimings.swift
+@@ -0,0 +1,16 @@
++import Foundation
++
++/// Opt-in aggregate timings for the autoregressive loop. Prediction measures the
++/// synchronous Core ML API; any synchronization deferred to reading the output is
++/// counted in logitsCopyAndCFGSeconds. No per-token logging or thermal polling.
++public struct DecodeStepTimings: Sendable, Codable {
++    public var iterations: Int = 0
++    public var inputPreparationSeconds: TimeInterval = 0
++    public var predictionSeconds: TimeInterval = 0
++    public var logitsCopyAndCFGSeconds: TimeInterval = 0
++    public var samplingSeconds: TimeInterval = 0
++
++    public var accountedSeconds: TimeInterval {
++        inputPreparationSeconds + predictionSeconds + logitsCopyAndCFGSeconds + samplingSeconds
++    }
++}
+--- a/Sources/ChatterboxCoreML/MTLPrefillAssembler.swift
++++ b/Sources/ChatterboxCoreML/MTLPrefillAssembler.swift
+@@ -4,10 +4,9 @@
+ /// (`T3LM` "prefill" function). Builds the
+ /// front-aligned `inputs_embeds (2, W, 1024)` plus the position / select tensors.
+ ///
+-/// Lane 0 = cond + text + BOS (conditional); lane 1 = cond + **zeroed** text + BOS
+-/// (CFG unconditional — only the text embedding is zeroed, cond + BOS are shared).
+-/// This mirrors `T3.prepare_input_embeds` (`text_emb[1].zero_()`) and the
+-/// converter's `build_cfg_prefix`.
++/// Official regular V3 inference uses cond + text + BOS0 + BOS0 in both lanes.
++/// With CFG, lane 1 zeroes lexical text BEFORE learned text positions are added.
++/// Both BOS rows share speech position zero; generated speech begins at position one.
+ ///
+ ///   cond   = [spkr(1); perceiver(prompt→32); emotion(1)]   (CondBlockBuilder)
+ ///   text   = text_emb(tok) + text_pos_emb(0…n_text−1)      (learned input pos-emb)
+@@ -23,6 +22,7 @@
+     let condBuilder: CondBlockBuilder
+     let window: Int
+     let hidden: Int
++    private let conditioningCache = ConditioningBlockCache()
+ 
+     init(textEmb: EmbeddingTable, textPosEmb: EmbeddingTable,
+          speechEmb: SpeechEmbedding, speechPosEmb: EmbeddingTable,
+@@ -39,8 +39,9 @@
+         var inputsEmbeds: [Float]      // flat (2 * W * hidden), C-order (lane outermost)
+         var positionIds: [Int32]       // (W): reals→0…realLength-1, pad→0
+         var logitsSelectMask: [Float]  // (W): one-hot at realLength-1 (BOS row)
+-        var realLength: Int            // T_cond(34) + T_text + 1(BOS)
++        var realLength: Int            // T_cond(34) + T_text + 2(BOS)
+         var condRows: Int              // 34
++        var conditioningCacheHit: Bool
+     }
+ 
+     /// Builds the conditioning-prompt speech embedding the Perceiver consumes:
+@@ -56,70 +57,49 @@
+         return out
+     }
+ 
+-    func assemble(textTokens: [Int32], conds: Conditionals, exaggeration: Float) -> Assembled {
++    func assemble(textTokens: [Int32], conds: Conditionals, exaggeration: Float, cfgWeight: Float = 0.5) -> Assembled {
+         let condRows = MultilingualConstants.condRows
+-        // Conditioning is never trimmed; trim text so realLength fits the window.
+-        let textBudget = max(0, window - condRows - 1)
+-        let usedText = textTokens.count > textBudget ? Array(textTokens.prefix(textBudget)) : textTokens
++        // The runner rejects oversized input before assembly; never trim source text.
++        let textBudget = max(0, window - condRows - 2)
++        precondition(textTokens.count <= textBudget)
++        let usedText = textTokens
+         let nText = usedText.count
+-        let realLength = condRows + nText + 1
++        let realLength = condRows + nText + 2
+ 
+         // 1. cond block (34, 1024) — shared by both lanes.
+         let promptTokens = conds.condPromptSpeechTokens
+-        let cond = condBuilder.build(
+-            speakerEmb: conds.speakerEmb,
+-            condPromptSpeechEmb: condPromptSpeechEmb(promptTokens),
+-            promptLen: promptTokens.count,
+-            exaggeration: exaggeration)
++        let cached = conditioningCache.value(for: .init(
++            speaker: conds.speakerEmb, promptTokens: promptTokens, exaggeration: exaggeration)) {
++                condBuilder.build(
++                    speakerEmb: conds.speakerEmb,
++                    condPromptSpeechEmb: condPromptSpeechEmb(promptTokens),
++                    promptLen: promptTokens.count,
++                    exaggeration: exaggeration)
++            }
++        let cond = cached.values
+ 
+-        // 2. text rows (n_text, 1024): text_emb(tok) + text_pos_emb(pos).
+-        var text = [Float](repeating: 0, count: nText * hidden)
++        var lexical = [Float](repeating: 0, count: nText * hidden)
++        var positions = [Float](repeating: 0, count: nText * hidden)
+         for (p, t) in usedText.enumerated() {
+-            let te = textEmb.row(Int(t))
+-            let pe = textPosEmb.row(p)
+-            let base = p * hidden
+-            for d in 0..<hidden { text[base + d] = te[d] + pe[d] }
++            let text = textEmb.row(Int(t)), position = textPosEmb.row(p)
++            for d in 0..<hidden {
++                lexical[p * hidden + d] = text[d]
++                positions[p * hidden + d] = position[d]
++            }
+         }
+-
+-        // 3. BOS row: speech_emb(start) + speech_pos_emb(0).
+         let bosE = speechEmb.row(MultilingualConstants.speechStartToken)
+         let bosP = speechPosEmb.row(0)
+         var bos = [Float](repeating: 0, count: hidden)
+         for d in 0..<hidden { bos[d] = bosE[d] + bosP[d] }
++        let packed = CanonicalMTLPrefillPacker.pack(conditioning: cond, lexicalText: lexical,
++            textPositions: positions, bos: bos, window: window, hidden: hidden, useCFG: cfgWeight > 0)
+ 
+-        // 4. front-align into (2, W, hidden): lane0 = cond+text+bos,
+-        //    lane1 = cond + zeros(text) + bos (CFG uncond zeroes only text).
+-        var inputsEmbeds = [Float](repeating: 0, count: 2 * window * hidden)
+-        let laneStride = window * hidden
+-        for lane in 0..<2 {
+-            let laneBase = lane * laneStride
+-            // cond rows
+-            for r in 0..<condRows {
+-                let dst = laneBase + r * hidden, src = r * hidden
+-                for d in 0..<hidden { inputsEmbeds[dst + d] = cond[src + d] }
+-            }
+-            // text rows (lane 1 stays zero)
+-            if lane == 0 {
+-                for r in 0..<nText {
+-                    let dst = laneBase + (condRows + r) * hidden, src = r * hidden
+-                    for d in 0..<hidden { inputsEmbeds[dst + d] = text[src + d] }
+-                }
+-            }
+-            // BOS row
+-            let bosDst = laneBase + (condRows + nText) * hidden
+-            for d in 0..<hidden { inputsEmbeds[bosDst + d] = bos[d] }
+-        }
+-
+-        var positionIds = [Int32](repeating: 0, count: window)
+-        var logitsSelectMask = [Float](repeating: 0, count: window)
+-        for j in 0..<realLength { positionIds[j] = Int32(j) }
+-        logitsSelectMask[realLength - 1] = 1   // BOS row = seed-logits row
+-
+         return Assembled(
+-            inputsEmbeds: inputsEmbeds,
+-            positionIds: positionIds,
+-            logitsSelectMask: logitsSelectMask,
++            inputsEmbeds: packed.inputsEmbeds,
++            positionIds: packed.positionIds,
++            logitsSelectMask: packed.logitsSelectMask,
+             realLength: realLength,
+-            condRows: condRows)
++            condRows: condRows,
++            conditioningCacheHit: cached.hit)
+     }
+ }
+--- a/Sources/ChatterboxCoreML/MTLT3LMRunner.swift
++++ b/Sources/ChatterboxCoreML/MTLT3LMRunner.swift
+@@ -25,6 +25,7 @@
+ final class MTLT3LMRunner: @unchecked Sendable {
+     private let prefillModel: MLModel
+     private let decodeModel: MLModel
++    var selectedComputeUnits: MLComputeUnits { prefillModel.configuration.computeUnits }
+     private let assembler: MTLPrefillAssembler
+     private let speechEmb: SpeechEmbedding
+     private let speechPosEmb: EmbeddingTable
+@@ -123,11 +124,21 @@
+         let prefillTime: TimeInterval
+         let decodeTime: TimeInterval
+         let seedLogits: [Float]   // CFG-combined seed logits (diagnostics/parity)
++        let hostAssemblyTime: TimeInterval
++        let conditioningCacheHit: Bool
++        let decodeStepTimings: DecodeStepTimings?
+     }
+ 
+     func generate(textTokens: [Int32], conds: Conditionals, options: GenerationOptions) throws -> Output {
+         #if arch(arm64)
+-        let asm = assembler.assemble(textTokens: textTokens, conds: conds, exaggeration: options.exaggeration)
++        try Task.checkCancellation()
++        try Self.validateContext(textTokenCount: textTokens.count, prefillWindow: maxLen,
++                                 maxSequence: maxSeq, maxNewTokens: options.maxTokens)
++        let assemblyStart = ContinuousClock.now
++        let asm = assembler.assemble(textTokens: textTokens, conds: conds, exaggeration: options.exaggeration, cfgWeight: options.cfgWeight)
++        let assemblyDuration = assemblyStart.duration(to: .now).components
++        let hostAssemblyTime = Double(assemblyDuration.seconds) + Double(assemblyDuration.attoseconds) / 1e18
++        Log.pipeline.debug("[assembly:mtl] host \(hostAssemblyTime, format: .fixed(precision: 6), privacy: .public)s conditioningCacheHit=\(asm.conditioningCacheHit, privacy: .public)")
+         let realLength = asm.realLength
+         let cfg = options.cfgWeight
+ 
+@@ -144,6 +155,7 @@
+             "logits_select_mask": MLMultiArray.float16(asm.logitsSelectMask, shape: [1, maxLen, 1]),
+         ])
+         let tPre = Date()
++        try Task.checkCancellation()
+         let prefillOut = try predictTrapping(prefillModel, from: prefillProvider, label: "MTL T3LM prefill") {
+             try $0.prediction(from: $1, using: state, options: MLPredictionOptions())
+         }
+@@ -173,12 +185,23 @@
+         var nextToken = sampler.sample(logits: seedLogits, previous: generated, minTokensReached: false)
+ 
+         let tDec = Date()
++        let profileDecode = ProcessInfo.processInfo.environment["CHATTERBOX_PROFILE_DECODE"] == "1"
++        var stepTimings = DecodeStepTimings()
++        func elapsed(_ start: ContinuousClock.Instant?) -> TimeInterval {
++            guard let start else { return 0 }
++            let components = start.duration(to: .now).components
++            return Double(components.seconds) + Double(components.attoseconds) / 1e18
++        }
+         for step in 0..<options.maxTokens {
++            try Task.checkCancellation()
+             if nextToken == MultilingualConstants.speechStopToken && generated.count >= options.minTokens {
+                 stoppedNaturally = true; break
+             }
+             let writePos = realLength + step
+-            guard writePos < maxSeq else { break }
++            guard writePos < maxSeq else {
++                throw ChatterboxError.invalidModelOutput("T3 context overflow at position \(writePos); refusing partial narration")
++            }
++            let preparationStart = profileDecode ? ContinuousClock.now : nil
+             generated.append(nextToken)
+ 
+             updateMask.withUnsafeMutableBytes { raw, _ in
+@@ -199,26 +222,57 @@
+                 "inputs_embeds": embeds, "position_ids": posArr,
+                 "update_mask": updateMask, "attn_mask": attnMaskD,
+             ])
++            if profileDecode { stepTimings.inputPreparationSeconds += elapsed(preparationStart) }
++            let predictionStart = profileDecode ? ContinuousClock.now : nil
+             let out = try predictTrapping(decodeModel, from: provider, label: "MTL T3LM decode") {
+                 try $0.prediction(from: $1, using: state, options: MLPredictionOptions())
+             }
++            if profileDecode { stepTimings.predictionSeconds += elapsed(predictionStart) }
++            let logitsStart = profileDecode ? ContinuousClock.now : nil
+             guard let logitsArr = out.featureValue(for: "logits")?.multiArrayValue else {
+                 throw ChatterboxError.invalidModelOutput("MTL T3LM decode missing 'logits'")
+             }
+             let logits = cfgCombine(logitsArr.toFloatArrayAnyPrecision(), cfg: cfg)
++            if profileDecode { stepTimings.logitsCopyAndCFGSeconds += elapsed(logitsStart) }
++            let samplingStart = profileDecode ? ContinuousClock.now : nil
+             nextToken = sampler.sample(logits: logits, previous: generated, minTokensReached: generated.count >= options.minTokens)
++            if profileDecode {
++                stepTimings.samplingSeconds += elapsed(samplingStart)
++                stepTimings.iterations += 1
++            }
+         }
+         let decodeTime = Date().timeIntervalSince(tDec)
+         let msPerTok = generated.isEmpty ? 0 : decodeTime * 1000 / Double(generated.count)
+         Log.decode.debug("[decode:mtl-t3lm] tokens=\(generated.count, privacy: .public) ms/tok=\(msPerTok, format: .fixed(precision: 2), privacy: .public) stopped=\(stoppedNaturally, privacy: .public) prefillLen=\(realLength, privacy: .public)")
++        if profileDecode {
++            Log.decode.notice("[decode-profile] iterations=\(stepTimings.iterations, privacy: .public) input=\(stepTimings.inputPreparationSeconds, privacy: .public)s prediction=\(stepTimings.predictionSeconds, privacy: .public)s logitsCFG=\(stepTimings.logitsCopyAndCFGSeconds, privacy: .public)s sample=\(stepTimings.samplingSeconds, privacy: .public)s total=\(decodeTime, privacy: .public)s maxSeq=\(self.maxSeq, privacy: .public)")
++        }
+         return Output(tokens: generated, prefillLength: realLength,
+-                      prefillTime: prefillTime, decodeTime: decodeTime, seedLogits: seedLogits)
++                      prefillTime: prefillTime, decodeTime: decodeTime, seedLogits: seedLogits,
++                      hostAssemblyTime: hostAssemblyTime, conditioningCacheHit: asm.conditioningCacheHit,
++                      decodeStepTimings: profileDecode ? stepTimings : nil)
+         #else
+         _ = (textTokens, conds, options)
+         preconditionFailure("MTLT3LMRunner requires arm64 (Apple Silicon)")
+         #endif
+     }
+ 
++    /// Admission uses the complete tokenized text and requested generation cap.
++    /// It runs before assembly (which historically trimmed) or state allocation.
++    static func validateContext(textTokenCount: Int, prefillWindow: Int,
++                                maxSequence: Int, maxNewTokens: Int) throws {
++        let fixedRows = MultilingualConstants.condRows + 2 // voice prefix + two position-0 BOS rows
++        guard textTokenCount >= 0, prefillWindow >= fixedRows,
++              textTokenCount <= prefillWindow - fixedRows else {
++            throw ChatterboxError.invalidModelOutput("T3 text exceeds prefill budget; replan the source unit instead of truncating")
++        }
++        let realLength = fixedRows + textTokenCount
++        guard maxNewTokens > 0, maxSequence >= realLength,
++              maxNewTokens <= maxSequence - realLength else {
++            throw ChatterboxError.invalidModelOutput("T3 context overflow: prefix \(realLength) + generation cap \(maxNewTokens) exceeds \(maxSequence); replan the source unit")
++        }
++    }
++
+     /// `cond + cfg·(cond − uncond)` over `logits (2, V)` flat (lane outermost).
+     private func cfgCombine(_ logits2: [Float], cfg: Float) -> [Float] {
+         var out = [Float](repeating: 0, count: vocab)
+--- a/Sources/ChatterboxCoreML/MTLTextTokenizer.swift
++++ b/Sources/ChatterboxCoreML/MTLTextTokenizer.swift
+@@ -123,7 +123,9 @@
+     /// The MTL preprocessing chain (no special-token ids; see `encode`). Exposed
+     /// for parity testing against the Python reference.
+     func preprocess(_ text: String, language: String?) -> String {
+-        var t = text.lowercased()
++        // Local V3 correction: the pinned en/es tokenizer config requests
++        // NFKD,fullcase. Other languages retain upstream behavior pending parity.
++        var t = (language == "en" || language == "es") ? text : text.lowercased()
+         t = t.decomposedStringWithCompatibilityMapping  // NFKD
+         if language == "ru" {
+             t = stresser.stress(t)
+--- /dev/null
++++ b/Sources/ChatterboxCoreML/MultilingualPromptBuilder.swift
+@@ -0,0 +1,54 @@
++import Foundation
++
++/// Canonical host frontend usable by a native decoder without loading Core ML T3.
++public struct ChatterboxMultilingualPromptBuilder: Sendable {
++    private let tokenizer: MTLTextTokenizer
++    private let assembler: MTLPrefillAssembler
++    private let speech: SpeechEmbedding
++    private let positions: EmbeddingTable
++
++    public init(modelDirectory: URL) async throws {
++        tokenizer = try await MTLTextTokenizer(modelFolder: modelDirectory)
++        speech = try SpeechEmbedding(contentsOf: modelDirectory.appendingPathComponent("speech_emb.npy"))
++        positions = try EmbeddingTable(contentsOf: modelDirectory.appendingPathComponent("speech_pos_emb.npy"), name: "speech_pos_emb")
++        assembler = MTLPrefillAssembler(
++            textEmb: try EmbeddingTable(contentsOf: modelDirectory.appendingPathComponent("text_emb.npy"), name: "text_emb"),
++            textPosEmb: try EmbeddingTable(contentsOf: modelDirectory.appendingPathComponent("text_pos_emb.npy"), name: "text_pos_emb"),
++            speechEmb: speech, speechPosEmb: positions, condBuilder: try CondBlockBuilder(dir: modelDirectory))
++    }
++
++    public struct Prompt: Sendable {
++        public let embeddings: [Float]
++        public let length: Int
++        public let textTokens: [Int32]
++    }
++
++    public func prepare(text: String, language: String, conditioningFile: URL,
++                        exaggeration: Float, guidance: Float, maxTokens: Int = 350) throws -> Prompt {
++        guard ["en", "es"].contains(language), !text.isEmpty, text.utf8.count <= 8_000,
++              exaggeration.isFinite, (0...2).contains(exaggeration), guidance.isFinite,
++              (0...2).contains(guidance), (2...350).contains(maxTokens)
++        else { throw ChatterboxError.invalidModelOutput("Invalid native prompt options") }
++        try Task.checkCancellation()
++        let ids = tokenizer.encode(text, language: language)
++        try MTLT3LMRunner.validateContext(textTokenCount: ids.count, prefillWindow: assembler.window,
++                                        maxSequence: 1536, maxNewTokens: maxTokens)
++        let conds = try Conditionals(contentsOf: conditioningFile)
++        guard conds.speakerEmb.count == 256, conds.speakerEmb.allSatisfy(\.isFinite),
++              !conds.condPromptSpeechTokens.isEmpty, conds.condPromptSpeechTokens.count <= 150,
++              conds.condPromptSpeechTokens.allSatisfy({ $0 >= 0 && Int($0) < speech.vocab })
++        else { throw ChatterboxError.invalidModelOutput("Invalid native speaker conditioning") }
++        let packed = assembler.assemble(textTokens: ids, conds: conds, exaggeration: exaggeration, cfgWeight: guidance)
++        let laneSize = assembler.window * 1024
++        let used = packed.realLength * 1024
++        let unpadded = Array(packed.inputsEmbeds[..<used]) + Array(packed.inputsEmbeds[laneSize..<(laneSize + used)])
++        guard unpadded.allSatisfy(\.isFinite) else { throw ChatterboxError.invalidModelOutput("Nonfinite native prompt") }
++        return Prompt(embeddings: unpadded, length: packed.realLength, textTokens: ids)
++    }
++
++    public func speechInput(token: Int, position: Int) throws -> [Float] {
++        guard (0..<speech.vocab).contains(token), (1..<positions.rows).contains(position)
++        else { throw ChatterboxError.invalidModelOutput("Native speech embedding overflow") }
++        return zip(speech.row(token), positions.row(position)).map(+)
++    }
++}
+--- a/Sources/ChatterboxCoreML/PredictionTrap.swift
++++ b/Sources/ChatterboxCoreML/PredictionTrap.swift
+@@ -20,6 +20,9 @@
+ /// converted. `label` names the stage in the thrown error so a device log says which
+ /// model faulted.
+ func trapping<T>(_ label: String, _ body: () throws -> T) throws -> T {
++    // Core ML calls are synchronous and cannot be interrupted here. Do not start
++    // one for a cancelled request, and stop at its return before more host work.
++    try Task.checkCancellation()
+     var outcome: Result<T, any Error>?
+     var trapped: NSError?
+     let completed = CBXPerformTrappingExceptions({ outcome = Result { try body() } }, &trapped)
+@@ -32,7 +35,9 @@
+         // Unreachable: the block ran to completion, so it assigned.
+         throw ChatterboxError.prediction(label, "produced no result")
+     }
+-    return try outcome.get()
++    let result = try outcome.get()
++    try Task.checkCancellation()
++    return result
+ }
+ 
+ /// One CoreML prediction, run under ``trapping(_:_:)``. `body` defaults to the plain
+--- a/Sources/ChatterboxCoreML/SynthRunner.swift
++++ b/Sources/ChatterboxCoreML/SynthRunner.swift
+@@ -106,6 +106,8 @@
+     private let cfm: MLModel
+     private let vocoder: MLModel
+     private let cfmSteps: Int
++    /// Per-load evaluation override. Nil retains the upstream environment policy.
++    private let padFlowToMaximum: Bool?
+     private let mel = Constants.melBins   // 80
+ 
+     /// Whether the resolved CFM compute units include the Neural Engine
+@@ -130,7 +132,9 @@
+     /// `CHATTERBOX_SYNTH_*_CU` env var and its built-in default. Default `.init()`
+     /// (all nil) = unchanged behavior (env, then default).
+     init(encoderURL: URL, cfmURL: URL, vocoderURL: URL,
+-         computeUnits: PipelineComputeUnits = .init()) throws {
++         computeUnits: PipelineComputeUnits = .init(),
++         padFlowToMaximum: Bool? = nil) throws {
++        self.padFlowToMaximum = padFlowToMaximum
+         func cu(_ envKey: String, _ override: MLComputeUnits?, default def: MLComputeUnits) -> MLComputeUnits {
+             if let override { return override }   // explicit app override wins over env + default
+             switch ProcessInfo.processInfo.environment[envKey]?.lowercased() {
+@@ -192,6 +196,7 @@
+     /// capped tighter still (`windowBudget`) so every window's T_h ≤ `cfmPadTarget`
+     /// and the CFM actually pads onto the Neural Engine per window.
+     func synthesize(generatedTokens: [Int], conds: Conditionals) throws -> [Float] {
++        try Task.checkCancellation()
+         // Clamp to the decoder's valid speech-token range up front.
+         let validGenerated = generatedTokens
+             .filter { $0 >= 0 && $0 <= Constants.speechTokenMaxValid }
+@@ -200,7 +205,7 @@
+         // Match `synthesizeWindow`'s pad gate so the window cap and the per-window
+         // pad decision agree: when padding is in play each window must additionally
+         // fit T_h ≤ cfmPadTarget, or it drops off the ANE to a CPU fallback.
+-        let forcePad = ProcessInfo.processInfo.environment["CHATTERBOX_SYNTH_CFM_PAD"] == "1"
++        let forcePad = padFlowToMaximum ?? (ProcessInfo.processInfo.environment["CHATTERBOX_SYNTH_CFM_PAD"] == "1")
+         let windowSize = Self.windowBudget(
+             promptTokens: conds.promptTokens.count, pad: cfmUsesANE || forcePad)
+         let windows = Self.tokenWindows(validGenerated, maxPerWindow: windowSize)
+@@ -210,6 +215,7 @@
+         Log.pipeline.debug("[synth] generated \(validGenerated.count, privacy: .public) > vocoder window \(windowSize, privacy: .public) (prompt \(conds.promptTokens.count, privacy: .public)) → \(windows.count, privacy: .public) windows")
+         var waveform: [Float] = []
+         for window in windows {
++            try Task.checkCancellation()
+             waveform.append(contentsOf: try synthesizeWindow(window, conds: conds))
+         }
+         return waveform
+@@ -323,6 +329,7 @@
+     /// tokens (already clamped to the valid range), prepended with the voice
+     /// prompt. The prompt's mel frames are sliced off before vocoding.
+     private func synthesizeWindow(_ generated: [Int32], conds: Conditionals) throws -> [Float] {
++        try Task.checkCancellation()
+         // 1. all_tokens = prompt ++ generated.
+         let allTokens = conds.promptTokens + generated
+         guard !allTokens.isEmpty else {
+@@ -393,7 +400,7 @@
+         // sliced real frames match the unpadded run (≥0.99999). Otherwise tRun == T_h
+         // and everything below is byte-identical to the pre-padding path. The env hook
+         // lets the padded path be exercised on any CU (e.g. Mac cpuAndGPU) for tests.
+-        let forcePad = ProcessInfo.processInfo.environment["CHATTERBOX_SYNTH_CFM_PAD"] == "1"
++        let forcePad = padFlowToMaximum ?? (ProcessInfo.processInfo.environment["CHATTERBOX_SYNTH_CFM_PAD"] == "1")
+         let padded = Self.shouldPad(usesANE: cfmUsesANE, forcePad: forcePad, tH: tH)
+         let tRun = padded ? Self.cfmPadTarget : tH
+ 
+@@ -436,6 +443,7 @@
+         let scale0 = try MLMultiArray.float32([0], shape: [1])
+         func tSpan(_ s: Float) -> Float { cfgMode ? (1 - Foundation.cos(s * 0.5 * .pi)) : s }
+         for i in 0..<n {
++            try Task.checkCancellation()
+             let t = tSpan(Float(i) / Float(n))
+             let r = tSpan(Float(i + 1) / Float(n))
+             let dt = r - t
+@@ -443,10 +451,13 @@
+             let tArr = try MLMultiArray.float32([t], shape: [1])
+             let dxdt: [Float]
+             if cfgMode {
+-                let vc = try predict(cfm, inputs: [
++                let conditionalInputs: [String: MLMultiArray] = [
+                     "x": xArr, "mu": muInArr, "cond": condArr, "spks_raw": spksArr,
+                     "t": tArr, "mask": maskArr, "spks_scale": scale1,
+-                ], output: "velocity").toFloatArrayAnyPrecision()
++                ]
++                if i == 0 { try dumpFirstCFMInputsIfRequested(conditionalInputs) }
++                let vc = try predict(cfm, inputs: conditionalInputs, output: "velocity").toFloatArrayAnyPrecision()
++                try Task.checkCancellation()
+                 let vu = try predict(cfm, inputs: [
+                     "x": xArr, "mu": zeroMelArr, "cond": zeroMelArr, "spks_raw": spksArr,
+                     "t": tArr, "mask": maskArr, "spks_scale": scale0,
+@@ -475,6 +486,7 @@
+         // 6. Vocoder: feat (1,80,melLen2) → waveform (1, melLen2*480). trim_fade is
+         //    applied inside the model graph (S3VocoderWrapper).
+         let tVoc = Date()
++        try Task.checkCancellation()
+         let wavArr = try predict(vocoder,
+                                  inputs: ["feat": MLMultiArray.float32(feat, shape: [1, mel, melLen2])],
+                                  output: "waveform")
+@@ -484,6 +496,33 @@
+         return waveform
+     }
+ 
++    /// Explicit diagnostic capture for a consented local probe. Absent the env
++    /// setting this is a no-op; an existing directory is never overwritten.
++    /// The manifest is published last, so a partial capture is recognizable.
++    private func dumpFirstCFMInputsIfRequested(_ inputs: [String: MLMultiArray]) throws {
++        guard let path = ProcessInfo.processInfo.environment["CHATTERBOX_DUMP_CFM_INPUTS"],
++              path.hasPrefix("/"), !FileManager.default.fileExists(atPath: path) else { return }
++        let directory = URL(fileURLWithPath: path, isDirectory: true)
++        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
++        var records: [String: Any] = [:]
++        for name in inputs.keys.sorted() {
++            guard let array = inputs[name] else { continue }
++            let values = array.toFloatArrayAnyPrecision()
++            let data = values.withUnsafeBytes { Data($0) }
++            let filename = name + ".float32le"
++            try data.write(to: directory.appendingPathComponent(filename), options: .atomic)
++            records[name] = ["shape": array.shape.map(\.intValue),
++                "originalStrides": array.strides.map(\.intValue),
++                "originalDataType": array.dataType.rawValue,
++                "storage": "float32-little-endian-C-order", "file": filename,
++                "finite": values.allSatisfy(\.isFinite)]
++        }
++        let manifest: [String: Any] = ["schemaVersion": 1, "stage": "S3CFM-first-conditional-step",
++            "requestedComputeUnits": String(describing: cfm.configuration.computeUnits), "inputs": records]
++        let data = try JSONSerialization.data(withJSONObject: manifest, options: [.prettyPrinted, .sortedKeys])
++        try data.write(to: directory.appendingPathComponent("manifest.json"), options: .atomic)
++    }
++
+     /// One synchronous CoreML predict, returning the named output's MLMultiArray.
+     private func predict(_ model: MLModel, inputs: [String: MLMultiArray], output: String) throws -> MLMultiArray {
+         let provider = try MLDictionaryFeatureProvider(
+--- a/Sources/ChatterboxCoreML/T3Backend.swift
++++ b/Sources/ChatterboxCoreML/T3Backend.swift
+@@ -1,4 +1,5 @@
+ import Foundation
++import CoreML
+ 
+ /// Abstracts the T3 front end (tokenize + prefill/decode) so
+ /// `ChatterboxCoreMLModel` can drive either the **turbo** (GPT-2, batch-1) or the
+@@ -6,6 +7,7 @@
+ /// (chunking, streaming, synth). The synth stack (`SynthRunner`) is already
+ /// variant-agnostic (it auto-detects the CFM), so only the T3 front end forks.
+ protocol T3Backend: Sendable {
++    var selectedComputeUnits: MLComputeUnits { get }
+     /// Prefill window width (`inputs_embeds` seq dim).
+     var maxLen: Int { get }
+ 
+@@ -29,6 +31,9 @@
+     let prefillLength: Int
+     let prefillTime: TimeInterval
+     let decodeTime: TimeInterval
++    var hostAssemblyTime: TimeInterval = 0
++    var conditioningCacheHit: Bool? = nil
++    var decodeStepTimings: DecodeStepTimings? = nil
+ }
+ 
+ // MARK: - Turbo (GPT-2, batch-1)
+@@ -36,6 +41,7 @@
+ /// Turbo front end: `TextTokenizer` (GPT-2 BPE) + the batch-1 `T3LMRunner`.
+ /// Behavior is identical to the pre-refactor inline path.
+ struct TurboBackend: T3Backend {
++    var selectedComputeUnits: MLComputeUnits { runner.selectedComputeUnits }
+     let tokenizer: TextTokenizer
+     let runner: T3LMRunner
+ 
+@@ -72,15 +78,16 @@
+ /// the `RussianStressing` seam) + the batch-2 CFG `MTLT3LMRunner`. `options`
+ /// carries `language` / `exaggeration` / `cfgWeight`; the cond prefix is the
+ /// fixed 34-row spkr+perceiver+emotion block, so the prefill text budget is
+-/// `window − 34 − 1` regardless of the prompt length.
++/// `window − 34 − 2` regardless of the prompt length.
+ struct MultilingualBackend: T3Backend {
++    var selectedComputeUnits: MLComputeUnits { runner.selectedComputeUnits }
+     let tokenizer: MTLTextTokenizer
+     let runner: MTLT3LMRunner
+ 
+     var maxLen: Int { runner.maxLen }
+ 
+     private func chunkerAndBudget(conds: Conditionals, options: GenerationOptions) -> (TextChunker, Int) {
+-        let prefillBudget = max(1, runner.maxLen - MultilingualConstants.condRows - 1)
++        let prefillBudget = max(1, runner.maxLen - MultilingualConstants.condRows - 2)
+         let vocoderWindow = Constants.maxVocoderTokens - conds.promptTokens.count
+         let vocoderBudget = max(1, vocoderWindow / Constants.maxSpeechTokensPerTextToken)
+         let budget = min(prefillBudget, vocoderBudget)
+@@ -103,6 +110,8 @@
+     func generate(textTokens: [Int32], conds: Conditionals, options: GenerationOptions) throws -> T3Result {
+         let out = try runner.generate(textTokens: textTokens, conds: conds, options: options)
+         return T3Result(tokens: out.tokens, prefillLength: out.prefillLength,
+-                        prefillTime: out.prefillTime, decodeTime: out.decodeTime)
++                        prefillTime: out.prefillTime, decodeTime: out.decodeTime,
++                        hostAssemblyTime: out.hostAssemblyTime,
++                        conditioningCacheHit: out.conditioningCacheHit, decodeStepTimings: out.decodeStepTimings)
+     }
+ }
+--- a/Sources/ChatterboxCoreML/T3LMRunner.swift
++++ b/Sources/ChatterboxCoreML/T3LMRunner.swift
+@@ -52,6 +52,7 @@
+ final class T3LMRunner: @unchecked Sendable {
+     private let prefillModel: MLModel
+     private let decodeModel: MLModel
++    var selectedComputeUnits: MLComputeUnits { prefillModel.configuration.computeUnits }
+     private let assembler: PrefillAssembler
+     private let speechEmb: SpeechEmbedding
+ 
+--- /dev/null
++++ b/Sources/ChatterboxCoreML/TokenSynthesizer.swift
+@@ -0,0 +1,71 @@
++import Foundation
++import CoreML
++import PerthCoreML
++
++/// Acoustic-only seam for an independently validated token decoder. Loads no
++/// Core ML T3 model. Calls are serialized; the host retains playback ownership.
++public actor ChatterboxTokenSynthesizer {
++    private let synth: SynthRunner
++    private let conditioning: Conditionals
++    private let watermark: PerthWatermarker
++
++    public init(modelDirectory: URL, conditioningFile: URL, watermarkDirectory: URL,
++                computeUnits: PipelineComputeUnits) async throws {
++        let encoder = try await Self.compiled("S3Encoder", directory: modelDirectory)
++        let flow = try await Self.compiled("S3CFM", directory: modelDirectory)
++        let vocoder = try await Self.compiled("S3Vocoder", directory: modelDirectory)
++        try Task.checkCancellation()
++        let conditioning = try Conditionals(contentsOf: conditioningFile)
++        guard conditioning.speakerEmb.count == 256, conditioning.genEmbedding.count == 192,
++              !conditioning.promptTokens.isEmpty, conditioning.promptTokens.count <= 750,
++              !conditioning.promptFeat.isEmpty, conditioning.promptFeat.count % 80 == 0,
++              conditioning.genEmbedding.allSatisfy(\.isFinite), conditioning.promptFeat.allSatisfy(\.isFinite)
++        else { throw ChatterboxError.invalidModelOutput("Invalid acoustic conditioning") }
++        self.conditioning = conditioning
++        synth = try SynthRunner(encoderURL: encoder, cfmURL: flow, vocoderURL: vocoder, computeUnits: computeUnits)
++        watermark = try PerthWatermarker(modelDirectory: watermarkDirectory, computeUnits: computeUnits.watermark ?? .cpuOnly)
++    }
++
++    private nonisolated static func compiled(_ name: String, directory: URL) async throws -> URL {
++        for suffix in ["mlmodelc", "mlpackage"] {
++            let url = directory.appendingPathComponent(name + "." + suffix)
++            if FileManager.default.fileExists(atPath: url.path) {
++                return try await ChatterboxCoreMLModel.compiledModel(at: url)
++            }
++        }
++        throw ChatterboxError.invalidModelOutput("Missing acoustic model: \(name)")
++    }
++
++    public func render(tokens: [Int]) throws -> [Float] {
++        try render(tokens: tokens, conditioning: conditioning)
++    }
++
++    public func render(tokens: [Int], conditioningFile: URL) throws -> [Float] {
++        try ChatterboxVoiceFile.validate(at: conditioningFile)
++        return try render(tokens: tokens, conditioning: Conditionals(contentsOf: conditioningFile))
++    }
++
++    private func render(tokens: [Int], conditioning: Conditionals) throws -> [Float] {
++        guard !tokens.isEmpty, tokens.count <= 1_000, tokens.allSatisfy({ (0..<6561).contains($0) })
++        else { throw ChatterboxError.invalidModelOutput("Invalid or unbounded speech tokens") }
++        try Task.checkCancellation()
++        let samples = try synth.synthesize(generatedTokens: tokens, conds: conditioning)
++        try Task.checkCancellation()
++        guard !samples.isEmpty, samples.count <= 24_000 * 120, samples.allSatisfy(\.isFinite)
++        else { throw ChatterboxError.invalidModelOutput("Invalid synthesized audio") }
++        let marked = try watermark.applyWatermark(samples, sampleRate: 24_000)
++        guard marked.count == samples.count, marked.allSatisfy(\.isFinite)
++        else { throw ChatterboxError.invalidModelOutput("Invalid watermarked audio") }
++        return marked
++    }
++}
++
++/// Shared host sampling policy for alternative token decoders. This delegates to
++/// the Core ML adapter sampler; it is not an official PyTorch sampler-parity claim.
++public struct ChatterboxSpeechSampler {
++    private var sampler: Sampler
++    public init(options: GenerationOptions) { sampler = Sampler(options: options) }
++    public mutating func sample(logits: [Float], previous: [Int], minTokensReached: Bool) -> Int {
++        sampler.sample(logits: logits, previous: previous, minTokensReached: minTokensReached)
++    }
++}
+--- a/Sources/ChatterboxCoreML/VoiceCloner.swift
++++ b/Sources/ChatterboxCoreML/VoiceCloner.swift
+@@ -22,6 +22,7 @@
+     private let veLSTM: MLModel
+     private let s3tok: MLModel
+     private let campplus: MLModel
++    private let encoderConditioningSeconds: Int
+ 
+     private let s3GenSR = 24000.0
+     private let s3SR = 16000.0
+@@ -34,7 +35,14 @@
+     /// Loads the five conditioning models from a directory (`.mlpackage` or
+     /// `.mlmodelc`). Same resolution + on-load compile convention as
+     /// `ChatterboxCoreMLModel.load`.
+-    public init(modelDirectory: URL) async throws {
++    public init(modelDirectory: URL, computeUnits: MLComputeUnits? = nil,
++                encoderConditioningSeconds: Int = 15,
++                modelComputeUnits: [String: MLComputeUnits] = [:]) async throws {
++        guard (1...15).contains(encoderConditioningSeconds),
++              Set(modelComputeUnits.keys).isSubset(of: ["MatchaMel", "VEMel", "VELSTM", "S3Tokenizer", "CAMPPlus"]) else {
++            throw ChatterboxError.invalidModelOutput("invalid reference conditioning configuration")
++        }
++        self.encoderConditioningSeconds = encoderConditioningSeconds
+         func cu() -> MLComputeUnits {
+             switch ProcessInfo.processInfo.environment["CHATTERBOX_VC_CU"]?.lowercased() {
+             case "cpu", "cpuonly": return .cpuOnly
+@@ -43,13 +51,13 @@
+             default: return .cpuAndGPU
+             }
+         }
+-        let units = cu()
++        let units = computeUnits ?? cu()
+         func load(_ names: [String]) async throws -> MLModel {
+             for n in names {
+                 let url = modelDirectory.appendingPathComponent(n)
+                 if FileManager.default.fileExists(atPath: url.path) {
+                     let cfg = MLModelConfiguration()
+-                    cfg.computeUnits = units
++                    cfg.computeUnits = modelComputeUnits[url.deletingPathExtension().lastPathComponent] ?? units
+                     let compiled = try await ChatterboxCoreMLModel.compiledModel(at: url)
+                     return try MLModel(contentsOf: compiled, configuration: cfg)
+                 }
+@@ -108,7 +116,7 @@
+         let wav16 = AudioIO.resample(wav24, from: s3GenSR, to: s3SR)
+         let clip24 = Array(wav24.prefix(Int(10 * s3GenSR)))          // DEC_COND_LEN
+         let clip16 = AudioIO.resample(clip24, from: s3GenSR, to: s3SR)
+-        let enc16 = Array(wav16.prefix(Int(15 * s3SR)))              // ENC_COND_LEN
++        let enc16 = Array(wav16.prefix(Int(Double(encoderConditioningSeconds) * s3SR)))
+ 
+         // gen.prompt_feat — MatchaMel(clip24): (1,80,T) -> store as (T,80) C-order.
+         let (feat, featFrames) = try promptFeat(clip24)
+@@ -122,9 +130,10 @@
+         let maxGen = featFrames / 2
+         if genTokens.count > maxGen { genTokens = Array(genTokens.prefix(maxGen)) }
+ 
+-        // t3.cond_prompt_speech_tokens — S3Tokenizer(enc16), capped at 375.
++        // Legacy default 15s/375; the multilingual V3 adapter explicitly uses 6s/150.
+         var condTokens = try tokens(enc16)
+-        if condTokens.count > 375 { condTokens = Array(condTokens.prefix(375)) }
++        let maxConditioningTokens = encoderConditioningSeconds * 25
++        if condTokens.count > maxConditioningTokens { condTokens = Array(condTokens.prefix(maxConditioningTokens)) }
+ 
+         // t3.speaker_emb — VE chain on the full 16 k stream.
+         let speakerEmb = try speakerEmbedding(wav16)
+--- /dev/null
++++ b/Sources/ChatterboxCoreML/VoiceFileValidation.swift
+@@ -0,0 +1,52 @@
++import Foundation
++
++/// Checks the bounded multilingual V3 conditioning format, not speaker identity.
++public enum ChatterboxVoiceFile {
++    public static let maximumBytes = 1_048_576
++    public static func validate(at url: URL) throws {
++        guard (try url.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? .max) <= maximumBytes else { throw invalid() }
++        let data = try Data(contentsOf: url)
++        guard (8...maximumBytes).contains(data.count) else { throw invalid() }
++        let headerBytes = data.prefix(8).enumerated().reduce(UInt64.zero) { $0 | UInt64($1.element) << ($1.offset * 8) }
++        guard headerBytes <= 65_536, headerBytes <= UInt64(data.count - 8),
++              let header = try JSONSerialization.jsonObject(with: data.subdata(in: 8..<(8 + Int(headerBytes)))) as? [String: Any]
++        else { throw invalid() }
++        let expected: [String: ([ClosedRange<Int>], String)] = [
++            "t3.speaker_emb": ([256...256], "F32"),
++            "t3.cond_prompt_speech_tokens": ([1...150], "I32"),
++            "gen.embedding": ([192...192], "F32"),
++            "gen.prompt_token": ([1...250], "I32"),
++            "gen.prompt_token_len": ([1...1], "I32"),
++            "gen.prompt_feat": ([1...500, 80...80], "F32")]
++        guard Set(header.keys).subtracting(["__metadata__"]) == Set(expected.keys) else { throw invalid() }
++        let payload = data.count - 8 - Int(headerBytes)
++        var ranges: [Range<Int>] = []
++        for (key, specification) in expected {
++            guard let item = header[key] as? [String: Any], let shape = item["shape"] as? [Int],
++                  shape.count == specification.0.count, zip(shape, specification.0).allSatisfy({ $1.contains($0) }),
++                  item["dtype"] as? String == specification.1,
++                  let offsets = item["data_offsets"] as? [Int], offsets.count == 2,
++                  offsets[0] >= 0, offsets[1] >= offsets[0], offsets[1] <= payload,
++                  offsets[1] - offsets[0] == shape.reduce(1, *) * 4
++            else { throw invalid() }
++            ranges.append(offsets[0]..<offsets[1])
++        }
++        let ordered = ranges.sorted { $0.lowerBound < $1.lowerBound }
++        guard ordered.first?.lowerBound == 0, ordered.last?.upperBound == payload,
++              zip(ordered, ordered.dropFirst()).allSatisfy({ $0.upperBound == $1.lowerBound }),
++              let lengthItem = header["gen.prompt_token_len"] as? [String: Any],
++              let lengthOffsets = lengthItem["data_offsets"] as? [Int],
++              let tokenItem = header["gen.prompt_token"] as? [String: Any], let tokenShape = tokenItem["shape"] as? [Int]
++        else { throw invalid() }
++        let start = 8 + Int(headerBytes) + lengthOffsets[0]
++        let length = data[start..<(start + 4)].enumerated().reduce(UInt32.zero) { $0 | UInt32($1.element) << ($1.offset * 8) }
++        guard length > 0, length <= tokenShape[0] else { throw invalid() }
++        let value = try Conditionals(contentsOf: url)
++        guard value.speakerEmb.allSatisfy(\.isFinite), value.genEmbedding.allSatisfy(\.isFinite),
++              value.promptFeat.allSatisfy(\.isFinite),
++              value.condPromptSpeechTokens.allSatisfy({ (0..<8194).contains($0) }),
++              value.promptTokens.allSatisfy({ (0..<6561).contains($0) })
++        else { throw invalid() }
++    }
++    private static func invalid() -> ChatterboxError { .invalidModelOutput("Invalid multilingual V3 voice profile") }
++}

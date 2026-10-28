@@ -1,0 +1,18 @@
+{
+  "status": "SDK_VALIDATED_APP_ADOPTION_PENDING",
+  "baseSHA": "858ad8de4f6811f8a9b9c6a5bbecd47094a7789b",
+  "featureCommit": null,
+  "sourceManifestSHA256": "9b76af6768a18f988f6a6105a43a5c3118b2eb950c691837b2e59c174b303952",
+  "macOSUILogSHA256": "2fc4b6f54bbc38d5dd37a92b2129feb3d9c6c4ade4c1930d40717ec051dabca9",
+  "iOSCrossBuildLogSHA256": "1b678259713bc63f2e1a11df6d92c5b5c1d333cf2ffd12c0d0e437e2bd2ac1f6",
+  "nativeReleaseBuildLogSHA256": "cd91ff32925f593074022e0f41be03852fe03e97eabb7b7740de13b3451de912",
+  "sharedTests": 49,
+  "directedAudioSeconds": 70.21,
+  "settingsUIInLibros": false,
+  "physicalMicrophoneValidated": false,
+  "phoneFullPipelineValidated": false,
+  "releaseOrUpload": false,
+  "finalRegressionLogSHA256": "888a9d3f7e8995e8da08a0652dc7160a76dfe4f798a5934014e779e6254402d1",
+  "finalMacUILogSHA256": "2fc4b6f54bbc38d5dd37a92b2129feb3d9c6c4ade4c1930d40717ec051dabca9",
+  "finaliOSUILogSHA256": "1b678259713bc63f2e1a11df6d92c5b5c1d333cf2ffd12c0d0e437e2bd2ac1f6"
+}
