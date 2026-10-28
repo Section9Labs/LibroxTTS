@@ -22,13 +22,21 @@ import LibroxChatterboxMLX
             conditioningFiles: [saved.id.uuidString: voice], seed: 42)
         guard !units.isEmpty else { throw Failure.arguments }
         try FileManager.default.createDirectory(at: out, withIntermediateDirectories: false)
+        // Diagnostic opt-in only. Keep encoder/vocoder/watermark on the reviewed
+        // CPU policy so this comparison changes CFM placement/padding alone.
+        let aneCFM = ProcessInfo.processInfo.environment["CHATTERBOX_MLX_CFM_ANE"] == "1"
+        let forcedPadding = ProcessInfo.processInfo.environment["CHATTERBOX_SYNTH_CFM_PAD"] == "1"
+        let acousticProfile = aneCFM ? "cfm-ane-padded" : (forcedPadding ? "cfm-cpu-padded" : "cfm-cpu")
+        let renderBegan = Date()
         if let value = ProcessInfo.processInfo.environment["CHATTERBOX_MLX_CACHE_BYTES"],
            let bytes = Int(value), bytes >= 0 {
             ChatterboxMLXRenderer.configureBufferCache(maximumBytes: bytes)
         }
         let renderer = try await ChatterboxMLXRenderer(weightsFile: urls[0], oracleFile: urls[1],
             modelDirectory: urls[2], defaultVoice: voice, watermarkDirectory: urls[3],
-            acousticComputeUnits: .init(encoder: .cpuOnly, cfm: .cpuOnly, vocoder: .cpuOnly, watermark: .cpuOnly))
+            acousticComputeUnits: .init(encoder: .cpuOnly, cfm: aneCFM ? .cpuAndNeuralEngine : .cpuOnly,
+                                       vocoder: .cpuOnly, watermark: .cpuOnly))
+        let modelLoadSeconds = Date().timeIntervalSince(renderBegan)
         let narrator = await renderer.makeNarrator()
         let memoryAfterLoad = memoryReport()
         var memoryWindows: [[String: Any]] = []
@@ -40,7 +48,7 @@ import LibroxChatterboxMLX
                 try ChatterboxCacheUnit(index: i, request: units[i].request,
                     modelManifestSHA256: "3df864ea174ee38478910c9b03358b36f2241166844bd5458c9b2f917e110ab0",
                     conditioningSHA256: saved.conditioningSHA256,
-                    rendererProfile: ChatterboxMLXRenderer.profile + ":" + ChatterboxBookDirector.revision)
+                    rendererProfile: ChatterboxMLXRenderer.profile + ":" + ChatterboxBookDirector.revision + ":" + acousticProfile)
             }
             let ready = try await cache.prepareWindow(window, using: narrator)
             memoryWindows.append(["last_unit": ready.last!.unit.index, "memory": memoryReport()])
@@ -72,11 +80,14 @@ import LibroxChatterboxMLX
         do { let writer = try AVAudioFile(forWriting: wav, settings: format.settings); try writer.write(from: buffer) }
         let report: [String: Any] = ["state": "complete", "profile": ChatterboxMLXRenderer.profile,
             "director_revision": ChatterboxBookDirector.revision, "voice": saved.name, "voice_id": saved.id.uuidString,
+            "requested_acoustic_profile": acousticProfile,
+            "model_load_seconds": modelLoadSeconds,
+            "total_wall_seconds": Date().timeIntervalSince(renderBegan),
             "conditioning_sha256": saved.conditioningSHA256, "units": reports, "duration_seconds": Double(full.count) / 24_000,
             "peak": full.reduce(Float.zero) { max($0, abs($1)) }, "model_oracle_checked": true,
             "memory_after_load": memoryAfterLoad, "memory_windows": memoryWindows,
             "source_preserved": true, "quality_accepted": false,
-            "scope": "Actual saved voice + Librox director/semantic cadence/current-plus-two cache + optional native MLX SDK; Mac CPU acoustics only"]
+            "scope": "Saved voice + Librox director/semantic cadence/current-plus-two cache + native MLX SDK; Mac diagnostic, requested CFM placement is not proof of actual device assignment"]
         try JSONSerialization.data(withJSONObject: report, options: [.prettyPrinted, .sortedKeys])
             .write(to: out.appendingPathComponent("report.json"), options: .atomic)
     }
