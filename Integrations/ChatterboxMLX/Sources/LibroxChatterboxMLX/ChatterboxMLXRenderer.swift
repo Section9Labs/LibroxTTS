@@ -106,8 +106,9 @@ public actor ChatterboxMLXRenderer {
               try availableMemory() >= UInt64(minimumAvailable) else { throw RendererError.resourceGuard }
     }
     private static func availableMemory() throws -> UInt64 {
-        #if os(macOS)
-        // A system free+inactive estimate on macOS, not iOS process headroom.
+        #if os(macOS) || targetEnvironment(macCatalyst)
+        // A system free+inactive estimate on the Mac (Catalyst too: there
+        // os_proc_available_memory() is 0 because no jetsam limit applies).
         var stats = vm_statistics64_data_t()
         var count = mach_msg_type_number_t(MemoryLayout<vm_statistics64_data_t>.size / MemoryLayout<integer_t>.size)
         let result = withUnsafeMutablePointer(to: &stats) {
