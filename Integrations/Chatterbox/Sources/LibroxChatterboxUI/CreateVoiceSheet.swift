@@ -47,10 +47,12 @@ import LibroxChatterbox
     public var body: some View {
         NavigationStack {
             Form {
-                Section {
-                    Text("Read at your normal pace in a quiet room. Stop when you finish; aim for 10–15 seconds.")
-                    Text(ChatterboxVoiceCreation.readingPrompt(language: language)).font(.title3).textSelection(.enabled)
-                } header: { Text("Read This Aloud") }
+                if stage == .ready || stage == .recording {
+                    Section {
+                        Text("Read at your normal pace in a quiet room. Stop when you finish; aim for 10–15 seconds.")
+                        Text(ChatterboxVoiceCreation.readingPrompt(language: language)).font(.title3).textSelection(.enabled)
+                    } header: { Text("Read This Aloud") }
+                }
                 if stage == .ready {
                     Toggle("Use my recording to create a saved voice on this device", isOn: $useRecording)
                     Button("Record My Voice", systemImage: "mic.fill") { start() }.disabled(!useRecording)
@@ -59,12 +61,17 @@ import LibroxChatterbox
                     Button("Stop Recording", systemImage: "stop.fill") { recorder.stop() }
                 } else if stage == .preparing {
                     ProgressView("Creating your voice preview…")
+                    Text("Keep Librox open while your preview is being created.")
                 } else if stage == .preview {
-                    TextField("Voice Name", text: $voiceName)
-                    Button("Play Preview", systemImage: "play.fill") { playPreview() }
-                    Text("Listen to the preview, then save if it sounds right.")
-                    Button("Save Voice", systemImage: "checkmark") { save() }
-                        .disabled(!previewPlayed || voiceName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    Section {
+                        TextField("Voice Name", text: $voiceName)
+                        Button("Play Preview", systemImage: "play.fill") { playPreview() }
+                            .accessibilityIdentifier("chatterbox.voice.playPreview")
+                    } header: { Text("Your Voice Preview") } footer: {
+                        Text(previewPlayed
+                             ? "Your preview is ready to save. Tap Save Voice to add it to My Voices."
+                             : "Play the whole preview to enable Save Voice. Your voice has not been saved yet.")
+                    }
                     Button("Record Again") { reset() }
                 } else if stage == .saving {
                     ProgressView("Saving your voice…")
@@ -76,7 +83,19 @@ import LibroxChatterbox
                 if let errorMessage { Text(errorMessage).foregroundStyle(.red).accessibilityLabel("Voice creation issue: " + errorMessage) }
             }
             .navigationTitle("Create Your Voice")
-            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismissed = true; cancel(); dismiss() }.disabled(stage == .saving) } }
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(stage == .preview ? "Discard" : "Cancel") { dismissed = true; cancel(); dismiss() }
+                        .disabled(stage == .saving)
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    if stage == .preview {
+                        Button("Save Voice") { save() }
+                            .disabled(!previewPlayed || voiceName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                            .accessibilityIdentifier("chatterbox.voice.save")
+                    }
+                }
+            }
         }
         .onDisappear { dismissed = true; cancel() }
         .onChange(of: scenePhase) { _, value in
@@ -160,7 +179,10 @@ import LibroxChatterbox
         guard !suspending else { return }
         // Saving crosses a short atomic disk commit; it has no microphone/GPU
         // work to stop and must retain its saved confirmation when returning.
-        guard stage != .saving, stage != .saved else { stopPreview(); return }
+        // A completed preview needs no GPU work. Preserve the private draft,
+        // name and acceptance state across background/foreground transitions;
+        // only an explicit Discard or sheet dismissal removes it.
+        guard stage != .preview, stage != .saving, stage != .saved else { stopPreview(); return }
         suspending = true
         let previous = task, oldDraft = draft
         previous?.cancel(); recorder.cancel(); stopPreview()
