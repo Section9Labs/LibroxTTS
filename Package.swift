@@ -32,19 +32,20 @@ let package = Package(
     // resolve can never pick up unreviewed model-runtime code.
     dependencies: [
         .package(url: "https://github.com/huggingface/swift-transformers.git", exact: "1.3.5"),
-        .package(url: "https://github.com/jkrukowski/swift-safetensors.git", exact: "0.1.1"),
         .package(url: "https://github.com/huggingface/swift-huggingface.git", exact: "0.13.0"),
         .package(url: "https://github.com/iliasaz/ruaccent-coreml.git", revision: "fbf86aaa01a6c7ee104c1ecff19ae317579203a3"),
         .package(url: "https://github.com/iliasaz/perth-coreml.git", revision: "85e99b1583b790fbfc283aaa4e67bd070d9b2913"),
         .package(url: "https://github.com/ml-explore/mlx-swift.git", exact: "0.32.3"),
     ],
     targets: [
+        // Vendored for a Mac Catalyst availability fix; see its PROVENANCE.md.
+        .target(name: "Safetensors", path: "Integrations/Chatterbox/Vendor/swift-safetensors/Sources/Safetensors"),
         .target(name: "ChatterboxExceptionTrap", path: "Integrations/Chatterbox/Vendor/ChatterboxCoreML/Sources/ChatterboxExceptionTrap"),
         .target(name: "ChatterboxCoreML", dependencies: [
             "ChatterboxExceptionTrap",
             .product(name: "Tokenizers", package: "swift-transformers"),
             .product(name: "Hub", package: "swift-transformers"),
-            .product(name: "Safetensors", package: "swift-safetensors"),
+            "Safetensors",
             .product(name: "HuggingFace", package: "swift-huggingface"),
             .product(name: "RUAccentCoreML", package: "ruaccent-coreml"),
             .product(name: "PerthCoreML", package: "perth-coreml"),

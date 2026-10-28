@@ -1,5 +1,5 @@
 {
-  "originHash" : "05ade1d713e6a9fd1f8404bb41a5f2ba95f60e93571eb0a7849ab5b35d43de0a",
+  "originHash" : "1ebdb560855e7d6e641f9454c3ce75a23dd2b6ad99e573c9c19a26c94c2d5a98",
   "pins" : [
     {
       "identity" : "eventsource",
@@ -87,15 +87,6 @@
       "state" : {
         "revision" : "0c0290ff6b24942dadb83a929ffaaa1481df04a2",
         "version" : "1.1.1"
-      }
-    },
-    {
-      "identity" : "swift-safetensors",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/jkrukowski/swift-safetensors.git",
-      "state" : {
-        "revision" : "3852f0bd561071588361c26c49c016d344234c60",
-        "version" : "0.1.1"
       }
     },
     {
