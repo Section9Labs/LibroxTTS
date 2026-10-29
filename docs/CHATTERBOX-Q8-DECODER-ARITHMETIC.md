@@ -346,3 +346,29 @@ order. These are offline Mac allocations, not iPhone process footprint, narratio
 throughput or battery results. No production loader default, decoder profile,
 renderer oracle or phone state changed. Evidence is in
 `runs/chatterbox-quantization-evaluation-v01/gpu-policy-factor-study-v01/controls-report.json`.
+
+The subsequent independent scalar RoPE audit found 16/32 frequency bits differ
+from backend-generated CPU frequencies. Across all 1,536 positions, this changes
+1,792 position/frequency pairs of half trig values. Holding imported frequencies
+fixed leaves one CPU trig discrepancy: position494/frequency7 cosine is48048,
+where the independent calculation gives48049. All policies agree at position95,
+so that captured rotation cannot distinguish their behavior at later positions.
+
+The independently defined table has now been qualified without the preliminary
+assumed transcendental enclosure. Each power-frequency decision uses exact
+rational binary32 midpoint powers. Machin and trig Taylor calculations use
+directed Decimal120 arithmetic with explicit alternating/Taylor remainder
+bounds. All32 frequency,49,152 phase,98,304 trig and98,304 half-conversion
+certificates pass. Twelve Python tests pass normally and with optimization,
+including rational interval checks and rounding/identity failure cases. Existing
+Astra review independently verified table size/hash and exact candidate bits.
+
+The resulting diagnostic table is196,736bytes (32frequency words, then cosine
+and sine half arrays), SHA-256
+`1d58a8abbe8e7f9c668cbc3d3b53bee8563e43f7cdb4cb8b758100f7ec664ca9`.
+It is not installed or selected by a renderer. Source and report are preserved
+under `semantic-rope-certificate-source-v01` and `semantic-rope-certificate-v01`.
+This closes this table's numerical definition, not the remaining operator or
+whole-model qualification. The next finite steps are independent same-input
+operator checks using existing captures, then unseen valid public EN/ES prefixes
+crossing cache256 and actually evaluating494 or later, before any app profile.
