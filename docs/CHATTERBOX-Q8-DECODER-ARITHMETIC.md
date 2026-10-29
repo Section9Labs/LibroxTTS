@@ -459,3 +459,31 @@ phone acceptance. Next are reviewed independent assembly, original/eager-native
 boundary controls and the already preregistered six public input trajectories.
 No app oracle/profile, source recordings or phone state changed. Evidence is in
 `reference-vector-engine-v01` and `reference-vector-engine-source-v01`.
+
+The six public EN/ES holdout inputs are now frozen, with no decoder forward or
+audio generation. The canonical local stock frontend produced 18 tensors:
+prefix embeddings, eight teacher-forcing inputs and text IDs per case. All21
+frontend files are pinned, including stock conditioning; the three optional
+tokenizer configuration/template files are required absent before and after
+preparation. The manifest itself is size-bounded and hash-pinned before decoding.
+The source was independently reviewed and33 Release regressions passed.
+
+| Case | Prefix rows | Planned decode offsets |
+| --- | ---: | --- |
+| English short | 80 | 80–87 |
+| English boundary | 251 | 251–258 |
+| English long | 501 | 501–508 |
+| Spanish short | 87 | 87–94 |
+| Spanish boundary | 252 | 252–259 |
+| Spanish long | 503 | 503–510 |
+
+The fixed teacher-forcing IDs remain `[173,920,31,404,2100,781,64,1500]` at
+speech positions1–8. Selection used whole-word token counts only: last valid
+boundary prefix, first valid long prefix. No model score influenced selection.
+Vector SHA-256 is
+`2d20b5932df08b022cbd95e5713de5f5f1c0b15fcebde04801f42b6a0584baf7`.
+Evidence is in `assembled-holdout-frozen-inputs-v01` and
+`assembled-holdout-preparation-source-v01`. The preparation report's
+`maximum_evaluated_position` field denotes a **planned** position only:
+`decoder_forward_count` is zero. Actual256-boundary and494+ position evaluation,
+full/chunk cache identity, all54 comparisons and phone clearance remain pending.
