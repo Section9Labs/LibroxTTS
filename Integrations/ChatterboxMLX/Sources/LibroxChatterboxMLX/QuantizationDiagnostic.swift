@@ -46,6 +46,10 @@ public enum ChatterboxQuantizationDiagnostic {
         let certifiedLogitsFile: String?
         let certifiedOperatorFile: String?
         let referenceComponentPreregistrationFile: String?
+        let referenceLinearPreregistrationFile: String?
+        let referenceResolverScript: String?
+        let referenceResolverPython: String?
+        let referenceSigmoidFile: String?
     }
 
     public static func run(configurationFile: URL) async throws {
@@ -66,6 +70,7 @@ public enum ChatterboxQuantizationDiagnostic {
                "local-q8-projection-counterfactual",
                "local-q8-gpu-factor-study",
                "local-q8-reference-softmax",
+               "local-q8-reference-engine",
                "acoustic-parity", "library-q8", "library-q8-canonical"].contains(c.profile), c.samples.count <= 6,
               ProcessInfo.processInfo.environment["MLX_ENABLE_TF32"] == "0",
               ProcessInfo.processInfo.environment["CHATTERBOX_SYNTH_SEED"] == "42",
@@ -101,6 +106,16 @@ public enum ChatterboxQuantizationDiagnostic {
         else { throw Failure.configuration }
         ChatterboxMLXRenderer.configureBufferCache(maximumBytes: 64 * 1_024 * 1_024)
         try healthy(minimumAvailable: 3 * 1_024 * 1_024 * 1_024)
+        if c.profile == "local-q8-reference-engine" {
+            guard c.samples.isEmpty, let primitive = c.primitiveFixtureFile, let scalar = c.certifiedOperatorFile,
+                let sigmoid = c.referenceSigmoidFile, let preregistration = c.referenceLinearPreregistrationFile,
+                let script = c.referenceResolverScript, let python = c.referenceResolverPython else { throw Failure.configuration }
+            try ReferenceEngineStudy.run(.init(primitive: URL(fileURLWithPath: primitive), scalar: URL(fileURLWithPath: scalar),
+                weights: URL(fileURLWithPath: c.weightsFile), sigmoid: URL(fileURLWithPath: sigmoid),
+                preregistration: URL(fileURLWithPath: preregistration), script: URL(fileURLWithPath: script),
+                python: URL(fileURLWithPath: python), output: URL(fileURLWithPath: c.outputDirectory)))
+            return
+        }
         if c.profile == "local-q8-reference-softmax" {
             guard c.samples.isEmpty, let fixture = c.certifiedOperatorFile,
                 let preregistration = c.referenceComponentPreregistrationFile else { throw Failure.configuration }

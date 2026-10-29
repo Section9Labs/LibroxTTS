@@ -429,3 +429,32 @@ original/eager controls and the frozen six-case holdout. Nothing selects this
 component or its tables in a production renderer. Evidence is preserved under
 `reference-softmax-fastpath-v01`, `reference-nonlinear-component-v01` and
 `reference-nonlinear-source-v01`.
+
+The remaining CPU reference engine now reproduces all182 scalar operator
+outputs **bit-identically**, as well as all60 auxiliary score/probability tensors.
+It uses CPU64 GEMM with outward-rounded general magnitude/error bounds, exact
+normalized dyadic Int128 fallback with preflight span/overflow checks, and a
+bounded bigint resolver for wider spans. RMSNorm retains the specified square,
+exact mean, epsilon, squared-midpoint inverse-root and multiplication boundaries.
+Neither the old half-only helper nor any production gate was widened.
+
+The validation recorded169,615 certified outputs,495 Int128 resolutions and one
+deliberately overwide bigint control. The actual GEMM fallback transports
+`[maxF32,-maxF32,minSubnormalF32] dot [1,1,1]` and returns the exact minimum
+subnormal. A separate actual subprocess resolves the known softmax midpoint row.
+Both request/response UUID/hash/shape controls pass. All runtime helper and import
+files are pinned; unresolved calculations never use native arithmetic fallback.
+
+All31 Release tests passed without skipping, including real Swift-task
+cancellation of owned Python workers, both ordinary termination and deliberate
+SIGTERM refusal. Cleanup permits one second for TERM, then one second for an
+owned-child KILL/join, and throws if termination is not observed. Three Python
+tests pass normally and with optimization, including partial-failure and shared
+deadline rejection. The engine operator bits have SHA-256
+`540f13b4e357fe7d1ed873767bd3539ac92dbaf43453625c7004ebc319733b3a`.
+
+This completes engine-to-scalar operator equivalence, not whole-backbone or
+phone acceptance. Next are reviewed independent assembly, original/eager-native
+boundary controls and the already preregistered six public input trajectories.
+No app oracle/profile, source recordings or phone state changed. Evidence is in
+`reference-vector-engine-v01` and `reference-vector-engine-source-v01`.
