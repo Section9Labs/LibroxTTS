@@ -318,3 +318,31 @@ certified CPU diagnostic condition and the unchanged old oracle, retaining all
 outcomes and a fixed signed 6472-minus-4205 margin. This maps two policy factors
 and their interaction, not the entire GPU arithmetic gap. It does not select
 an app profile, replace an oracle or provide production/phone clearance.
+
+The four-arm study is now complete. Each arm ran in its own GPU-only process,
+using the same canonical two-row decode. The unchanged baseline reproduced all
+18 native and four restored legacy comparisons exactly. All eight required
+cross-prefill restored tensor pairs are bit-identical. The analyzer pins the
+historical report, certified diagnostic and preregistration, checks exact
+condition/lane membership and verifies raw tensor hashes. Seven Python control
+tests and all 21 Release regression tests pass.
+
+| Prefill | RoPE | Old oracle passes | Certified CPU diagnostic passes | Native target signed margin |
+| --- | --- | ---: | ---: | ---: |
+| Native quantized | Native GPU | 20/22 | 21/22 | +0.000084877014 |
+| Canonical half, dense FP32 accumulation | Native GPU | 20/22 | 21/22 | +0.000020980835 |
+| Native quantized | Pinned CPU half table | 19/22 | 22/22 | -0.000391006470 |
+| Canonical half, dense FP32 accumulation | Pinned CPU half table | 19/22 | 22/22 | -0.000354766846 |
+
+Thus, in this fixed study, changing RoPE is sufficient to align the remaining
+target ranking with the certified CPU diagnostic under either prefill policy.
+Changing prefill alone is insufficient. Agreement with this diagnostic is not
+an independently qualified model reference or permission to replace the old
+acceptance gate. The old oracle continues to reject the three target conditions
+for both half-RoPE arms. Raw results and both reference comparisons remain intact.
+
+Measured MLX peak allocations were approximately 1.05/1.96/0.95/1.78 GB in table
+order. These are offline Mac allocations, not iPhone process footprint, narration
+throughput or battery results. No production loader default, decoder profile,
+renderer oracle or phone state changed. Evidence is in
+`runs/chatterbox-quantization-evaluation-v01/gpu-policy-factor-study-v01/controls-report.json`.
