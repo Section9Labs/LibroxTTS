@@ -387,7 +387,7 @@ final class SynthRunner: @unchecked Sendable {
         }
         let tEncOut = muShape[2]                 // 2·encTokens.count
         let tH = 2 * realT                       // trim the padded frames off
-        var mu = muArr.toFloatArrayAnyPrecision()
+        var mu = try muArr.toFloatArrayAnyPrecision()
         if pad != 0 {
             var trimmed = [Float](repeating: 0, count: mel * tH)
             mu.withUnsafeBufferPointer { m in
@@ -519,7 +519,7 @@ final class SynthRunner: @unchecked Sendable {
         let wavArr = try predict(vocoder,
                                  inputs: ["feat": MLMultiArray.float32(feat, shape: [1, mel, melLen2])],
                                  output: "waveform")
-        let waveform = wavArr.toFloatArrayAnyPrecision()
+        let waveform = try wavArr.toFloatArrayAnyPrecision()
 
         Log.pipeline.debug("[synth] T_tok=\(allTokens.count, privacy: .public) T_h=\(tH, privacy: .public) T_run=\(tRun, privacy: .public) pad=\(padded, privacy: .public) gen=\(melLen2, privacy: .public) steps=\(n, privacy: .public) · enc \(tCFM.timeIntervalSince(tEnc), format: .fixed(precision: 3), privacy: .public)s cfm \(tVoc.timeIntervalSince(tCFM), format: .fixed(precision: 3), privacy: .public)s voc \(Date().timeIntervalSince(tVoc), format: .fixed(precision: 3), privacy: .public)s → \(waveform.count, privacy: .public) samples")
         var timings = ChatterboxAcousticTimings()
@@ -546,7 +546,7 @@ final class SynthRunner: @unchecked Sendable {
         var records: [String: Any] = [:]
         for name in inputs.keys.sorted() {
             guard let array = inputs[name] else { continue }
-            let values = array.toFloatArrayAnyPrecision()
+            let values = try array.toFloatArrayAnyPrecision()
             let data = values.withUnsafeBytes { Data($0) }
             let filename = name + ".float32le"
             try data.write(to: directory.appendingPathComponent(filename), options: .atomic)

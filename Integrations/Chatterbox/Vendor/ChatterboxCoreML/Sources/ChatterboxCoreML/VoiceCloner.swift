@@ -156,7 +156,7 @@ public final class VoiceCloner {
             throw ChatterboxError.invalidModelOutput("MatchaMel shape \(shape) != (1,80,T)")
         }
         let t = shape[2]
-        let flat = arr.toFloatArrayAnyPrecision()                   // (80*T) C-order [m*T + f]
+        let flat = try arr.toFloatArrayAnyPrecision()                   // (80*T) C-order [m*T + f]
         var out = [Float](repeating: 0, count: t * mel)             // (T,80) C-order [f*80 + m]
         for m in 0..<mel {
             let base = m * t
@@ -173,7 +173,7 @@ public final class VoiceCloner {
             throw ChatterboxError.invalidModelOutput("S3Tokenizer shape \(shape) != (1,T,8)")
         }
         let tdim = shape[1]
-        let h = arr.toFloatArrayAnyPrecision()                      // (T*8) C-order
+        let h = try arr.toFloatArrayAnyPrecision()                      // (T*8) C-order
         var out = [Int32](repeating: 0, count: tdim)
         let powers: [Int32] = [1, 3, 9, 27, 81, 243, 729, 2187]     // 3^0..3^7
         for t in 0..<tdim {
@@ -198,7 +198,7 @@ public final class VoiceCloner {
             throw ChatterboxError.invalidModelOutput("VEMel shape \(shape) != (1,T,40)")
         }
         let t = shape[1]
-        let melFlat = melArr.toFloatArrayAnyPrecision()             // (T*40) C-order [f*40 + c]
+        let melFlat = try melArr.toFloatArrayAnyPrecision()             // (T*40) C-order [f*40 + c]
 
         // Number of partials + target length (voice_encoder.get_num_wins).
         let win = vePartialFrames, step = veFrameStep
@@ -223,7 +223,7 @@ public final class VoiceCloner {
         let embArr = try predict(veLSTM,
                                  inputs: ["partials": MLMultiArray.float32(partials, shape: [nPartials, win, 40])],
                                  output: "embeds")
-        let emb = embArr.toFloatArrayAnyPrecision()                 // (N,256)
+        let emb = try embArr.toFloatArrayAnyPrecision()                 // (N,256)
         // Mean over partials, then L2-normalize (utt_to_spk_embed).
         var raw = [Float](repeating: 0, count: Constants.speakerEmbDim)
         for p in 0..<nPartials {

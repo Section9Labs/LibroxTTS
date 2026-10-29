@@ -163,7 +163,7 @@ final class MTLT3LMRunner: @unchecked Sendable {
         guard let seedArr = prefillOut.featureValue(for: "logits")?.multiArrayValue else {
             throw ChatterboxError.invalidModelOutput("MTL T3LM prefill missing 'logits'")
         }
-        let seedLogits = cfgCombine(seedArr.toFloatArrayAnyPrecision(), cfg: cfg)
+        let seedLogits = try cfgCombine(seedArr.toFloatArrayAnyPrecision(), cfg: cfg)
 
         // --- Decode loop ---
         var sampler = Sampler(options: options)
@@ -232,7 +232,7 @@ final class MTLT3LMRunner: @unchecked Sendable {
             guard let logitsArr = out.featureValue(for: "logits")?.multiArrayValue else {
                 throw ChatterboxError.invalidModelOutput("MTL T3LM decode missing 'logits'")
             }
-            let logits = cfgCombine(logitsArr.toFloatArrayAnyPrecision(), cfg: cfg)
+            let logits = try cfgCombine(logitsArr.toFloatArrayAnyPrecision(), cfg: cfg)
             if profileDecode { stepTimings.logitsCopyAndCFGSeconds += elapsed(logitsStart) }
             let samplingStart = profileDecode ? ContinuousClock.now : nil
             nextToken = sampler.sample(logits: logits, previous: generated, minTokensReached: generated.count >= options.minTokens)

@@ -223,7 +223,7 @@ final class T3LMRunner: @unchecked Sendable {
         guard let seedArr = prefillOut.featureValue(for: "logits")?.multiArrayValue else {
             throw ChatterboxError.invalidModelOutput("T3LM prefill missing 'logits'")
         }
-        let seedLogits = seedArr.toFloatArrayAnyPrecision()
+        let seedLogits = try seedArr.toFloatArrayAnyPrecision()
         Self.logTopK(seedLogits, label: "[decode:t3lm] seed top-5", count: 5)
 
         // --- Decode loop ---
@@ -292,7 +292,7 @@ final class T3LMRunner: @unchecked Sendable {
             guard let logitsArr = out.featureValue(for: "logits")?.multiArrayValue else {
                 throw ChatterboxError.invalidModelOutput("T3LM decode missing 'logits'")
             }
-            let logits = logitsArr.toFloatArrayAnyPrecision()
+            let logits = try logitsArr.toFloatArrayAnyPrecision()
             if step < 4 {
                 Self.logTopK(logits, label: "[decode:t3lm] step=\(step) top-5", count: 5)
             }
