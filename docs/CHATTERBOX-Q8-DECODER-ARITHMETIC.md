@@ -174,3 +174,53 @@ discrepancy by itself establishes responsibility for the final ranking.
 Release validation after these hooks passed all 10 focused MLX XCTest cases;
 the complete log is `primitive-release-tests-v01.log`. No audio or phone work
 was performed in this stage.
+
+## Preregistered exact-dot results
+
+The sampling rule above was evaluated without changing membership: all 210
+matrices, 32 uniform output rows, both lanes, 13,440 scalar outputs and
+19,660,800 products. CPU and GPU operators retained their full original shapes.
+All 798,720 CPU-half outputs reproduced their captured values, and all
+9,830,400 sampled reconstructed weight bits agreed across CPU and GPU.
+
+The independent Python analyzer uses integer sums in units of 2^-48 and direct
+nearest/ties-to-even half rounding. It passed 253,962 arithmetic/ULP checks,
+including exhaustive finite-half decoding/inversion and adjacent midpoint
+tests. It refuses optimized Python that would remove assertions. Input hashes,
+membership, shapes, finiteness, preallocation size limits and bounded runtime
+are checked before accepting the study.
+
+| Method, identical sampled operands | Different from exact rounded dot | Maximum half-ULP distance | Maximum absolute error |
+| --- | ---: | ---: | ---: |
+| CPU-half | 3,138 / 13,440 | 436 | 0.00390625 |
+| CPU-FP32 then half | 25 / 13,440 | 1 | 0.000244140625 |
+| Canonical packed GPU | 7 / 13,440 | 1 | 0.00006103515625 |
+| Dense-half GPU | 6 / 13,440 | 1 | 0.000244140625 |
+| Dense-FP32 GPU then half | 24 / 13,440 | 1 | 0.000244140625 |
+
+The 436-ULP CPU case is near zero, with absolute error approximately
+0.00002599; it is not the maximum-absolute-error case. CPU-half agrees less
+often with exact rounded dot arithmetic on this sample. This does not identify
+an undocumented backend mechanism or establish full-model/audio quality.
+
+Paired GPU-versus-CPU-FP32 differences are 28 (packed), 27 (dense-half) and 17
+(dense-FP32), each at most one half ULP. Kahan matches every sampled exact
+rounded result, but integer arithmetic remains the reference. The
+half-rounded-product fingerprint disagrees with CPU-half on 5,179 samples;
+it must not be used as a guessed replacement kernel.
+
+Artifacts and exact executed-source manifests are under
+`exact-dot-cpu-export-v01`, `exact-dot-gpu-export-v01`,
+`exact-dot-cpu-source-v01`, `exact-dot-gpu-source-v01` and
+`exact-dot-analyzer-source-v01`. Detailed paired bits and membership are retained
+in `exact-dot-analysis-v01.json`. The implementation is in
+`Experiments/Q8ExactDotStudy/exact_dot.py` and `ExactDotExport.swift`.
+
+The next diagnostic is preregistered in
+`certified-projection-counterfactual-v01-preregistration.json`: independently
+certify FP64 projection accumulation against integer sums, resolving ambiguous
+half-rounding intervals exactly, then replace only transformer projections in
+an offline CPU counterfactual. Preserve the original CPU nonprojection
+operations, native18 and CPU93/95 controls. Keep old-oracle parity and proposed
+exact-projection fidelity separate. This does not create or approve a new
+oracle, inference profile or phone build.

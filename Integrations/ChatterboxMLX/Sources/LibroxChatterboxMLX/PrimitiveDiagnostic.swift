@@ -81,7 +81,7 @@ enum PrimitiveDiagnostic {
         }
     }
 
-    private static func identities(_ f: Files) throws {
+    static func identities(_ f: Files) throws {
         let profile = ChatterboxMLXRenderer.DecoderProfile.q8CanonicalHalfV2
         guard try ChatterboxMLXRenderer.digest(f.weights) == profile.weightsSHA256,
             try ChatterboxMLXRenderer.digest(f.oracle) == profile.oracleSHA256,
@@ -277,7 +277,7 @@ enum PrimitiveDiagnostic {
         }
     }
 
-    private static func validate(_ arrays: [String: MLXArray], model: SpeechDecoder) throws {
+    static func validate(_ arrays: [String: MLXArray], model: SpeechDecoder) throws {
         var required = Set<String>()
         var moduleCount = 0
         for (name, module) in primitives(model) {
