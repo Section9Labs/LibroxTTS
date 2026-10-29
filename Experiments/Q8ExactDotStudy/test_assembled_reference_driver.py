@@ -144,6 +144,50 @@ time.sleep(30)
             with self.assertRaisesRegex(ValueError, 'Changed pinned JSON'):
                 study.verify_pair(*dirs, 'en-short', ('0' * 64, hashes[1]), ('regression-sha', 'case-sha'))
 
+    def test_post_run_seal_binds_exact_pair_and_reference_receipts(self):
+        # Isolate the binding layer; the raw/cache verifier has separate real
+        # payload tests. This mock produces no neural evidence or production data.
+        with tempfile.TemporaryDirectory() as directory, patch.object(study, 'RUN_ROOT', Path(directory)):
+            root = Path(directory); program = root / 'program'; program.mkdir()
+            manifest = {'run_root': str(root), 'program_directory': str(program), 'job_version': 'v99',
+                        'regression_control_sha256': 'regression-sha', 'runtime_metallib_sha256': 'runtime-sha'}
+            manifest_file = root / 'manifest.json'; study.write(manifest_file, manifest)
+            entries, summaries = [], {}
+            for case in study.CASES:
+                for stage in ('native-controls', 'reference-full', 'reference-chunks'):
+                    name = 'assembled-native-controls-' + case + '-v99' if stage == 'native-controls' else 'assembled-' + case + '-' + stage + '-v99'
+                    path = root / name; path.mkdir()
+                    value = {'completed': True, 'case': case, 'all_trace_boundaries_bit_identical': True,
+                             'runtime_metallib_sha256': 'runtime-sha', 'logits_sha256': case + '-logits'}
+                    study.write(path / 'report.json', value)
+                    entries.append({'case': case, 'stage': stage, 'report_sha256': study.digest(path / 'report.json')})
+                summaries[case] = {'case': case, 'completed': True, 'full_chunk_logits_bit_identical': True,
+                                   'all_active_cache_bits_reconstructed_and_identical': True, 'logits_compared': 9,
+                                   'cache_stages': 9, 'maximum_offset': study.LENGTHS[case] + 8}
+                study.write(program / (case + '-full-chunk-comparison.json'), summaries[case])
+            report = {'completed': True, 'reference_cases': 6, 'full_chunk_comparisons': 54,
+                      'gpu_candidate_comparisons': 0, 'finished': entries}
+            report_file = program / 'report.json'; study.write(report_file, report)
+            manifest_sha, report_sha = study.digest(manifest_file), study.digest(report_file)
+
+            def verify(full, chunk, case, refs, controls):
+                return summaries[case]
+
+            output = root / 'seal.json'
+            with patch.object(study, 'verify_pair', side_effect=verify), patch.object(study, 'install_signal_handlers'):
+                study.seal_program(manifest_file, manifest_sha, report_file, report_sha, output)
+                seal = json.loads(output.read_text())
+                self.assertEqual(seal['program_report_sha256'], report_sha)
+                self.assertEqual(len(seal['cases']), 6)
+                for row in seal['cases']:
+                    expected = next(x['report_sha256'] for x in entries if x['case'] == row['case'] and x['stage'] == 'reference-full')
+                    self.assertEqual(row['full_reference_report_sha256'], expected)
+                pair = program / 'en-short-full-chunk-comparison.json'
+                study.write(pair, dict(summaries['en-short'], completed=False))
+                with self.assertRaisesRegex(ValueError, 'Pair summary differs'):
+                    study.seal_program(manifest_file, manifest_sha, report_file, report_sha, root / 'failed-seal.json')
+                self.assertFalse((root / 'failed-seal.json').exists())
+
 
 if __name__ == '__main__':
     unittest.main()

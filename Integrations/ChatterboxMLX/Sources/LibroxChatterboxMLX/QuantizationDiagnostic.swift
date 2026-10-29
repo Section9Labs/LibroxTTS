@@ -64,6 +64,15 @@ public enum ChatterboxQuantizationDiagnostic {
         let referenceAssemblyCaseControlSHA256: String?
         let runtimeMetallibFile: String?
         let runtimeMetallibSHA256: String?
+        let assembledGPUPreregistrationFile: String?
+        let referenceAssemblyProgramReportFile: String?
+        let referenceAssemblyProgramReportSHA256: String?
+        let referenceAssemblyReferenceReportFile: String?
+        let referenceAssemblyReferenceReportSHA256: String?
+        let referenceAssemblyPairReportFile: String?
+        let referenceAssemblyPairReportSHA256: String?
+        let referenceAssemblyQualificationSealFile: String?
+        let referenceAssemblyQualificationSealSHA256: String?
     }
 
     public static func run(configurationFile: URL) async throws {
@@ -96,6 +105,7 @@ public enum ChatterboxQuantizationDiagnostic {
                "local-q8-freeze-holdout-inputs",
                "local-q8-assembly-native-controls", "local-q8-assembled-reference",
                "local-q8-runtime-bootstrap",
+               "local-q8-assembled-gpu-candidate",
                "acoustic-parity", "library-q8", "library-q8-canonical"].contains(c.profile), c.samples.count <= 6,
               ProcessInfo.processInfo.environment["MLX_ENABLE_TF32"] == "0",
               ProcessInfo.processInfo.environment["CHATTERBOX_SYNTH_SEED"] == "42",
@@ -139,6 +149,24 @@ public enum ChatterboxQuantizationDiagnostic {
             try write(["completed": true, "diagnostic_only": true, "model_forward_count": 0,
                 "production_clearance": false, "runtime_metallib_sha256": resourceSHA,
                 "memory_cache_bytes": Memory.cacheMemory], to: output.appendingPathComponent("report.json"))
+            return
+        }
+        if c.profile == "local-q8-assembled-gpu-candidate" {
+            guard c.samples.isEmpty, let preregistration = c.assembledGPUPreregistrationFile,
+                let inputs = c.referenceAssemblyInputsFile, let rope = c.referenceAssemblyRoPEFile,
+                let caseID = c.referenceAssemblyCase, let runtimeSHA = c.runtimeMetallibSHA256,
+                let program = c.referenceAssemblyProgramReportFile, let programSHA = c.referenceAssemblyProgramReportSHA256,
+                let reference = c.referenceAssemblyReferenceReportFile, let referenceSHA = c.referenceAssemblyReferenceReportSHA256,
+                let pair = c.referenceAssemblyPairReportFile, let pairSHA = c.referenceAssemblyPairReportSHA256,
+                let seal = c.referenceAssemblyQualificationSealFile, let sealSHA = c.referenceAssemblyQualificationSealSHA256,
+                c.expectedSHA256 == ChatterboxMLXRenderer.DecoderProfile.q8CanonicalHalfV2.weightsSHA256
+            else { throw Failure.configuration }
+            try AssembledGPUCandidate.run(.init(weights: URL(fileURLWithPath: c.weightsFile),
+                rope: URL(fileURLWithPath: rope), inputs: URL(fileURLWithPath: inputs), output: URL(fileURLWithPath: c.outputDirectory),
+                preregistration: URL(fileURLWithPath: preregistration), programReport: URL(fileURLWithPath: program),
+                referenceReport: URL(fileURLWithPath: reference), pairReport: URL(fileURLWithPath: pair), qualificationSeal: URL(fileURLWithPath: seal),
+                programSHA256: programSHA, referenceSHA256: referenceSHA, pairSHA256: pairSHA, qualificationSHA256: sealSHA,
+                runtimeSHA256: runtimeSHA, caseID: caseID))
             return
         }
         if c.profile == "local-q8-assembly-native-controls" {

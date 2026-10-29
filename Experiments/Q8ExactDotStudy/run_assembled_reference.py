@@ -244,6 +244,64 @@ def install_signal_handlers():
     signal.signal(signal.SIGINT, stop)
 
 
+def seal_program(manifest_file, manifest_sha, report_file, report_sha, output):
+    """Post-run artifact audit only. Binds comparisons to both exact receipts.
+
+    The original frozen controller/program are never modified or restarted.
+    This deliberately performs no Popen or model call.
+    """
+    install_signal_handlers()
+    output = owned(output)
+    if output.exists():
+        raise ValueError('Existing qualification seal')
+    manifest, _ = pinned_json(manifest_file, manifest_sha, maximum=1_048_576)
+    program, _ = receipt(report_file, report_sha)
+    if (program.get('reference_cases') != 6 or program.get('full_chunk_comparisons') != 54 or
+            program.get('gpu_candidate_comparisons') != 0):
+        raise ValueError('Unqualified program counters')
+    entries = program.get('finished', [])
+    expected = {(case, stage) for case in CASES for stage in ('native-controls', 'reference-full', 'reference-chunks')}
+    found = {(x.get('case'), x.get('stage')) for x in entries}
+    if len(entries) != 18 or found != expected:
+        raise ValueError('Program condition membership')
+    by_key = {(x['case'], x['stage']): x['report_sha256'] for x in entries}
+    root, version = owned(manifest['run_root']), manifest['job_version']
+    regression_sha = manifest['regression_control_sha256']
+    runtime_sha = manifest['runtime_metallib_sha256']
+    if Path(report_file).resolve().parent != owned(manifest['program_directory']):
+        raise ValueError('Program receipt location')
+    cases = []
+    for case in CASES:
+        check_stop()
+        full = root / ('assembled-' + case + '-reference-full-' + version)
+        chunks = root / ('assembled-' + case + '-reference-chunks-' + version)
+        control_sha = by_key[(case, 'native-controls')]
+        native, _ = receipt(root / ('assembled-native-controls-' + case + '-' + version) / 'report.json', control_sha)
+        if (native.get('case') != case or native.get('all_trace_boundaries_bit_identical') is not True or
+                native.get('runtime_metallib_sha256') != runtime_sha):
+            raise ValueError('Native control qualification')
+        refs = (by_key[(case, 'reference-full')], by_key[(case, 'reference-chunks')])
+        pair_file = owned(Path(report_file).parent / (case + '-full-chunk-comparison.json'))
+        pair, pair_sha = pinned_json(pair_file)
+        actual = verify_pair(full, chunks, case, refs, (regression_sha, control_sha))
+        if pair != actual:
+            raise ValueError('Pair summary differs from artifact verification')
+        ref, _ = receipt(full / 'report.json', refs[0])
+        if ref.get('runtime_metallib_sha256') != runtime_sha:
+            raise ValueError('Reference runtime qualification')
+        cases.append({'case': case, 'prefix_length': LENGTHS[case], 'native_control_sha256': control_sha,
+                      'full_reference_report_sha256': refs[0], 'chunk_reference_report_sha256': refs[1],
+                      'pair_report_sha256': pair_sha, 'reference_logits_sha256': ref['logits_sha256'],
+                      'verified_logits': 9, 'verified_cache_stages': 9})
+    check_stop()
+    write(output, {'schema': 1, 'completed': True, 'scope': 'assembled-reference-artifact-qualification',
+                   'program_manifest_sha256': manifest_sha, 'program_report_sha256': report_sha,
+                   'input_vectors_sha256': INPUT_SHA, 'runtime_metallib_sha256': runtime_sha,
+                   'verifier_source_sha256': digest(Path(__file__)), 'cases': cases,
+                   'full_logit_comparisons': 54, 'gpu_candidate_comparisons': 0,
+                   'production_clearance': False, 'audio_generated': False})
+
+
 def run_job(executable, executable_sha, config, output, program):
     check_stop()
     if digest(executable) != executable_sha or output.exists():
@@ -365,4 +423,7 @@ def main(manifest_file, manifest_sha):
 
 
 if __name__ == '__main__':
-    main(Path(sys.argv[1]), sys.argv[2])
+    if sys.argv[1] == '--seal':
+        seal_program(Path(sys.argv[2]), sys.argv[3], Path(sys.argv[4]), sys.argv[5], Path(sys.argv[6]))
+    else:
+        main(Path(sys.argv[1]), sys.argv[2])

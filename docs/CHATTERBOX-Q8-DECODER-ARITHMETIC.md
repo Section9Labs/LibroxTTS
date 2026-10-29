@@ -487,3 +487,34 @@ Evidence is in `assembled-holdout-frozen-inputs-v01` and
 `maximum_evaluated_position` field denotes a **planned** position only:
 `decoder_forward_count` is zero. Actual256-boundary and494+ position evaluation,
 full/chunk cache identity, all54 comparisons and phone clearance remain pending.
+
+The independently assembled CPU decoder has now completed the six frozen cases.
+All54 full-prefix versus fixed64-row-chunk logit comparisons are bit-identical,
+as are every active cache state reconstructed from the full prefill and eight
+append-only deltas. These are the reference's two execution strategies, not yet
+54 GPU/reference comparisons. Actual long positions494+ and256-boundary crossings
+were evaluated. Original/deferred/eager native controls also passed all22 old
+conditions and all six new nine-condition cases, including754 named operator
+boundaries per stage. Forty Release tests and six Python tests pass.
+
+The first frozen controller stopped before model execution because its archived
+CLI lacked the SwiftPM metallib. That terminal run is retained. The separatev02
+runtime pins the exact2,401,016-byte shader asset and validates descriptor/path
+identity and bytes across initialization. Its zero-forward bootstrap and fresh
+22-condition control passed before the six-case program ran. No arithmetic,
+weight, guard or old-oracle change was made by that packaging correction.
+
+`assembled-reference-program-v02` holds the completed CPU program; source and
+runtime closure are in `assembled-reference-source-v02` and
+`assembled-reference-controller-source-v02`. A separate post-run artifact seal
+re-verifies and binds every pair to the exact full/chunk receipts before any GPU
+candidate may use those targets. Its scope is reference artifact qualification,
+not sound, speed, phone or app-profile approval.
+
+The single registered GPU candidate retains canonical two-row Q8 decode and
+native prefill, replacing only RoPE tables with the independently certified
+semantic table. It must pass all54 unchanged comparisons in fresh GPU-only
+processes. Actual shape/dtype and raw outputs are preserved before numerical
+checks, including malformed values. No production profile or oracle is selected
+by the candidate diagnostic. Complete watermarked audio, voice quality and
+sustained narration remain separate required gates.
