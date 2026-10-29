@@ -34,6 +34,13 @@ enum CertifiedHalfProjection {
         let maximumWeight: Double
         let exactHalfBits: UInt16
     }
+    struct PreparedWeights {
+        fileprivate let n: Int
+        fileprivate let k: Int
+        fileprivate let half: [Float16]
+        fileprivate let maxima: [Double]
+        fileprivate let double: MLXArray
+    }
 
     static func coefficient(_ bits: UInt16) throws -> Int128 {
         let exponent = Int((bits >> 10) & 31), mantissa = Int128(bits & 1023)
@@ -93,22 +100,20 @@ enum CertifiedHalfProjection {
     }
 
     static func evaluate(input: MLXArray, weight: MLXArray, budget: Budget) throws -> Result {
+        let prepared = try prepare(weight: weight, budget: budget)
+        return try evaluate(input: input, prepared: prepared, budget: budget)
+    }
+
+    /// Offline counterfactuals reuse immutable prepared weights across fixed
+    /// inputs. The larger FP64 residency is never a phone footprint claim.
+    static func prepare(weight: MLXArray, budget: Budget) throws -> PreparedWeights {
         try budget.check()
-        guard input.dtype == .float16, weight.dtype == .float16,
-            input.ndim == 3, weight.ndim == 2, input.dim(0) == 2,
-            (1...93).contains(input.dim(1)), [1024, 4096].contains(input.dim(2)),
-            [1024, 4096].contains(weight.dim(0)), weight.dim(1) == input.dim(2)
+        guard weight.dtype == .float16, weight.ndim == 2,
+            [1024, 4096].contains(weight.dim(0)), [1024, 4096].contains(weight.dim(1))
         else { throw Failure.configuration }
-        let k = input.dim(2), n = weight.dim(0), m = input.size / k
-        let x = input.asArray(Float16.self), w = weight.asArray(Float16.self)
-        var xMax = [Double](repeating: 0, count: m), wMax = [Double](repeating: 0, count: n)
-        for row in 0..<m {
-            for index in 0..<k {
-                let value = x[row * k + index]
-                guard value.isFinite else { throw Failure.nonfinite }
-                xMax[row] = max(xMax[row], abs(Double(value)))
-            }
-        }
+        try ChatterboxMLXRenderer.healthy(minimumAvailable: weight.nbytes * 5 + 1_024 * 1_024 * 1_024)
+        let n = weight.dim(0), k = weight.dim(1), w = weight.asArray(Float16.self)
+        var wMax = [Double](repeating: 0, count: n)
         for row in 0..<n {
             if row % 64 == 0 { try budget.check() }
             for index in 0..<k {
@@ -117,8 +122,27 @@ enum CertifiedHalfProjection {
                 wMax[row] = max(wMax[row], abs(Double(value)))
             }
         }
+        let double = weight.asType(.float64, stream: .cpu); eval(double)
+        return PreparedWeights(n: n, k: k, half: w, maxima: wMax, double: double)
+    }
+
+    static func evaluate(input: MLXArray, prepared: PreparedWeights, budget: Budget) throws -> Result {
+        try budget.check()
+        let n = prepared.n, k = prepared.k, w = prepared.half, wMax = prepared.maxima
+        guard input.dtype == .float16, input.ndim == 3, input.dim(0) == 2,
+            (1...93).contains(input.dim(1)), input.dim(2) == k else { throw Failure.configuration }
+        let m = input.size / k, x = input.asArray(Float16.self)
+        var xMax = [Double](repeating: 0, count: m)
+        for row in 0..<m {
+            try budget.check()
+            for index in 0..<k {
+                let value = x[row * k + index]
+                guard value.isFinite else { throw Failure.nonfinite }
+                xMax[row] = max(xMax[row], abs(Double(value)))
+            }
+        }
         let sums = matmul(input.asType(.float64, stream: .cpu),
-            weight.asType(.float64, stream: .cpu).T, stream: .cpu)
+            prepared.double.T, stream: .cpu)
         guard sums.dtype == .float64 else { throw Failure.configuration }
         let actual = sums.asArray(Double.self)
         guard actual.count == m * n, actual.allSatisfy(\.isFinite) else { throw Failure.nonfinite }

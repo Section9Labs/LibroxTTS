@@ -269,3 +269,52 @@ projections and throw immediately after `model.logits`, before evaluating or
 accepting output. Forced first/middle/last failures and cancellation must prove
 that no successful receipt or artifact can be produced. No native-arithmetic
 fallback is permitted. All old references, failures and gates remain unchanged.
+
+## Full-model projection-only counterfactual
+
+`projection-counterfactual-v01/report.json` completed the preregistered three
+CPU arms under one monotonic 180-second budget. Original and eager-native
+FP16 arms have byte-identical logits in all 22 conditions (native18 plus CPU93
+three-step and CPU95 single-step replays). Their caches are bit-identical at
+both measured boundaries. This validates the host-copy negative control.
+
+Replacing only the 210 transformer projections with certified arithmetic,
+while retaining every original CPU nonprojection operation, changes the
+unconditional target leader from 6472 to 4205:
+
+| `es.decode.2` condition | Original/eager signed 6472-minus-4205 | Certified projection-only |
+| --- | ---: | ---: |
+| Native trajectory | +0.00024795532 | -0.00037956238 |
+| Original CPU93 incoming cache | +0.00024795532 | -0.00089120865 |
+| Original CPU95 incoming cache | +0.00024795532 | -0.0004925728 |
+
+Projection arithmetic alone is therefore sufficient to cause this ranking
+flip, including when inherited state is fixed. It does not explain every GPU
+discrepancy or qualify a new reference. The certified arm passes 19/22 old
+comparisons; only the three target conditions reject. It produced 150,957,134
+interval-certified outputs and 946 exact resolutions. Per-condition logits,
+both lane comparisons, boundary cases and cache drift are preserved.
+
+Original, eager and certified arm times were approximately 2.78, 2.98 and
+10.90 seconds. These are offline CPU diagnostic times, not narration RTF or a
+phone performance result. Immutable FP64 prepared weights are reused inside
+one arm, with incremental allocation guards; their larger residency is not a
+mobile footprint claim.
+
+The per-run error latch checks before construction, before evaluation and
+after evaluation, and increments acceptance only afterward. Failed arms are
+discarded. The atomic completed report is the final success commit; status
+alone is insufficient. All 21 focused Release tests passed, including forced
+first/middle/last projection failures, actual mid-run/preconstruction/late
+cancellation, and cached-versus-uncached prepared-weight equivalence.
+
+The next bounded study is preregistered as
+`gpu-policy-factor-study-v01-preregistration.json`: all four combinations of
+native/canonical-FP32 prefill and native/CPU-table-half RoPE, with the same
+two-row decode kernel. Use a fresh GPU-only process per arm. For a fixed RoPE
+mode, restored CPU93/95 outputs must be bit-identical across prefill policies,
+where prefill is inactive. Compare every condition against its matching
+certified CPU diagnostic condition and the unchanged old oracle, retaining all
+outcomes and a fixed signed 6472-minus-4205 margin. This maps two policy factors
+and their interaction, not the entire GPU arithmetic gap. It does not select
+an app profile, replace an oracle or provide production/phone clearance.
