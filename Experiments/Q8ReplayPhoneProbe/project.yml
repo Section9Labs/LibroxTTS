@@ -22,11 +22,13 @@ targets:
         SWIFT_VERSION: '6.0'
         TARGETED_DEVICE_FAMILY: '1,2'
         MARKETING_VERSION: '0.2'
-        CURRENT_PROJECT_VERSION: '11'
+        CURRENT_PROJECT_VERSION: '12'
     info:
       path: Generated/Info.plist
       properties:
         CFBundleDisplayName: Q8 Replay Probe
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         UILaunchScreen: {}
         UIFileSharingEnabled: true
         LSSupportsOpeningDocumentsInPlace: true

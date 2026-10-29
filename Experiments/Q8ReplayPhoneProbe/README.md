@@ -1,7 +1,7 @@
 # Isolated Q8 cache diagnostic
 
-Local developer harness only, bundle `com.librox.ChatterboxBenchmark`, version
-0.2(11). It does not update Librox, access its container, load voice recordings,
+Local developer harness only, bundle `com.librox.ChatterboxBenchmark`; version
+and build come from `project.yml`. It does not update Librox, access its container, load voice recordings,
 produce audio or change the production accuracy gate. It uses the SDK's reviewed
 fixed-fixture diagnostic rather than implementing model math in an app.
 
