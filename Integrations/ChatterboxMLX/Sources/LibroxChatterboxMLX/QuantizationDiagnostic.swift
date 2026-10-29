@@ -956,6 +956,7 @@ public enum ChatterboxQuantizationDiagnostic {
             "oracle_sha256": profile.oracleSHA256, "rope_sha256": SemanticHalfRoPE.sha256,
             "audio_or_phone_clearance": false]
         var stage = "preparation"
+        var stageFiles: [[String: Any]] = []
         do {
             try Device.withDefaultDevice(.gpu) {
                 let fixture = try AssemblyNativeControls.pinnedArrays(URL(fileURLWithPath: oracle), sha: profile.oracleSHA256, budget: budget)
@@ -971,9 +972,11 @@ public enum ChatterboxQuantizationDiagnostic {
                         let file = out.appendingPathComponent(stem + ".safetensors")
                         try save(arrays: ["actual": output, "expected": expected], url: file)
                         report["current_stage"] = stem
-                        report["current_raw"] = ["file": file.lastPathComponent, "sha256": try digest(file),
-                            "actual_shape": output.shape, "actual_dtype": String(describing: output.dtype)]
+                        stageFiles.append(["stage": stem, "file": file.lastPathComponent, "sha256": try digest(file),
+                            "actual_shape": output.shape, "actual_dtype": String(describing: output.dtype)])
+                        report["stage_files"] = stageFiles
                         try write(report, to: out.appendingPathComponent("report.json"))
+                        guard output.dtype == .float32, output.shape == [2, 8194] else { throw Failure.output }
                         comparisons.append(try ChatterboxQ8FixedFixtureDiagnostic.compare(output.asArray(Float.self),
                             expected.asArray(Float.self), stage: stem))
                         report["comparisons"] = try JSONSerialization.jsonObject(with: JSONEncoder().encode(comparisons))
@@ -1017,7 +1020,7 @@ public enum ChatterboxQuantizationDiagnostic {
         let voice = URL(fileURLWithPath: c.conditioningFile)
         var reports: [[String: Any]] = []
         for sample in c.samples {
-            let collector = BookBenchmarkCollector()
+            let collector = BookBenchmarkCollector(progressFile: out.appendingPathComponent(sample.id + "-progress.json"))
             let session = try ChatterboxBookSession(narrator: narrator,
                 cacheDirectory: out.appendingPathComponent(sample.id + "-cache"),
                 modelManifestSHA256: c.expectedSHA256, rendererProfile: renderer.profileIdentifier)
@@ -1161,6 +1164,8 @@ public enum ChatterboxQuantizationDiagnostic {
     }
 }
 private actor BookBenchmarkCollector {
+    let progressFile: URL
+    init(progressFile: URL) { self.progressFile = progressFile }
     var samples: [Float] = []
     var frames = 0
     var rows: [[String: Any]] = []
@@ -1182,6 +1187,8 @@ private actor BookBenchmarkCollector {
             if let a = t.acoustics { row["acoustics"] = try? JSONSerialization.jsonObject(with: JSONEncoder().encode(a)) }
         }
         rows.append(row)
+        try JSONSerialization.data(withJSONObject: ["completed": false, "units": rows], options: [.sortedKeys])
+            .write(to: progressFile, options: .atomic)
     }
     struct Result: Sendable { let samples: [Float]; let frames: Int; let rowsData: Data }
     func result() throws -> Result { .init(samples: samples, frames: frames, rowsData: try JSONSerialization.data(withJSONObject: rows)) }
