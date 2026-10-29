@@ -4,7 +4,7 @@ import MLXNN
 
 /// Exact local V3 Q8 artifact. Its identity is checked before this loader is used.
 enum Q8DecoderWeights {
-    static func load(from url: URL) throws -> SpeechDecoder {
+    static func load(from url: URL, canonicalHalf: Bool = false) throws -> SpeechDecoder {
         let weights = try loadArrays(url: url)
         let model = SpeechDecoder(precision: .mixedFloat16Accurate)
         let expected = model.parameters().flattened()
@@ -21,7 +21,9 @@ enum Q8DecoderWeights {
                   all(isFinite(s)).item(Bool.self), all(isFinite(b)).item(Bool.self)
             else { throw DecoderWeightError.invalidStructure }
             keys.insert(name + ".scales"); keys.insert(name + ".biases")
-            let projection = QuantizedLinear(weight: w, scales: s, biases: b, groupSize: 64, bits: 8)
+            let projection: QuantizedLinear = canonicalHalf
+                ? CanonicalQ8Linear(weight: w, scales: s, biases: b, useNativePrefill: true)
+                : QuantizedLinear(weight: w, scales: s, biases: b, groupSize: 64, bits: 8)
             guard projection(MLXArray.zeros([2, 1, linear.shape.1], dtype: .float16)).dtype == .float16
             else { throw DecoderWeightError.invalidStructure }
             modules.append((name, projection))

@@ -3,6 +3,19 @@ import XCTest
 @testable import LibroxChatterboxMLX
 
 final class RendererErrorTests: XCTestCase {
+    func testCanonicalTrialHasSeparateCacheIdentityAndSamePinnedArtifacts() {
+        let original = ChatterboxMLXRenderer.DecoderProfile.mixedFloat16Accurate
+        let oldQ8 = ChatterboxMLXRenderer.DecoderProfile.q8ExperimentalV1
+        let canonical = ChatterboxMLXRenderer.DecoderProfile.q8CanonicalHalfV2
+        XCTAssertNotEqual(canonical.rawValue, oldQ8.rawValue)
+        XCTAssertNotEqual(canonical.rawValue, original.rawValue)
+        XCTAssertEqual(canonical.weightsSHA256, oldQ8.weightsSHA256)
+        XCTAssertEqual(canonical.oracleSHA256, oldQ8.oracleSHA256)
+        XCTAssertTrue(canonical.usesQ8Weights)
+        XCTAssertFalse(original.usesQ8Weights)
+        XCTAssertEqual(ChatterboxMLXRenderer.profile, original.rawValue)
+    }
+
     func testExistingNSErrorCodesRemainStable() {
         let resource = ChatterboxMLXRenderer.ResourceGuardDetails(reason: .memory,
             minimumAvailableBytes: 1,

@@ -15,16 +15,24 @@ public actor ChatterboxMLXRenderer {
         case mixedFloat16Accurate = "native-mlx-mixed-f16-accurate-1"
         /// Explicit trial profile, not a claim of original-FP32 or listening parity.
         case q8ExperimentalV1 = "native-mlx-q8-g64-f16-affine-experimental-1"
+        /// Explicit canonical-half-weight decode trial. Requires fresh device qualification.
+        case q8CanonicalHalfV2 = "native-mlx-q8-g64-canonical-half-experimental-2"
+        public var usesQ8Weights: Bool {
+            switch self {
+            case .mixedFloat16Accurate: false
+            case .q8ExperimentalV1, .q8CanonicalHalfV2: true
+            }
+        }
         public var weightsSHA256: String {
             switch self {
             case .mixedFloat16Accurate: "3df864ea174ee38478910c9b03358b36f2241166844bd5458c9b2f917e110ab0"
-            case .q8ExperimentalV1: "231647ebb4deedad901c46cf3d7ca1e0fa70371b461c934c14dc63f16ec69017"
+            case .q8ExperimentalV1, .q8CanonicalHalfV2: "231647ebb4deedad901c46cf3d7ca1e0fa70371b461c934c14dc63f16ec69017"
             }
         }
         public var oracleSHA256: String {
             switch self {
             case .mixedFloat16Accurate: "87b8ab31eda9c63abbeecb8a9f0678bc8e0fe6980396ea0c4f9e16637ef618d2"
-            case .q8ExperimentalV1: "8f7b5d2a6437c23cfa753f0ac25e2f23f296ca32f3e91b98b3f6219b26325b44"
+            case .q8ExperimentalV1, .q8CanonicalHalfV2: "8f7b5d2a6437c23cfa753f0ac25e2f23f296ca32f3e91b98b3f6219b26325b44"
             }
         }
     }
@@ -132,7 +140,10 @@ public actor ChatterboxMLXRenderer {
         else { throw RendererError.identityMismatch }
         let model = try Device.withDefaultDevice(.gpu) {
             let model: SpeechDecoder
-            if decoderProfile == .q8ExperimentalV1 { model = try Q8DecoderWeights.load(from: weightsFile) }
+            if decoderProfile.usesQ8Weights {
+                model = try Q8DecoderWeights.load(from: weightsFile,
+                    canonicalHalf: decoderProfile == .q8CanonicalHalfV2)
+            }
             else {
                 model = SpeechDecoder(precision: .mixedFloat16Accurate)
                 let weights = try DecoderPrecision.mixedFloat16Accurate.loadWeights(from: weightsFile)

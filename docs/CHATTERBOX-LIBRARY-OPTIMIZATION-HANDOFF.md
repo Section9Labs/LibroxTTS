@@ -148,3 +148,51 @@ library error-code mapping and serializable diagnostic fields.
 
 This diagnostic update is not a precision correction or a successful phone test.
 The first failed fixture's numbers are required before selecting a correction.
+
+## Canonical-half two-row decode V2: separate trial
+
+Build296 confirmed stock Standard serial playback underruns:26.56seconds of
+generated speech required34.72seconds of component rendering (RTF1.307), while
+thermal state stayed nominal and memory remained available. This is not a new
+safety stop or a successful sustained-narration result.
+
+Its Q8 failure was `es.decode.2`:max-abs .0066943 and relative-L2 .00045055 passed,
+but both-lane top-1 agreement failed. The frozen reference's unconditional lane
+has a .000247955 margin between tokens6472/4205. The error bound identifies that
+ranking reversal; it does not identify the responsible hardware operation.
+
+MLX's small-batch quantized kernel and the frozen dense CPU reference do not
+round reconstructed weights identically. Mac counterfactuals preserved every gate:
+rounded dense GPU17/18, rounded dense with explicit FP32 accumulation18/18,
+then packed canonical-half decode18/18. Apple CPU execution uses BNNS half GEMM;
+its internal accumulation order is not established by this comparison.
+
+Explicit profile `.q8CanonicalHalfV2` has cache identity
+`native-mlx-q8-g64-canonical-half-experimental-2`. It keeps native quantized
+prefill and uses a separate two-row Metal decode kernel:reconstruct each packed
+weight in FP32, round it to FP16, accumulate products in FP32, round outputs to
+FP16. All210 matrices/503316480 reconstructed weight bits matched independent
+CPU reconstruction. The unchanged18-case gate passed on Mac; parameter storage
+remains568586240bytes. The native-prefill control peaked at1.019GB MLX allocation,
+whereas expanded-prefill diagnostics peaked at1.938GB. Neither is a phone
+physical-footprint measurement or end-to-end speed claim.
+
+Default Standard and Q8-v1 behavior, artifacts and gates stay unchanged. V2 uses
+the same two pinned Q8 files; no download/conversion/reimport is needed. App code
+must use `decoder.usesQ8Weights` for asset/oracle/manifest routing, retain actual
+instance profile/cache identities, and offer V2 as an explicit separate trial.
+Do not silently map old Q8 selection/cache into V2. Exhaustive profile switches
+must handle the new case. The shader assumes32-thread Apple SIMD groups; the
+exact iOS build and physical18-case startup gate remain required. No phone
+quality, battery, sustained-playback or5x acceptance follows from Mac validation.
+
+Validation of the V2 integration:57 adapter tests plus3 MLX error/profile tests
+pass in Release. Independent read-only review found no blocker for a bounded
+experimental trial. The real BookSession path loaded V2, passed its startup gate,
+and completed fresh English/Spanish generated-only samples with CPU acoustics,
+Perth and input reuse off. Current Mac RTFs were1.770/1.442; these do not show a
+speed win. A sequential Q8-v1 control measured1.460/.945; both decoder and acoustic
+timings varied. These are short consecutive runs, not controlled energy evidence
+or proof that V2 accelerates narration. Receipts are under
+`canonical-half-v02-library` in the same artifact root. Preserve the old controls,
+failed counterfactual and original gates rather than promoting from a pass count.

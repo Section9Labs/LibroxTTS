@@ -34,7 +34,11 @@ public enum ChatterboxQuantizationDiagnostic {
     public static func run(configurationFile: URL) async throws {
         let c = try JSONDecoder().decode(Configuration.self, from: Data(contentsOf: configurationFile))
         guard ["baseline", "smdesai-q8-oracle-only", "local-q8-f16scales", "export-local-q8",
-               "local-q4-f16scales", "export-local-q4", "local-q8-cpu-reference", "acoustic-parity", "library-q8"].contains(c.profile), c.samples.count <= 6,
+               "local-q4-f16scales", "export-local-q4", "local-q8-cpu-reference", "local-q8-rounded-dense",
+               "local-q8-rounded-dense-acc32",
+               "local-q8-canonical-packed",
+               "local-q8-canonical-packed-native-prefill",
+               "acoustic-parity", "library-q8", "library-q8-canonical"].contains(c.profile), c.samples.count <= 6,
               ProcessInfo.processInfo.environment["MLX_ENABLE_TF32"] == "0",
               ProcessInfo.processInfo.environment["CHATTERBOX_SYNTH_SEED"] == "42",
               !FileManager.default.fileExists(atPath: c.outputDirectory),
@@ -45,6 +49,25 @@ public enum ChatterboxQuantizationDiagnostic {
         // Foreign-checkpoint embeddings differ from our V3 frontend. Running
         // audio with that hybrid is invalid even if a few logits look plausible.
         guard c.profile != "smdesai-q8-oracle-only" || c.samples.isEmpty else { throw Failure.configuration }
+        // Arithmetic counterfactual only: no audio or production profile. It
+        // materializes dense FP16 weights and makes no packed-memory claim.
+        guard !c.profile.hasPrefix("local-q8-rounded-dense") || (c.samples.isEmpty &&
+            c.expectedSHA256 == "231647ebb4deedad901c46cf3d7ca1e0fa70371b461c934c14dc63f16ec69017" &&
+            c.referenceOracleFile != nil) else { throw Failure.configuration }
+        if c.profile.hasPrefix("local-q8-rounded-dense") {
+            guard let reference = c.referenceOracleFile,
+                try digest(URL(fileURLWithPath: reference)) ==
+                    "8f7b5d2a6437c23cfa753f0ac25e2f23f296ca32f3e91b98b3f6219b26325b44"
+            else { throw Failure.configuration }
+        }
+        if c.profile.hasPrefix("local-q8-canonical-packed") {
+            guard c.samples.isEmpty,
+                c.expectedSHA256 == "231647ebb4deedad901c46cf3d7ca1e0fa70371b461c934c14dc63f16ec69017",
+                let reference = c.referenceOracleFile,
+                try digest(URL(fileURLWithPath: reference)) ==
+                    "8f7b5d2a6437c23cfa753f0ac25e2f23f296ca32f3e91b98b3f6219b26325b44"
+            else { throw Failure.configuration }
+        }
         guard Set(c.samples.map(\.id)).count == c.samples.count,
               c.samples.allSatisfy({ $0.id.range(of: "^[a-z0-9-]+$", options: .regularExpression) != nil })
         else { throw Failure.configuration }
@@ -62,7 +85,7 @@ public enum ChatterboxQuantizationDiagnostic {
             try await acousticComparison(c)
             return
         }
-        if c.profile == "library-q8" {
+        if c.profile == "library-q8" || c.profile == "library-q8-canonical" {
             try await libraryBenchmark(c)
             return
         }
@@ -71,6 +94,7 @@ public enum ChatterboxQuantizationDiagnostic {
         let began = Date()
         let model = try Device.withDefaultDevice(.gpu) { try load(c) }
         let backboneLoadSeconds = Date().timeIntervalSince(began)
+        let canonicalAudit = c.profile.hasPrefix("local-q8-canonical-packed") ? try auditCanonicalWeights(model) : nil
         let modelBytes = model.parameters().flattened().reduce(0) { $0 + $1.1.nbytes }
         let oracles = try Device.withDefaultDevice(.gpu) {
             try oracleReport(model, file: URL(fileURLWithPath: c.oracleFile))
@@ -81,8 +105,14 @@ public enum ChatterboxQuantizationDiagnostic {
             "model_parameter_bytes": modelBytes, "backbone_load_seconds": backboneLoadSeconds,
             "memory_after_backbone": memory(), "oracles": oracles,
             "production_gate_passed": oracles.allSatisfy { $0["production_gate_passed"] as? Bool == true },
-            "experimental_mac_only": true, "acoustics": "unchanged CPU + Perth", "seed": 42]
-        report["precision_policy"] = c.profile.hasPrefix("local-q")
+            "experimental_mac_only": true,
+            "acoustics": c.samples.isEmpty ? "not loaded (oracle-only)" : "unchanged CPU + Perth", "seed": 42]
+        if let canonicalAudit { report["canonical_weight_audit"] = canonicalAudit }
+        report["precision_policy"] = c.profile.hasPrefix("local-q8-rounded-dense")
+            ? "diagnostic dense GPU: exact Q8 affine decoded in FP32 then rounded to resident FP16; projection accumulation \(c.profile.hasSuffix("acc32") ? "FP32" : "native FP16 matmul"); not packed residency"
+            : c.profile.hasPrefix("local-q8-canonical-packed")
+            ? "diagnostic packed Q8: per-weight canonical FP16 rounding, two-row custom FP32 accumulation; prefill \(c.profile.hasSuffix("native-prefill") ? "unchanged native quantized matrix multiply" : "transient dense FP32 control"); no production clearance"
+            : c.profile.hasPrefix("local-q")
             ? "210 Q\(bits(c)) group64 projections, FP16 affine scales/biases and KV; FP32 norms/head/accurate activations"
             : c.profile == "baseline" ? "production mixedFloat16Accurate"
             : "foreign Q8 group64, FP32 affine scales promote projection output and KV to FP32; oracle-only"
@@ -98,7 +128,12 @@ public enum ChatterboxQuantizationDiagnostic {
             guard report["q8_implementation_gate_passed"] as? Bool == true else { throw Failure.output }
         }
         if c.profile == "baseline", report["production_gate_passed"] as? Bool != true { throw Failure.output }
-        if c.samples.isEmpty { return }
+        if c.samples.isEmpty {
+            report["completed"] = true
+            report["scope"] = "fixed-prefix logits only; not audio or device qualification"
+            try write(report, to: out.appendingPathComponent("report.json"))
+            return
+        }
         let front = try await ChatterboxMultilingualPromptBuilder(modelDirectory: URL(fileURLWithPath: c.modelDirectory))
         let voice = URL(fileURLWithPath: c.conditioningFile)
         try ChatterboxVoiceFile.validate(at: voice)
@@ -144,6 +179,7 @@ public enum ChatterboxQuantizationDiagnostic {
     }
 
     private static func load(_ c: Configuration) throws -> SpeechDecoder {
+        if c.profile.hasPrefix("local-q8-rounded-dense") { return try loadRoundedDenseComparison(c) }
         let model = SpeechDecoder(precision: .mixedFloat16Accurate)
         if c.profile == "baseline" {
             guard c.expectedSHA256 == "3df864ea174ee38478910c9b03358b36f2241166844bd5458c9b2f917e110ab0" else { throw Failure.weights }
@@ -167,7 +203,10 @@ public enum ChatterboxQuantizationDiagnostic {
                 else { throw Failure.weights }
                 guard all(isFinite(s)).item(Bool.self), all(isFinite(b)).item(Bool.self) else { throw Failure.weights }
                 expectedKeys.insert(name + ".scales"); expectedKeys.insert(name + ".biases")
-                let quantizedLayer = QuantizedLinear(weight: w, scales: s, biases: b, groupSize: 64, bits: bits(c))
+                let quantizedLayer: QuantizedLinear = c.profile.hasPrefix("local-q8-canonical-packed")
+                    ? CanonicalQ8Linear(weight: w, scales: s, biases: b,
+                        useNativePrefill: c.profile.hasSuffix("native-prefill"))
+                    : QuantizedLinear(weight: w, scales: s, biases: b, groupSize: 64, bits: bits(c))
                 if c.profile.hasPrefix("local-q") {
                     let probe = quantizedLayer(MLXArray.zeros([2, 1, linear.shape.1], dtype: .float16))
                     guard probe.dtype == .float16 else { throw Failure.weights }
@@ -184,6 +223,81 @@ public enum ChatterboxQuantizationDiagnostic {
         eval(model)
         Memory.clearCache()
         return model
+    }
+
+    /// Mirrors the frozen CPU reference's weight reconstruction on the GPU,
+    /// isolating fused quantized projection arithmetic from model compression.
+    /// Never rewrites an oracle, changes a gate or becomes an app fallback.
+    private static func loadRoundedDenseComparison(_ c: Configuration) throws -> SpeechDecoder {
+        let source = try loadArrays(url: URL(fileURLWithPath: c.weightsFile))
+        let model = SpeechDecoder(precision: .mixedFloat16Accurate)
+        var dense: [String: MLXArray] = [:]
+        guard source.count == 692 else { throw Failure.weights }
+        for (key, template) in model.parameters().flattened() {
+            try healthy()
+            guard let w = source[key] else { throw Failure.weights }
+            if key.hasPrefix("tfmr.layers."), template.ndim == 2 {
+                let stem = String(key.dropLast(7))
+                guard let s = source[stem + ".scales"], let b = source[stem + ".biases"],
+                    w.dtype == .uint32, w.shape == [template.shape[0], template.shape[1] / 4],
+                    s.dtype == .float16, b.dtype == .float16,
+                    s.shape == [template.shape[0], template.shape[1] / 64], b.shape == s.shape,
+                    all(isFinite(s)).item(Bool.self), all(isFinite(b)).item(Bool.self)
+                else { throw Failure.weights }
+                let value = dequantized(w, scales: s.asType(.float32), biases: b.asType(.float32),
+                    groupSize: 64, bits: 8, dtype: .float32).asType(.float16)
+                eval(value); dense[key] = value
+            } else {
+                guard w.dtype == .float32, w.shape == template.shape,
+                    all(isFinite(w)).item(Bool.self) else { throw Failure.weights }
+                dense[key] = w
+            }
+        }
+        if c.profile.hasSuffix("acc32") {
+            let modules: [(String, Module)] = model.leafModules().flattened().compactMap { name, module in
+                guard name.hasPrefix("tfmr.layers."), let linear = module as? Linear else { return nil }
+                return (name, FP32AccumulatingLinear(weight: linear.weight, bias: nil))
+            }
+            guard modules.count == 210 else { throw Failure.weights }
+            model.update(modules: ModuleChildren.unflattened(modules))
+        }
+        try model.update(parameters: ModuleParameters.unflattened(dense), verify: .all)
+        eval(model)
+        Memory.clearCache()
+        return model
+    }
+
+    /// Diagnostic control: keep FP16 input/weight/output rounding, change only
+    /// the dot-product accumulator's requested dtype. Never used by the renderer.
+    private final class FP32AccumulatingLinear: Linear {
+        override func callAsFunction(_ x: MLXArray) -> MLXArray {
+            matmul(x.asType(.float32), weight.asType(.float32).T).asType(.float16)
+        }
+    }
+
+    /// Compare every decoded half-weight bit to independent CPU reconstruction
+    /// before treating the custom-kernel numbers as an arithmetic experiment.
+    private static func auditCanonicalWeights(_ model: SpeechDecoder) throws -> [String: Any] {
+        var matrices = 0, elements = 0
+        for (_, module) in model.leafModules().flattened() {
+            guard let layer = module as? CanonicalQ8Linear else { continue }
+            try healthy()
+            let actual = Device.withDefaultDevice(.gpu) {
+                let result = layer.reconstructedWeights(); eval(result); return result.asArray(Float16.self)
+            }
+            let expected = Device.withDefaultDevice(.cpu) {
+                let result = dequantized(layer.weight, scales: layer.scales.asType(.float32),
+                    biases: layer.biases!.asType(.float32), groupSize: 64, bits: 8,
+                    dtype: .float32).asType(.float16)
+                eval(result); return result.asArray(Float16.self)
+            }
+            guard actual.count == expected.count,
+                zip(actual, expected).allSatisfy({ $0.bitPattern == $1.bitPattern }) else { throw Failure.output }
+            matrices += 1; elements += actual.count
+            Memory.clearCache()
+        }
+        guard matrices == 210 else { throw Failure.weights }
+        return ["matrices": matrices, "elements": elements, "all_weight_bits_identical": true]
     }
 
     private static func exportQuantized(_ c: Configuration) throws {
@@ -315,7 +429,8 @@ public enum ChatterboxQuantizationDiagnostic {
             oracleFile: URL(fileURLWithPath: oracle), modelDirectory: URL(fileURLWithPath: c.modelDirectory),
             defaultVoice: URL(fileURLWithPath: c.conditioningFile), watermarkDirectory: URL(fileURLWithPath: c.watermarkDirectory),
             acousticComputeUnits: .init(encoder: .cpuOnly, cfm: .cpuOnly, vocoder: .cpuOnly, watermark: .cpuOnly),
-            decoderProfile: .q8ExperimentalV1, reuseAcousticInputs: c.reuseFlowInputs ?? false)
+            decoderProfile: c.profile == "library-q8-canonical" ? .q8CanonicalHalfV2 : .q8ExperimentalV1,
+            reuseAcousticInputs: c.reuseFlowInputs ?? false)
         let loadSeconds = Date().timeIntervalSince(began)
         let narrator = await renderer.makeNarrator(overlap: c.overlap ?? false)
         let voice = URL(fileURLWithPath: c.conditioningFile)
