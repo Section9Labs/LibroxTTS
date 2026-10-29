@@ -62,6 +62,13 @@ final class IndependentReferenceBackboneTests: XCTestCase {
         try Data(repeating: 0, count: 1024).write(to: file)
         XCTAssertThrowsError(try ReferencePinnedBytes.load(file, count: 4, sha256: hash, budget: .init()))
     }
+    func testDiagnosticRuntimeRejectsUnregisteredOrWrongSizedShader() throws {
+        let file = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: file) }
+        try Data([1, 2, 3, 4]).write(to: file)
+        XCTAssertThrowsError(try DiagnosticMetalRuntimeAsset(url: file, expectedSHA256: String(repeating: "0", count: 64)))
+        XCTAssertThrowsError(try DiagnosticMetalRuntimeAsset(url: file, expectedSHA256: DiagnosticMetalRuntimeAsset.sha256))
+    }
     func testHalfCacheBoundaryAndSnapshotAreIndependent() throws {
         let cache = IndependentReferenceBackbone.Cache(), budget = CertifiedHalfProjection.Budget()
         let prefix = (0..<(32 * 255 * 64)).map { Float(Float16(Float($0 % 31 - 15) / 16)) }
@@ -102,7 +109,7 @@ final class IndependentReferenceBackboneTests: XCTestCase {
         let report: [String: Any] = ["completed": true, "mode": "cpu-original-trace-eager-control", "case": "en-short",
             "conditions": 9, "input_vectors_sha256": ReferenceAssemblyInputs.sha256,
             "all_trace_boundaries_bit_identical": true, "all_original_traced_eager_logits_caches_bit_identical": true,
-            "old22_bit_identical": false, "raw_sha256": rawHash, "arms": arms]
+            "old22_bit_identical": false, "raw_sha256": rawHash, "runtime_metallib_sha256": String(repeating: "1", count: 64), "arms": arms]
         let data = try JSONSerialization.data(withJSONObject: report, options: [.sortedKeys])
         let file = directory.appendingPathComponent("report.json"); try data.write(to: file)
         let reportHash = SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()

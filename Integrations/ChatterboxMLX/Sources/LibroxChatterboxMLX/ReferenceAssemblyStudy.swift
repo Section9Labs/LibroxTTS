@@ -110,6 +110,7 @@ enum ReferenceAssemblyStudy {
         let script: URL, python: URL, output: URL
         let regressionControl: URL, caseControl: URL, oldOracle: URL
         let regressionControlSHA256: String, caseControlSHA256: String
+        let runtimeMetallibSHA256: String
         let caseID: String, arm: String
     }
     static func run(_ f: Files) throws {
@@ -121,11 +122,14 @@ enum ReferenceAssemblyStudy {
         let budget = CertifiedHalfProjection.Budget()
         let oldBinding = try AssemblyControlGate.verify(f.regressionControl, sha256: f.regressionControlSHA256, caseID: "regression", oracle: f.oldOracle, budget: budget)
         let caseBinding = try AssemblyControlGate.verify(f.caseControl, sha256: f.caseControlSHA256, caseID: f.caseID, oracle: nil, budget: budget)
+        guard oldBinding["runtime_metallib_sha256"] as? String == f.runtimeMetallibSHA256,
+            caseBinding["runtime_metallib_sha256"] as? String == f.runtimeMetallibSHA256
+        else { throw IndependentReferenceBackbone.Failure.identity }
         try FileManager.default.createDirectory(at: f.output, withIntermediateDirectories: false)
         var report: [String: Any] = ["completed": false, "case": f.caseID, "arm": f.arm,
             "input_vectors_sha256": ReferenceAssemblyInputs.sha256,
             "production_clearance": false, "audio_generated": false, "independent_own_cache": true,
-            "consumed_native_controls": [oldBinding, caseBinding]]
+            "consumed_native_controls": [oldBinding, caseBinding], "runtime_metallib_sha256": f.runtimeMetallibSHA256]
         var stage = "preparation"
         do {
             try Device.withDefaultDevice(.cpu) {
@@ -213,6 +217,7 @@ enum AssemblyControlGate {
         let input_vectors_sha256: String, all_trace_boundaries_bit_identical: Bool
         let all_original_traced_eager_logits_caches_bit_identical: Bool, old22_bit_identical: Bool
         let raw_sha256: String
+        let runtime_metallib_sha256: String
         let arms: [Arm]
     }
     static var boundaryNames: Set<String> {
@@ -297,7 +302,8 @@ enum AssemblyControlGate {
         }
         try budget.check()
         return ["case": caseID, "receipt_sha256": sha256, "raw_sha256": report.raw_sha256,
-            "conditions": expected.count, "boundaries_per_stage": boundaryNames.count]
+            "conditions": expected.count, "boundaries_per_stage": boundaryNames.count,
+            "runtime_metallib_sha256": report.runtime_metallib_sha256]
     }
 }
 #endif

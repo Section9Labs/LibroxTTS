@@ -62,10 +62,20 @@ public enum ChatterboxQuantizationDiagnostic {
         let referenceAssemblyCaseControl: String?
         let referenceAssemblyRegressionControlSHA256: String?
         let referenceAssemblyCaseControlSHA256: String?
+        let runtimeMetallibFile: String?
+        let runtimeMetallibSHA256: String?
     }
 
     public static func run(configurationFile: URL) async throws {
         let c = try JSONDecoder().decode(Configuration.self, from: Data(contentsOf: configurationFile))
+        // Standalone archived CLI executables do not inherit SwiftPM's adjacent
+        // resource bundle. Pin that asset explicitly before ANY MLX operation.
+        let runtimeAsset: DiagnosticMetalRuntimeAsset?
+        if c.runtimeMetallibFile != nil || c.runtimeMetallibSHA256 != nil {
+            guard let path = c.runtimeMetallibFile, let expected = c.runtimeMetallibSHA256 else { throw Failure.configuration }
+            runtimeAsset = try DiagnosticMetalRuntimeAsset(url: URL(fileURLWithPath: path), expectedSHA256: expected)
+            GPU.metallib = runtimeAsset?.url
+        } else { runtimeAsset = nil }
         guard ["baseline", "smdesai-q8-oracle-only", "local-q8-f16scales", "export-local-q8",
                "local-q4-f16scales", "export-local-q4", "local-q8-cpu-reference", "local-q8-rounded-dense",
                "local-q8-rounded-dense-acc32",
@@ -85,6 +95,7 @@ public enum ChatterboxQuantizationDiagnostic {
                "local-q8-reference-engine",
                "local-q8-freeze-holdout-inputs",
                "local-q8-assembly-native-controls", "local-q8-assembled-reference",
+               "local-q8-runtime-bootstrap",
                "acoustic-parity", "library-q8", "library-q8-canonical"].contains(c.profile), c.samples.count <= 6,
               ProcessInfo.processInfo.environment["MLX_ENABLE_TF32"] == "0",
               ProcessInfo.processInfo.environment["CHATTERBOX_SYNTH_SEED"] == "42",
@@ -119,14 +130,25 @@ public enum ChatterboxQuantizationDiagnostic {
               c.samples.allSatisfy({ $0.id.range(of: "^[a-z0-9-]+$", options: .regularExpression) != nil })
         else { throw Failure.configuration }
         ChatterboxMLXRenderer.configureBufferCache(maximumBytes: 64 * 1_024 * 1_024)
+        try runtimeAsset?.verify()
         try healthy(minimumAvailable: 3 * 1_024 * 1_024 * 1_024)
+        if c.profile == "local-q8-runtime-bootstrap" {
+            guard c.samples.isEmpty, let resourceSHA = c.runtimeMetallibSHA256 else { throw Failure.configuration }
+            let output = URL(fileURLWithPath: c.outputDirectory)
+            try FileManager.default.createDirectory(at: output, withIntermediateDirectories: false)
+            try write(["completed": true, "diagnostic_only": true, "model_forward_count": 0,
+                "production_clearance": false, "runtime_metallib_sha256": resourceSHA,
+                "memory_cache_bytes": Memory.cacheMemory], to: output.appendingPathComponent("report.json"))
+            return
+        }
         if c.profile == "local-q8-assembly-native-controls" {
             guard c.samples.isEmpty, let inputs = c.referenceAssemblyInputsFile, let caseID = c.referenceAssemblyCase,
                 let oracle = c.referenceOracleFile, let cpu93 = c.prefillCacheFile, let cpu95 = c.ropeFixtureFile,
+                let resourceSHA = c.runtimeMetallibSHA256,
                 c.expectedSHA256 == ChatterboxMLXRenderer.DecoderProfile.q8CanonicalHalfV2.weightsSHA256 else { throw Failure.configuration }
             try AssemblyNativeControls.run(.init(inputs: URL(fileURLWithPath: inputs), oracle: URL(fileURLWithPath: oracle),
                 cpu93: URL(fileURLWithPath: cpu93), cpu95: URL(fileURLWithPath: cpu95),
-                output: URL(fileURLWithPath: c.outputDirectory), caseID: caseID)) { try loadRoundedDenseComparison(c) }
+                output: URL(fileURLWithPath: c.outputDirectory), caseID: caseID, runtimeMetallibSHA256: resourceSHA)) { try loadRoundedDenseComparison(c) }
             return
         }
         if c.profile == "local-q8-assembled-reference" {
@@ -138,6 +160,7 @@ public enum ChatterboxQuantizationDiagnostic {
                 let caseControl = c.referenceAssemblyCaseControl,
                 let oldControlSHA = c.referenceAssemblyRegressionControlSHA256,
                 let caseControlSHA = c.referenceAssemblyCaseControlSHA256, let oldOracle = c.referenceOracleFile,
+                let resourceSHA = c.runtimeMetallibSHA256,
                 c.expectedSHA256 == ChatterboxMLXRenderer.DecoderProfile.q8CanonicalHalfV2.weightsSHA256 else { throw Failure.configuration }
             try ReferenceAssemblyStudy.run(.init(weights: URL(fileURLWithPath: c.weightsFile),
                 rope: URL(fileURLWithPath: rope), sigmoid: URL(fileURLWithPath: sigmoid), inputs: URL(fileURLWithPath: inputs),
@@ -145,7 +168,7 @@ public enum ChatterboxQuantizationDiagnostic {
                 python: URL(fileURLWithPath: python), output: URL(fileURLWithPath: c.outputDirectory),
                 regressionControl: URL(fileURLWithPath: oldControl), caseControl: URL(fileURLWithPath: caseControl),
                 oldOracle: URL(fileURLWithPath: oldOracle), regressionControlSHA256: oldControlSHA,
-                caseControlSHA256: caseControlSHA, caseID: caseID, arm: arm))
+                caseControlSHA256: caseControlSHA, runtimeMetallibSHA256: resourceSHA, caseID: caseID, arm: arm))
             return
         }
         if c.profile == "local-q8-freeze-holdout-inputs" {

@@ -5,6 +5,7 @@ import hashlib
 import json
 import math
 import os
+import re
 from pathlib import Path
 import signal
 import struct
@@ -17,6 +18,7 @@ CASES = ('en-short', 'en-boundary', 'en-long', 'es-short', 'es-boundary', 'es-lo
 LENGTHS = dict(zip(CASES, (80, 251, 501, 87, 252, 503)))
 INPUT_SHA = '2d20b5932df08b022cbd95e5713de5f5f1c0b15fcebde04801f42b6a0584baf7'
 PREREG_SHA = '7bf0b7d723603fb34b161e3d545a279a3d0487e86e1c987548d01671253bc12b'
+RUNTIME_PREREG_SHA = '8d7b52804e3c7094bddae67d75646567ac20375d60acda036023425da3117173'
 SOURCE = Path('/Users/matt/Code/swift/librox-tts-chatterbox')
 _stop_signal = None
 
@@ -289,6 +291,7 @@ def main(manifest_file, manifest_sha):
     manifest_file = owned(manifest_file)
     manifest, actual_manifest_sha = pinned_json(manifest_file, manifest_sha, maximum=1_048_576)
     pinned_json(owned(manifest['preregistration']), PREREG_SHA, maximum=1_048_576)
+    pinned_json(owned(manifest['runtime_packaging_preregistration']), RUNTIME_PREREG_SHA, maximum=1_048_576)
     if digest(Path(__file__)) != manifest['driver_sha256']:
         raise ValueError('Driver source identity')
     program = owned(manifest['program_directory'])
@@ -297,21 +300,35 @@ def main(manifest_file, manifest_sha):
     executable = owned(manifest['executable'])
     binary_sha = manifest['executable_sha256']
     base = manifest['base_configuration']
+    version = manifest['job_version']
+    if re.fullmatch(r'v[0-9]{2}', version) is None:
+        raise ValueError('Explicit separately-versioned job namespace required')
     root = owned(manifest['run_root'])
     regression = owned(manifest['regression_control'])
     completed = []
     try:
+        runtime = owned(manifest['runtime_metallib_file'])
+        runtime_sha = manifest['runtime_metallib_sha256']
+        if (digest(runtime) != runtime_sha or base.get('runtimeMetallibFile') != str(runtime) or
+                base.get('runtimeMetallibSHA256') != runtime_sha):
+            raise ValueError('Runtime resource binding')
+        bootstrap, _ = receipt(owned(manifest['bootstrap_control']), manifest['bootstrap_control_sha256'])
+        if bootstrap.get('model_forward_count') != 0 or bootstrap.get('runtime_metallib_sha256') != runtime_sha:
+            raise ValueError('Runtime bootstrap prerequisite')
         regression_sha = manifest['regression_control_sha256']
-        if receipt(regression, regression_sha)[0].get('old22_bit_identical') is not True:
+        regression_report = receipt(regression, regression_sha)[0]
+        if (regression_report.get('old22_bit_identical') is not True or
+                regression_report.get('runtime_metallib_sha256') != runtime_sha):
             raise ValueError('Regression control prerequisite')
         controls = {}
         for case in CASES:
             check_stop()
-            output = root / ('assembled-native-controls-' + case + '-v01')
+            output = root / ('assembled-native-controls-' + case + '-' + version)
             config = dict(base, profile='local-q8-assembly-native-controls', referenceAssemblyCase=case,
                           outputDirectory=str(output))
             result, report_sha = run_job(executable, binary_sha, config, output, program)
-            if result.get('case') != case or result.get('all_trace_boundaries_bit_identical') is not True:
+            if (result.get('case') != case or result.get('all_trace_boundaries_bit_identical') is not True or
+                    result.get('runtime_metallib_sha256') != runtime_sha):
                 raise ValueError('Native control outcome')
             controls[case] = (output / 'report.json', report_sha)
             completed.append({'stage': 'native-controls', 'case': case, 'report_sha256': report_sha})
@@ -322,7 +339,7 @@ def main(manifest_file, manifest_sha):
             receipt(regression, regression_sha)
             receipt(*controls[case])
             for arm in ('reference-full', 'reference-chunks'):
-                output = root / ('assembled-' + case + '-' + arm + '-v01')
+                output = root / ('assembled-' + case + '-' + arm + '-' + version)
                 config = dict(base, profile='local-q8-assembled-reference', referenceAssemblyCase=case,
                               referenceAssemblyArm=arm, outputDirectory=str(output),
                               referenceAssemblyRegressionControl=str(regression),

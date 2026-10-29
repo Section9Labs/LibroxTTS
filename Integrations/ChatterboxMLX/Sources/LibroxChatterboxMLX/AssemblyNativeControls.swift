@@ -10,6 +10,7 @@ enum AssemblyNativeControls {
     struct Files {
         let inputs: URL, oracle: URL, cpu93: URL, cpu95: URL, output: URL
         let caseID: String
+        let runtimeMetallibSHA256: String
     }
     static func run(_ f: Files, loadModel: () throws -> SpeechDecoder) throws {
         guard f.caseID == "regression" || ReferenceAssemblyInputs.lengths[f.caseID] != nil,
@@ -17,7 +18,8 @@ enum AssemblyNativeControls {
         try FileManager.default.createDirectory(at: f.output, withIntermediateDirectories: false)
         var report: [String: Any] = ["completed": false, "case": f.caseID,
             "mode": "cpu-original-trace-eager-control", "production_clearance": false,
-            "input_vectors_sha256": ReferenceAssemblyInputs.sha256]
+            "input_vectors_sha256": ReferenceAssemblyInputs.sha256,
+            "runtime_metallib_sha256": f.runtimeMetallibSHA256]
         var stage = "preparation"
         do {
             try Device.withDefaultDevice(.cpu) {
