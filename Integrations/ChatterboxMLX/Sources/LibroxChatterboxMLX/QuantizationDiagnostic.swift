@@ -54,6 +54,14 @@ public enum ChatterboxQuantizationDiagnostic {
         let referenceHoldoutPreregistrationFile: String?
         let referenceChunkControlsFile: String?
         let referenceFrontendIdentitiesFile: String?
+        let referenceAssemblyInputsFile: String?
+        let referenceAssemblyCase: String?
+        let referenceAssemblyArm: String?
+        let referenceAssemblyRoPEFile: String?
+        let referenceAssemblyRegressionControl: String?
+        let referenceAssemblyCaseControl: String?
+        let referenceAssemblyRegressionControlSHA256: String?
+        let referenceAssemblyCaseControlSHA256: String?
     }
 
     public static func run(configurationFile: URL) async throws {
@@ -76,6 +84,7 @@ public enum ChatterboxQuantizationDiagnostic {
                "local-q8-reference-softmax",
                "local-q8-reference-engine",
                "local-q8-freeze-holdout-inputs",
+               "local-q8-assembly-native-controls", "local-q8-assembled-reference",
                "acoustic-parity", "library-q8", "library-q8-canonical"].contains(c.profile), c.samples.count <= 6,
               ProcessInfo.processInfo.environment["MLX_ENABLE_TF32"] == "0",
               ProcessInfo.processInfo.environment["CHATTERBOX_SYNTH_SEED"] == "42",
@@ -111,6 +120,34 @@ public enum ChatterboxQuantizationDiagnostic {
         else { throw Failure.configuration }
         ChatterboxMLXRenderer.configureBufferCache(maximumBytes: 64 * 1_024 * 1_024)
         try healthy(minimumAvailable: 3 * 1_024 * 1_024 * 1_024)
+        if c.profile == "local-q8-assembly-native-controls" {
+            guard c.samples.isEmpty, let inputs = c.referenceAssemblyInputsFile, let caseID = c.referenceAssemblyCase,
+                let oracle = c.referenceOracleFile, let cpu93 = c.prefillCacheFile, let cpu95 = c.ropeFixtureFile,
+                c.expectedSHA256 == ChatterboxMLXRenderer.DecoderProfile.q8CanonicalHalfV2.weightsSHA256 else { throw Failure.configuration }
+            try AssemblyNativeControls.run(.init(inputs: URL(fileURLWithPath: inputs), oracle: URL(fileURLWithPath: oracle),
+                cpu93: URL(fileURLWithPath: cpu93), cpu95: URL(fileURLWithPath: cpu95),
+                output: URL(fileURLWithPath: c.outputDirectory), caseID: caseID)) { try loadRoundedDenseComparison(c) }
+            return
+        }
+        if c.profile == "local-q8-assembled-reference" {
+            guard c.samples.isEmpty, let inputs = c.referenceAssemblyInputsFile, let caseID = c.referenceAssemblyCase,
+                let arm = c.referenceAssemblyArm, let rope = c.referenceAssemblyRoPEFile,
+                let sigmoid = c.referenceSigmoidFile, let parent = c.referenceHoldoutPreregistrationFile,
+                let chunk = c.referenceChunkControlsFile, let script = c.referenceResolverScript,
+                let python = c.referenceResolverPython, let oldControl = c.referenceAssemblyRegressionControl,
+                let caseControl = c.referenceAssemblyCaseControl,
+                let oldControlSHA = c.referenceAssemblyRegressionControlSHA256,
+                let caseControlSHA = c.referenceAssemblyCaseControlSHA256, let oldOracle = c.referenceOracleFile,
+                c.expectedSHA256 == ChatterboxMLXRenderer.DecoderProfile.q8CanonicalHalfV2.weightsSHA256 else { throw Failure.configuration }
+            try ReferenceAssemblyStudy.run(.init(weights: URL(fileURLWithPath: c.weightsFile),
+                rope: URL(fileURLWithPath: rope), sigmoid: URL(fileURLWithPath: sigmoid), inputs: URL(fileURLWithPath: inputs),
+                parent: URL(fileURLWithPath: parent), chunk: URL(fileURLWithPath: chunk), script: URL(fileURLWithPath: script),
+                python: URL(fileURLWithPath: python), output: URL(fileURLWithPath: c.outputDirectory),
+                regressionControl: URL(fileURLWithPath: oldControl), caseControl: URL(fileURLWithPath: caseControl),
+                oldOracle: URL(fileURLWithPath: oldOracle), regressionControlSHA256: oldControlSHA,
+                caseControlSHA256: caseControlSHA, caseID: caseID, arm: arm))
+            return
+        }
         if c.profile == "local-q8-freeze-holdout-inputs" {
             guard c.samples.isEmpty, let plan = c.referenceHoldoutPlanFile,
                 let parent = c.referenceHoldoutPreregistrationFile, let chunk = c.referenceChunkControlsFile,

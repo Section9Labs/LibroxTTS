@@ -121,6 +121,7 @@ private class T3Llama3ScaledRoPE: Module {
 
 private class T3Attention: Module {
 #if os(macOS)
+    var diagnosticBoundaryObserver: ((String, MLXArray) -> Void)?
     var diagnosticMaterializedAttention = false
     var diagnosticPrimitiveObserver: ((String, MLXArray) -> Void)?
 #endif
@@ -177,6 +178,9 @@ private class T3Attention: Module {
 
         let attentionType: DType = accurateActivations ? .float32 : projectionType
 #if os(macOS)
+        diagnosticBoundaryObserver?("query", queries.asType(attentionType))
+        diagnosticBoundaryObserver?("key", keys.asType(attentionType))
+        diagnosticBoundaryObserver?("value", values.asType(attentionType))
         if let observe = diagnosticPrimitiveObserver {
             observe("query", queries.asType(attentionType))
             observe("key", keys.asType(attentionType))
@@ -202,6 +206,7 @@ private class T3Attention: Module {
         let output = attended.transposed(0, 2, 1, 3).reshaped(b, l, -1).asType(projectionType)
 #if os(macOS)
         diagnosticPrimitiveObserver?("output", attended)
+        diagnosticBoundaryObserver?("output", attended)
 #endif
 
         return wo(output).asType(x.dtype)
@@ -212,6 +217,7 @@ private class T3Attention: Module {
 
 private class T3MLP: Module {
 #if os(macOS)
+    var diagnosticBoundaryObserver: ((String, MLXArray) -> Void)?
     var diagnosticUncompiledSiLU = false
     var diagnosticPrimitiveObserver: ((String, MLXArray) -> Void)?
 #endif
@@ -238,6 +244,7 @@ private class T3MLP: Module {
             let activated = silu(gate(projectedInput).asType(.float32)) * up(projectedInput).asType(.float32)
 #if os(macOS)
             diagnosticPrimitiveObserver?("activated", activated)
+            diagnosticBoundaryObserver?("activated", activated)
 #endif
             return down(activated.asType(projectionType)).asType(x.dtype)
         }
@@ -249,6 +256,7 @@ private class T3MLP: Module {
 
 private class T3TransformerBlock: Module {
 #if os(macOS)
+    var diagnosticBoundaryObserver: ((String, MLXArray) -> Void)?
     var diagnosticExplicitNorm = false
 #endif
     @ModuleInfo(key: "self_attn") var attention: T3Attention
@@ -276,6 +284,21 @@ private class T3TransformerBlock: Module {
                 projectionType: projectionType, accurateActivations: accurateActivations)
         }
 #endif
+#if os(macOS)
+        if let observe = diagnosticBoundaryObserver {
+            let n = inputLayerNorm(x)
+            observe("input_layernorm.input", x); observe("input_layernorm.output", n)
+            let r = attention(n, mask: mask, cache: cache, projectionType: projectionType,
+                accurateActivations: accurateActivations)
+            let h = x + r
+            observe("attention_residual", h)
+            let p = postAttentionLayerNorm(h)
+            observe("post_attention_layernorm.input", h); observe("post_attention_layernorm.output", p)
+            let output = h + mlp(p, projectionType: projectionType, accurateActivations: accurateActivations)
+            observe("mlp_residual", output)
+            return output
+        }
+#endif
         let r = attention(inputLayerNorm(x), mask: mask, cache: cache, projectionType: projectionType,
                           accurateActivations: accurateActivations)
         let h = x + r
@@ -291,6 +314,7 @@ private class T3TransformerBlock: Module {
 /// This corresponds to LLaMA's model.layers + norm, accepting pre-computed embeddings.
 class T3LlamaInner: Module {
 #if os(macOS)
+    private var diagnosticBoundaryObserver: ((String, MLXArray) -> Void)?
     private var diagnosticExplicitNorm = false
     private var diagnosticPrimitiveObserver: ((String, MLXArray) -> Void)?
 #endif
@@ -303,6 +327,16 @@ class T3LlamaInner: Module {
     }
 
 #if os(macOS)
+    func diagnosticObserveBoundaries(_ observer: ((String, MLXArray) -> Void)?) {
+        diagnosticBoundaryObserver = observer
+        for (index, layer) in layers.enumerated() {
+            let prefix = "tfmr.layers.\(index)."
+            layer.diagnosticBoundaryObserver = observer.map { o in { name, array in o(prefix + name, array) } }
+            layer.attention.diagnosticBoundaryObserver = observer.map { o in { name, array in o(prefix + "attention." + name, array) } }
+            layer.mlp.diagnosticBoundaryObserver = observer.map { o in { name, array in o(prefix + "mlp." + name, array) } }
+        }
+    }
+
     func diagnosticObservePrimitives(_ observer: ((String, MLXArray) -> Void)?) {
         diagnosticPrimitiveObserver = observer
         for (index, layer) in layers.enumerated() {
@@ -354,6 +388,8 @@ class T3LlamaInner: Module {
 #if os(macOS)
         diagnosticPrimitiveObserver?("tfmr.norm.input", h)
         diagnosticPrimitiveObserver?("tfmr.norm.output", output)
+        diagnosticBoundaryObserver?("tfmr.norm.input", h)
+        diagnosticBoundaryObserver?("tfmr.norm.output", output)
 #endif
         return output
     }
