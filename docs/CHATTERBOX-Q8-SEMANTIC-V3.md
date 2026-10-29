@@ -37,3 +37,25 @@ buffer/underrun and complete-audio RTF measurements. Private phone conditioning
 stays on the phone. Matt's listening approval and physical phone validation
 remain separate final gates. T3 receives only the exact reviewed library and
 artifact contract after these checks, and owns application integration.
+
+## Runtime and complete-pipeline results
+
+The independently generated original-input reference is SHA256
+`d2878e946dfef6f4a0073493b4196a201fa1993fd4551d744d67646ada900d86`.
+All 18 startup comparisons pass in the archived V3 runtime, including the
+previous Spanish failure. Its bundled table resolves inside the copied
+resource bundle. Release checks pass 42 MLX tests plus the 57-case library run
+(with three opt-in real-model integrations skipped). This does not clear phone
+execution or listening quality.
+
+The first matched full-pipeline run stopped on the **Standard** baseline:
+English completed 36.24 seconds of generated audio in 34.993 seconds (RTF 0.966),
+then Spanish unit 0 reached `generationLimit` before audio. V3 audio did not run.
+The failed run and all English PCM/per-unit progress remain immutable.
+Compatible grouping merges up to 300 characters, while the multilingual
+frontend retains a hard 350-token generation bound. The failed first Spanish
+paragraph has 246 characters and 42 words; this is a hypothesis for the failure,
+not proof of causation. The separately registered sentence-control experiment
+changes only the existing explicit grouping mode, retaining text, conditioning,
+seeds, arithmetic, the 350-token guard, CPU acoustics and watermark. No phone
+build is cleared while this full-pipeline issue remains.
