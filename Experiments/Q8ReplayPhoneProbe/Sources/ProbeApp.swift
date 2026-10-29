@@ -15,7 +15,7 @@ struct Q8ReplayProbeApp: App {
                 Text(state.phase)
                 Text("Public test inputs only. No recordings or narration.")
                     .font(.footnote).foregroundStyle(.secondary)
-                Text("Build 0.2 (10)").font(.caption.monospaced()).foregroundStyle(.secondary)
+                Text("Build " + ProbeState.buildLabel).font(.caption.monospaced()).foregroundStyle(.secondary)
             }
             .padding(30)
             .task { if scenePhase == .active { state.start() } }
@@ -35,10 +35,18 @@ private final class ProbeState: ObservableObject {
     private var watchdog: Task<Void, Never>?
     private var stopReason: String?
     private var runID: String?
+    private let launchID = UUID().uuidString
+    private var activeRunDirectory: URL?
+    static var buildLabel: String {
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "unknown"
+        let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "unknown"
+        return "\(version) (\(build))"
+    }
     private var root: URL {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("q8-cache-replay-v01", isDirectory: true)
     }
+    private var launchDirectory: URL { root.appendingPathComponent("launches/" + launchID, isDirectory: true) }
     private struct Request: Decodable {
         let runID: UUID
         let expiresAt: Double
@@ -61,6 +69,7 @@ private final class ProbeState: ObservableObject {
             do {
                 try FileManager.default.createDirectory(at: root.appendingPathComponent("inputs"),
                                                         withIntermediateDirectories: true)
+                try FileManager.default.createDirectory(at: launchDirectory, withIntermediateDirectories: true)
                 phase = "Waiting for diagnostic files"
                 try writeStatus("waiting")
                 let requestURL = root.appendingPathComponent("request.json")
@@ -69,7 +78,12 @@ private final class ProbeState: ObservableObject {
                     try await Task.sleep(for: .milliseconds(250))
                 }
                 try Task.checkCancellation()
-                let request = try JSONDecoder().decode(Request.self, from: Data(contentsOf: requestURL))
+                // Retire even an invalid/expired request once, preserving its
+                // bytes in this launch's owned evidence directory.
+                let archivedRequest = launchDirectory.appendingPathComponent("received-request.json")
+                try FileManager.default.moveItem(at: requestURL, to: archivedRequest)
+                let requestData = try Data(contentsOf: archivedRequest)
+                let request = try JSONDecoder().decode(Request.self, from: requestData)
                 let expectedSDK = Bundle.main.object(forInfoDictionaryKey: "LibroxSDKRevision") as? String
                 guard request.expiresAt > Date().timeIntervalSince1970,
                     request.expiresAt <= Date().timeIntervalSince1970 + 180,
@@ -78,7 +92,8 @@ private final class ProbeState: ObservableObject {
                 let directory = root.appendingPathComponent("runs/" + request.runID.uuidString, isDirectory: true)
                 guard !FileManager.default.fileExists(atPath: directory.path) else { throw ProbeError.alreadyConsumed }
                 try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-                try Data(contentsOf: requestURL).write(to: directory.appendingPathComponent("consumed-request.json"), options: .atomic)
+                activeRunDirectory = directory
+                try requestData.write(to: directory.appendingPathComponent("consumed-request.json"), options: .atomic)
                 try Task.checkCancellation()
                 guard UIApplication.shared.applicationState == .active else { throw CancellationError() }
                 phase = "Measuring three fixed-input cases"
@@ -114,11 +129,13 @@ private final class ProbeState: ObservableObject {
     }
     private func writeStatus(_ status: String, error: [String: Any]? = nil) throws {
         var value: [String: Any] = ["status": status, "at": Date().timeIntervalSince1970,
-            "build": "0.2 (10)", "sdkRevision": Bundle.main.object(forInfoDictionaryKey: "LibroxSDKRevision") as? String ?? "unknown",
-            "diagnosticOnly": true, "runID": runID ?? "pending", "idleHoldMaximumSeconds": 90]
+            "build": Self.buildLabel, "sdkRevision": Bundle.main.object(forInfoDictionaryKey: "LibroxSDKRevision") as? String ?? "unknown",
+            "diagnosticOnly": true, "runID": runID ?? "pending", "launchID": launchID, "idleHoldMaximumSeconds": 90]
         if let error { value["error"] = error }
-        try JSONSerialization.data(withJSONObject: value, options: [.prettyPrinted, .sortedKeys])
-            .write(to: root.appendingPathComponent("latest-status.json"), options: .atomic)
+        let data = try JSONSerialization.data(withJSONObject: value, options: [.prettyPrinted, .sortedKeys])
+        try data.write(to: launchDirectory.appendingPathComponent("status.json"), options: .atomic)
+        if let activeRunDirectory { try data.write(to: activeRunDirectory.appendingPathComponent("status.json"), options: .atomic) }
+        try data.write(to: root.appendingPathComponent("latest-status.json"), options: .atomic)
     }
     private enum ProbeError: Error { case invalidRequest, alreadyConsumed }
 }

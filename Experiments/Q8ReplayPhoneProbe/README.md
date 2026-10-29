@@ -1,7 +1,7 @@
 # Isolated Q8 cache diagnostic
 
 Local developer harness only, bundle `com.librox.ChatterboxBenchmark`, version
-0.2(10). It does not update Librox, access its container, load voice recordings,
+0.2(11). It does not update Librox, access its container, load voice recordings,
 produce audio or change the production accuracy gate. It uses the SDK's reviewed
 fixed-fixture diagnostic rather than implementing model math in an app.
 
@@ -26,11 +26,14 @@ and copy these public artifacts into its container:
 Copy `Documents/q8-cache-replay-v01/request.json` **last**. It must contain a new
 UUID `runID`, `expiresAt` (Unix seconds, no more than180seconds ahead), and the
 exact `sdkRevision` from `project.yml`. The SDK verifies all artifact identities.
-The request is consumed once before model work; a consumed or expired request
-cannot run again automatically.
+Each received request is atomically retired into its unique launch directory,
+including malformed/expired requests. A valid request is consumed once before
+model work; no automatic retry.
 
 Read `Documents/q8-cache-replay-v01/latest-status.json`, then
-`Documents/q8-cache-replay-v01/runs/<runID>/report.json`. Results contain fixed
+`Documents/q8-cache-replay-v01/runs/<runID>/report.json`. Each launch and accepted
+run retains its own status/error receipt; a later launch cannot overwrite old
+terminal evidence. Results contain fixed
 public-fixture comparisons only. Keep all previous benchmark data and reports.
 After results are captured and the worker is finished, terminate only this owned
 benchmark process and release the phone reservation. No release or TestFlight.
