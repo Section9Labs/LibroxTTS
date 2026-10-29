@@ -10,7 +10,7 @@ public actor ChatterboxTokenSynthesizer {
     private let watermark: PerthWatermarker
 
     public init(modelDirectory: URL, conditioningFile: URL, watermarkDirectory: URL,
-                computeUnits: PipelineComputeUnits) async throws {
+                computeUnits: PipelineComputeUnits, reuseFlowInputs: Bool = false) async throws {
         let encoder = try await Self.compiled("S3Encoder", directory: modelDirectory)
         let flow = try await Self.compiled("S3CFM", directory: modelDirectory)
         let vocoder = try await Self.compiled("S3Vocoder", directory: modelDirectory)
@@ -22,7 +22,8 @@ public actor ChatterboxTokenSynthesizer {
               conditioning.genEmbedding.allSatisfy(\.isFinite), conditioning.promptFeat.allSatisfy(\.isFinite)
         else { throw ChatterboxError.invalidModelOutput("Invalid acoustic conditioning") }
         self.conditioning = conditioning
-        synth = try SynthRunner(encoderURL: encoder, cfmURL: flow, vocoderURL: vocoder, computeUnits: computeUnits)
+        synth = try SynthRunner(encoderURL: encoder, cfmURL: flow, vocoderURL: vocoder,
+                               computeUnits: computeUnits, reuseFlowInputs: reuseFlowInputs)
         watermark = try PerthWatermarker(modelDirectory: watermarkDirectory, computeUnits: computeUnits.watermark ?? .cpuOnly)
     }
 
@@ -37,26 +38,38 @@ public actor ChatterboxTokenSynthesizer {
     }
 
     public func render(tokens: [Int]) throws -> [Float] {
-        try render(tokens: tokens, conditioning: conditioning)
+        try renderMeasured(tokens: tokens, conditioning: conditioning).samples
     }
 
     public func render(tokens: [Int], conditioningFile: URL) throws -> [Float] {
         try ChatterboxVoiceFile.validate(at: conditioningFile)
-        return try render(tokens: tokens, conditioning: Conditionals(contentsOf: conditioningFile))
+        return try renderMeasured(tokens: tokens, conditioning: Conditionals(contentsOf: conditioningFile)).samples
     }
 
-    private func render(tokens: [Int], conditioning: Conditionals) throws -> [Float] {
+    public func renderMeasured(tokens: [Int], conditioningFile: URL? = nil) throws -> ChatterboxAcousticOutput {
+        if let conditioningFile {
+            try ChatterboxVoiceFile.validate(at: conditioningFile)
+            return try renderMeasured(tokens: tokens, conditioning: Conditionals(contentsOf: conditioningFile))
+        }
+        return try renderMeasured(tokens: tokens, conditioning: conditioning)
+    }
+
+    private func renderMeasured(tokens: [Int], conditioning: Conditionals) throws -> ChatterboxAcousticOutput {
         guard !tokens.isEmpty, tokens.count <= 1_000, tokens.allSatisfy({ (0..<6561).contains($0) })
         else { throw ChatterboxError.invalidModelOutput("Invalid or unbounded speech tokens") }
         try Task.checkCancellation()
-        let samples = try synth.synthesize(generatedTokens: tokens, conds: conditioning)
+        let output = try synth.synthesizeMeasured(generatedTokens: tokens, conds: conditioning)
+        let samples = output.samples
         try Task.checkCancellation()
         guard !samples.isEmpty, samples.count <= 24_000 * 120, samples.allSatisfy(\.isFinite)
         else { throw ChatterboxError.invalidModelOutput("Invalid synthesized audio") }
+        let began = Date()
         let marked = try watermark.applyWatermark(samples, sampleRate: 24_000)
         guard marked.count == samples.count, marked.allSatisfy(\.isFinite)
         else { throw ChatterboxError.invalidModelOutput("Invalid watermarked audio") }
-        return marked
+        var timings = output.timings
+        timings.watermarkSeconds = Date().timeIntervalSince(began)
+        return .init(samples: marked, timings: timings)
     }
 }
 

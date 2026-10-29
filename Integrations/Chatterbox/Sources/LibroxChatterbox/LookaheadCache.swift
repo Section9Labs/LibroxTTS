@@ -27,6 +27,9 @@ public struct ChatterboxCachedUnit: Sendable {
     public let unit: ChatterboxCacheUnit
     public let file: URL
     public let frames: Int
+    /// In-memory counters for a newly rendered complete unit; not persisted in PCM.
+    public var timings: ChatterboxChunkTimings? = nil
+    public var cacheHit = true
     public var durationSeconds: TimeInterval { Double(frames) / 24_000 }
 }
 
@@ -50,6 +53,8 @@ public actor ChatterboxLookaheadCache {
     private var pendingRequest = 0
     private var pendingChunk = 0
     private var nextReady = 0
+    private var renderedIndices: Set<Int> = []
+    private var renderedTimings: [Int: ChatterboxChunkTimings] = [:]
 
     /// Use a dedicated, disposable app cache directory. Unrelated files are ignored.
     public init(directory: URL, maximumBytes: Int = 64 * 1_024 * 1_024,
@@ -80,6 +85,7 @@ public actor ChatterboxLookaheadCache {
             occupied = false
             pendingSamples.removeAll(keepingCapacity: false)
             pendingRequest = 0; pendingChunk = 0; nextReady = 0
+            renderedIndices.removeAll(); renderedTimings.removeAll()
         }
         try Task.checkCancellation()
         let protected = Set(units.map(\.key))
@@ -125,6 +131,9 @@ public actor ChatterboxLookaheadCache {
         if value.isFinalChunk {
             try Task.checkCancellation()
             try store(pendingSamples, key: work[value.requestIndex].key, protected: protected)
+            let index = work[value.requestIndex].index
+            renderedIndices.insert(index)
+            if pendingChunk == 1 { renderedTimings[index] = value.audio.timings }
             pendingSamples.removeAll(keepingCapacity: false)
             pendingRequest += 1; pendingChunk = 0
             try await publishReadyPrefix(window, onReady: onReady)
@@ -145,7 +154,10 @@ public actor ChatterboxLookaheadCache {
         let frames = data.withUnsafeBytes { Int(UInt32(littleEndian: $0.loadUnaligned(fromByteOffset: 12, as: UInt32.self))) }
         let file = try path(unit.key)
         try FileManager.default.setAttributes([.modificationDate: Date()], ofItemAtPath: file.path)
-        return ChatterboxCachedUnit(unit: unit, file: file, frames: frames)
+        var result = ChatterboxCachedUnit(unit: unit, file: file, frames: frames)
+        result.cacheHit = !renderedIndices.contains(unit.index)
+        result.timings = renderedTimings[unit.index]
+        return result
     }
 
     private func path(_ key: String) throws -> URL {

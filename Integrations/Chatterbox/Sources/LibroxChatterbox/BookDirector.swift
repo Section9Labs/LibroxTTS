@@ -7,20 +7,42 @@ public struct ChatterboxDirectedUnit: Sendable {
     public let request: ChatterboxRequest
     public let timingContext: DialogueTimingContext
     public let performance: NarrationPerformance
+    /// Original UTF-16 ranges of the component sentence fragments. Audio offsets
+    /// are deliberately absent: the model provides no validated sentence aligner.
+    public var sourceFragments: [NSRange] = []
 }
 
 /// Text-native orchestration using Librox's source/cast, performance and timing
 /// contracts. Delivery names remain descriptive evidence, not exact model switches.
 public enum ChatterboxBookDirector {
-    public static let revision = "librox-chatterbox-director-1"
+    public static let revision = "librox-chatterbox-director-2"
     public enum Direction: Sendable { case neutral, storyteller }
-    public enum PlanningError: Error { case unbreakableUnit, tooManyUnits }
+    public enum Grouping: Sendable, Equatable {
+        case sentences
+        /// Narration only; dialogue, paragraph and performance changes remain boundaries.
+        case compatibleNarration(maxCharacters: Int = 300)
+        public var cacheRevision: String {
+            switch self {
+            case .sentences: "sentences-1"
+            case .compatibleNarration(let maximum): "compatible-narration-1:\(maximum)"
+            }
+        }
+    }
+    public enum PlanningError: Error { case unbreakableUnit, tooManyUnits, invalidGroupingBudget }
 
     public static func plan(_ source: String, language: String, narratorID: String,
                             conditioningFiles: [String: URL], direction: Direction = .storyteller,
+                            grouping: Grouping = .sentences,
                             reviewedDialogue: [DialogueAnnotation]? = nil,
                             characterVoices: [String: String] = [:], seed: UInt64? = nil) throws -> [ChatterboxDirectedUnit] {
         guard ["en", "es"].contains(language) else { throw ChatterboxNarrationError.unsupportedLanguage(language) }
+        let characterBudget: Int
+        switch grouping {
+        case .sentences: characterBudget = 300
+        case .compatibleNarration(let maximum):
+            guard (50...300).contains(maximum) else { throw PlanningError.invalidGroupingBudget }
+            characterBudget = maximum
+        }
         let story = StoryNarrator()
         // Unreviewed quotes supply possible delivery boundaries only. They never
         // identify a character or alternate model voices.
@@ -41,7 +63,7 @@ public enum ChatterboxBookDirector {
             for index in 0..<(cuts.count - 1) {
                 var remaining = cuts[index]..<cuts[index + 1]
                 while !remaining.isEmpty {
-                    var end = span.text.index(remaining.lowerBound, offsetBy: 300, limitedBy: remaining.upperBound) ?? remaining.upperBound
+                    var end = span.text.index(remaining.lowerBound, offsetBy: characterBudget, limitedBy: remaining.upperBound) ?? remaining.upperBound
                     if end < remaining.upperBound {
                         guard let space = span.text[remaining.lowerBound..<end].lastIndex(where: \.isWhitespace), space > remaining.lowerBound
                         else { throw PlanningError.unbreakableUnit }
@@ -72,13 +94,45 @@ public enum ChatterboxBookDirector {
                         previousRole: previous?.role ?? .unknown, nextRole: role,
                         structuralBreak: gap.contains(where: \.isNewline) ? .paragraph : .none,
                         sourceGap: gap, languageCode: language)
-                    result.append(.init(request: request, timingContext: context, performance: performance))
+                    let candidate = ChatterboxDirectedUnit(request: request, timingContext: context,
+                        performance: performance, sourceFragments: [range])
+                    if case .compatibleNarration = grouping, let last = result.last,
+                       let merged = try merged(last, candidate, source: original, maximum: characterBudget) {
+                        result[result.count - 1] = merged
+                    } else { result.append(candidate) }
                     guard result.count <= 128 else { throw PlanningError.tooManyUnits }
                     previous = unit
                 }
             }
         }
         return result
+    }
+
+    private static func merged(_ left: ChatterboxDirectedUnit, _ right: ChatterboxDirectedUnit,
+                               source: NSString, maximum: Int) throws -> ChatterboxDirectedUnit? {
+        let a = left.request, b = right.request
+        guard left.timingContext.nextRole == .narration, right.timingContext.nextRole == .narration,
+              right.timingContext.structuralBreak == .none,
+              left.performance == right.performance,
+              a.language == b.language, a.conditioningFile == b.conditioningFile,
+              a.exaggeration == b.exaggeration, a.guidance == b.guidance,
+              a.temperature == b.temperature, a.maxTokens == b.maxTokens, a.seed == b.seed,
+              let ac = a.sourceContext, let bc = b.sourceContext,
+              ac.voiceID == bc.voiceID, ac.speakerID == bc.speakerID,
+              NSMaxRange(ac.range) <= bc.range.location else { return nil }
+        let gap = source.substring(with: NSRange(location: NSMaxRange(ac.range),
+                                                 length: bc.range.location - NSMaxRange(ac.range)))
+        guard gap.allSatisfy(\.isWhitespace), !gap.contains(where: \.isNewline) else { return nil }
+        let range = NSRange(location: ac.range.location, length: NSMaxRange(bc.range) - ac.range.location)
+        let text = source.substring(with: range)
+        guard text.count <= maximum else { return nil }
+        let context = ChatterboxSourceContext(range: range, originalText: text, voiceID: ac.voiceID,
+            speakerID: ac.speakerID, performance: left.performance)
+        let request = try ChatterboxRequest(text: text, language: a.language, conditioningFile: a.conditioningFile,
+            exaggeration: a.exaggeration, guidance: a.guidance, temperature: a.temperature,
+            maxTokens: a.maxTokens, seed: a.seed, sourceContext: context)
+        return .init(request: request, timingContext: left.timingContext, performance: left.performance,
+                     sourceFragments: left.sourceFragments + right.sourceFragments)
     }
 
     private static func intensity(_ value: NarrationPerformance) -> Float {

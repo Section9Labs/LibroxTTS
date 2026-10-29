@@ -75,6 +75,7 @@ public struct ChatterboxChunkTimings: Sendable {
     public let decodeBackend: String
     public var hostAssemblySeconds: TimeInterval = 0
     public var conditioningCacheHit: Bool? = nil
+    public var acoustics: ChatterboxAcousticTimings? = nil
     /// Present only for the explicit decode profiling diagnostic.
     public var decodeSteps: DecodeStepTimings? = nil
     public init(prefillSeconds: TimeInterval, decodeSeconds: TimeInterval, synthSeconds: TimeInterval,
@@ -112,6 +113,11 @@ public struct ChatterboxBatchChunk: Sendable {
     /// The original immutable request, including source/cast/performance metadata.
     public let request: ChatterboxRequest
     public let audio: ChatterboxAudioChunk
+    public init(requestIndex: Int, chunkIndex: Int, isFinalChunk: Bool,
+                request: ChatterboxRequest, audio: ChatterboxAudioChunk) {
+        self.requestIndex = requestIndex; self.chunkIndex = chunkIndex; self.isFinalChunk = isFinalChunk
+        self.request = request; self.audio = audio
+    }
 }
 
 /// Optional Core ML backend. Owns no audio session, downloads, playback, or Kokoro state.
@@ -119,7 +125,7 @@ public struct ChatterboxBatchChunk: Sendable {
 public actor ChatterboxNarrator {
     public typealias Renderer = @Sendable (ChatterboxRequest) async throws -> ChatterboxAudioChunk
     typealias Source = @Sendable (ChatterboxRequest) -> AsyncThrowingStream<ChatterboxAudioChunk, Error>
-    typealias BatchSource = @Sendable ([ChatterboxRequest], @escaping @Sendable (ChatterboxBatchChunk) async throws -> Void) async throws -> Void
+    public typealias BatchSource = @Sendable ([ChatterboxRequest], @escaping @Sendable (ChatterboxBatchChunk) async throws -> Void) async throws -> Void
     private var source: Source?
     private var batchSource: BatchSource?
     private var occupied = false
@@ -130,6 +136,9 @@ public actor ChatterboxNarrator {
     /// An alternative decoder can use the same source bridge and lookahead cache.
     /// Direct awaited calls preserve cancellation and busy-lease lifetime.
     public init(rendering: @escaping Renderer) { renderer = rendering }
+    public init(rendering: @escaping Renderer, batchRendering: @escaping BatchSource) {
+        renderer = rendering; batchSource = batchRendering
+    }
     init(source: @escaping Source) { self.source = source }
     init(batchSource: @escaping BatchSource) { self.batchSource = batchSource }
 
@@ -277,7 +286,8 @@ public actor ChatterboxNarrator {
         for request in requests {
             if let voice = request.conditioningFile { try Self.requireFile(voice) }
         }
-        if let renderer {
+        if let batchSource { try await batchSource(requests, receive) }
+        else if let renderer {
             // Direct renderers provide one complete bounded unit per call.
             // They share the same cache/identity contract without replicating models.
             for (index, request) in requests.enumerated() {
@@ -286,7 +296,7 @@ public actor ChatterboxNarrator {
                 try Task.checkCancellation()
                 try await receive(.init(requestIndex: index, chunkIndex: 0, isFinalChunk: true, request: request, audio: audio))
             }
-        } else { try await batchSource!(requests, receive) }
+        }
         try Task.checkCancellation()
     }
 

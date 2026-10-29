@@ -2,6 +2,25 @@ import Foundation
 import CoreML
 
 extension MLMultiArray {
+    /// Reuses an owned synchronous-prediction input, preserving every Float bit.
+    /// Never call while an asynchronous prediction is using this array.
+    func replaceContiguousFloat32(with values: [Float]) throws {
+        var expectedStride = 1
+        for index in shape.indices.reversed() {
+            guard strides[index].intValue == expectedStride else {
+                throw ChatterboxError.invalidModelOutput("Noncontiguous reusable input")
+            }
+            expectedStride *= shape[index].intValue
+        }
+        guard dataType == .float32, count == values.count else {
+            throw ChatterboxError.invalidModelOutput("Reusable input type/count mismatch")
+        }
+        withUnsafeMutableBytes { raw, _ in
+            values.withUnsafeBufferPointer {
+                raw.baseAddress!.assumingMemoryBound(to: Float.self).update(from: $0.baseAddress!, count: values.count)
+            }
+        }
+    }
     /// Builds a contiguous Int32 MLMultiArray with the given shape.
     static func int32(_ values: [Int32], shape: [Int]) throws -> MLMultiArray {
         let array = try MLMultiArray(shape: shape.map { NSNumber(value: $0) }, dataType: .int32)

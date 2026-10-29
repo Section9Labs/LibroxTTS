@@ -11,6 +11,25 @@ import Darwin
 /// owns foreground eligibility and global MLX memory/cache budgets.
 public actor ChatterboxMLXRenderer {
     public static let profile = "native-mlx-mixed-f16-accurate-1"
+    public enum DecoderProfile: String, Sendable {
+        case mixedFloat16Accurate = "native-mlx-mixed-f16-accurate-1"
+        /// Explicit trial profile, not a claim of original-FP32 or listening parity.
+        case q8ExperimentalV1 = "native-mlx-q8-g64-f16-affine-experimental-1"
+        public var weightsSHA256: String {
+            switch self {
+            case .mixedFloat16Accurate: "3df864ea174ee38478910c9b03358b36f2241166844bd5458c9b2f917e110ab0"
+            case .q8ExperimentalV1: "231647ebb4deedad901c46cf3d7ca1e0fa70371b461c934c14dc63f16ec69017"
+            }
+        }
+        public var oracleSHA256: String {
+            switch self {
+            case .mixedFloat16Accurate: "87b8ab31eda9c63abbeecb8a9f0678bc8e0fe6980396ea0c4f9e16637ef618d2"
+            case .q8ExperimentalV1: "8f7b5d2a6437c23cfa753f0ac25e2f23f296ca32f3e91b98b3f6219b26325b44"
+            }
+        }
+    }
+    public nonisolated let decoderProfile: DecoderProfile
+    public nonisolated var profileIdentifier: String { decoderProfile.rawValue }
     public enum RendererError: Error {
         case precisionPolicy, identityMismatch, oracleMismatch, busy
         case resourceGuard(ResourceGuardDetails)
@@ -58,17 +77,24 @@ public actor ChatterboxMLXRenderer {
     private var occupied = false
 
     public init(weightsFile: URL, oracleFile: URL, modelDirectory: URL,
-                defaultVoice: URL, watermarkDirectory: URL, acousticComputeUnits: PipelineComputeUnits) async throws {
+                defaultVoice: URL, watermarkDirectory: URL, acousticComputeUnits: PipelineComputeUnits,
+                decoderProfile: DecoderProfile = .mixedFloat16Accurate,
+                reuseAcousticInputs: Bool = false) async throws {
+        self.decoderProfile = decoderProfile
         // Never change this process-global switch after another model initializes.
         guard ProcessInfo.processInfo.environment["MLX_ENABLE_TF32"] == "0" else { throw RendererError.precisionPolicy }
         try Self.healthy(minimumAvailable: 3 * 1_024 * 1_024 * 1_024)
-        guard try Self.digest(weightsFile) == "3df864ea174ee38478910c9b03358b36f2241166844bd5458c9b2f917e110ab0",
-              try Self.digest(oracleFile) == "87b8ab31eda9c63abbeecb8a9f0678bc8e0fe6980396ea0c4f9e16637ef618d2"
+        guard try Self.digest(weightsFile) == decoderProfile.weightsSHA256,
+              try Self.digest(oracleFile) == decoderProfile.oracleSHA256
         else { throw RendererError.identityMismatch }
         let model = try Device.withDefaultDevice(.gpu) {
-            let model = SpeechDecoder(precision: .mixedFloat16Accurate)
-            let weights = try DecoderPrecision.mixedFloat16Accurate.loadWeights(from: weightsFile)
-            try model.update(parameters: ModuleParameters.unflattened(weights), verify: .all)
+            let model: SpeechDecoder
+            if decoderProfile == .q8ExperimentalV1 { model = try Q8DecoderWeights.load(from: weightsFile) }
+            else {
+                model = SpeechDecoder(precision: .mixedFloat16Accurate)
+                let weights = try DecoderPrecision.mixedFloat16Accurate.loadWeights(from: weightsFile)
+                try model.update(parameters: ModuleParameters.unflattened(weights), verify: .all)
+            }
             eval(model)
             try Self.verify(model, fixture: loadArrays(url: oracleFile))
             return model
@@ -82,12 +108,17 @@ public actor ChatterboxMLXRenderer {
         self.defaultVoice = defaultVoice
         try Self.healthy(minimumAvailable: 1_024 * 1_024 * 1_024)
         synth = try await ChatterboxTokenSynthesizer(modelDirectory: modelDirectory,
-            conditioningFile: defaultVoice, watermarkDirectory: watermarkDirectory, computeUnits: acousticComputeUnits)
+            conditioningFile: defaultVoice, watermarkDirectory: watermarkDirectory,
+            computeUnits: acousticComputeUnits, reuseFlowInputs: reuseAcousticInputs)
         try Self.healthy()
     }
 
-    public func makeNarrator() -> ChatterboxNarrator {
-        ChatterboxNarrator(rendering: { request in try await self.render(request) })
+    public func makeNarrator(overlap: Bool = false) -> ChatterboxNarrator {
+        if overlap {
+            return ChatterboxNarrator(rendering: { request in try await self.render(request) },
+                batchRendering: { requests, receive in try await self.renderBatch(requests, receive: receive) })
+        }
+        return ChatterboxNarrator(rendering: { request in try await self.render(request) })
     }
 
     public func render(_ request: ChatterboxRequest) async throws -> ChatterboxAudioChunk {
@@ -103,17 +134,66 @@ public actor ChatterboxMLXRenderer {
         let decoded = try decode(request, voice: voice)
         Self.trimUnusedMemory()
         try Self.healthy()
+        return try await Self.synthesize(decoded, voice: voice, using: synth, profile: decoderProfile.rawValue)
+    }
+
+    private nonisolated static func synthesize(_ decoded: DecodedSpeech, voice: URL,
+        using synth: ChatterboxTokenSynthesizer, profile: String) async throws -> ChatterboxAudioChunk {
+        try Self.healthy()
         let synthBegan = Date()
-        let samples = try await synth.render(tokens: decoded.tokens, conditioningFile: voice)
+        let output = try await synth.renderMeasured(tokens: decoded.tokens, conditioningFile: voice)
         try Task.checkCancellation()
-        return try .init(samples: samples, timings: .init(prefillSeconds: decoded.prefillSeconds,
-            decodeSeconds: decoded.decodeSeconds, synthSeconds: Date().timeIntervalSince(synthBegan), watermarkSeconds: 0,
-            speechTokens: decoded.tokens.count, decodeBackend: Self.profile, hostAssemblySeconds: decoded.assemblySeconds))
+        var timings = ChatterboxChunkTimings(prefillSeconds: decoded.prefillSeconds,
+            decodeSeconds: decoded.decodeSeconds,
+            synthSeconds: max(0, Date().timeIntervalSince(synthBegan) - output.timings.watermarkSeconds),
+            watermarkSeconds: output.timings.watermarkSeconds, speechTokens: decoded.tokens.count,
+            decodeBackend: profile, hostAssemblySeconds: decoded.assemblySeconds)
+        timings.acoustics = output.timings
+        return try .init(samples: output.samples, timings: timings)
+    }
+
+    /// One decoder plus one acoustic worker, at most one completed/active prior
+    /// unit. Cancellation joins the worker before the busy lease is released.
+    private func renderBatch(_ requests: [ChatterboxRequest],
+        receive: @escaping @Sendable (ChatterboxBatchChunk) async throws -> Void) async throws {
+        guard !occupied else { throw RendererError.busy }
+        guard (1...8).contains(requests.count) else { throw ChatterboxNarrationError.invalidBatch }
+        occupied = true
+        defer { occupied = false; Self.trimUnusedMemory() }
+        try await withThrowingTaskGroup(of: ChatterboxAudioChunk.self) { group in
+            var hasPending = false
+            var previous = 0
+            for (index, request) in requests.enumerated() {
+                try Self.healthy()
+                let voice = request.conditioningFile ?? defaultVoice
+                try ChatterboxVoiceFile.validate(at: voice)
+                let decoded = try decode(request, voice: voice)
+                Self.trimUnusedMemory()
+                if hasPending {
+                    guard let audio = try await group.next() else { throw RendererError.oracleMismatch }
+                    try Task.checkCancellation()
+                    try await receive(.init(requestIndex: previous, chunkIndex: 0, isFinalChunk: true,
+                                            request: requests[previous], audio: audio))
+                }
+                try Task.checkCancellation()
+                let worker = synth, profile = decoderProfile.rawValue
+                group.addTask { try await Self.synthesize(decoded, voice: voice, using: worker, profile: profile) }
+                hasPending = true
+                previous = index
+            }
+            if hasPending {
+                guard let audio = try await group.next() else { throw RendererError.oracleMismatch }
+                try Task.checkCancellation()
+                try await receive(.init(requestIndex: previous, chunkIndex: 0, isFinalChunk: true,
+                                        request: requests[previous], audio: audio))
+            }
+        }
+        try Task.checkCancellation()
     }
 
     /// Keep all GPU tensors/KV storage in a synchronous scope. Only CPU token
     /// IDs and timing scalars survive into the Core ML acoustic phase.
-    private struct DecodedSpeech {
+    private struct DecodedSpeech: Sendable {
         let tokens: [Int]
         let prefillSeconds: Double
         let decodeSeconds: Double

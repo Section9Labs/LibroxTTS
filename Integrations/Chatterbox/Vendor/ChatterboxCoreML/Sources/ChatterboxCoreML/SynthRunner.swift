@@ -106,6 +106,7 @@ final class SynthRunner: @unchecked Sendable {
     private let cfm: MLModel
     private let vocoder: MLModel
     private let cfmSteps: Int
+    private let reuseFlowInputs: Bool
     /// Per-load evaluation override. Nil retains the upstream environment policy.
     private let padFlowToMaximum: Bool?
     private let mel = Constants.melBins   // 80
@@ -133,8 +134,9 @@ final class SynthRunner: @unchecked Sendable {
     /// (all nil) = unchanged behavior (env, then default).
     init(encoderURL: URL, cfmURL: URL, vocoderURL: URL,
          computeUnits: PipelineComputeUnits = .init(),
-         padFlowToMaximum: Bool? = nil) throws {
+         padFlowToMaximum: Bool? = nil, reuseFlowInputs: Bool = false) throws {
         self.padFlowToMaximum = padFlowToMaximum
+        self.reuseFlowInputs = reuseFlowInputs
         func cu(_ envKey: String, _ override: MLComputeUnits?, default def: MLComputeUnits) -> MLComputeUnits {
             if let override { return override }   // explicit app override wins over env + default
             switch ProcessInfo.processInfo.environment[envKey]?.lowercased() {
@@ -196,6 +198,10 @@ final class SynthRunner: @unchecked Sendable {
     /// capped tighter still (`windowBudget`) so every window's T_h ≤ `cfmPadTarget`
     /// and the CFM actually pads onto the Neural Engine per window.
     func synthesize(generatedTokens: [Int], conds: Conditionals) throws -> [Float] {
+        try synthesizeMeasured(generatedTokens: generatedTokens, conds: conds).samples
+    }
+
+    func synthesizeMeasured(generatedTokens: [Int], conds: Conditionals) throws -> ChatterboxAcousticOutput {
         try Task.checkCancellation()
         // Clamp to the decoder's valid speech-token range up front.
         let validGenerated = generatedTokens
@@ -214,11 +220,22 @@ final class SynthRunner: @unchecked Sendable {
         }
         Log.pipeline.debug("[synth] generated \(validGenerated.count, privacy: .public) > vocoder window \(windowSize, privacy: .public) (prompt \(conds.promptTokens.count, privacy: .public)) → \(windows.count, privacy: .public) windows")
         var waveform: [Float] = []
+        var timings = ChatterboxAcousticTimings()
+        timings.promptTokens = conds.promptTokens.count
         for window in windows {
             try Task.checkCancellation()
-            waveform.append(contentsOf: try synthesizeWindow(window, conds: conds))
+            let output = try synthesizeWindow(window, conds: conds)
+            waveform.append(contentsOf: output.samples)
+            timings.encoderSeconds += output.timings.encoderSeconds
+            timings.preparationSeconds += output.timings.preparationSeconds
+            timings.flowSeconds += output.timings.flowSeconds
+            timings.vocoderSeconds += output.timings.vocoderSeconds
+            timings.generatedTokens += output.timings.generatedTokens
+            timings.windows += output.timings.windows
+            timings.flowPredictions += output.timings.flowPredictions
         }
-        return waveform
+        timings.reusedFlowInputBuffers = reuseFlowInputs
+        return .init(samples: waveform, timings: timings)
     }
 
     /// Splits `tokens` into in-order windows of at most `maxPerWindow` each, with
@@ -328,7 +345,7 @@ final class SynthRunner: @unchecked Sendable {
     /// Runs the three-package synth for one window's worth of `generated` speech
     /// tokens (already clamped to the valid range), prepended with the voice
     /// prompt. The prompt's mel frames are sliced off before vocoding.
-    private func synthesizeWindow(_ generated: [Int32], conds: Conditionals) throws -> [Float] {
+    private func synthesizeWindow(_ generated: [Int32], conds: Conditionals) throws -> ChatterboxAcousticOutput {
         try Task.checkCancellation()
         // 1. all_tokens = prompt ++ generated.
         let allTokens = conds.promptTokens + generated
@@ -382,6 +399,7 @@ final class SynthRunner: @unchecked Sendable {
             mu = trimmed
         }
 
+        let encoderEnd = Date()
         // 3. Conditioning, mirroring flow.inference:
         //    mel_len1 = #prompt mel frames; cond = prompt_feat in the first mel_len1
         //    frames, zero elsewhere; spks = L2-normed xvec. `mask` marks the real
@@ -441,14 +459,25 @@ final class SynthRunner: @unchecked Sendable {
         let zeroMelArr = try MLMultiArray.float32([Float](repeating: 0, count: mel * tRun), shape: [1, mel, tRun])
         let scale1 = try MLMultiArray.float32([1], shape: [1])
         let scale0 = try MLMultiArray.float32([0], shape: [1])
+        // These inputs are owned by this invocation and used only by synchronous
+        // predictions. Outputs have been read before either buffer is overwritten.
+        let reusableX = reuseFlowInputs ? try MLMultiArray.float32(x, shape: [1, mel, tRun]) : nil
+        let reusableT = reuseFlowInputs ? try MLMultiArray.float32([0], shape: [1]) : nil
         func tSpan(_ s: Float) -> Float { cfgMode ? (1 - Foundation.cos(s * 0.5 * .pi)) : s }
         for i in 0..<n {
             try Task.checkCancellation()
             let t = tSpan(Float(i) / Float(n))
             let r = tSpan(Float(i + 1) / Float(n))
             let dt = r - t
-            let xArr = try MLMultiArray.float32(x, shape: [1, mel, tRun])
-            let tArr = try MLMultiArray.float32([t], shape: [1])
+            let xArr: MLMultiArray, tArr: MLMultiArray
+            if let reusableX, let reusableT {
+                try reusableX.replaceContiguousFloat32(with: x)
+                try reusableT.replaceContiguousFloat32(with: [t])
+                xArr = reusableX; tArr = reusableT
+            } else {
+                xArr = try MLMultiArray.float32(x, shape: [1, mel, tRun])
+                tArr = try MLMultiArray.float32([t], shape: [1])
+            }
             let dxdt: [Float]
             if cfgMode {
                 let conditionalInputs: [String: MLMultiArray] = [
@@ -493,7 +522,17 @@ final class SynthRunner: @unchecked Sendable {
         let waveform = wavArr.toFloatArrayAnyPrecision()
 
         Log.pipeline.debug("[synth] T_tok=\(allTokens.count, privacy: .public) T_h=\(tH, privacy: .public) T_run=\(tRun, privacy: .public) pad=\(padded, privacy: .public) gen=\(melLen2, privacy: .public) steps=\(n, privacy: .public) · enc \(tCFM.timeIntervalSince(tEnc), format: .fixed(precision: 3), privacy: .public)s cfm \(tVoc.timeIntervalSince(tCFM), format: .fixed(precision: 3), privacy: .public)s voc \(Date().timeIntervalSince(tVoc), format: .fixed(precision: 3), privacy: .public)s → \(waveform.count, privacy: .public) samples")
-        return waveform
+        var timings = ChatterboxAcousticTimings()
+        timings.encoderSeconds = encoderEnd.timeIntervalSince(tEnc)
+        timings.preparationSeconds = tCFM.timeIntervalSince(encoderEnd)
+        timings.flowSeconds = tVoc.timeIntervalSince(tCFM)
+        timings.vocoderSeconds = Date().timeIntervalSince(tVoc)
+        timings.promptTokens = conds.promptTokens.count
+        timings.generatedTokens = generated.count
+        timings.windows = 1
+        timings.flowPredictions = n * (cfgMode ? 2 : 1)
+        timings.reusedFlowInputBuffers = reuseFlowInputs
+        return .init(samples: waveform, timings: timings)
     }
 
     /// Explicit diagnostic capture for a consented local probe. Absent the env
