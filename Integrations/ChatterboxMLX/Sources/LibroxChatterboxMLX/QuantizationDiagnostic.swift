@@ -105,7 +105,7 @@ public enum ChatterboxQuantizationDiagnostic {
                "local-q8-freeze-holdout-inputs",
                "local-q8-assembly-native-controls", "local-q8-assembled-reference",
                "local-q8-runtime-bootstrap",
-               "local-q8-assembled-gpu-candidate",
+               "local-q8-assembled-gpu-candidate", "local-q8-semantic-startup-reference",
                "acoustic-parity", "library-q8", "library-q8-canonical"].contains(c.profile), c.samples.count <= 6,
               ProcessInfo.processInfo.environment["MLX_ENABLE_TF32"] == "0",
               ProcessInfo.processInfo.environment["CHATTERBOX_SYNTH_SEED"] == "42",
@@ -149,6 +149,20 @@ public enum ChatterboxQuantizationDiagnostic {
             try write(["completed": true, "diagnostic_only": true, "model_forward_count": 0,
                 "production_clearance": false, "runtime_metallib_sha256": resourceSHA,
                 "memory_cache_bytes": Memory.cacheMemory], to: output.appendingPathComponent("report.json"))
+            return
+        }
+        if c.profile == "local-q8-semantic-startup-reference" {
+            guard c.samples.isEmpty, let oracle = c.referenceOracleFile,
+                let rope = c.referenceAssemblyRoPEFile, let sigmoid = c.referenceSigmoidFile,
+                let script = c.referenceResolverScript, let python = c.referenceResolverPython,
+                let registration = c.certifiedPreregistrationFile, let runtime = c.runtimeMetallibSHA256,
+                c.expectedSHA256 == ChatterboxMLXRenderer.DecoderProfile.q8CanonicalHalfV2.weightsSHA256
+            else { throw Failure.configuration }
+            try SemanticStartupReference.run(weights: URL(fileURLWithPath: c.weightsFile),
+                oldInputs: URL(fileURLWithPath: oracle), rope: URL(fileURLWithPath: rope),
+                sigmoid: URL(fileURLWithPath: sigmoid), script: URL(fileURLWithPath: script),
+                python: URL(fileURLWithPath: python), registration: URL(fileURLWithPath: registration),
+                runtimeSHA256: runtime, output: URL(fileURLWithPath: c.outputDirectory))
             return
         }
         if c.profile == "local-q8-assembled-gpu-candidate" {
