@@ -296,7 +296,7 @@ public actor ChatterboxMLXRenderer {
         }
     }
 
-    private static func healthy(minimumAvailable: Int = 256 * 1_024 * 1_024) throws {
+    static func healthy(minimumAvailable: Int = 256 * 1_024 * 1_024) throws {
         try Task.checkCancellation()
         let snapshot = memorySnapshot()
         let reason: ResourceGuardDetails.Reason?
@@ -329,7 +329,7 @@ public actor ChatterboxMLXRenderer {
         return UInt64(os_proc_available_memory())
         #endif
     }
-    private static func digest(_ file: URL) throws -> String {
+    static func digest(_ file: URL) throws -> String {
         let input = try FileHandle(forReadingFrom: file); defer { try? input.close() }
         var hash = SHA256()
         while let bytes = try input.read(upToCount: 1_048_576), !bytes.isEmpty { try Task.checkCancellation(); hash.update(data: bytes) }

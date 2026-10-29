@@ -29,6 +29,8 @@ public enum ChatterboxQuantizationDiagnostic {
         let groupSentences: Bool?
         let overlap: Bool?
         let reuseFlowInputs: Bool?
+        let exporterSourceSHA256: String?
+        let prefillCacheFile: String?
     }
 
     public static func run(configurationFile: URL) async throws {
@@ -38,6 +40,8 @@ public enum ChatterboxQuantizationDiagnostic {
                "local-q8-rounded-dense-acc32",
                "local-q8-canonical-packed",
                "local-q8-canonical-packed-native-prefill",
+               "local-q8-export-prefill-cache",
+               "local-q8-prefill-replay",
                "acoustic-parity", "library-q8", "library-q8-canonical"].contains(c.profile), c.samples.count <= 6,
               ProcessInfo.processInfo.environment["MLX_ENABLE_TF32"] == "0",
               ProcessInfo.processInfo.environment["CHATTERBOX_SYNTH_SEED"] == "42",
@@ -79,6 +83,21 @@ public enum ChatterboxQuantizationDiagnostic {
         }
         if c.profile == "local-q8-cpu-reference" {
             try exportCPUReference(c)
+            return
+        }
+        if c.profile == "local-q8-export-prefill-cache" {
+            try exportPrefillCache(c)
+            return
+        }
+        if c.profile == "local-q8-prefill-replay" {
+            guard c.samples.isEmpty, let oracle = c.referenceOracleFile,
+                let cache = c.prefillCacheFile else { throw Failure.configuration }
+            let report = try await ChatterboxQ8FixedFixtureDiagnostic.run(.init(
+                weightsFile: URL(fileURLWithPath: c.weightsFile), oracleFile: URL(fileURLWithPath: oracle),
+                cpuPrefillCacheFile: URL(fileURLWithPath: cache)))
+            let out = URL(fileURLWithPath: c.outputDirectory)
+            try FileManager.default.createDirectory(at: out, withIntermediateDirectories: false)
+            try JSONEncoder().encode(report).write(to: out.appendingPathComponent("report.json"), options: .atomic)
             return
         }
         if c.profile == "acoustic-parity" {
@@ -335,6 +354,74 @@ public enum ChatterboxQuantizationDiagnostic {
     }
 
     private static func bits(_ c: Configuration) -> Int { c.profile.contains("q4") ? 4 : 8 }
+
+    /// Export causal replay state only after exact reproduction of all frozen
+    /// CPU logits. No tolerance, oracle edit or model-generation path is added.
+    private static func exportPrefillCache(_ c: Configuration) throws {
+        guard c.samples.isEmpty,
+            c.expectedSHA256 == "231647ebb4deedad901c46cf3d7ca1e0fa70371b461c934c14dc63f16ec69017",
+            let reference = c.referenceOracleFile,
+            try digest(URL(fileURLWithPath: reference)) == "8f7b5d2a6437c23cfa753f0ac25e2f23f296ca32f3e91b98b3f6219b26325b44",
+            let destination = c.exportFile, !FileManager.default.fileExists(atPath: destination),
+            let exporter = c.exporterSourceSHA256,
+            exporter.range(of: "^[a-f0-9]{64}$", options: .regularExpression) != nil
+        else { throw Failure.configuration }
+        let out = URL(fileURLWithPath: c.outputDirectory)
+        try FileManager.default.createDirectory(at: out, withIntermediateDirectories: false)
+        try Device.withDefaultDevice(.cpu) {
+            let model = try loadRoundedDenseComparison(c)
+            let fixture = try loadArrays(url: URL(fileURLWithPath: reference))
+            var snapshots: [(keys: [Float16], values: [Float16])] = []
+            var checks: [[String: Any]] = []
+            for language in ["en", "es"] {
+                let cache = (0..<30).map { _ in KVCache() }
+                for step in 0...8 {
+                    try healthy()
+                    let stem = language + (step == 0 ? ".prefill" : ".decode.\(step - 1)")
+                    guard let input = fixture[stem + ".input"], let target = fixture[stem + ".logits"]
+                    else { throw Failure.weights }
+                    let output = model.logits(input, cache: cache); eval(output)
+                    let a = output.asArray(Float.self), b = target.asArray(Float.self)
+                    guard a.count == 16_388, b.count == a.count,
+                        a.allSatisfy(\.isFinite), b.allSatisfy(\.isFinite) else { throw Failure.output }
+                    let exact = zip(a, b).allSatisfy { $0.bitPattern == $1.bitPattern }
+                    checks.append(["stage": stem, "bit_identical": exact,
+                        "max_abs": zip(a, b).map { abs($0 - $1) }.max() ?? 0])
+                    if language == "es", step == 0 {
+                        // Copy now, before any later decode mutates the buffers.
+                        snapshots = try cache.map {
+                            try healthy()
+                            return try $0.fixedFixtureSnapshot()
+                        }
+                    }
+                }
+            }
+            let exact = checks.count == 18 && checks.allSatisfy { $0["bit_identical"] as? Bool == true }
+            try write(["all_18_bit_identical": exact, "checks": checks,
+                "weights_sha256": c.expectedSHA256, "oracle_sha256": try digest(URL(fileURLWithPath: reference)),
+                "exporter_source_sha256": exporter], to: out.appendingPathComponent("report.json"))
+            guard exact, snapshots.count == 30 else { throw Failure.output }
+            var arrays: [String: MLXArray] = [:]
+            for (index, snapshot) in snapshots.enumerated() {
+                guard snapshot.keys.count == 2 * 16 * 93 * 64,
+                    snapshot.values.count == snapshot.keys.count else { throw Failure.output }
+                arrays["es.prefill.layer.\(index).keys"] = MLXArray(snapshot.keys, [2, 16, 93, 64])
+                arrays["es.prefill.layer.\(index).values"] = MLXArray(snapshot.values, [2, 16, 93, 64])
+            }
+            guard arrays.count == 60 else { throw Failure.output }
+            try save(arrays: arrays, metadata: ["scope": "public fixed ES prefill cache only; never request conditioning",
+                "offset": "93", "capacity": "256", "weights_sha256": c.expectedSHA256,
+                "oracle_sha256": try digest(URL(fileURLWithPath: reference)),
+                "exporter_source_sha256": exporter, "all_18_frozen_logits_bit_identical": "true"],
+                url: URL(fileURLWithPath: destination))
+            try write(["completed": true, "all_18_bit_identical": true, "checks": checks,
+                "weights_sha256": c.expectedSHA256, "exporter_source_sha256": exporter,
+                "cache_sha256": try digest(URL(fileURLWithPath: destination)),
+                "tensor_count": arrays.count, "payload_bytes": 22_855_680,
+                "active_shape": [2, 16, 93, 64], "restore_capacity": 256],
+                to: out.appendingPathComponent("report.json"))
+        }
+    }
 
     /// Independent ordinary dense FP16 CPU execution of the intended Q8 weights.
     /// This never invokes quantizedMatmul or the candidate Metal projection path.
