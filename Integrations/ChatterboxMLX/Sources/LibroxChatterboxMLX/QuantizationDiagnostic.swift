@@ -50,6 +50,10 @@ public enum ChatterboxQuantizationDiagnostic {
         let referenceResolverScript: String?
         let referenceResolverPython: String?
         let referenceSigmoidFile: String?
+        let referenceHoldoutPlanFile: String?
+        let referenceHoldoutPreregistrationFile: String?
+        let referenceChunkControlsFile: String?
+        let referenceFrontendIdentitiesFile: String?
     }
 
     public static func run(configurationFile: URL) async throws {
@@ -71,6 +75,7 @@ public enum ChatterboxQuantizationDiagnostic {
                "local-q8-gpu-factor-study",
                "local-q8-reference-softmax",
                "local-q8-reference-engine",
+               "local-q8-freeze-holdout-inputs",
                "acoustic-parity", "library-q8", "library-q8-canonical"].contains(c.profile), c.samples.count <= 6,
               ProcessInfo.processInfo.environment["MLX_ENABLE_TF32"] == "0",
               ProcessInfo.processInfo.environment["CHATTERBOX_SYNTH_SEED"] == "42",
@@ -106,6 +111,18 @@ public enum ChatterboxQuantizationDiagnostic {
         else { throw Failure.configuration }
         ChatterboxMLXRenderer.configureBufferCache(maximumBytes: 64 * 1_024 * 1_024)
         try healthy(minimumAvailable: 3 * 1_024 * 1_024 * 1_024)
+        if c.profile == "local-q8-freeze-holdout-inputs" {
+            guard c.samples.isEmpty, let plan = c.referenceHoldoutPlanFile,
+                let parent = c.referenceHoldoutPreregistrationFile, let chunk = c.referenceChunkControlsFile,
+                let identities = c.referenceFrontendIdentitiesFile,
+                URL(fileURLWithPath: c.conditioningFile).standardizedFileURL ==
+                    URL(fileURLWithPath: c.modelDirectory).appendingPathComponent("default-conds.safetensors").standardizedFileURL
+            else { throw Failure.configuration }
+            try await ReferenceHoldoutPreparation.run(.init(model: URL(fileURLWithPath: c.modelDirectory),
+                plan: URL(fileURLWithPath: plan), parent: URL(fileURLWithPath: parent), chunk: URL(fileURLWithPath: chunk),
+                frontendIdentities: URL(fileURLWithPath: identities), output: URL(fileURLWithPath: c.outputDirectory)))
+            return
+        }
         if c.profile == "local-q8-reference-engine" {
             guard c.samples.isEmpty, let primitive = c.primitiveFixtureFile, let scalar = c.certifiedOperatorFile,
                 let sigmoid = c.referenceSigmoidFile, let preregistration = c.referenceLinearPreregistrationFile,
