@@ -38,6 +38,8 @@ public enum ChatterboxQuantizationDiagnostic {
         let primitiveFixtureSHA256: String?
         let exactPreregistrationFile: String?
         let exactCPUArtifactFile: String?
+        let certifiedPreregistrationFile: String?
+        let exactDotReportFile: String?
     }
 
     public static func run(configurationFile: URL) async throws {
@@ -54,6 +56,7 @@ public enum ChatterboxQuantizationDiagnostic {
                "local-q8-primitive-export", "local-q8-primitive-replay",
                "local-q8-primitive-cpu-replay",
                "local-q8-exact-cpu-export", "local-q8-exact-gpu-export",
+               "local-q8-certified-projection-samples",
                "acoustic-parity", "library-q8", "library-q8-canonical"].contains(c.profile), c.samples.count <= 6,
               ProcessInfo.processInfo.environment["MLX_ENABLE_TF32"] == "0",
               ProcessInfo.processInfo.environment["CHATTERBOX_SYNTH_SEED"] == "42",
@@ -98,7 +101,7 @@ public enum ChatterboxQuantizationDiagnostic {
             return
         }
         if ["local-q8-primitive-export", "local-q8-primitive-replay", "local-q8-primitive-cpu-replay",
-            "local-q8-exact-cpu-export", "local-q8-exact-gpu-export"].contains(c.profile) {
+            "local-q8-exact-cpu-export", "local-q8-exact-gpu-export", "local-q8-certified-projection-samples"].contains(c.profile) {
             guard c.samples.isEmpty, let reference = c.referenceOracleFile,
                 let cpu93 = c.prefillCacheFile, let cpu95 = c.ropeFixtureFile,
                 let primitives = c.primitiveFixtureFile else { throw Failure.configuration }
@@ -106,7 +109,11 @@ public enum ChatterboxQuantizationDiagnostic {
                 oracle: URL(fileURLWithPath: reference), cpu93: URL(fileURLWithPath: cpu93),
                 cpu95: URL(fileURLWithPath: cpu95), primitives: URL(fileURLWithPath: primitives),
                 output: URL(fileURLWithPath: c.outputDirectory))
-            if c.profile.hasPrefix("local-q8-exact-") {
+            if c.profile == "local-q8-certified-projection-samples" {
+                guard let preregistration = c.certifiedPreregistrationFile, let report = c.exactDotReportFile else { throw Failure.configuration }
+                try CertifiedProjectionStudy.run(files, preregistration: URL(fileURLWithPath: preregistration),
+                    exactReport: URL(fileURLWithPath: report)) { try loadRoundedDenseComparison(c) }
+            } else if c.profile.hasPrefix("local-q8-exact-") {
                 guard let preregistration = c.exactPreregistrationFile else { throw Failure.configuration }
                 let p = URL(fileURLWithPath: preregistration)
                 if c.profile == "local-q8-exact-cpu-export" {

@@ -224,3 +224,48 @@ an offline CPU counterfactual. Preserve the original CPU nonprojection
 operations, native18 and CPU93/95 controls. Keep old-oracle parity and proposed
 exact-projection fidelity separate. This does not create or approve a new
 oracle, inference profile or phone build.
+
+## Certified projection helper: certification stage
+
+`CertifiedHalfProjection` is a throwing, Mac-only offline helper. It computes
+CPU FP64 dots on the original half operands, using an outward-inflated
+gamma_K accumulation-error interval. It accepts a rounded half only when both
+interval endpoints round to identical bits; ambiguous cases use exact Int128
+summation and direct nearest/ties-to-even rounding. Finite half coefficients
+bound the complete integer sum below 2^92. Operand/maxima invariants, monotonic
+180-second budget, cancellation and resource checks remain active, including
+checks every 64 output columns before potentially expensive exact work.
+
+This certification assumes ordinary IEEE binary64 accumulation in CPU BLAS.
+The local Float64 backend dispatches to CBLAS DGEMM; that opaque implementation
+assumption is stated explicitly. Tests exercise its cancellation and subnormal
+conversions, direct Double-to-half rounding at every half boundary, exact
+normal/subnormal/tie/overflow behavior, maximum-length integer sums and forced
+ambiguity resolution. All 16 focused Release tests passed.
+
+On the stored Spanish target-step operands, the certification study produced
+798,719 interval-certified outputs and one exact fallback. All 13,440
+independent integer-reference samples matched bit-for-bit; all 798,720 original
+CPU-half control outputs also reproduced their captured bits. The fallback was
+recorded at `tfmr.layers.7.mlp.down_proj`, flattened input row1, output652.
+It is a rounding-boundary ambiguity, not a claim that the exact dot is a tie.
+
+`certified-projection-samples-v01` retains the initial result;
+`certified-projection-samples-v02` adds explicit boundary audit data. Their 210
+tensor payloads are bit-identical, despite different container hashes. The
+comparison is retained as `payload-comparison.json` in v02. Exact source/binary
+manifests are under `certified-projection-source-v01` and `-v02`.
+
+**The full-model precision intervention has not run.** These are diagnostic
+projection outputs, not an app oracle, selected model or device qualification.
+The next stage adds an eager-native-FP16 negative control with identical host
+copy boundaries, then tests a projection-only certified arm while keeping
+original CPU nonprojection semantics. Require bit-identical eager-native18 and
+CPU93/95 trajectories before attributing differences to precision.
+
+`projection-counterfactual-implementation-controls-v01.json` defines the
+per-run first-error latch for nonthrowing Linear callbacks: short-circuit later
+projections and throw immediately after `model.logits`, before evaluating or
+accepting output. Forced first/middle/last failures and cancellation must prove
+that no successful receipt or artifact can be produced. No native-arithmetic
+fallback is permitted. All old references, failures and gates remain unchanged.
