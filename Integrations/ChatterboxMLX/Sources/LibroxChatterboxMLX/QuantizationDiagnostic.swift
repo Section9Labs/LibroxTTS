@@ -44,6 +44,8 @@ public enum ChatterboxQuantizationDiagnostic {
         let gpuFactorPreregistrationFile: String?
         let gpuFactorArm: String?
         let certifiedLogitsFile: String?
+        let certifiedOperatorFile: String?
+        let referenceComponentPreregistrationFile: String?
     }
 
     public static func run(configurationFile: URL) async throws {
@@ -63,6 +65,7 @@ public enum ChatterboxQuantizationDiagnostic {
                "local-q8-certified-projection-samples",
                "local-q8-projection-counterfactual",
                "local-q8-gpu-factor-study",
+               "local-q8-reference-softmax",
                "acoustic-parity", "library-q8", "library-q8-canonical"].contains(c.profile), c.samples.count <= 6,
               ProcessInfo.processInfo.environment["MLX_ENABLE_TF32"] == "0",
               ProcessInfo.processInfo.environment["CHATTERBOX_SYNTH_SEED"] == "42",
@@ -98,6 +101,13 @@ public enum ChatterboxQuantizationDiagnostic {
         else { throw Failure.configuration }
         ChatterboxMLXRenderer.configureBufferCache(maximumBytes: 64 * 1_024 * 1_024)
         try healthy(minimumAvailable: 3 * 1_024 * 1_024 * 1_024)
+        if c.profile == "local-q8-reference-softmax" {
+            guard c.samples.isEmpty, let fixture = c.certifiedOperatorFile,
+                let preregistration = c.referenceComponentPreregistrationFile else { throw Failure.configuration }
+            try ReferenceSoftmaxStudy.run(fixture: URL(fileURLWithPath: fixture),
+                preregistration: URL(fileURLWithPath: preregistration), output: URL(fileURLWithPath: c.outputDirectory))
+            return
+        }
         if c.profile.hasPrefix("export-local-q") {
             try exportQuantized(c)
             return

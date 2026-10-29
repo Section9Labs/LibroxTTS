@@ -403,3 +403,29 @@ oracle. Source/outputs are in `semantic-operator-source-v01` and
 `semantic-operator-audit-v01`. The next stage must assemble these declared
 operations and preregister valid public EN/ES inputs before evaluating the
 candidate. Keep the old profiles/references rejected and unchanged.
+
+The nonlinear reference buildingblock now avoids scalar Decimal work for every
+probability. Its optimized CPU interval polynomial evaluates P24(x/256), uses
+the explicit Taylor remainder below2^-83 on[-1,0], then performs eight interval
+squarings. Coefficients and operations round outward. Error-free TwoSum retains
+score-difference residuals; small exponential mass stays bounded rather than
+being dropped. A row that spans any F32 rounding boundary returns no approximate
+probabilities and requires the independent Decimal resolver.
+
+All960 captured rows (92,160probabilities) certified directly and matched the
+scalar reference bit-for-bit; no captured row needed fallback. The known
+`[0,2^-23]` midpoint case deliberately remains unresolved in Release and its
+Decimal resolver produces the exact expected bits. An exhaustive finite-F16
+sigmoid cache contains63,488 qualified values and2,048 forbidden nonfinite
+sentinels. Its262,144byte table hash is
+`71da0d3bb8b7812e046eb6128e7538b13903c2ad0a68a6bb3c789e97aa176b7e`.
+Lookup-based evaluation reproduces all245,760 captured SiLU/up outputs exactly.
+
+All24 Release regressions passed; three focused Release tests include exact
+TwoSum residual-sign endpoints, and three Python tests pass normally and with
+optimization. This qualifies nonlinear engine components only. Generic certified
+GEMM/norm/head work must still reproduce all182 scalar outputs before assembly,
+original/eager controls and the frozen six-case holdout. Nothing selects this
+component or its tables in a production renderer. Evidence is preserved under
+`reference-softmax-fastpath-v01`, `reference-nonlinear-component-v01` and
+`reference-nonlinear-source-v01`.
