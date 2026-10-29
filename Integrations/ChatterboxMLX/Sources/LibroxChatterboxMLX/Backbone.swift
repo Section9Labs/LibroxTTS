@@ -122,6 +122,7 @@ private class T3Llama3ScaledRoPE: Module {
 private class T3Attention: Module {
 #if os(macOS)
     var diagnosticMaterializedAttention = false
+    var diagnosticPrimitiveObserver: ((String, MLXArray) -> Void)?
 #endif
     let scale: Float
     let nHeads: Int
@@ -175,6 +176,13 @@ private class T3Attention: Module {
         }
 
         let attentionType: DType = accurateActivations ? .float32 : projectionType
+#if os(macOS)
+        if let observe = diagnosticPrimitiveObserver {
+            observe("query", queries.asType(attentionType))
+            observe("key", keys.asType(attentionType))
+            observe("value", values.asType(attentionType))
+        }
+#endif
         let attended: MLXArray
 #if os(macOS)
         if diagnosticMaterializedAttention {
@@ -192,6 +200,9 @@ private class T3Attention: Module {
         )
 #endif
         let output = attended.transposed(0, 2, 1, 3).reshaped(b, l, -1).asType(projectionType)
+#if os(macOS)
+        diagnosticPrimitiveObserver?("output", attended)
+#endif
 
         return wo(output).asType(x.dtype)
     }
@@ -202,6 +213,7 @@ private class T3Attention: Module {
 private class T3MLP: Module {
 #if os(macOS)
     var diagnosticUncompiledSiLU = false
+    var diagnosticPrimitiveObserver: ((String, MLXArray) -> Void)?
 #endif
     @ModuleInfo(key: "gate_proj") var gate: Linear
     @ModuleInfo(key: "down_proj") var down: Linear
@@ -224,6 +236,9 @@ private class T3MLP: Module {
             }
 #endif
             let activated = silu(gate(projectedInput).asType(.float32)) * up(projectedInput).asType(.float32)
+#if os(macOS)
+            diagnosticPrimitiveObserver?("activated", activated)
+#endif
             return down(activated.asType(projectionType)).asType(x.dtype)
         }
         return down(silu(gate(projectedInput)) * up(projectedInput)).asType(x.dtype)
@@ -277,6 +292,7 @@ private class T3TransformerBlock: Module {
 class T3LlamaInner: Module {
 #if os(macOS)
     private var diagnosticExplicitNorm = false
+    private var diagnosticPrimitiveObserver: ((String, MLXArray) -> Void)?
 #endif
     fileprivate let layers: [T3TransformerBlock]
     let norm: RMSNorm
@@ -287,6 +303,18 @@ class T3LlamaInner: Module {
     }
 
 #if os(macOS)
+    func diagnosticObservePrimitives(_ observer: ((String, MLXArray) -> Void)?) {
+        diagnosticPrimitiveObserver = observer
+        for (index, layer) in layers.enumerated() {
+            layer.attention.diagnosticPrimitiveObserver = observer.map { observe in
+                { name, array in observe("tfmr.layers.\(index).attention.\(name)", array) }
+            }
+            layer.mlp.diagnosticPrimitiveObserver = observer.map { observe in
+                { name, array in observe("tfmr.layers.\(index).mlp.\(name)", array) }
+            }
+        }
+    }
+
     func diagnosticSetArithmetic(_ policy: DiagnosticArithmetic) {
         diagnosticExplicitNorm = policy.contains(.explicitNorm)
         for layer in layers {
@@ -322,6 +350,11 @@ class T3LlamaInner: Module {
 #if os(macOS)
         if diagnosticExplicitNorm { return DiagnosticArithmetic.norm(h, norm) }
 #endif
-        return norm(h)
+        let output = norm(h)
+#if os(macOS)
+        diagnosticPrimitiveObserver?("tfmr.norm.input", h)
+        diagnosticPrimitiveObserver?("tfmr.norm.output", output)
+#endif
+        return output
     }
 }

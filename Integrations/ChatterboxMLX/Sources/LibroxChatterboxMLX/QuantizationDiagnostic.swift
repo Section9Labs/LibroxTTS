@@ -34,6 +34,8 @@ public enum ChatterboxQuantizationDiagnostic {
         let prefillCacheFile: String?
         let ropeFixtureFile: String?
         let ropeFixtureSHA256: String?
+        let primitiveFixtureFile: String?
+        let primitiveFixtureSHA256: String?
     }
 
     public static func run(configurationFile: URL) async throws {
@@ -47,6 +49,8 @@ public enum ChatterboxQuantizationDiagnostic {
                "local-q8-prefill-replay",
                "local-q8-rope-counterfactual",
                "local-q8-rope-export",
+               "local-q8-primitive-export", "local-q8-primitive-replay",
+               "local-q8-primitive-cpu-replay",
                "acoustic-parity", "library-q8", "library-q8-canonical"].contains(c.profile), c.samples.count <= 6,
               ProcessInfo.processInfo.environment["MLX_ENABLE_TF32"] == "0",
               ProcessInfo.processInfo.environment["CHATTERBOX_SYNTH_SEED"] == "42",
@@ -88,6 +92,26 @@ public enum ChatterboxQuantizationDiagnostic {
         }
         if c.profile == "local-q8-cpu-reference" {
             try exportCPUReference(c)
+            return
+        }
+        if ["local-q8-primitive-export", "local-q8-primitive-replay", "local-q8-primitive-cpu-replay"].contains(c.profile) {
+            guard c.samples.isEmpty, let reference = c.referenceOracleFile,
+                let cpu93 = c.prefillCacheFile, let cpu95 = c.ropeFixtureFile,
+                let primitives = c.primitiveFixtureFile else { throw Failure.configuration }
+            let files = PrimitiveDiagnostic.Files(weights: URL(fileURLWithPath: c.weightsFile),
+                oracle: URL(fileURLWithPath: reference), cpu93: URL(fileURLWithPath: cpu93),
+                cpu95: URL(fileURLWithPath: cpu95), primitives: URL(fileURLWithPath: primitives),
+                output: URL(fileURLWithPath: c.outputDirectory))
+            if c.profile == "local-q8-primitive-export" {
+                try PrimitiveDiagnostic.export(files) { try loadRoundedDenseComparison(c) }
+            } else {
+                guard let hash = c.primitiveFixtureSHA256 else { throw Failure.configuration }
+                if c.profile == "local-q8-primitive-cpu-replay" {
+                    try PrimitiveDiagnostic.replayCPUProjections(files, expectedSHA256: hash) { try loadRoundedDenseComparison(c) }
+                } else {
+                    try PrimitiveDiagnostic.replay(files, expectedSHA256: hash)
+                }
+            }
             return
         }
         if c.profile == "local-q8-export-prefill-cache" {

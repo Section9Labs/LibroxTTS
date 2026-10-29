@@ -105,3 +105,72 @@ independent review and fresh physical validation before app integration.
 Sustained narration, recorded-voice listening acceptance and whole-pipeline
 RTF<=0.20 remain separate unresolved goals. These fixed-input decoder
 experiments provide no audio-quality, battery or end-to-end speed evidence.
+
+## Same-input primitive stage
+
+The CLI now also supports `local-q8-primitive-export`,
+`local-q8-primitive-replay` and `local-q8-primitive-cpu-replay`. CPU export and
+GPU replay remain separate fresh processes. The fixed CPU artifact is
+`cpu-primitives-offset95-v02.safetensors`, SHA256
+`ba0a7add438d5f1326ce7aa541339cee4b2d3d3d973c3f56ddfb6019b00d38d4`.
+It contains 694 finite, shape-checked tensors for the public Spanish target.
+
+The CPU exporter again reproduces all 18 frozen outputs both without and with
+instrumentation, plus the restored CPU95 target, bit-for-bit. It wraps 211
+linear modules and 60 block norms. The immutable final norm is observed through
+a hook rather than replaced. Attention records the entire active 96-position
+K/V prefix; arrays are copied into independent host storage immediately after
+the target evaluation, before subsequent cache updates. All hooks are Mac-only
+and nil during normal inference.
+
+Two failed harness attempts remain preserved: CPU export v01 attempted to
+replace the final norm despite its immutable registration; GPU replay v01
+incorrectly included RoPE leaves in its linear/norm schema. The versioned fixes
+use the final-norm hook and explicitly select the 272 measured linear/norm
+modules. RoPE remains covered by its separate replay. Neither failure changed
+production arithmetic or numerical gates.
+
+Successful receipts are `primitive-cpu-export-v02/report.json`,
+`primitive-gpu-replay-v02/report.json` and `primitive-cpu-replay-v01/report.json`.
+The GPU report has 873 measurements and reproduces the known unchanged native18,
+CPU93 and CPU95 controls, including their failing signed margins.
+
+| Same CPU inputs, native GPU operation | Values compared | Half-rounded differences |
+| --- | ---: | ---: |
+| 210 packed projections | 798,720 | 190,760 |
+| 61 norms | 124,928 | 8 |
+| 30 attention outputs | 61,440 | 50 |
+| 30 activated MLP products | 245,760 | 9 |
+| Final FP32 head | 16,388 | 0 |
+
+The same-input final head is bit-identical in FP32, including both expected
+leaders and margins. This rules out head arithmetic alone for this particular
+fixed input. It does not rule out upstream hidden-state differences.
+
+The CPU-local materialization control is important: all 211 linear outputs are
+bit-identical to their captured CPU outputs. Thus the large projection
+discrepancy is not explained by merely copying these inputs. Changing CPU
+projection arithmetic to FP32 matmul followed by a half cast changes 190,776
+of 798,720 half outputs, maximum absolute difference 0.00390625. GPU dense-half
+and dense-FP32 controls have similar aggregate disagreement counts against the
+CPU-half capture. **Similar counts do not establish pairwise CPU-FP32/GPU
+identity or which backend is more accurate.**
+
+The next stage is preregistered in `exact-dot-study-v01-preregistration.json`:
+32 uniformly spaced output rows from every transformer projection, both lanes,
+13,440 scalar outputs. Execute full original backend shapes before selecting
+rows, so sampling does not itself change dispatch. Save paired output bits.
+Finite half operands are integer multiples of 2^-24, allowing exact integer
+dot sums in units of 2^-48 and direct nearest/ties-to-even half rounding.
+Compare full products with half-rounded products as a policy fingerprint;
+Double/Kahan is a cross-check, not the half-midpoint arbiter. Validate the
+rounder on normal/subnormal, tie, cancellation and overflow boundaries.
+
+Characterize the CPU-half backend's numerical policy before proposing any
+correction. Do not select a new reference from whichever candidate happens to
+pass. All existing references and gates remain immutable, and no primitive
+discrepancy by itself establishes responsibility for the final ranking.
+
+Release validation after these hooks passed all 10 focused MLX XCTest cases;
+the complete log is `primitive-release-tests-v01.log`. No audio or phone work
+was performed in this stage.
