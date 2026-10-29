@@ -28,6 +28,7 @@ public enum ChatterboxQuantizationDiagnostic {
         let tokenReportFile: String?
         let referenceOracleFile: String?
         let groupSentences: Bool?
+        let kitDirection: String?
         let overlap: Bool?
         let reuseFlowInputs: Bool?
         let exporterSourceSHA256: String?
@@ -114,6 +115,7 @@ public enum ChatterboxQuantizationDiagnostic {
               try digest(URL(fileURLWithPath: c.oracleFile)) ==
                 "87b8ab31eda9c63abbeecb8a9f0678bc8e0fe6980396ea0c4f9e16637ef618d2"
         else { throw Failure.configuration }
+        guard c.kitDirection == nil || ["neutral", "storyteller"].contains(c.kitDirection!) else { throw Failure.configuration }
         // Foreign-checkpoint embeddings differ from our V3 frontend. Running
         // audio with that hybrid is invalid even if a few logits look plausible.
         guard c.profile != "smdesai-q8-oracle-only" || c.samples.isEmpty else { throw Failure.configuration }
@@ -1026,7 +1028,7 @@ public enum ChatterboxQuantizationDiagnostic {
                 modelManifestSHA256: c.expectedSHA256, rendererProfile: renderer.profileIdentifier)
             let start = Date()
             try await session.stream(sample.text, language: sample.language, narratorID: "stock",
-                conditioningFiles: ["stock": voice], direction: .neutral,
+                conditioningFiles: ["stock": voice], direction: c.kitDirection == "storyteller" ? .storyteller : .neutral,
                 grouping: c.groupSentences == true ? .compatibleNarration() : .sentences, seed: 42,
                 preparation: .finiteExcerpt) { passage in
                     try await collector.append(passage)
@@ -1041,12 +1043,14 @@ public enum ChatterboxQuantizationDiagnostic {
                 "units": try JSONSerialization.jsonObject(with: result.rowsData), "memory": memory()])
             try write(["completed": false, "load_seconds": loadSeconds, "samples": reports,
                 "grouped": c.groupSentences ?? false, "overlap": c.overlap ?? false,
+                "kit_direction": c.kitDirection ?? "neutral",
                 "reuse_flow_inputs": c.reuseFlowInputs ?? false, "profile": renderer.profileIdentifier,
                 "startup_implementation_checks": 18, "conditioning_sha256": try digest(URL(fileURLWithPath: c.conditioningFile)), "original_fp32_equivalent": false], to: out.appendingPathComponent("report.json"))
         }
         try await narrator.unload()
         try write(["completed": true, "load_seconds": loadSeconds, "samples": reports,
             "grouped": c.groupSentences ?? false, "overlap": c.overlap ?? false,
+                "kit_direction": c.kitDirection ?? "neutral",
             "reuse_flow_inputs": c.reuseFlowInputs ?? false, "profile": renderer.profileIdentifier,
             "startup_implementation_checks": 18, "conditioning_sha256": try digest(URL(fileURLWithPath: c.conditioningFile)), "original_fp32_equivalent": false], to: out.appendingPathComponent("report.json"))
         } catch {
