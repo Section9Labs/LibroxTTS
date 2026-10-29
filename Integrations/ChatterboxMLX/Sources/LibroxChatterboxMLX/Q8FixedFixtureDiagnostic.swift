@@ -182,7 +182,7 @@ public enum ChatterboxQ8FixedFixtureDiagnostic {
             decodeOutputs: outputs)
     }
 
-    private static func compare(_ a: [Float], _ b: [Float], stage: String) throws -> Comparison {
+    static func compare(_ a: [Float], _ b: [Float], stage: String) throws -> Comparison {
         guard a.count == 16_388, b.count == a.count,
             a.allSatisfy(\.isFinite), b.allSatisfy(\.isFinite) else { throw Failure.fixture }
         var maximum: Float = 0, squared = 0.0, norm = 0.0

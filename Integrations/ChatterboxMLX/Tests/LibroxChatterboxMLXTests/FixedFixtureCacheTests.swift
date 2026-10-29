@@ -44,4 +44,23 @@ final class FixedFixtureCacheTests: XCTestCase {
             XCTAssertThrowsError(try KVCache.restoringFixedFixture(keys: wrongType, values: wrongType))
         }
     }
+
+    func testTargetBoundaryPreservesBothEarlierDecodePositions() throws {
+        try Device.withDefaultDevice(.cpu) {
+            // Keep the fixture finite while making position94 distinguishable.
+            let keys = MLXArray.ones([2, 16, 95, 64], dtype: .float16)
+            keys[.ellipsis, 94, 0...] = MLXArray(Float16(3))
+            let restored = try KVCache.restoringFixedFixture(keys: keys, values: keys, expectedOffset: 95)
+            let snapshot = try restored.fixedFixtureSnapshot(expectedOffset: 95)
+            XCTAssertEqual(restored.offset, 95)
+            XCTAssertThrowsError(try restored.fixedFixtureSnapshot())
+            let append = MLXArray.zeros([2, 16, 1, 64], dtype: .float16)
+            let result = restored.update(keys: append, values: append)
+            XCTAssertEqual(restored.offset, 96)
+            XCTAssertEqual(result.0.shape, [2, 16, 96, 64])
+            XCTAssertTrue(result.0[.ellipsis, 94, 0...].asArray(Float16.self).allSatisfy { $0 == 3 })
+            XCTAssertTrue(result.0[.ellipsis, 95, 0...].asArray(Float16.self).allSatisfy { $0 == 0 })
+            XCTAssertEqual(snapshot.keys, keys.asArray(Float16.self))
+        }
+    }
 }

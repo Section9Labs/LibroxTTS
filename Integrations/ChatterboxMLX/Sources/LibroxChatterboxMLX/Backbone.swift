@@ -18,6 +18,11 @@ private class T3Llama3ScaledRoPE: Module {
     let dims: Int
     let traditional: Bool
     private let _freqs: MLXArray
+#if os(macOS)
+    // Mac-only causal probes; never configured by any renderer/profile.
+    var diagnosticObserver: ((MLXArray, MLXArray, MLXArray, Int) -> Void)?
+    var diagnosticRotation: ((MLXArray, Int) -> MLXArray)?
+#endif
 
     init(
         dims: Int,
@@ -93,7 +98,10 @@ private class T3Llama3ScaledRoPE: Module {
     }
 
     func callAsFunction(_ x: MLXArray, offset: Int = 0) -> MLXArray {
-        return MLXFast.RoPE(
+#if os(macOS)
+        if let diagnosticRotation { return diagnosticRotation(x, offset) }
+#endif
+        let result = MLXFast.RoPE(
             x,
             dimensions: dims,
             traditional: traditional,
@@ -102,12 +110,19 @@ private class T3Llama3ScaledRoPE: Module {
             offset: offset,
             freqs: _freqs
         )
+#if os(macOS)
+        diagnosticObserver?(x, _freqs, result, offset)
+#endif
+        return result
     }
 }
 
 // MARK: - T3 LLaMA Attention
 
 private class T3Attention: Module {
+#if os(macOS)
+    var diagnosticMaterializedAttention = false
+#endif
     let scale: Float
     let nHeads: Int
     let nKVHeads: Int
@@ -160,10 +175,23 @@ private class T3Attention: Module {
         }
 
         let attentionType: DType = accurateActivations ? .float32 : projectionType
-        let output = MLXFast.scaledDotProductAttention(
+        let attended: MLXArray
+#if os(macOS)
+        if diagnosticMaterializedAttention {
+            attended = DiagnosticArithmetic.attention(queries: queries.asType(attentionType),
+                keys: keys.asType(attentionType), values: values.asType(attentionType), scale: scale)
+        } else {
+            attended = MLXFast.scaledDotProductAttention(
+                queries: queries.asType(attentionType), keys: keys.asType(attentionType),
+                values: values.asType(attentionType), scale: scale, mask: mask)
+        }
+#else
+        attended = MLXFast.scaledDotProductAttention(
             queries: queries.asType(attentionType), keys: keys.asType(attentionType),
             values: values.asType(attentionType), scale: scale, mask: mask
-        ).transposed(0, 2, 1, 3).reshaped(b, l, -1).asType(projectionType)
+        )
+#endif
+        let output = attended.transposed(0, 2, 1, 3).reshaped(b, l, -1).asType(projectionType)
 
         return wo(output).asType(x.dtype)
     }
@@ -172,6 +200,9 @@ private class T3Attention: Module {
 // MARK: - T3 LLaMA MLP
 
 private class T3MLP: Module {
+#if os(macOS)
+    var diagnosticUncompiledSiLU = false
+#endif
     @ModuleInfo(key: "gate_proj") var gate: Linear
     @ModuleInfo(key: "down_proj") var down: Linear
     @ModuleInfo(key: "up_proj") var up: Linear
@@ -185,6 +216,13 @@ private class T3MLP: Module {
     func callAsFunction(_ x: MLXArray, projectionType: DType, accurateActivations: Bool) -> MLXArray {
         let projectedInput = x.asType(projectionType)
         if accurateActivations {
+#if os(macOS)
+            if diagnosticUncompiledSiLU {
+                let g = gate(projectedInput).asType(.float32)
+                let activated = (g * MLX.sigmoid(g)) * up(projectedInput).asType(.float32)
+                return down(activated.asType(projectionType)).asType(x.dtype)
+            }
+#endif
             let activated = silu(gate(projectedInput).asType(.float32)) * up(projectedInput).asType(.float32)
             return down(activated.asType(projectionType)).asType(x.dtype)
         }
@@ -195,6 +233,9 @@ private class T3MLP: Module {
 // MARK: - T3 LLaMA Transformer Block
 
 private class T3TransformerBlock: Module {
+#if os(macOS)
+    var diagnosticExplicitNorm = false
+#endif
     @ModuleInfo(key: "self_attn") var attention: T3Attention
     @ModuleInfo(key: "mlp") var mlp: T3MLP
     @ModuleInfo(key: "input_layernorm") var inputLayerNorm: RMSNorm
@@ -211,6 +252,15 @@ private class T3TransformerBlock: Module {
         _ x: MLXArray, mask: MLXFast.ScaledDotProductAttentionMaskMode, cache: KVCache?, projectionType: DType,
         accurateActivations: Bool
     ) -> MLXArray {
+#if os(macOS)
+        if diagnosticExplicitNorm {
+            let r = attention(DiagnosticArithmetic.norm(x, inputLayerNorm), mask: mask, cache: cache,
+                projectionType: projectionType, accurateActivations: accurateActivations)
+            let h = x + r
+            return h + mlp(DiagnosticArithmetic.norm(h, postAttentionLayerNorm),
+                projectionType: projectionType, accurateActivations: accurateActivations)
+        }
+#endif
         let r = attention(inputLayerNorm(x), mask: mask, cache: cache, projectionType: projectionType,
                           accurateActivations: accurateActivations)
         let h = x + r
@@ -225,6 +275,9 @@ private class T3TransformerBlock: Module {
 /// In the Python code, `self.tfmr.model(inputs=None, input_embeddings=embeds, cache=cache)`.
 /// This corresponds to LLaMA's model.layers + norm, accepting pre-computed embeddings.
 class T3LlamaInner: Module {
+#if os(macOS)
+    private var diagnosticExplicitNorm = false
+#endif
     fileprivate let layers: [T3TransformerBlock]
     let norm: RMSNorm
 
@@ -232,6 +285,29 @@ class T3LlamaInner: Module {
         self.layers = (0 ..< config.numHiddenLayers).map { _ in T3TransformerBlock(config) }
         self.norm = RMSNorm(dimensions: config.hiddenSize, eps: config.rmsNormEps)
     }
+
+#if os(macOS)
+    func diagnosticSetArithmetic(_ policy: DiagnosticArithmetic) {
+        diagnosticExplicitNorm = policy.contains(.explicitNorm)
+        for layer in layers {
+            layer.diagnosticExplicitNorm = policy.contains(.explicitNorm)
+            layer.attention.diagnosticMaterializedAttention = policy.contains(.materializedAttention)
+            layer.mlp.diagnosticUncompiledSiLU = policy.contains(.uncompiledSiLU)
+        }
+    }
+
+    func diagnosticObserveRoPE(_ observer: ((Int, MLXArray, MLXArray, MLXArray, Int) -> Void)?) {
+        for (index, layer) in layers.enumerated() {
+            layer.attention.rope.diagnosticObserver = observer.map { observe in
+                { input, frequencies, output, offset in observe(index, input, frequencies, output, offset) }
+            }
+        }
+    }
+
+    func diagnosticReplaceRoPE(_ rotation: ((MLXArray, Int) -> MLXArray)?) {
+        for layer in layers { layer.attention.rope.diagnosticRotation = rotation }
+    }
+#endif
 
     /// Forward pass with pre-computed embeddings.
     func callAsFunction(_ embeddings: MLXArray, cache: [KVCache]? = nil, projectionType: DType = .float32,
@@ -243,6 +319,9 @@ class T3LlamaInner: Module {
             h = layer(h, mask: mask, cache: cache?[i], projectionType: projectionType,
                       accurateActivations: accurateActivations)
         }
+#if os(macOS)
+        if diagnosticExplicitNorm { return DiagnosticArithmetic.norm(h, norm) }
+#endif
         return norm(h)
     }
 }

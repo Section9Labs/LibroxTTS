@@ -3,6 +3,7 @@ import Foundation
 import AVFoundation
 import CryptoKit
 import MLX
+import MLXFast
 import MLXNN
 import ChatterboxCoreML
 import LibroxChatterbox
@@ -31,6 +32,8 @@ public enum ChatterboxQuantizationDiagnostic {
         let reuseFlowInputs: Bool?
         let exporterSourceSHA256: String?
         let prefillCacheFile: String?
+        let ropeFixtureFile: String?
+        let ropeFixtureSHA256: String?
     }
 
     public static func run(configurationFile: URL) async throws {
@@ -42,6 +45,8 @@ public enum ChatterboxQuantizationDiagnostic {
                "local-q8-canonical-packed-native-prefill",
                "local-q8-export-prefill-cache",
                "local-q8-prefill-replay",
+               "local-q8-rope-counterfactual",
+               "local-q8-rope-export",
                "acoustic-parity", "library-q8", "library-q8-canonical"].contains(c.profile), c.samples.count <= 6,
               ProcessInfo.processInfo.environment["MLX_ENABLE_TF32"] == "0",
               ProcessInfo.processInfo.environment["CHATTERBOX_SYNTH_SEED"] == "42",
@@ -102,6 +107,10 @@ public enum ChatterboxQuantizationDiagnostic {
         }
         if c.profile == "acoustic-parity" {
             try await acousticComparison(c)
+            return
+        }
+        if c.profile == "local-q8-rope-counterfactual" || c.profile == "local-q8-rope-export" {
+            try ropeCounterfactual(c)
             return
         }
         if c.profile == "library-q8" || c.profile == "library-q8-canonical" {
@@ -244,10 +253,227 @@ public enum ChatterboxQuantizationDiagnostic {
         return model
     }
 
+    /// Compare identical real CPU q/k inputs before a separately scoped rotation
+    /// counterfactual. No audio, production promotion or oracle mutation.
+    private static func ropeCounterfactual(_ c: Configuration) throws {
+        guard c.samples.isEmpty,
+            c.expectedSHA256 == ChatterboxMLXRenderer.DecoderProfile.q8CanonicalHalfV2.weightsSHA256,
+            let reference = c.referenceOracleFile,
+            try digest(URL(fileURLWithPath: reference)) == ChatterboxMLXRenderer.DecoderProfile.q8CanonicalHalfV2.oracleSHA256,
+            let cachePath = c.prefillCacheFile,
+            try digest(URL(fileURLWithPath: cachePath)) == ChatterboxQ8FixedFixtureDiagnostic.cpuPrefillCacheSHA256,
+            let ropePath = c.ropeFixtureFile
+        else { throw Failure.configuration }
+        let out = URL(fileURLWithPath: c.outputDirectory)
+        try FileManager.default.createDirectory(at: out, withIntermediateDirectories: false)
+        let began = Date()
+        struct Capture {
+            let layer: Int
+            let input: MLXArray
+            let frequencies: MLXArray
+            let output: MLXArray
+        }
+        var captures: [Capture] = []
+        var boundary95: [(keys: [Float16], values: [Float16])] = []
+        let fixtures = try loadArrays(url: URL(fileURLWithPath: reference))
+        // Hooks retain arrays without evaluation. Traced and untraced execution
+        // must each reproduce all 18 frozen CPU outputs bit-for-bit.
+        if c.profile == "local-q8-rope-export" {
+          guard !FileManager.default.fileExists(atPath: ropePath) else { throw Failure.configuration }
+          try Device.withDefaultDevice(.cpu) {
+            let model = try loadRoundedDenseComparison(c)
+            for traced in [false, true] {
+                if traced {
+                    model.transformer.diagnosticObserveRoPE { layer, input, frequencies, output, offset in
+                        if offset == 95 { captures.append(Capture(layer: layer, input: input, frequencies: frequencies, output: output)) }
+                    }
+                }
+                for language in ["en", "es"] {
+                    let caches = (0..<30).map { _ in KVCache() }
+                    for step in 0...8 {
+                        try healthy()
+                        let stem = language + (step == 0 ? ".prefill" : ".decode.\(step - 1)")
+                        guard let input = fixtures[stem + ".input"], let target = fixtures[stem + ".logits"]
+                        else { throw Failure.weights }
+                        let result = model.logits(input, cache: caches); eval(result)
+                        let a = result.asArray(Float.self), b = target.asArray(Float.self)
+                        guard a.count == 16_388, zip(a, b).allSatisfy({ $0.bitPattern == $1.bitPattern })
+                        else { throw Failure.output }
+                        if !traced, language == "es", step == 2 {
+                            boundary95 = try caches.map { try $0.fixedFixtureSnapshot(expectedOffset: 95) }
+                        }
+                    }
+                }
+            }
+            model.transformer.diagnosticObserveRoPE(nil)
+            guard boundary95.count == 30,
+                let input = fixtures["es.decode.2.input"], let target = fixtures["es.decode.2.logits"]
+            else { throw Failure.output }
+            let restored = try boundary95.map {
+                try KVCache.restoringFixedFixture(keys: MLXArray($0.keys, [2, 16, 95, 64]),
+                    values: MLXArray($0.values, [2, 16, 95, 64]), expectedOffset: 95)
+            }
+            let result = model.logits(input, cache: restored); eval(result)
+            guard zip(result.asArray(Float.self), target.asArray(Float.self)).allSatisfy({ $0.bitPattern == $1.bitPattern })
+            else { throw Failure.output }
+            guard captures.count == 60 else { throw Failure.output }
+            var arrays: [String: MLXArray] = [:]
+            for (index, capture) in captures.enumerated() {
+                try healthy()
+                arrays["rope.\(index).input"] = MLXArray(capture.input.asArray(Float16.self), capture.input.shape)
+                arrays["rope.\(index).output"] = MLXArray(capture.output.asArray(Float16.self), capture.output.shape)
+                arrays["rope.\(index).frequencies"] = MLXArray(capture.frequencies.asArray(Float.self))
+            }
+            for (index, bytes) in boundary95.enumerated() {
+                try healthy()
+                arrays["layer.\(index).keys"] = MLXArray(bytes.keys, [2, 16, 95, 64])
+                arrays["layer.\(index).values"] = MLXArray(bytes.values, [2, 16, 95, 64])
+            }
+            let tables = DiagnosticHalfRoPE.makeCPUTables(frequencies: captures[0].frequencies.asArray(Float.self), capacity: 1536)
+            arrays["rope.cosines"] = MLXArray(tables.0, [1536, 32])
+            arrays["rope.sines"] = MLXArray(tables.1, [1536, 32])
+            let file = URL(fileURLWithPath: ropePath)
+            try save(arrays: arrays, metadata: ["scope": "public fixed input CPU RoPE causal replay, offset95 KV and all-position trig",
+                "cpu_untraced_and_traced_all18_bit_identical": "true", "cpu_offset95_target_bit_identical": "true",
+                "weights_sha256": c.expectedSHA256, "oracle_sha256": try digest(URL(fileURLWithPath: reference))], url: file)
+            try write(["completed": true, "cpu_only_process": true, "tensor_count": arrays.count,
+                "cpu_untraced_and_traced_all18_bit_identical": true, "cpu_offset95_target_bit_identical": true,
+                "weights_sha256": c.expectedSHA256, "oracle_sha256": try digest(URL(fileURLWithPath: reference)),
+                "rope_fixture_sha256": try digest(file), "wall_seconds": Date().timeIntervalSince(began)],
+                to: out.appendingPathComponent("report.json"))
+          }
+          return
+        }
+        // A fresh GPU-only process avoids the dependency's compiled SiLU cache
+        // accidentally inheriting a graph first traced in the CPU exporter.
+        guard let ropeSHA = c.ropeFixtureSHA256,
+            ropeSHA == DiagnosticRoPEFixture.sha256,
+            try digest(URL(fileURLWithPath: ropePath)) == ropeSHA else { throw Failure.configuration }
+        let exported = try loadArrays(url: URL(fileURLWithPath: ropePath))
+        try DiagnosticRoPEFixture.validate(exported)
+        captures = try (0..<60).map { index in
+            guard let input = exported["rope.\(index).input"], let output = exported["rope.\(index).output"],
+                let frequencies = exported["rope.\(index).frequencies"], input.dtype == .float16,
+                output.dtype == .float16, input.shape == [2, 16, 1, 64], output.shape == input.shape,
+                frequencies.shape == [32], frequencies.dtype == .float32 else { throw Failure.weights }
+            return Capture(layer: index / 2, input: input, frequencies: frequencies, output: output)
+        }
+        guard captures.count == 60 else { throw Failure.output }
+        let frequencies = captures[0].frequencies.asArray(Float.self)
+        var rotationChecks: [[String: Any]] = []
+        try Device.withDefaultDevice(.gpu) {
+            guard let cosines = exported["rope.cosines"], let sines = exported["rope.sines"],
+                cosines.shape == [1536, 32], sines.shape == cosines.shape,
+                cosines.dtype == .float16, sines.dtype == .float16,
+                all(isFinite(cosines)).item(Bool.self), all(isFinite(sines)).item(Bool.self)
+            else { throw Failure.weights }
+            let canonical = DiagnosticHalfRoPE(cosines: cosines, sines: sines)
+            for (index, capture) in captures.enumerated() {
+                try healthy()
+                let f = capture.frequencies.asArray(Float.self)
+                guard f.count == 32, zip(f, frequencies).allSatisfy({ $0.bitPattern == $1.bitPattern }),
+                    capture.input.shape == [2, 16, 1, 64] else { throw Failure.output }
+                let input = MLXArray(capture.input.asArray(Float16.self), capture.input.shape)
+                let expected = capture.output.asArray(Float16.self)
+                let fast = MLXFast.RoPE(input, dimensions: 64, traditional: false, base: nil,
+                    scale: 1, offset: 95, freqs: MLXArray(frequencies))
+                let corrected = canonical(input, offset: 95); eval(fast, corrected)
+                func mismatches(_ result: MLXArray) -> Int {
+                    zip(result.asArray(Float16.self), expected).filter { $0.bitPattern != $1.bitPattern }.count
+                }
+                rotationChecks.append(["layer": capture.layer, "kind": index % 2 == 0 ? "query" : "key",
+                    "count": expected.count, "fast_gpu_half_bit_mismatches": mismatches(fast),
+                    "cpu_rounding_gpu_half_bit_mismatches": mismatches(corrected)])
+            }
+            var report: [String: Any] = ["diagnostic_only": true, "audio_generated": false,
+                "cpu_untraced_and_traced_all18_bit_identical_to_frozen": true,
+                "cpu_offset95_restore_target_bit_identical_to_frozen": true,
+                "gpu_only_consumer_process": true, "cpu_fixture_sha256": ropeSHA,
+                "same_cpu_inputs_offset": 95, "same_cpu_frequencies_bits": frequencies.map(\.bitPattern),
+                "rotation_checks": rotationChecks,
+                "all_corrected_rotation_bits_identical": rotationChecks.allSatisfy {
+                    $0["cpu_rounding_gpu_half_bit_mismatches"] as? Int == 0 },
+                "weights_sha256": c.expectedSHA256, "oracle_sha256": try digest(URL(fileURLWithPath: reference))]
+            try write(report, to: out.appendingPathComponent("report.json"))
+            guard report["all_corrected_rotation_bits_identical"] as? Bool == true else { throw Failure.output }
+            captures.removeAll(); Memory.clearCache()
+            var model = try Q8DecoderWeights.load(from: URL(fileURLWithPath: c.weightsFile), canonicalHalf: true)
+            let cpuCache = try loadArrays(url: URL(fileURLWithPath: cachePath))
+            func replay(offset: Int) throws -> Any {
+                let caches = try (0..<30).map { index -> KVCache in
+                    try healthy()
+                    let stem = offset == 93 ? "es.prefill.layer.\(index)" : "layer.\(index)"
+                    let arrays = offset == 93 ? cpuCache : exported
+                    guard let k = arrays[stem + ".keys"], let v = arrays[stem + ".values"] else { throw Failure.weights }
+                    return try KVCache.restoringFixedFixture(keys: k, values: v, expectedOffset: offset)
+                }
+                var rows: [ChatterboxQ8FixedFixtureDiagnostic.Comparison] = []
+                for step in (offset - 93)..<3 {
+                    try healthy()
+                    let stem = "es.decode.\(step)"
+                    guard let input = fixtures[stem + ".input"], let target = fixtures[stem + ".logits"]
+                    else { throw Failure.weights }
+                    let output = model.logits(input, cache: caches); eval(output)
+                    rows.append(try ChatterboxQ8FixedFixtureDiagnostic.compare(
+                        output.asArray(Float.self), target.asArray(Float.self), stage: stem))
+                }
+                return try JSONSerialization.jsonObject(with: JSONEncoder().encode(rows))
+            }
+            // In-process controls distinguish frequency policy from half rounding,
+            // and isolate the target decode from state created by earlier decodes.
+            var arms: [[String: Any]] = []
+            for arm in ["unchangedV2", "fastGPUWithCPUFrequencies", "cpuHalfRounding",
+                        "materializedAttentionOnly", "halfRopeAndAttention", "halfRopeAndNorm",
+                        "halfRopeAndSiLU", "allFallbackSequences", "denseFP32AccumNativeOtherOps",
+                        "denseFP32AccumHalfRope", "denseFP32AccumAllFallback"] {
+                if arm == "denseFP32AccumNativeOtherOps" {
+                    try healthy(minimumAvailable: 3 * 1_024 * 1_024 * 1_024)
+                    model = try loadRoundedDenseComparison(c, forceFP32Accumulation: true)
+                    Memory.clearCache()
+                }
+                model.transformer.diagnosticSetArithmetic([])
+                switch arm {
+                case "fastGPUWithCPUFrequencies":
+                    let f = MLXArray(frequencies)
+                    model.transformer.diagnosticReplaceRoPE { input, offset in
+                        MLXFast.RoPE(input, dimensions: 64, traditional: false, base: nil, scale: 1, offset: offset, freqs: f)
+                    }
+                case "cpuHalfRounding":
+                    model.transformer.diagnosticReplaceRoPE { input, offset in canonical(input, offset: offset) }
+                case "denseFP32AccumHalfRope", "denseFP32AccumAllFallback":
+                    model.transformer.diagnosticReplaceRoPE { input, offset in canonical(input, offset: offset) }
+                    if arm == "denseFP32AccumAllFallback" {
+                        model.transformer.diagnosticSetArithmetic([.materializedAttention, .explicitNorm, .uncompiledSiLU])
+                    }
+                case "materializedAttentionOnly":
+                    model.transformer.diagnosticReplaceRoPE(nil)
+                    model.transformer.diagnosticSetArithmetic(.materializedAttention)
+                case "halfRopeAndAttention", "halfRopeAndNorm", "halfRopeAndSiLU", "allFallbackSequences":
+                    model.transformer.diagnosticReplaceRoPE { input, offset in canonical(input, offset: offset) }
+                    let policy: DiagnosticArithmetic = arm == "halfRopeAndAttention" ? .materializedAttention
+                        : arm == "halfRopeAndNorm" ? .explicitNorm
+                        : arm == "halfRopeAndSiLU" ? .uncompiledSiLU
+                        : [.materializedAttention, .explicitNorm, .uncompiledSiLU]
+                    model.transformer.diagnosticSetArithmetic(policy)
+                default: model.transformer.diagnosticReplaceRoPE(nil)
+                }
+                arms.append(["name": arm, "model_parameter_bytes": model.parameters().flattened().reduce(0) { $0 + $1.1.nbytes },
+                    "full18": try oracleReport(model, file: URL(fileURLWithPath: reference)),
+                    "cpu_prefill_replay": try replay(offset: 93), "cpu_offset95_target": try replay(offset: 95)])
+                report["arms"] = arms
+                try write(report, to: out.appendingPathComponent("report.json"))
+            }
+            report["wall_seconds"] = Date().timeIntervalSince(began)
+            report["completed"] = true
+            report["scope"] = "Mac causal arithmetic only; no production or phone clearance"
+            try write(report, to: out.appendingPathComponent("report.json"))
+        }
+    }
+
     /// Mirrors the frozen CPU reference's weight reconstruction on the GPU,
     /// isolating fused quantized projection arithmetic from model compression.
     /// Never rewrites an oracle, changes a gate or becomes an app fallback.
-    private static func loadRoundedDenseComparison(_ c: Configuration) throws -> SpeechDecoder {
+    private static func loadRoundedDenseComparison(_ c: Configuration, forceFP32Accumulation: Bool = false) throws -> SpeechDecoder {
         let source = try loadArrays(url: URL(fileURLWithPath: c.weightsFile))
         let model = SpeechDecoder(precision: .mixedFloat16Accurate)
         var dense: [String: MLXArray] = [:]
@@ -272,7 +498,7 @@ public enum ChatterboxQuantizationDiagnostic {
                 dense[key] = w
             }
         }
-        if c.profile.hasSuffix("acc32") {
+        if c.profile.hasSuffix("acc32") || forceFP32Accumulation {
             let modules: [(String, Module)] = model.leafModules().flattened().compactMap { name, module in
                 guard name.hasPrefix("tfmr.layers."), let linear = module as? Linear else { return nil }
                 return (name, FP32AccumulatingLinear(weight: linear.weight, bias: nil))

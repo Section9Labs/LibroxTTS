@@ -9,31 +9,31 @@ final class KVCache {
     private var keys: MLXArray?
     private var values: MLXArray?
 
-    /// Fixed public Spanish prefill only. Independent host bytes prevent a
+    /// Fixed public Spanish fixture boundaries only. Independent host bytes prevent a
     /// later decode's in-place cache update from changing this snapshot.
-    func fixedFixtureSnapshot() throws -> (keys: [Float16], values: [Float16]) {
-        guard offset == 93, let keys, let values,
+    func fixedFixtureSnapshot(expectedOffset: Int = 93) throws -> (keys: [Float16], values: [Float16]) {
+        guard [93, 94, 95].contains(expectedOffset), offset == expectedOffset, let keys, let values,
             keys.shape == [2, 16, 256, 64], values.shape == keys.shape,
             keys.dtype == .float16, values.dtype == .float16 else { throw FixedFixtureError.invalidState }
-        let k = keys[.ellipsis, ..<93, 0...].asArray(Float16.self)
-        let v = values[.ellipsis, ..<93, 0...].asArray(Float16.self)
+        let k = keys[.ellipsis, ..<expectedOffset, 0...].asArray(Float16.self)
+        let v = values[.ellipsis, ..<expectedOffset, 0...].asArray(Float16.self)
         guard k.allSatisfy(\.isFinite), v.allSatisfy(\.isFinite) else { throw FixedFixtureError.invalidState }
         return (k, v)
     }
 
-    /// Same zero padding, capacity and strides as a normal 93-position prefill.
+    /// Same zero padding, capacity and strides as a normal fixed public state.
     /// This helper is used only by a non-audio fixed-fixture diagnostic.
-    static func restoringFixedFixture(keys: MLXArray, values: MLXArray) throws -> KVCache {
-        guard keys.shape == [2, 16, 93, 64], values.shape == keys.shape,
+    static func restoringFixedFixture(keys: MLXArray, values: MLXArray, expectedOffset: Int = 93) throws -> KVCache {
+        guard [93, 94, 95].contains(expectedOffset), keys.shape == [2, 16, expectedOffset, 64], values.shape == keys.shape,
             keys.dtype == .float16, values.dtype == .float16,
             all(isFinite(keys)).item(Bool.self), all(isFinite(values)).item(Bool.self)
         else { throw FixedFixtureError.invalidState }
         let cache = KVCache()
         cache.keys = MLXArray.zeros([2, 16, 256, 64], dtype: .float16)
         cache.values = MLXArray.zeros([2, 16, 256, 64], dtype: .float16)
-        cache.keys?[.ellipsis, ..<93, 0...] = keys
-        cache.values?[.ellipsis, ..<93, 0...] = values
-        cache.offset = 93
+        cache.keys?[.ellipsis, ..<expectedOffset, 0...] = keys
+        cache.values?[.ellipsis, ..<expectedOffset, 0...] = values
+        cache.offset = expectedOffset
         eval(cache.keys!, cache.values!)
         return cache
     }
