@@ -372,3 +372,34 @@ This closes this table's numerical definition, not the remaining operator or
 whole-model qualification. The next finite steps are independent same-input
 operator checks using existing captures, then unseen valid public EN/ES prefixes
 crossing cache256 and actually evaluating494 or later, before any app profile.
+
+The preregistered remaining-operator audit is complete on the existing captured
+inputs, with no model forward. Exact binary32 integer reductions and root-midpoint
+comparisons implement the declared boundaries. Sigmoid/softmax use directed
+intervals enclosing the [correctly rounded Decimal exponential](https://docs.python.org/3/library/decimal.html#decimal.Decimal.exp).
+The full pinned weight file is hashed while streaming; norm/head rows are read
+without retaining the packed artifact. All60 residual additions (122,880values)
+are bit-identical, and every captured activation-to-half cast association passes.
+
+| Operator | Values | Different F32 bits | Different half-cast bits | Maximum absolute error |
+| --- | ---: | ---: | ---: | ---: |
+|61 RMS norms|124,928|52,296|10|0.00000190735|
+|30 SiLU/up products|245,760|82,525|15|0.000000238419|
+|30 attention outputs|61,440|51,054|44|0.000000238419|
+|60 residual additions|122,880|0|0|0|
+|Final F32 head|16,388|15,325|19|0.0000247955|
+
+The head's existing comparison criteria pass with relativeL2 approximately
+0.000000640834 and both leaders unchanged (5986/6472). Its half-cast column is
+diagnostic only; the accurate model's head stays F32. Large ULP counts near zero
+do not imply large absolute errors. All independent bits, attention scores and
+probabilities are retained with the182 comparisons. Eight tests pass normally
+and with Python optimization; the three injected cancellation cases cover
+publication boundaries, not interrupted numerical loops. Runtime was37.88seconds.
+
+This qualifies same-input operator behavior under the frozen strict array
+sequence; it does not qualify an assembled independent model or choose a new
+oracle. Source/outputs are in `semantic-operator-source-v01` and
+`semantic-operator-audit-v01`. The next stage must assemble these declared
+operations and preregister valid public EN/ES inputs before evaluating the
+candidate. Keep the old profiles/references rejected and unchanged.
