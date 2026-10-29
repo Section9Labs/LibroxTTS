@@ -127,3 +127,24 @@ phone workload until Matt confirms current availability for the ready build.
 No release, merge, TestFlight, private audio export, watermark removal or old unsafe
 GPU/ANE run resumption is part of this handoff. CoreAI/acoustic acceleration toward
 whole-pipeline RTF≤.20 remains a separately versioned next stage.
+
+## First build295 phone attempt: numerical gate stopped
+
+Matt reported a listening stop before audio. The phone's saved failure records
+build295, segment0, RendererError code3 and zero buffered seconds; its latest
+passage telemetry still belongs to294. Settings selected Q8 with overlap enabled.
+In295's payload-bearing error enum, code3 is `oracleMismatch`. No phone Q8 audio,
+quality or throughput result was obtained. This invalidates any inference that
+the Mac Q8 numerical pass qualified this phone. Do not retry or widen tolerances.
+
+The diagnostic successor preserves existing NSError codes0–6 explicitly and adds
+code7, `oracleValidation`, with fixed-fixture stage, actual decoder profile, reason,
+element counts and (when available) maximum absolute error, relative L2 and both
+CFG top-1 agreement. The NSError `userInfo` fields start with `oracle`; the app
+must retain those fields in the load failure receipt. They contain no request
+text, recording, conditioning or generated audio. The numerical criteria and
+model arithmetic are unchanged. Two focused Release tests verify the actual
+library error-code mapping and serializable diagnostic fields.
+
+This diagnostic update is not a precision correction or a successful phone test.
+The first failed fixture's numbers are required before selecting a correction.

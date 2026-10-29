@@ -72,6 +72,8 @@ let package = Package(
                           path: "Integrations/ChatterboxMLX/Sources/ChatterboxQuantizationProbe"),
         .testTarget(name: "LibroxChatterboxTests", dependencies: ["LibroxChatterbox", "KokoroPronunciation"],
                     path: "Integrations/Chatterbox/Tests/LibroxChatterboxTests"),
+        .testTarget(name: "LibroxChatterboxMLXTests", dependencies: ["LibroxChatterboxMLX"],
+                    path: "Integrations/ChatterboxMLX/Tests/LibroxChatterboxMLXTests"),
         .testTarget(name: "QwenANETests", dependencies: ["QwenANE"]),
         .target(name: "QwenANE", exclude: ["PROVENANCE.md"], resources: [.copy("Resources/TinyTrashLabs-LICENSE.txt")]),
         .systemLibrary(name: "CZlib"),

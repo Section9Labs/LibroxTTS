@@ -30,10 +30,53 @@ public actor ChatterboxMLXRenderer {
     }
     public nonisolated let decoderProfile: DecoderProfile
     public nonisolated var profileIdentifier: String { decoderProfile.rawValue }
-    public enum RendererError: Error {
+    public enum RendererError: Error, CustomNSError {
         case precisionPolicy, identityMismatch, oracleMismatch, busy
         case resourceGuard(ResourceGuardDetails)
         case missingVoice, generationLimit
+        case oracleValidation(OracleValidationDetails)
+
+        public static var errorDomain: String { "LibroxChatterboxMLX.ChatterboxMLXRenderer.RendererError" }
+        // Keep existing codes stable when associated-value cases are added.
+        public var errorCode: Int {
+            switch self {
+            case .resourceGuard: 0
+            case .precisionPolicy: 1
+            case .identityMismatch: 2
+            case .oracleMismatch: 3
+            case .busy: 4
+            case .missingVoice: 5
+            case .generationLimit: 6
+            case .oracleValidation: 7
+            }
+        }
+        public var errorUserInfo: [String: Any] {
+            guard case .oracleValidation(let details) = self else { return [:] }
+            var result: [String: Any] = ["oracleStage": details.stage,
+                "oracleProfile": details.profileIdentifier,
+                "oracleReason": details.reason.rawValue,
+                "oracleActualCount": details.actualCount,
+                "oracleExpectedCount": details.expectedCount]
+            if let value = details.maximumAbsoluteError { result["oracleMaximumAbsoluteError"] = value }
+            if let value = details.relativeL2 { result["oracleRelativeL2"] = value }
+            if let value = details.top1Matches { result["oracleTop1Matches"] = value }
+            return result
+        }
+    }
+
+    /// Public, fixed-fixture diagnostics only; never contains request text or a voice.
+    public struct OracleValidationDetails: Sendable, Codable {
+        public enum Reason: String, Sendable, Codable {
+            case missingFixture, invalidOutput, numericalMismatch
+        }
+        public let stage: String
+        public let profileIdentifier: String
+        public let reason: Reason
+        public let actualCount: Int
+        public let expectedCount: Int
+        public let maximumAbsoluteError: Double?
+        public let relativeL2: Double?
+        public let top1Matches: Bool?
     }
 
     /// Numeric diagnostics only: contains no book text, audio or voice identity.
@@ -96,7 +139,7 @@ public actor ChatterboxMLXRenderer {
                 try model.update(parameters: ModuleParameters.unflattened(weights), verify: .all)
             }
             eval(model)
-            try Self.verify(model, fixture: loadArrays(url: oracleFile))
+            try Self.verify(model, fixture: loadArrays(url: oracleFile), profile: decoderProfile)
             return model
         }
         // Verification allocates its own KV caches and oracle tensors. None are
@@ -281,23 +324,36 @@ public actor ChatterboxMLXRenderer {
         while let bytes = try input.read(upToCount: 1_048_576), !bytes.isEmpty { try Task.checkCancellation(); hash.update(data: bytes) }
         return hash.finalize().map { String(format: "%02x", $0) }.joined()
     }
-    private static func verify(_ model: SpeechDecoder, fixture: [String: MLXArray]) throws {
+    private static func verify(_ model: SpeechDecoder, fixture: [String: MLXArray], profile: DecoderProfile) throws {
         for language in ["en", "es"] {
             let cache = (0..<30).map { _ in KVCache() }
             for step in 0...8 {
                 try healthy()
                 let stem = language + (step == 0 ? ".prefill" : ".decode.\(step - 1)")
-                guard let input = fixture[stem + ".input"], let expected = fixture[stem + ".logits"] else { throw RendererError.oracleMismatch }
+                guard let input = fixture[stem + ".input"], let expected = fixture[stem + ".logits"] else {
+                    throw RendererError.oracleValidation(.init(stage: stem, profileIdentifier: profile.rawValue, reason: .missingFixture,
+                        actualCount: 0, expectedCount: 16_388,
+                        maximumAbsoluteError: nil, relativeL2: nil, top1Matches: nil))
+                }
                 let output = model.logits(input, cache: cache); eval(output)
                 let a = output.asArray(Float.self), b = expected.asArray(Float.self)
-                guard a.count == 16_388, b.count == a.count, a.allSatisfy(\.isFinite) else { throw RendererError.oracleMismatch }
+                guard a.count == 16_388, b.count == a.count, a.allSatisfy(\.isFinite) else {
+                    throw RendererError.oracleValidation(.init(stage: stem, profileIdentifier: profile.rawValue, reason: .invalidOutput,
+                        actualCount: a.count, expectedCount: b.count,
+                        maximumAbsoluteError: nil, relativeL2: nil, top1Matches: nil))
+                }
                 var maximum: Float = 0, squared = 0.0, norm = 0.0
                 for (x, y) in zip(a, b) { maximum = max(maximum, abs(x - y)); squared += pow(Double(x - y), 2); norm += pow(Double(y), 2) }
                 let top1 = (0..<2).allSatisfy { lane in
                     (0..<8194).max { a[lane * 8194 + $0] < a[lane * 8194 + $1] } ==
                     (0..<8194).max { b[lane * 8194 + $0] < b[lane * 8194 + $1] }
                 }
-                guard maximum <= 0.05, sqrt(squared / max(norm, 1e-30)) <= 0.002, top1 else { throw RendererError.oracleMismatch }
+                let relativeL2 = sqrt(squared / max(norm, 1e-30))
+                guard maximum <= 0.05, relativeL2 <= 0.002, top1 else {
+                    throw RendererError.oracleValidation(.init(stage: stem, profileIdentifier: profile.rawValue, reason: .numericalMismatch,
+                        actualCount: a.count, expectedCount: b.count,
+                        maximumAbsoluteError: Double(maximum), relativeL2: relativeL2, top1Matches: top1))
+                }
             }
         }
     }
