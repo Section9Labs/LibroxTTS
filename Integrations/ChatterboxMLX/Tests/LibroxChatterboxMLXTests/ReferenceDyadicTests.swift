@@ -49,6 +49,20 @@ final class ReferenceDyadicTests: XCTestCase {
         let result = try CertifiedReferenceMatrix.multiply([Float](repeating: 0.5, count: 96), rows: 1, weight: w,
             output: .f32, budget: b, statistics: statistics, resolver: { _ in XCTFail("Unexpected fallback"); return [] })
         XCTAssertEqual(result, [12])
+        // The assembled decoder's projection branch requests F16, unlike the
+        // 182 F32 operator outputs. Cover that branch at real projection K and
+        // a non-power-of-two K against the older independent integer helper.
+        for k in [96, 1024, 1536, 4096] {
+            let hx = (0..<(3 * k)).map { Float16(Float($0 % 17 - 8) / 16) }
+            let hw = (0..<(2 * k)).map { Float16(Float($0 % 13 - 6) / 8) }
+            let prepared = try CertifiedReferenceMatrix.prepare(hw.map(Float.init), rows: 2, columns: k, budget: b)
+            let y = try CertifiedReferenceMatrix.multiply(hx.map(Float.init), rows: 3, weight: prepared, output: .f16,
+                budget: b, statistics: statistics, resolver: { _ in XCTFail("Unexpected wide half reduction"); return [] })
+            for row in 0..<3 { for column in 0..<2 {
+                let expected = try CertifiedHalfProjection.exact(hx, hw, xOffset: row * k, wOffset: column * k, count: k)
+                XCTAssertEqual(Float16(y[row * 2 + column]).bitPattern, expected)
+            } }
+        }
         let tiny: [Float] = [.leastNonzeroMagnitude]
         let t = try CertifiedReferenceMatrix.prepare([1], rows: 1, columns: 1, budget: b)
         XCTAssertEqual(try CertifiedReferenceMatrix.multiply(tiny, rows: 1, weight: t, output: .f32,

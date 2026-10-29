@@ -445,7 +445,8 @@ subnormal. A separate actual subprocess resolves the known softmax midpoint row.
 Both request/response UUID/hash/shape controls pass. All runtime helper and import
 files are pinned; unresolved calculations never use native arithmetic fallback.
 
-All31 Release tests passed without skipping, including real Swift-task
+All31 Release tests passed without skipping, including F16-output GEMM at
+K96/1024/1536/4096 against the prior exact integer helper and real Swift-task
 cancellation of owned Python workers, both ordinary termination and deliberate
 SIGTERM refusal. Cleanup permits one second for TERM, then one second for an
 owned-child KILL/join, and throws if termination is not observed. Three Python
