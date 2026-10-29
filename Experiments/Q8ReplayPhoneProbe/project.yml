@@ -1,0 +1,35 @@
+name: ChatterboxQ8ReplayProbe
+options:
+  deploymentTarget:
+    iOS: '18.0'
+packages:
+  LibroxTTS:
+    path: ../..
+targets:
+  ChatterboxQ8ReplayProbe:
+    type: application
+    platform: iOS
+    sources:
+      - Sources
+    dependencies:
+      - package: LibroxTTS
+        product: LibroxChatterboxMLX
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.librox.ChatterboxBenchmark
+        DEVELOPMENT_TEAM: 995PCLM9KH
+        CODE_SIGN_STYLE: Automatic
+        SWIFT_VERSION: '6.0'
+        TARGETED_DEVICE_FAMILY: '1,2'
+        MARKETING_VERSION: '0.2'
+        CURRENT_PROJECT_VERSION: '10'
+    info:
+      path: Generated/Info.plist
+      properties:
+        CFBundleDisplayName: Q8 Replay Probe
+        UILaunchScreen: {}
+        UIFileSharingEnabled: true
+        LSSupportsOpeningDocumentsInPlace: true
+        LibroxSDKRevision: bfa2f565687db0c633f91febb546b751eed1f6a5
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
