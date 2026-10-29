@@ -39,6 +39,20 @@ class ShapeOnlyTests(unittest.TestCase):
             with self.assertRaises(ValueError): require_shape_only(old, new)
 
 class MILMaterializationTests(unittest.TestCase):
+    def testActualFloat16Float32ClassRepresentationCannotHidePrecisionChange(self):
+        import coremltools as ct
+        import numpy as np
+        from coremltools.converters.mil import Builder as mb
+        from coremltools.converters.mil.mil import types
+        from materialize_exact import describe
+        def make(dtype):
+            @mb.program(input_specs=[mb.TensorSpec((1, 80, 700), dtype=dtype)], opset_version=ct.target.iOS17)
+            def program(x): return x
+            return describe(program.functions['main'], np)
+        a, b = make(types.fp16), make(types.fp32)
+        self.assertNotEqual(a['inputs']['x']['dtype'], b['inputs']['x']['dtype'])
+        with self.assertRaises(ValueError): require_shape_only(a, b)
+
     def testActualSinglePassRetainsOperationsConstantsAndDtypes(self):
         import coremltools as ct
         import numpy as np

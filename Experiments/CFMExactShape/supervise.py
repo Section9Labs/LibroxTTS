@@ -24,6 +24,12 @@ def main(manifest_path, expected_sha):
     import run_assembled_reference as owner
     owner.install_signal_handlers()
     manifest, _ = owner.pinned_json(Path(manifest_path), expected_sha)
+    scope = manifest.get('scope', 'structural')
+    if scope not in ('structural', 'precision_metadata'):
+        raise ValueError('Unreviewed supervisor scope')
+    budget = 180 if scope == 'precision_metadata' else 600
+    if manifest.get('budget_seconds', budget) != budget:
+        raise ValueError('Wrong scope budget')
     script = owner.owned(manifest['script'])
     if owner.digest(script) != manifest['script_sha256']:
         raise ValueError('Changed frozen converter')
@@ -34,7 +40,10 @@ def main(manifest_path, expected_sha):
     program = owner.owned(manifest['programDirectory'])
     if output.parent != ROOT.resolve() or output.exists() or program.exists():
         raise ValueError('Existing or unowned output')
-    spec = importlib.util.spec_from_file_location('frozen_converter', script)
+    guard_module = owner.owned(manifest.get('guard_module', str(script)))
+    if owner.digest(guard_module) != manifest.get('guard_module_sha256', manifest['script_sha256']):
+        raise ValueError('Changed frozen host guard')
+    spec = importlib.util.spec_from_file_location('frozen_converter', guard_module)
     converter = importlib.util.module_from_spec(spec); spec.loader.exec_module(converter)
     host_guard = converter.HostGuard(); host_guard()
     program.mkdir()
@@ -52,12 +61,12 @@ def main(manifest_path, expected_sha):
                 stdin=subprocess.DEVNULL, stdout=stream, stderr=subprocess.STDOUT,
                 start_new_session=True)
             owner.write(program / 'status.json', {'state': 'running', 'owned_child_pid': child.pid,
-                'manifest_sha256': expected_sha, 'deadline_seconds': 600})
+                'manifest_sha256': expected_sha, 'deadline_seconds': budget})
             next_check = 0.0
             while child.poll() is None:
                 owner.check_stop()
                 now = time.monotonic()
-                if now - started >= 600:
+                if now - started >= budget:
                     raise TimeoutError('Owned conversion deadline')
                 if now >= next_check:
                     host_guard()
@@ -80,14 +89,14 @@ def main(manifest_path, expected_sha):
                 raise RuntimeError('Terminal converter failure or unexpected descendants')
         host_guard()
         report, report_sha = owner.receipt(output / 'report.json')
-        if report.get('predictions') != 0 or report.get('runtime_model_loads') != 0 or not report.get('structural_pass'):
+        if report.get('predictions') != 0 or report.get('runtime_model_loads') != 0 or not report.get('precision_gate_passed' if scope == 'precision_metadata' else 'structural_pass'):
             raise ValueError('Wrong conversion scope receipt')
         owner.write(program / 'status.json', {'state': 'complete', 'owned_child_absent': True,
             'report_commit_required': True})
         owner.check_stop(); host_guard()
         if shutil.disk_usage(ROOT).free < 1024**3:
             raise RuntimeError('Storage guard before publication')
-        if time.monotonic() - started >= 600:
+        if time.monotonic() - started >= budget:
             raise TimeoutError('Expired before supervisor publication')
         owner.write(program / 'report.json', {'completed': True, 'manifest_sha256': expected_sha,
             'child_report_sha256': report_sha, 'peak_child_rss_bytes': peak,

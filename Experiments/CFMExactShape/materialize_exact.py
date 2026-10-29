@@ -40,10 +40,11 @@ def atomic(path, data):
 
 def describe(function, np, check=lambda: None):
     """Keep names/edges/types/constants; shape metadata is the sole intervention."""
+    from coremltools.converters.mil.mil import types
     result = {'inputs': {}, 'outputs': [], 'operators': [], 'constants': {}}
     def value(v):
         shape = [int(x) if isinstance(x, (int, np.integer)) else str(x) for x in v.shape]
-        return {'name': v.name, 'dtype': str(v.dtype), 'shape': shape}
+        return {'name': v.name, 'dtype': types.builtin_to_string(v.dtype), 'shape': shape}
     for name, v in function.inputs.items():
         result['inputs'][name] = value(v)
     result['outputs'] = [value(v) for v in function.outputs]
