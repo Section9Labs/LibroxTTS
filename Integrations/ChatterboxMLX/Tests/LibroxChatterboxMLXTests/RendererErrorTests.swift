@@ -1,8 +1,38 @@
 import Foundation
 import XCTest
+import ChatterboxCoreML
+import LibroxChatterbox
 @testable import LibroxChatterboxMLX
 
 final class RendererErrorTests: XCTestCase {
+    func testAudioCacheSeparatesLegacyLayoutAndEachAcousticPolicy() throws {
+        let decoder = ChatterboxMLXRenderer.DecoderProfile.mixedFloat16Accurate
+        let cpu = PipelineComputeUnits(encoder: .cpuOnly, cfm: .cpuOnly, vocoder: .cpuOnly, watermark: .cpuOnly)
+        let request = try ChatterboxRequest(text: "Hello.", language: "en", seed: 42)
+        let hash = String(repeating: "a", count: 64)
+        func key(_ units: PipelineComputeUnits, reuse: Bool = false) throws -> String {
+            try request.cacheKey(modelManifestSHA256: hash, conditioningSHA256: hash,
+                rendererProfile: ChatterboxMLXRenderer.renderingProfileIdentifier(
+                    decoderProfile: decoder, acousticComputeUnits: units, reuseAcousticInputs: reuse))
+        }
+        let base = try key(cpu)
+        XCTAssertEqual(base, try key(cpu))
+        XCTAssertNotEqual(base, try request.cacheKey(modelManifestSHA256: hash,
+            conditioningSHA256: hash, rendererProfile: decoder.rawValue))
+        for stage in 0..<4 {
+            var changed = cpu
+            switch stage {
+            case 0: changed.encoder = .cpuAndGPU
+            case 1: changed.cfm = .cpuAndGPU
+            case 2: changed.vocoder = .cpuAndGPU
+            default: changed.watermark = .cpuAndGPU
+            }
+            XCTAssertNotEqual(base, try key(changed))
+        }
+        XCTAssertNotEqual(base, try key(.init()))
+        XCTAssertNotEqual(base, try key(cpu, reuse: true))
+    }
+
     func testCanonicalTrialHasSeparateCacheIdentityAndSamePinnedArtifacts() {
         let original = ChatterboxMLXRenderer.DecoderProfile.mixedFloat16Accurate
         let oldQ8 = ChatterboxMLXRenderer.DecoderProfile.q8ExperimentalV1

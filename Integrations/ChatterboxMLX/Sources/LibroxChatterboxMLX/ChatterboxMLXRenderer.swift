@@ -10,6 +10,7 @@ import Darwin
 /// Optional native decoder with the phone-tested mixed-precision math. The host
 /// owns foreground eligibility and global MLX memory/cache budgets.
 public actor ChatterboxMLXRenderer {
+    /// Legacy decoder selection ID. Use instance profileIdentifier for audio caches.
     public static let profile = "native-mlx-mixed-f16-accurate-1"
     public enum DecoderProfile: String, Sendable {
         case mixedFloat16Accurate = "native-mlx-mixed-f16-accurate-1"
@@ -41,7 +42,19 @@ public actor ChatterboxMLXRenderer {
         }
     }
     public nonisolated let decoderProfile: DecoderProfile
-    public nonisolated var profileIdentifier: String { decoderProfile.rawValue }
+    /// Opaque rendering identity, including host-copy semantics and selected
+    /// acoustic stages. Decoder selection/oracle IDs remain unchanged.
+    public nonisolated let profileIdentifier: String
+    public nonisolated static func renderingProfileIdentifier(
+        decoderProfile: DecoderProfile, acousticComputeUnits: PipelineComputeUnits,
+        reuseAcousticInputs: Bool = false
+    ) -> String {
+        let stages = [acousticComputeUnits.encoder, acousticComputeUnits.cfm,
+            acousticComputeUnits.vocoder, acousticComputeUnits.watermark]
+            .map { $0.map { String($0.rawValue) } ?? "inherit" }.joined(separator: ",")
+        return decoderProfile.rawValue + ":" + ChatterboxRequest.adapterRevision +
+            ":acoustics=" + stages + ":reuse=" + (reuseAcousticInputs ? "1" : "0")
+    }
     public enum RendererError: Error, CustomNSError {
         case precisionPolicy, identityMismatch, oracleMismatch, busy
         case resourceGuard(ResourceGuardDetails)
@@ -136,6 +149,8 @@ public actor ChatterboxMLXRenderer {
                 decoderProfile: DecoderProfile = .mixedFloat16Accurate,
                 reuseAcousticInputs: Bool = false) async throws {
         self.decoderProfile = decoderProfile
+        self.profileIdentifier = Self.renderingProfileIdentifier(decoderProfile: decoderProfile,
+            acousticComputeUnits: acousticComputeUnits, reuseAcousticInputs: reuseAcousticInputs)
         // Never change this process-global switch after another model initializes.
         guard ProcessInfo.processInfo.environment["MLX_ENABLE_TF32"] == "0" else { throw RendererError.precisionPolicy }
         try Self.healthy(minimumAvailable: 3 * 1_024 * 1_024 * 1_024)

@@ -3,8 +3,8 @@ import CryptoKit
 import KokoroNarration
 
 extension ChatterboxRequest {
-    /// Bump when adapter preprocessing, conditioning, or default sampling changes.
-    public static let adapterRevision = "chatterbox-coreml-v3-librox-3-canonical"
+    /// Bump when preprocessing, conditioning, sampling or tensor interpretation changes.
+    public static let adapterRevision = "chatterbox-coreml-v3-librox-4-logical-layout"
 
     /// The host supplies hashes of its immutable installed-model manifest and the
     /// exact conditioning file (including the installed default, when used).

@@ -59,3 +59,24 @@ not proof of causation. The separately registered sentence-control experiment
 changes only the existing explicit grouping mode, retaining text, conditioning,
 seeds, arithmetic, the 350-token guard, CPU acoustics and watermark. No phone
 build is cleared while this full-pipeline issue remains.
+
+## Cache identity after logical tensor access
+
+The logical-layout correction changes the interpretation of valid strided Core
+ML tensors. SDK cache adapter revision 4 prevents reuse of audio made under the
+previous packed-storage assumption. The native renderer exposes an opaque
+`profileIdentifier` that also binds decoder selection, encoder/CFM/vocoder/
+watermark compute-unit policies and input-buffer reuse. Hosts should use that
+identity or the matching pure `renderingProfileIdentifier` helper, rather than
+reconstructing it from `usesQ8Weights` or the legacy decoder-only ID.
+
+Decoder selection strings, weight/oracle hashes and saved voice files remain
+unchanged. This invalidates generated-audio identities; it neither migrates
+voices nor clears a failed decoder gate. It does not activate GPU/ANE policies.
+
+Subsequent sentence controls completed all eight Standard/V3 English/Spanish,
+stock/authorized-reference outputs. V3 complete playback RTF was about1.12–1.32
+with derived buffer deficits. Matt slightly preferred Standard's neutral
+expression. Matched storyteller outputs also completed; their listening
+acceptance remains separate. None of these results clears phone throughput or
+the five-times-playback target.
