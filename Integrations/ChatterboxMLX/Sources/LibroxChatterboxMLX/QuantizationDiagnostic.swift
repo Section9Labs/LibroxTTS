@@ -105,8 +105,8 @@ public enum ChatterboxQuantizationDiagnostic {
                "local-q8-freeze-holdout-inputs",
                "local-q8-assembly-native-controls", "local-q8-assembled-reference",
                "local-q8-runtime-bootstrap",
-               "local-q8-assembled-gpu-candidate", "local-q8-semantic-startup-reference",
-               "acoustic-parity", "library-q8", "library-q8-canonical"].contains(c.profile), c.samples.count <= 6,
+               "local-q8-assembled-gpu-candidate", "local-q8-semantic-startup-reference", "local-q8-semantic-startup-gpu",
+               "acoustic-parity", "library-q8", "library-q8-canonical", "library-q8-semantic", "library-standard"].contains(c.profile), c.samples.count <= 6,
               ProcessInfo.processInfo.environment["MLX_ENABLE_TF32"] == "0",
               ProcessInfo.processInfo.environment["CHATTERBOX_SYNTH_SEED"] == "42",
               !FileManager.default.fileExists(atPath: c.outputDirectory),
@@ -145,10 +145,17 @@ public enum ChatterboxQuantizationDiagnostic {
         if c.profile == "local-q8-runtime-bootstrap" {
             guard c.samples.isEmpty, let resourceSHA = c.runtimeMetallibSHA256 else { throw Failure.configuration }
             let output = URL(fileURLWithPath: c.outputDirectory)
+            _ = try SemanticHalfRoPE(data: SemanticHalfRoPE.bundledBytes())
             try FileManager.default.createDirectory(at: output, withIntermediateDirectories: false)
             try write(["completed": true, "diagnostic_only": true, "model_forward_count": 0,
+                "semantic_table_sha256": SemanticHalfRoPE.sha256,
+                "semantic_table_path": try SemanticHalfRoPE.bundledURL().path,
                 "production_clearance": false, "runtime_metallib_sha256": resourceSHA,
                 "memory_cache_bytes": Memory.cacheMemory], to: output.appendingPathComponent("report.json"))
+            return
+        }
+        if c.profile == "local-q8-semantic-startup-gpu" {
+            try semanticStartupGPU(c)
             return
         }
         if c.profile == "local-q8-semantic-startup-reference" {
@@ -317,7 +324,7 @@ public enum ChatterboxQuantizationDiagnostic {
             try ropeCounterfactual(c)
             return
         }
-        if c.profile == "library-q8" || c.profile == "library-q8-canonical" {
+        if ["library-q8", "library-q8-canonical", "library-q8-semantic", "library-standard"].contains(c.profile) {
             try await libraryBenchmark(c)
             return
         }
@@ -937,19 +944,76 @@ public enum ChatterboxQuantizationDiagnostic {
         try write(["rows": rows, "completed": true, "all_bit_identical": true], to: out.appendingPathComponent("report.json"))
     }
 
+    private static func semanticStartupGPU(_ c: Configuration) throws {
+        let budget = CertifiedHalfProjection.Budget()
+        let profile = ChatterboxMLXRenderer.DecoderProfile.q8SemanticHalfV3
+        guard c.samples.isEmpty, let oracle = c.referenceOracleFile,
+            c.expectedSHA256 == profile.weightsSHA256 else { throw Failure.configuration }
+        let out = URL(fileURLWithPath: c.outputDirectory)
+        try FileManager.default.createDirectory(at: out, withIntermediateDirectories: false)
+        var comparisons: [ChatterboxQ8FixedFixtureDiagnostic.Comparison] = []
+        var report: [String: Any] = ["completed": false, "profile": profile.rawValue,
+            "oracle_sha256": profile.oracleSHA256, "rope_sha256": SemanticHalfRoPE.sha256,
+            "audio_or_phone_clearance": false]
+        var stage = "preparation"
+        do {
+            try Device.withDefaultDevice(.gpu) {
+                let fixture = try AssemblyNativeControls.pinnedArrays(URL(fileURLWithPath: oracle), sha: profile.oracleSHA256, budget: budget)
+                let model = try Q8DecoderWeights.load(from: URL(fileURLWithPath: c.weightsFile), canonicalHalf: true,
+                    semanticRoPE: SemanticHalfRoPE(data: SemanticHalfRoPE.bundledBytes()))
+                try budget.check()
+                for language in ["en", "es"] {
+                    let cache = (0..<30).map { _ in KVCache() }
+                    for stem in SemanticStartupReference.stems.filter({ $0.hasPrefix(language + ".") }) {
+                        stage = stem; try budget.check()
+                        guard let input = fixture[stem + ".input"], let expected = fixture[stem + ".logits"] else { throw Failure.configuration }
+                        let output = model.logits(input, cache: cache); eval(output)
+                        let file = out.appendingPathComponent(stem + ".safetensors")
+                        try save(arrays: ["actual": output, "expected": expected], url: file)
+                        report["current_stage"] = stem
+                        report["current_raw"] = ["file": file.lastPathComponent, "sha256": try digest(file),
+                            "actual_shape": output.shape, "actual_dtype": String(describing: output.dtype)]
+                        try write(report, to: out.appendingPathComponent("report.json"))
+                        comparisons.append(try ChatterboxQ8FixedFixtureDiagnostic.compare(output.asArray(Float.self),
+                            expected.asArray(Float.self), stage: stem))
+                        report["comparisons"] = try JSONSerialization.jsonObject(with: JSONEncoder().encode(comparisons))
+                        try write(report, to: out.appendingPathComponent("report.json"))
+                    }
+                }
+                try budget.check()
+            }
+            report["all18_pass"] = comparisons.count == 18 && comparisons.allSatisfy(\.passesOriginalCriteria)
+            try budget.check(); report["completed"] = true
+            try write(report, to: out.appendingPathComponent("report.json"))
+        } catch {
+            report["completed"] = false; report["failed_stage"] = stage; report["error"] = String(describing: error)
+            try? write(report, to: out.appendingPathComponent("report.json"))
+            throw error
+        }
+    }
+
     private static func libraryBenchmark(_ c: Configuration) async throws {
         guard let oracle = c.referenceOracleFile, !c.samples.isEmpty else { throw Failure.configuration }
         let out = URL(fileURLWithPath: c.outputDirectory)
         try FileManager.default.createDirectory(at: out, withIntermediateDirectories: false)
         let began = Date()
+        let selectedProfile: ChatterboxMLXRenderer.DecoderProfile = switch c.profile {
+        case "library-standard": .mixedFloat16Accurate
+        case "library-q8-semantic": .q8SemanticHalfV3
+        case "library-q8-canonical": .q8CanonicalHalfV2
+        default: .q8ExperimentalV1
+        }
+        var activeNarrator: ChatterboxNarrator?
+        do {
         let renderer = try await ChatterboxMLXRenderer(weightsFile: URL(fileURLWithPath: c.weightsFile),
             oracleFile: URL(fileURLWithPath: oracle), modelDirectory: URL(fileURLWithPath: c.modelDirectory),
             defaultVoice: URL(fileURLWithPath: c.conditioningFile), watermarkDirectory: URL(fileURLWithPath: c.watermarkDirectory),
             acousticComputeUnits: .init(encoder: .cpuOnly, cfm: .cpuOnly, vocoder: .cpuOnly, watermark: .cpuOnly),
-            decoderProfile: c.profile == "library-q8-canonical" ? .q8CanonicalHalfV2 : .q8ExperimentalV1,
+            decoderProfile: selectedProfile,
             reuseAcousticInputs: c.reuseFlowInputs ?? false)
         let loadSeconds = Date().timeIntervalSince(began)
         let narrator = await renderer.makeNarrator(overlap: c.overlap ?? false)
+        activeNarrator = narrator
         let voice = URL(fileURLWithPath: c.conditioningFile)
         var reports: [[String: Any]] = []
         for sample in c.samples {
@@ -975,13 +1039,20 @@ public enum ChatterboxQuantizationDiagnostic {
             try write(["completed": false, "load_seconds": loadSeconds, "samples": reports,
                 "grouped": c.groupSentences ?? false, "overlap": c.overlap ?? false,
                 "reuse_flow_inputs": c.reuseFlowInputs ?? false, "profile": renderer.profileIdentifier,
-                "q8_implementation_checks": 18, "original_fp32_equivalent": false], to: out.appendingPathComponent("report.json"))
+                "startup_implementation_checks": 18, "conditioning_sha256": try digest(URL(fileURLWithPath: c.conditioningFile)), "original_fp32_equivalent": false], to: out.appendingPathComponent("report.json"))
         }
         try await narrator.unload()
         try write(["completed": true, "load_seconds": loadSeconds, "samples": reports,
             "grouped": c.groupSentences ?? false, "overlap": c.overlap ?? false,
             "reuse_flow_inputs": c.reuseFlowInputs ?? false, "profile": renderer.profileIdentifier,
-            "q8_implementation_checks": 18, "original_fp32_equivalent": false], to: out.appendingPathComponent("report.json"))
+            "startup_implementation_checks": 18, "conditioning_sha256": try digest(URL(fileURLWithPath: c.conditioningFile)), "original_fp32_equivalent": false], to: out.appendingPathComponent("report.json"))
+        } catch {
+            if let activeNarrator { try? await activeNarrator.unload() }
+            try? write(["completed": false, "profile": selectedProfile.rawValue,
+                "error": String(describing: error), "cancelled": error is CancellationError],
+                to: out.appendingPathComponent("failure.json"))
+            throw error
+        }
     }
 
     private static func oracleReport(_ model: SpeechDecoder, file: URL) throws -> [[String: Any]] {
@@ -1093,13 +1164,18 @@ private actor BookBenchmarkCollector {
     var samples: [Float] = []
     var frames = 0
     var rows: [[String: Any]] = []
+    private let began = DispatchTime.now().uptimeNanoseconds
     func append(_ passage: ChatterboxPreparedPassage) throws {
         guard passage.samples.count <= 180 * 24_000 - samples.count else { throw CocoaError(.fileWriteOutOfSpace) }
         samples += passage.samples; frames += passage.generatedFrames
         var row: [String: Any] = ["index": passage.index, "source_location": passage.unit.request.sourceContext!.range.location,
             "source_length": passage.unit.request.sourceContext!.range.length,
             "sentence_fragments": passage.unit.sourceFragments.count, "cache_hit": passage.cacheHit,
-            "generated_frames": passage.generatedFrames]
+            "generated_frames": passage.generatedFrames,
+            "available_seconds": Double(DispatchTime.now().uptimeNanoseconds - began) / 1e9,
+            "playback_seconds": Double(passage.samples.count) / 24000,
+            "raw_peak": passage.samples.map { abs($0) }.max() ?? 0,
+            "all_samples_finite": passage.samples.allSatisfy(\.isFinite)]
         if let t = passage.timings {
             row["decode_seconds"] = t.decodeSeconds; row["prefill_seconds"] = t.prefillSeconds
             row["synth_seconds"] = t.synthSeconds; row["watermark_seconds"] = t.watermarkSeconds

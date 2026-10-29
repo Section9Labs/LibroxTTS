@@ -18,6 +18,7 @@ private class T3Llama3ScaledRoPE: Module {
     let dims: Int
     let traditional: Bool
     private let _freqs: MLXArray
+    var semanticRotation: SemanticHalfRoPE?
 #if os(macOS)
     // Mac-only causal probes; never configured by any renderer/profile.
     var diagnosticObserver: ((MLXArray, MLXArray, MLXArray, Int) -> Void)?
@@ -98,6 +99,7 @@ private class T3Llama3ScaledRoPE: Module {
     }
 
     func callAsFunction(_ x: MLXArray, offset: Int = 0) -> MLXArray {
+        if let semanticRotation { return semanticRotation(x, offset: offset) }
 #if os(macOS)
         if let diagnosticRotation { return diagnosticRotation(x, offset) }
 #endif
@@ -370,6 +372,11 @@ class T3LlamaInner: Module {
         for layer in layers { layer.attention.rope.diagnosticRotation = rotation }
     }
 #endif
+
+    /// Explicit V3-only policy; the same immutable tables are shared by all layers.
+    func useSemanticHalfRoPE(_ rotation: SemanticHalfRoPE) {
+        for layer in layers { layer.attention.rope.semanticRotation = rotation }
+    }
 
     /// Forward pass with pre-computed embeddings.
     func callAsFunction(_ embeddings: MLXArray, cache: [KVCache]? = nil, projectionType: DType = .float32,

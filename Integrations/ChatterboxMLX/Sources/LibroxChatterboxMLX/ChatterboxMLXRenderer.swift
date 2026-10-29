@@ -17,22 +17,26 @@ public actor ChatterboxMLXRenderer {
         case q8ExperimentalV1 = "native-mlx-q8-g64-f16-affine-experimental-1"
         /// Explicit canonical-half-weight decode trial. Requires fresh device qualification.
         case q8CanonicalHalfV2 = "native-mlx-q8-g64-canonical-half-experimental-2"
+        /// Additive semantic arithmetic profile; independently qualified reference.
+        /// Device and listening acceptance are still required before distribution.
+        case q8SemanticHalfV3 = "native-mlx-q8-g64-semantic-half-experimental-3"
         public var usesQ8Weights: Bool {
             switch self {
             case .mixedFloat16Accurate: false
-            case .q8ExperimentalV1, .q8CanonicalHalfV2: true
+            case .q8ExperimentalV1, .q8CanonicalHalfV2, .q8SemanticHalfV3: true
             }
         }
         public var weightsSHA256: String {
             switch self {
             case .mixedFloat16Accurate: "3df864ea174ee38478910c9b03358b36f2241166844bd5458c9b2f917e110ab0"
-            case .q8ExperimentalV1, .q8CanonicalHalfV2: "231647ebb4deedad901c46cf3d7ca1e0fa70371b461c934c14dc63f16ec69017"
+            case .q8ExperimentalV1, .q8CanonicalHalfV2, .q8SemanticHalfV3: "231647ebb4deedad901c46cf3d7ca1e0fa70371b461c934c14dc63f16ec69017"
             }
         }
         public var oracleSHA256: String {
             switch self {
             case .mixedFloat16Accurate: "87b8ab31eda9c63abbeecb8a9f0678bc8e0fe6980396ea0c4f9e16637ef618d2"
             case .q8ExperimentalV1, .q8CanonicalHalfV2: "8f7b5d2a6437c23cfa753f0ac25e2f23f296ca32f3e91b98b3f6219b26325b44"
+            case .q8SemanticHalfV3: "d2878e946dfef6f4a0073493b4196a201fa1993fd4551d744d67646ada900d86"
             }
         }
     }
@@ -142,7 +146,9 @@ public actor ChatterboxMLXRenderer {
             let model: SpeechDecoder
             if decoderProfile.usesQ8Weights {
                 model = try Q8DecoderWeights.load(from: weightsFile,
-                    canonicalHalf: decoderProfile == .q8CanonicalHalfV2)
+                    canonicalHalf: decoderProfile != .q8ExperimentalV1,
+                    semanticRoPE: decoderProfile == .q8SemanticHalfV3
+                        ? try SemanticHalfRoPE(data: SemanticHalfRoPE.bundledBytes()) : nil)
             }
             else {
                 model = SpeechDecoder(precision: .mixedFloat16Accurate)

@@ -4,7 +4,7 @@ import MLXNN
 
 /// Exact local V3 Q8 artifact. Its identity is checked before this loader is used.
 enum Q8DecoderWeights {
-    static func load(from url: URL, canonicalHalf: Bool = false, useNativePrefill: Bool = true) throws -> SpeechDecoder {
+    static func load(from url: URL, canonicalHalf: Bool = false, useNativePrefill: Bool = true, semanticRoPE: SemanticHalfRoPE? = nil) throws -> SpeechDecoder {
         let weights = try loadArrays(url: url)
         let model = SpeechDecoder(precision: .mixedFloat16Accurate)
         let expected = model.parameters().flattened()
@@ -35,6 +35,10 @@ enum Q8DecoderWeights {
         }
         model.update(modules: ModuleChildren.unflattened(modules))
         try model.update(parameters: ModuleParameters.unflattened(weights), verify: .all)
+        if let semanticRoPE {
+            guard canonicalHalf && useNativePrefill else { throw DecoderWeightError.invalidStructure }
+            model.transformer.useSemanticHalfRoPE(semanticRoPE)
+        }
         eval(model)
         return model
     }

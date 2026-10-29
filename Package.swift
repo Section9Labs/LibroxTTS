@@ -61,7 +61,7 @@ let package = Package(
             "LibroxChatterbox", "ChatterboxCoreML",
             .product(name: "MLX", package: "mlx-swift"), .product(name: "MLXNN", package: "mlx-swift"),
             .product(name: "MLXFast", package: "mlx-swift"),
-        ], path: "Integrations/ChatterboxMLX/Sources/LibroxChatterboxMLX"),
+        ], path: "Integrations/ChatterboxMLX/Sources/LibroxChatterboxMLX", resources: [.copy("Resources")]),
         .executableTarget(name: "ChatterboxProbe", dependencies: ["LibroxChatterbox"],
                           path: "Integrations/Chatterbox/Sources/ChatterboxProbe"),
         .executableTarget(name: "ChatterboxVoices", dependencies: ["LibroxChatterbox"],
