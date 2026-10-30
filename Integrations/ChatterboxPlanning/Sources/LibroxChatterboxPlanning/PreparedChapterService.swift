@@ -20,13 +20,18 @@ public struct ChatterboxStockCapability: Sendable {
     }
 }
 public struct ChatterboxStockCatalog: Sendable {
+    /// Local authority can finish a local-only cancellation after its durable
+    /// Reader journal commit. Cloud still requires the exact server receipt.
+    /// This is a transport domain, never availability or listening approval.
+    public enum DeliveryDomain: Sendable { case local, cloud }
     public let session: ChapterAccountSession
     public let voices: [ChatterboxStockCapability]
-    public init(session: ChapterAccountSession, voices: [ChatterboxStockCapability]) throws {
+    public let deliveryDomain: DeliveryDomain
+    public init(session: ChapterAccountSession, voices: [ChatterboxStockCapability], deliveryDomain: DeliveryDomain = .cloud) throws {
         // V1 is exactly one stock identity, with supported EN/ES metadata. An
         // unavailable service must throw, not return an invented empty catalog.
         guard voices.count == 1 else { throw ChapterServiceError.invalidCatalog }
-        self.session = session; self.voices = voices
+        self.session = session; self.voices = voices; self.deliveryDomain = deliveryDomain
     }
 }
 

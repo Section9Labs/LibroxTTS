@@ -371,6 +371,16 @@ public actor ChapterDemandOutbox {
         return .init(intent: entry.intent, sourceReference: source, renderPlanReference: entry.renderPlanReference)
     }
 
+    /// Current local-device intent, including cancellation without stored source.
+    /// Observation only; does not clear pending or imply server acknowledgement.
+    public func currentIntent(for request: ChapterRenderRequest) throws -> ChapterDemandIntent? {
+        try writable(); try Task.checkCancellation(); try request.validate()
+        guard request.accountPartition == accountPartition else { throw ChapterWorkerError.accountMismatch }
+        guard let entry = entries[try request.renderKey()] else { return nil }
+        guard entry.intent.request == request else { throw ChapterOutboxError.corrupt }
+        return entry.intent
+    }
+
     /// Reader-owned atomic read of the exact wanted intent plus both durable
     /// references. Legacy/incomplete/cancelled entries are not render work.
     public func wantedReadSet(for request: ChapterRenderRequest) throws -> ChapterIntentReadSet? {

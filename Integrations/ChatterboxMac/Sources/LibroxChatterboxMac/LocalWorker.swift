@@ -101,13 +101,19 @@ public actor ChatterboxMacLocalWorker {
     }
     init(renderer: ChatterboxMacResidentRenderer, journal: ChapterWorkerJournal, session: ChapterAccountSession,
          gate: ChapterAccountSessionGate, directories: ChatterboxMacWorkerDirectories, hooks: LocalWorkerLifecycleHooks = .init(),
-         artifactBudget: ChapterArtifactStorageBudget? = nil) {
-        nativeModelIdentity = nil // Internal synthetic seam, never a production profile.
+         artifactBudget: ChapterArtifactStorageBudget? = nil, nativeModelIdentity: String? = nil) {
+        self.nativeModelIdentity = nativeModelIdentity // nil only in the internal synthetic seam.
         self.renderer = renderer; self.journal = journal; self.session = session; self.gate = gate; self.directories = directories; self.hooks = hooks
         self.artifactBudget = artifactBudget
     }
     deinit { cancellation.stop(terminal: true) }
     public func state() -> Phase { phase }
+    func acceptingClaims() -> Bool {
+        // Healthy busy rendering can admit queued demand. render() still
+        // serializes actual claims; a retained allowance after failure disables
+        // enabled/cancellation before a successful public return.
+        enabled && cancellation.accepting && !closed && !terminalRequested && !stopping
+    }
     public func checkpoint(for request: ChapterRenderRequest) async throws -> ChapterWorkerCheckpoint? {
         try await gate.validate(session); try Task.checkCancellation()
         let result = try await journal.checkpoint(for: request)

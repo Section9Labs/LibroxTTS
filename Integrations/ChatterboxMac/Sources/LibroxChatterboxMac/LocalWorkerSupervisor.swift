@@ -53,6 +53,10 @@ public actor ChatterboxMacLocalWorkerSupervisor {
         self.beforeAcceptance = beforeAcceptance
     }
     deinit { cancellation.stop(terminal: true); worker.stopClaims() }
+    func acceptingClaims() async -> Bool {
+        let accepted = await worker.acceptingClaims()
+        return accepted && enabled && cancellation.accepting && !closed && !terminalRequested && stops == 0
+    }
 
     public func enable() async throws {
         guard !closed, !terminalRequested else { throw ChatterboxMacWorkerError.closed }
