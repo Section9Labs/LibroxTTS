@@ -8,6 +8,9 @@ final class KVCache {
     private var keys: MLXArray?
     private var values: MLXArray?
 
+    /// Diagnostic metadata observation only; callers must not evaluate to inspect availability.
+    var retainedArrays: [MLXArray] { [keys, values].compactMap { $0 } }
+
     func update(keys incomingKeys: MLXArray, values incomingValues: MLXArray) -> (MLXArray, MLXArray) {
         let previous = offset
         let next = previous + incomingKeys.dim(2)
