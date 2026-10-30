@@ -96,6 +96,11 @@ public actor ChapterBookOutbox {
         guard let entry = entries[scopeID] else { return nil }
         return try snapshot(entry)
     }
+    package func requireCurrentIntent(_ intent: ChapterBookDemandIntent) throws {
+        try writable()
+        guard intent.accountPartition == accountPartition, intent.deviceID == deviceID else { throw ChapterWorkerError.accountMismatch }
+        guard entries[intent.scopeID]?.intent == intent else { throw ChapterBookJournalError.staleAdmission }
+    }
     public func pending(maximum: Int = 16) throws -> [ChapterBookStoredPreparation] {
         try writable()
         guard (1...Self.maximumBooks).contains(maximum) else { throw ChapterBookJournalError.budget }
