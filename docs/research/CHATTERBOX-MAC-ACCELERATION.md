@@ -25,7 +25,7 @@ Measure complete watermarked audio, not decoder token rate. Quality reference re
 - Official `ResembleAI/Chatterbox-Multilingual-es-es` (and regional packs) is a full-size V3 language finetune, not Turbo or distillation. Its own T3/tokenizer/acoustic assets must remain matched. It is an optional Spanish quality comparison after the runtime baseline.
 - Official Chatterbox Flash releases an English-tokenizer block-diffusion decoder. Its MLX backend accelerates the LLaMA backbone while the PyTorch side remains CPU. It is not a drop-in multilingual full-GPU solution.
 - FluidAudio's Core ML multilingual backend is explicitly beta, has short static limits, currently built-in voice only, and documents no watermark stage. Nano's published 5.4–6x is English-only and not the multilingual model.
-- MLX-Audio Swift's general README does not establish multilingual V3 support; verify the actual model source before assuming its Python functionality is available in Swift.
+- Direct native Swift source inspection now found regular multilingual Chatterbox and shared S3Gen flow/vocoder in MLX-Audio Swift at `d08558975ef219e5ed38c71fe2522cc03167899f`. Its model README documents Regular (LLaMA520M,23languages) and Turbo. This is a reusable native candidate, not proof of V3 tokenizer/weight/arithmetic compatibility. Source-only snapshot: owned `chatterbox-macos-acceleration-research-v01/swift-source-d0855897`. No dependency was added or native model built. Prioritize qualifying a native acoustic seam with the already validated Librox decoder; do not silently replace the decoder or import a moving package branch. Retain license/provenance if code is reused.
 
 ## Optimization sequence
 
@@ -56,3 +56,7 @@ Use pinned full-precision MLX V3 with public stock/synthetic reference only and 
 - https://ml-explore.github.io/mlx/build/html/usage/compile.html
 - https://ml-explore.github.io/mlx/build/html/usage/using_streams.html
 - https://apple.github.io/coremltools/docs-guides/source/opt-overview.html
+
+## Latest watermark result
+
+Native Swift explicit opt-out is implemented in SDK10a00d8; five focused Release tests passed. Default identity and the two default audio PCM streams are byte-identical to the prior control. A new paired short Standard EN/ES control completed with explicit disabled policy and a deliberately absent Perth directory: no hidden load/fallback, zero watermark work. Wall seconds marked→unmarked: EN9.358→9.255;ES10.183→10.389. This single pair does not show a reliable end-to-end speed win, and cadence can change slightly when the waveform changes. Keep the option and report it accurately; prioritize the acoustic GPU path. The final phone build remains pinned to the previously reviewed watermarked SDK e718bfe.
