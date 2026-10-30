@@ -1,6 +1,7 @@
 import Foundation
 import Synchronization
 import Testing
+import KokoroNarration
 @testable import LibroxChatterbox
 @testable import ChatterboxCoreML
 
@@ -108,4 +109,33 @@ private func writeTestConditioning(to file: URL) throws {
     try await narrator.stream(request) { _ in }
     #expect(batch.withLock { $0 } == 1)
     #expect(single.withLock { $0 } == 1)
+}
+
+@Test func bookSessionCarriesReviewedDirectionsAndDoesNotReuseWrongExpressionAudio() async throws {
+    let dir = FileManager.default.temporaryDirectory.appendingPathComponent("book-direction-" + UUID().uuidString)
+    try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: dir) }
+    let voice = dir.appendingPathComponent("voice"); try writeTestConditioning(to: voice)
+    let source = "Come here.", range = NSRange(location: 0, length: source.utf16.count)
+    let calls = Mutex<[Float]>([]), hits = Mutex<[Bool]>([])
+    let narrator = ChatterboxNarrator(rendering: { request in
+        calls.withLock { $0.append(request.exaggeration) }
+        #expect(request.text == source)
+        #expect(request.sourceContext?.performance.evidence.source == .explicitOverride)
+        return try .init(samples: [request.exaggeration * 0.1])
+    })
+    let session = try ChatterboxBookSession(narrator: narrator, cacheDirectory: dir.appendingPathComponent("pcm"),
+        modelManifestSHA256: String(repeating: "a", count: 64), rendererProfile: "test")
+    for delivery: NarrationVocalDelivery in [.soft, .shout, .shout] {
+        let sidecar = try ChatterboxPerformanceDirections(source: source, annotations: [.init(range: range,
+            originalText: source, performance: .init(delivery: delivery, strength: .strong))])
+        try await session.stream(source, language: "en", narratorID: "v", conditioningFiles: ["v": voice],
+            performanceDirections: sidecar, preparation: .finiteExcerpt) { passage in
+                hits.withLock { $0.append(passage.cacheHit) }
+                #expect(passage.unit.performance.delivery == delivery)
+            }
+    }
+    #expect(calls.withLock { $0.count } == 2)
+    #expect(calls.withLock { $0[0] < $0[1] })
+    #expect(hits.withLock { $0 } == [false, false, true])
 }

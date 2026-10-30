@@ -49,7 +49,8 @@ public actor ChatterboxBookSession {
                        conditioningFiles: [String: URL], conditioningSHA256: [String: String]? = nil,
                        direction: ChatterboxBookDirector.Direction = .storyteller,
                        grouping: ChatterboxBookDirector.Grouping = .compatibleNarration(), seed: UInt64? = nil,
-                       reviewedDialogue: [DialogueAnnotation]? = nil, characterVoices: [String: String] = [:],
+                       reviewedDialogue: [DialogueAnnotation]? = nil,
+                       performanceDirections: ChatterboxPerformanceDirections? = nil, characterVoices: [String: String] = [:],
                        preparation: Preparation = .playbackLookahead,
                        receive: @escaping @Sendable (ChatterboxPreparedPassage) async throws -> Void) async throws {
         guard !occupied else { throw ChatterboxNarrationError.busy }
@@ -71,7 +72,7 @@ public actor ChatterboxBookSession {
         try Task.checkCancellation()
         let originalUnits = try ChatterboxBookDirector.plan(source, language: language, narratorID: narratorID,
             conditioningFiles: conditioningFiles, direction: direction, grouping: grouping,
-            reviewedDialogue: reviewedDialogue, characterVoices: characterVoices, seed: seed)
+            reviewedDialogue: reviewedDialogue, performanceDirections: performanceDirections, characterVoices: characterVoices, seed: seed)
         var hashes: [String: String] = [:]
         var frozenFiles: [String: URL] = [:]
         for id in Set(originalUnits.compactMap { $0.request.sourceContext?.voiceID }) {

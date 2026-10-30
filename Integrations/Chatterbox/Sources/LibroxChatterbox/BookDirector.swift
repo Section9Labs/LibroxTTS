@@ -34,8 +34,11 @@ public enum ChatterboxBookDirector {
                             conditioningFiles: [String: URL], direction: Direction = .storyteller,
                             grouping: Grouping = .sentences,
                             reviewedDialogue: [DialogueAnnotation]? = nil,
+                            performanceDirections: ChatterboxPerformanceDirections? = nil,
                             characterVoices: [String: String] = [:], seed: UInt64? = nil) throws -> [ChatterboxDirectedUnit] {
         guard ["en", "es"].contains(language) else { throw ChatterboxNarrationError.unsupportedLanguage(language) }
+        try performanceDirections?.validate(source: source)
+        var usedAnnotations: Set<Int> = []
         let characterBudget: Int
         switch grouping {
         case .sentences: characterBudget = 300
@@ -52,6 +55,7 @@ public enum ChatterboxBookDirector {
         let original = source as NSString
         var result: [ChatterboxDirectedUnit] = []
         var previous: BookNarrationUnit?
+        var previousAnnotationIndex: Int?
         for span in spans {
             let tokenizer = NLTokenizer(unit: .sentence)
             tokenizer.setLanguage(NLLanguage(rawValue: language)); tokenizer.string = span.text
@@ -80,13 +84,23 @@ public enum ChatterboxBookDirector {
                     let role: DialogueTimingRole = span.role == .dialogue ? .dialogue : .narration
                     let unit = BookNarrationUnit(sourceText: text, sourceRange: range, narratorID: span.voiceID,
                         role: role, speakerID: span.speakerID)
+                    let annotationIndex = try performanceDirections?.annotationIndex(for: range)
+                    let annotation = annotationIndex.flatMap { performanceDirections?.annotations[$0] }
+                    let explicit = annotation?.performance
+                    let controls = annotation?.controls
+                    if let annotationIndex { usedAnnotations.insert(annotationIndex) }
                     let base = try ChatterboxNarrationBridge.prepare(unit, source: source, followingAttribution: following,
-                        languageCode: language, conditioningFiles: conditioningFiles, seed: seed)
+                        languageCode: language, conditioningFiles: conditioningFiles, override: explicit, seed: seed)
                     let performance = base.sourceContext!.performance
-                    let exaggeration = direction == .neutral ? Float(0.5) : intensity(performance)
+                    // An explicit reviewed direction takes precedence over automatic
+                    // style. Strength is respected through the existing conservative
+                    // bridge; it remains a suggestion, not a whisper/shout switch.
+                    let exaggeration = controls?.exaggeration ?? (explicit != nil ? base.exaggeration :
+                        (direction == .neutral ? Float(0.5) : intensity(performance)))
+                    let guidance = controls?.guidance ?? (explicit != nil ? base.guidance : (exaggeration >= 0.85 ? Float(0.25) : Float(0.3)))
                     let request = try ChatterboxRequest(text: base.text, language: language, conditioningFile: base.conditioningFile,
-                        exaggeration: exaggeration, guidance: exaggeration >= 0.85 ? 0.25 : 0.3,
-                        temperature: base.temperature, maxTokens: base.maxTokens, seed: seed, sourceContext: base.sourceContext)
+                        exaggeration: exaggeration, guidance: guidance,
+                        temperature: controls?.temperature ?? base.temperature, maxTokens: base.maxTokens, seed: seed, sourceContext: base.sourceContext)
                     let gap = previous.map { original.substring(with: NSRange(location: NSMaxRange($0.range),
                         length: range.location - NSMaxRange($0.range))) } ?? ""
                     let context = DialogueTimingContext(previousText: previous?.text ?? "", nextText: text,
@@ -96,14 +110,17 @@ public enum ChatterboxBookDirector {
                         sourceGap: gap, languageCode: language)
                     let candidate = ChatterboxDirectedUnit(request: request, timingContext: context,
                         performance: performance, sourceFragments: [range])
-                    if case .compatibleNarration = grouping, let last = result.last,
+                    if case .compatibleNarration = grouping, previousAnnotationIndex == annotationIndex, let last = result.last,
                        let merged = try merged(last, candidate, source: original, maximum: characterBudget) {
                         result[result.count - 1] = merged
                     } else { result.append(candidate) }
                     guard result.count <= 128 else { throw PlanningError.tooManyUnits }
-                    previous = unit
+                    previous = unit; previousAnnotationIndex = annotationIndex
                 }
             }
+        }
+        if let performanceDirections, usedAnnotations.count != performanceDirections.annotations.count {
+            throw ChatterboxPerformanceDirections.Failure.unusedAnnotation
         }
         return result
     }
