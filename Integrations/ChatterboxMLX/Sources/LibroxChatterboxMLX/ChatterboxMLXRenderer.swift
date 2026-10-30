@@ -25,6 +25,12 @@ public actor ChatterboxMLXRenderer {
             }
         }
     }
+    /// Explicit Mac-only numerical trial. Frozen references/gates are unchanged.
+    public enum DecoderExecution: String, Sendable {
+        case eager = "eager-1"
+        case compiledDecodeMLPTrial = "compiled-decode-mlp-1"
+        var suffix: String { self == .eager ? "" : ":decoderexecution=" + rawValue }
+    }
     /// Allocation lifetime only: no precision, arithmetic or output changes.
     public enum BufferRetention: String, Sendable {
         case trimBetweenUnits = "trim-between-units-1"
@@ -42,6 +48,8 @@ public actor ChatterboxMLXRenderer {
         public let profileIdentifier: String
     }
     public nonisolated let decoderProfile: DecoderProfile
+    /// Cold fixed-fixture qualification, including first compiled tracing when selected.
+    public nonisolated let decoderQualificationSeconds: Double
     public nonisolated let watermarkPolicy: ChatterboxWatermarkPolicy
     /// Opaque rendering identity, including host-copy semantics and selected
     /// acoustic stages. Decoder selection/oracle IDs remain unchanged.
@@ -49,7 +57,7 @@ public actor ChatterboxMLXRenderer {
     public nonisolated static func renderingProfileIdentifier(
         decoderProfile: DecoderProfile, acousticComputeUnits: PipelineComputeUnits,
         reuseAcousticInputs: Bool = false, watermarkPolicy: ChatterboxWatermarkPolicy = .perth,
-        acousticBackendIdentifier: String? = nil
+        acousticBackendIdentifier: String? = nil, decoderExecution: DecoderExecution = .eager
     ) -> String {
         let stages = [acousticComputeUnits.encoder, acousticComputeUnits.cfm,
             acousticComputeUnits.vocoder, acousticComputeUnits.watermark]
@@ -58,7 +66,7 @@ public actor ChatterboxMLXRenderer {
             ":acoustics=" + stages + ":reuse=" + (reuseAcousticInputs ? "1" : "0")
         // Keep previously qualified watermarked identities byte-for-byte stable.
         let marked = watermarkPolicy == .perth ? base : base + ":watermark=" + watermarkPolicy.rawValue
-        return marked + (acousticBackendIdentifier.map { ":backend=" + $0 } ?? "")
+        return marked + (acousticBackendIdentifier.map { ":backend=" + $0 } ?? "") + decoderExecution.suffix
     }
     public enum RendererError: Error, CustomNSError {
         case precisionPolicy, identityMismatch, oracleMismatch, busy
@@ -154,7 +162,11 @@ public actor ChatterboxMLXRenderer {
                 decoderProfile: DecoderProfile = .mixedFloat16Accurate,
                 reuseAcousticInputs: Bool = false,
                 watermarkPolicy: ChatterboxWatermarkPolicy = .perth,
-                acousticBackend: ChatterboxAcousticBackend? = nil) async throws {
+                acousticBackend: ChatterboxAcousticBackend? = nil,
+                decoderExecution: DecoderExecution = .eager) async throws {
+        #if !os(macOS)
+        guard decoderExecution == .eager else { throw RendererError.precisionPolicy }
+        #endif
         if let acousticBackend {
             guard acousticBackend.watermarkPolicy == watermarkPolicy, !reuseAcousticInputs
             else { throw RendererError.precisionPolicy }
@@ -163,25 +175,26 @@ public actor ChatterboxMLXRenderer {
         self.watermarkPolicy = watermarkPolicy
         self.profileIdentifier = Self.renderingProfileIdentifier(decoderProfile: decoderProfile,
             acousticComputeUnits: acousticComputeUnits, reuseAcousticInputs: reuseAcousticInputs,
-            watermarkPolicy: watermarkPolicy, acousticBackendIdentifier: acousticBackend?.identifier)
+            watermarkPolicy: watermarkPolicy, acousticBackendIdentifier: acousticBackend?.identifier, decoderExecution: decoderExecution)
         // Never change this process-global switch after another model initializes.
         guard ProcessInfo.processInfo.environment["MLX_ENABLE_TF32"] == "0" else { throw RendererError.precisionPolicy }
         try Self.healthy(minimumAvailable: 3 * 1_024 * 1_024 * 1_024)
         guard try Self.digest(weightsFile) == decoderProfile.weightsSHA256,
               try Self.digest(oracleFile) == decoderProfile.oracleSHA256
         else { throw RendererError.identityMismatch }
-        let model = try Device.withDefaultDevice(.gpu) {
-            let model = SpeechDecoder(precision: .mixedFloat16Accurate)
+        let qualified = try Device.withDefaultDevice(.gpu) {
+            let model = SpeechDecoder(precision: .mixedFloat16Accurate, compiledDecodeMLP: decoderExecution == .compiledDecodeMLPTrial)
             let weights = try DecoderPrecision.mixedFloat16Accurate.loadWeights(from: weightsFile)
             try model.update(parameters: ModuleParameters.unflattened(weights), verify: .all)
             eval(model)
+            let qualificationBegan = Date()
             try Self.verify(model, fixture: loadArrays(url: oracleFile), profile: decoderProfile)
-            return model
+            return (model, Date().timeIntervalSince(qualificationBegan))
         }
         // Verification allocates its own KV caches and oracle tensors. None are
         // needed by the acoustic models; return unused buffers before loading them.
         Self.trimUnusedMemory()
-        decoder = model
+        decoder = qualified.0; decoderQualificationSeconds = qualified.1
         frontend = try await ChatterboxMultilingualPromptBuilder(modelDirectory: modelDirectory)
         try ChatterboxVoiceFile.validate(at: defaultVoice)
         self.defaultVoice = defaultVoice

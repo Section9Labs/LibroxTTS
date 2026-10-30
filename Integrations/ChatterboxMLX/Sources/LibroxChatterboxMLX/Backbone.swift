@@ -174,18 +174,32 @@ private class T3Attention: Module {
 
 // MARK: - T3 LLaMA MLP
 
-private class T3MLP: Module {
+final class T3MLP: Module {
+    private var compiledAccurateDecode: (@Sendable (MLXArray) -> MLXArray)?
     @ModuleInfo(key: "gate_proj") var gate: Linear
     @ModuleInfo(key: "down_proj") var down: Linear
     @ModuleInfo(key: "up_proj") var up: Linear
 
-    init(_ config: LlamaBackboneConfig) {
+    init(_ config: LlamaBackboneConfig, compiledDecode: Bool = false) {
         self._gate.wrappedValue = Linear(config.hiddenSize, config.intermediateSize, bias: config.mlpBias)
         self._down.wrappedValue = Linear(config.intermediateSize, config.hiddenSize, bias: config.mlpBias)
         self._up.wrappedValue = Linear(config.hiddenSize, config.intermediateSize, bias: config.mlpBias)
+        super.init()
+        if compiledDecode {
+            // Capture children, not the owning MLP. Live parameters are explicit
+            // compile inputs; first tracing occurs only after strict weight load.
+            let g = gate, u = up, d = down
+            compiledAccurateDecode = MLX.compile(inputs: [g, u, d]) { x in
+                let projected = x.asType(.float16)
+                let activated = silu(g(projected).asType(.float32)) * u(projected).asType(.float32)
+                return d(activated.asType(.float16)).asType(x.dtype)
+            }
+        }
     }
 
     func callAsFunction(_ x: MLXArray, projectionType: DType, accurateActivations: Bool) -> MLXArray {
+        if accurateActivations, projectionType == .float16, x.ndim == 3, x.dim(1) == 1,
+           let compiledAccurateDecode { return compiledAccurateDecode(x) }
         let projectedInput = x.asType(projectionType)
         if accurateActivations {
             let activated = silu(gate(projectedInput).asType(.float32)) * up(projectedInput).asType(.float32)
@@ -203,9 +217,9 @@ private class T3TransformerBlock: Module {
     @ModuleInfo(key: "input_layernorm") var inputLayerNorm: RMSNorm
     @ModuleInfo(key: "post_attention_layernorm") var postAttentionLayerNorm: RMSNorm
 
-    init(_ config: LlamaBackboneConfig) {
+    init(_ config: LlamaBackboneConfig, compiledDecodeMLP: Bool = false) {
         self._attention.wrappedValue = T3Attention(config)
-        self._mlp.wrappedValue = T3MLP(config)
+        self._mlp.wrappedValue = T3MLP(config, compiledDecode: compiledDecodeMLP)
         self._inputLayerNorm.wrappedValue = RMSNorm(dimensions: config.hiddenSize, eps: config.rmsNormEps)
         self._postAttentionLayerNorm.wrappedValue = RMSNorm(dimensions: config.hiddenSize, eps: config.rmsNormEps)
     }
@@ -231,8 +245,8 @@ class T3LlamaInner: Module {
     fileprivate let layers: [T3TransformerBlock]
     let norm: RMSNorm
 
-    init(_ config: LlamaBackboneConfig) {
-        self.layers = (0 ..< config.numHiddenLayers).map { _ in T3TransformerBlock(config) }
+    init(_ config: LlamaBackboneConfig, compiledDecodeMLP: Bool = false) {
+        self.layers = (0 ..< config.numHiddenLayers).map { _ in T3TransformerBlock(config, compiledDecodeMLP: compiledDecodeMLP) }
         self.norm = RMSNorm(dimensions: config.hiddenSize, eps: config.rmsNormEps)
     }
 

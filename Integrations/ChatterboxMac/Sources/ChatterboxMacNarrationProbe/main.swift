@@ -30,6 +30,7 @@ struct BookAudition: Codable {
 struct Configuration: Decodable {
     let checkpoint, metallib, backbone, oracle, modelDirectory, voice, watermarkDirectory, outputDirectory: String
     let variant, watermark: String
+    let decoderExecution: String?
     let overlap, grouped: Bool
     let texts: [String: String]
     let residentControls: Bool?
@@ -111,6 +112,7 @@ struct ProgramResult: Codable {
     let state, variant, watermark, decoderWeightsSHA256, acousticCheckpointSHA256, stockSHA256: String
     let overlap, grouped: Bool
     let coldLoadSeconds, totalColdWallSeconds: Double
+    let decoderQualificationSeconds: Double?
     let bootWarmupSeconds: Double?
     let results: [LanguageResult]
     let trials: [Trial]
@@ -140,6 +142,7 @@ struct ProgramResult: Codable {
         let bytes = try input.read(upToCount: 65537) ?? Data()
         guard bytes.count <= 65536 else { throw AcousticInventoryError.input }
         let c = try JSONDecoder().decode(Configuration.self, from: bytes)
+        guard let execution = ChatterboxMLXRenderer.DecoderExecution(rawValue: c.decoderExecution ?? "eager-1") else { throw AcousticInventoryError.input }
         guard let waveformPolicy = NativeAcousticWaveformPolicy(rawValue: c.waveformPolicy ?? "legacy-atomic-1") else { throw AcousticInventoryError.input }
         guard c.variant == "native" || waveformPolicy == .legacyAtomic else { throw AcousticInventoryError.input }
         let languages = c.bookAudition == nil ? ["en", "es"] : ["en"]
@@ -185,7 +188,7 @@ struct ProgramResult: Codable {
             oracleFile: URL(fileURLWithPath: c.oracle), modelDirectory: URL(fileURLWithPath: c.modelDirectory),
             defaultVoice: voice, watermarkDirectory: URL(fileURLWithPath: c.watermarkDirectory),
             acousticComputeUnits: .init(encoder: .cpuOnly, cfm: .cpuOnly, vocoder: .cpuOnly, watermark: .cpuOnly),
-            watermarkPolicy: wm, acousticBackend: backend)
+            watermarkPolicy: wm, acousticBackend: backend, decoderExecution: execution)
         let loaded = Date().timeIntervalSince(began)
         print("models ready after \(loaded)s; profile \(renderer.profileIdentifier)");fflush(stdout)
         var results: [LanguageResult] = []
@@ -280,6 +283,7 @@ struct ProgramResult: Codable {
             stockSHA256: ChatterboxMacAcousticSynthesizer.stockSHA256,
             overlap: c.overlap, grouped: c.grouped, coldLoadSeconds: loaded,
             totalColdWallSeconds: Date().timeIntervalSince(began),
+            decoderQualificationSeconds: renderer.decoderQualificationSeconds,
             bootWarmupSeconds: results.first(where: { $0.trialID == "warmup" })?.completeWarmSeconds,
             results: results, trials: trials,
             pcmIdentityValidated: (c.residentControls == true || c.bookSchedulingControls == true) ? true : nil,

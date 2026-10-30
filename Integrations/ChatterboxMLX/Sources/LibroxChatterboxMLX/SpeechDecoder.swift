@@ -46,9 +46,9 @@ final class SpeechDecoder: Module {
     let precision: DecoderPrecision
     @ModuleInfo(key: "tfmr") var transformer: T3LlamaInner
     @ModuleInfo(key: "speech_head") var head: Linear
-    init(precision: DecoderPrecision = .float32) {
+    init(precision: DecoderPrecision = .float32, compiledDecodeMLP: Bool = false) {
         self.precision = precision
-        _transformer.wrappedValue = T3LlamaInner(.llama520M)
+        _transformer.wrappedValue = T3LlamaInner(.llama520M, compiledDecodeMLP: compiledDecodeMLP)
         _head.wrappedValue = Linear(1024, 8194, bias: false)
     }
     func logits(_ embeddings: MLXArray, cache: [KVCache]) -> MLXArray {
