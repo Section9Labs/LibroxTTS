@@ -32,7 +32,8 @@ public actor ChatterboxMLXRenderer {
     public nonisolated let profileIdentifier: String
     public nonisolated static func renderingProfileIdentifier(
         decoderProfile: DecoderProfile, acousticComputeUnits: PipelineComputeUnits,
-        reuseAcousticInputs: Bool = false, watermarkPolicy: ChatterboxWatermarkPolicy = .perth
+        reuseAcousticInputs: Bool = false, watermarkPolicy: ChatterboxWatermarkPolicy = .perth,
+        acousticBackendIdentifier: String? = nil
     ) -> String {
         let stages = [acousticComputeUnits.encoder, acousticComputeUnits.cfm,
             acousticComputeUnits.vocoder, acousticComputeUnits.watermark]
@@ -40,7 +41,8 @@ public actor ChatterboxMLXRenderer {
         let base = decoderProfile.rawValue + ":" + ChatterboxRequest.adapterRevision +
             ":acoustics=" + stages + ":reuse=" + (reuseAcousticInputs ? "1" : "0")
         // Keep previously qualified watermarked identities byte-for-byte stable.
-        return watermarkPolicy == .perth ? base : base + ":watermark=" + watermarkPolicy.rawValue
+        let marked = watermarkPolicy == .perth ? base : base + ":watermark=" + watermarkPolicy.rawValue
+        return marked + (acousticBackendIdentifier.map { ":backend=" + $0 } ?? "")
     }
     public enum RendererError: Error, CustomNSError {
         case precisionPolicy, identityMismatch, oracleMismatch, busy
@@ -127,7 +129,7 @@ public actor ChatterboxMLXRenderer {
     }
     private let decoder: SpeechDecoder
     private let frontend: ChatterboxMultilingualPromptBuilder
-    private let synth: ChatterboxTokenSynthesizer
+    private let synth: any ChatterboxAcousticSynthesizing
     private let defaultVoice: URL
     private var occupied = false
 
@@ -135,12 +137,17 @@ public actor ChatterboxMLXRenderer {
                 defaultVoice: URL, watermarkDirectory: URL, acousticComputeUnits: PipelineComputeUnits,
                 decoderProfile: DecoderProfile = .mixedFloat16Accurate,
                 reuseAcousticInputs: Bool = false,
-                watermarkPolicy: ChatterboxWatermarkPolicy = .perth) async throws {
+                watermarkPolicy: ChatterboxWatermarkPolicy = .perth,
+                acousticBackend: ChatterboxAcousticBackend? = nil) async throws {
+        if let acousticBackend {
+            guard acousticBackend.watermarkPolicy == watermarkPolicy, !reuseAcousticInputs
+            else { throw RendererError.precisionPolicy }
+        }
         self.decoderProfile = decoderProfile
         self.watermarkPolicy = watermarkPolicy
         self.profileIdentifier = Self.renderingProfileIdentifier(decoderProfile: decoderProfile,
             acousticComputeUnits: acousticComputeUnits, reuseAcousticInputs: reuseAcousticInputs,
-            watermarkPolicy: watermarkPolicy)
+            watermarkPolicy: watermarkPolicy, acousticBackendIdentifier: acousticBackend?.identifier)
         // Never change this process-global switch after another model initializes.
         guard ProcessInfo.processInfo.environment["MLX_ENABLE_TF32"] == "0" else { throw RendererError.precisionPolicy }
         try Self.healthy(minimumAvailable: 3 * 1_024 * 1_024 * 1_024)
@@ -163,9 +170,12 @@ public actor ChatterboxMLXRenderer {
         try ChatterboxVoiceFile.validate(at: defaultVoice)
         self.defaultVoice = defaultVoice
         try Self.healthy(minimumAvailable: 1_024 * 1_024 * 1_024)
-        synth = try await ChatterboxTokenSynthesizer(modelDirectory: modelDirectory,
-            conditioningFile: defaultVoice, watermarkDirectory: watermarkDirectory,
-            computeUnits: acousticComputeUnits, reuseFlowInputs: reuseAcousticInputs, watermarkPolicy: watermarkPolicy)
+        if let acousticBackend { synth = acousticBackend.synthesizer }
+        else {
+            synth = try await ChatterboxTokenSynthesizer(modelDirectory: modelDirectory,
+                conditioningFile: defaultVoice, watermarkDirectory: watermarkDirectory,
+                computeUnits: acousticComputeUnits, reuseFlowInputs: reuseAcousticInputs, watermarkPolicy: watermarkPolicy)
+        }
         try Self.healthy()
     }
 
@@ -194,7 +204,7 @@ public actor ChatterboxMLXRenderer {
     }
 
     private nonisolated static func synthesize(_ decoded: DecodedSpeech, voice: URL,
-        using synth: ChatterboxTokenSynthesizer, profile: String) async throws -> ChatterboxAudioChunk {
+        using synth: any ChatterboxAcousticSynthesizing, profile: String) async throws -> ChatterboxAudioChunk {
         try Self.healthy()
         let synthBegan = Date()
         let output = try await synth.renderMeasured(tokens: decoded.tokens, conditioningFile: voice)
@@ -334,7 +344,14 @@ public actor ChatterboxMLXRenderer {
     static func digest(_ file: URL) throws -> String {
         let input = try FileHandle(forReadingFrom: file); defer { try? input.close() }
         var hash = SHA256()
-        while let bytes = try input.read(upToCount: 1_048_576), !bytes.isEmpty { try Task.checkCancellation(); hash.update(data: bytes) }
+        while true {
+            let hasData = try autoreleasepool {
+                try Task.checkCancellation()
+                guard let bytes = try input.read(upToCount: 1_048_576), !bytes.isEmpty else { return false }
+                hash.update(data: bytes); return true
+            }
+            if !hasData { break }
+        }
         return hash.finalize().map { String(format: "%02x", $0) }.joined()
     }
     private static func verify(_ model: SpeechDecoder, fixture: [String: MLXArray], profile: DecoderProfile) throws {

@@ -6,6 +6,19 @@ import MLX
 import MLXNN
 import MLXFFT
 
+/// Exact regular-model one-sample reflection (not zero padding).
+func hifiganReflectLeft(_ x: MLXArray) throws -> MLXArray {
+    guard x.ndim == 3, x.dim(2) >= 2 else { throw AcousticInventoryError.input }
+    return MLX.concatenated([x[0..., 0..., 1..<2], x], axis: 2)
+}
+func hifiganExactFusion(_ x: MLXArray, _ source: MLXArray, stage: Int) throws -> MLXArray {
+    guard x.shape == source.shape else {
+        throw NativeAcousticShapeError(stage: "vocoder-source-fusion-\(stage)", actual: source.shape, expected: x.shape)
+    }
+    return x + source
+}
+struct NativeAcousticShapeError: Error { let stage: String; let actual, expected: [Int] }
+
 // MARK: - Conv1d Wrapper (matching Python Conv1dPT)
 
 /// Wrapper matching Python's Conv1dPT which stores `self.conv = nn.Conv1d(...)`.
@@ -616,7 +629,7 @@ class HiFTGenerator: Module {
     /// Decode mel-spectrogram + source to waveform.
     /// x: (B, C, T) mel spectrogram in channel-first format
     /// s: (B, 1, T_audio) source signal
-    func decode(x: MLXArray, s: MLXArray) -> MLXArray {
+    func decode(x: MLXArray, s: MLXArray) throws -> MLXArray {
         // STFT of source signal
         let squeezedS = s.squeezed(axis: 1)  // (B, T_audio)
         let nFft = istftParams["n_fft"]!
@@ -641,9 +654,7 @@ class HiFTGenerator: Module {
 
             // Reflection padding at last upsample step
             if i == numUpsamples - 1 {
-                // Pad time dimension: pad 1 on the left
-                // h is (B, C, T), need to pad axis 2
-                h = MLX.padded(h, widths: [.init(0), .init(0), .init((1, 0))])
+                h = try hifiganReflectLeft(h)
             }
 
             // Source fusion: downsample source STFT and add to h
@@ -654,21 +665,15 @@ class HiFTGenerator: Module {
             si = si.transposed(0, 2, 1)  // (B, outCh, T')
             si = sourceResblocks[i](si)  // ResBlock in (B, C, T)
 
-            // Match time dimensions (take minimum to handle off-by-one)
-            let minLen = min(h.dim(2), si.dim(2))
-            h = h[0..., 0..., ..<minLen] + si[0..., 0..., ..<minLen]
+            // Python regular model requires exact source/feature alignment.
+            // Cropping a mismatched branch would conceal a porting defect.
+            h = try hifiganExactFusion(h, si, stage: i)
 
             // Apply resblocks and average
-            var xs: MLXArray? = nil
-            for j in 0 ..< numKernels {
-                let idx = i * numKernels + j
-                if xs == nil {
-                    xs = resblocks[idx](h)
-                } else {
-                    xs = xs! + resblocks[idx](h)
-                }
-            }
-            h = xs! / Float(numKernels)
+            let input = h
+            h = MLX.mean(MLX.stacked((0..<numKernels).map { j in
+                resblocks[i * numKernels + j](input)
+            }, axis: 0), axis: 0)
         }
 
         // Final processing
@@ -692,7 +697,7 @@ class HiFTGenerator: Module {
     }
 
     func callAsFunction(_ speechFeat: MLXArray, cacheSource: MLXArray? = nil)
-        -> (MLXArray, MLXArray)
+        throws -> (MLXArray, MLXArray)
     {
         let cache = cacheSource ?? MLXArray.zeros([1, 1, 0])
 
@@ -714,7 +719,7 @@ class HiFTGenerator: Module {
         }
 
         // Decode
-        let generatedSpeech = decode(x: speechFeat, s: s)
+        let generatedSpeech = try decode(x: speechFeat, s: s)
 
         return (generatedSpeech, s)
     }

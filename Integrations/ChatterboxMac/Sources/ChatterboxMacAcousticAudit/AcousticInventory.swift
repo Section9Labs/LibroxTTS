@@ -119,48 +119,8 @@ public enum AcousticInventory {
         }
         try guardRun()
         let runtimeAsset = try AcousticRuntimeAsset(url: runtimeMetallib)
-        let handle = try FileHandle(forReadingFrom: modelFile)
-        defer { try? handle.close() }
-        var initial = stat()
-        guard fstat(handle.fileDescriptor, &initial) == 0,
-              initial.st_size == checkpointBytes, (initial.st_mode & S_IFMT) == S_IFREG,
-              let lengthBytes = try handle.read(upToCount: 8), lengthBytes.count == 8
-        else { throw AcousticInventoryError.identity }
-        let headerLength = lengthBytes.enumerated().reduce(UInt64(0)) { $0 | UInt64($1.element) << ($1.offset * 8) }
-        guard (2...16_777_216).contains(headerLength),
-              let headerBytes = try handle.read(upToCount: Int(headerLength)), headerBytes.count == Int(headerLength),
-              var objects = try JSONSerialization.jsonObject(with: headerBytes) as? [String: Any]
-        else { throw AcousticInventoryError.input }
-        objects.removeValue(forKey: "__metadata__")
-        let header = try JSONDecoder().decode([String: AcousticTensor].self,
-            from: JSONSerialization.data(withJSONObject: objects))
-        let payloadBytes = checkpointBytes - 8 - Int(headerLength)
-        let ordered = header.sorted { $0.value.data_offsets.first ?? -1 < $1.value.data_offsets.first ?? -1 }
-        var end = 0
-        for (_, spec) in ordered {
-            try spec.validate(payloadBytes: payloadBytes)
-            guard spec.data_offsets[0] == end else { throw AcousticInventoryError.input }
-            end = spec.data_offsets[1]
-        }
-        guard end == payloadBytes, header.count == 2487 else { throw AcousticInventoryError.identity }
-        var hash = SHA256(); hash.update(data: lengthBytes); hash.update(data: headerBytes)
-        while true {
-            // Foundation can retain autoreleased read buffers until the outer
-            // pool drains. Keep the 2.7 GB identity pass bounded per chunk.
-            let hasData = try autoreleasepool {
-                try guardRun()
-                guard let data = try handle.read(upToCount: 4 * 1024 * 1024), !data.isEmpty else { return false }
-                hash.update(data: data)
-                return true
-            }
-            if !hasData { break }
-        }
-        let digest = hash.finalize().map { String(format: "%02x", $0) }.joined()
-        var after = stat(), path = stat()
-        guard digest == checkpointSHA256, fstat(handle.fileDescriptor, &after) == 0,
-              stat(modelFile.path, &path) == 0,
-              same(initial, after), same(initial, path) else { throw AcousticInventoryError.identity }
-        try guardRun()
+        let checkpoint = try AcousticCheckpointAsset(modelFile: modelFile, check: guardRun)
+        let header = checkpoint.header, digest = checkpoint.digest
 
         var errors: [String] = [], entries: [AcousticInventoryReport.Entry] = []
         var routed: [String: (raw: String, spec: AcousticTensor)] = [:]
@@ -208,6 +168,7 @@ public enum AcousticInventory {
         }
         try guardRun()
         try runtimeAsset.verify()
+        try checkpoint.verify()
         let elapsed = began.duration(to: .now).components
         return .init(state: errors.isEmpty ? "INVENTORY_MATCH_NO_FORWARD_CLEARANCE" : "INVENTORY_REJECTED",
             checkpointSHA256: digest, runtimeMetallibSHA256: AcousticRuntimeAsset.sha256, rawTensorCount: header.count, routedLearnedCount: routed.count,

@@ -879,8 +879,8 @@ public class CausalMaskedDiffWithXvec: Module {
     }
 
     /// Run vocoder (HiFi-GAN) on mel spectrogram to produce waveform.
-    public func vocoder(_ mel: MLXArray) -> (MLXArray, MLXArray) {
-        return vocoderModule(mel)
+    public func vocoder(_ mel: MLXArray) throws -> (MLXArray, MLXArray) {
+        return try vocoderModule(mel)
     }
 
     /// Flow matching inference: speech tokens → mel spectrogram.

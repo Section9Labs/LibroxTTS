@@ -1,4 +1,5 @@
 import XCTest
+import MLX
 @testable import ChatterboxMacAcousticAudit
 #if os(macOS)
 final class AcousticInventoryTests: XCTestCase {
@@ -44,6 +45,39 @@ final class AcousticInventoryTests: XCTestCase {
         XCTAssertEqual(Set(constructor.keys).subtracting(targets), [
             "decoder.estimator.time_embed_mixer.weight", "decoder.randNoise",
             "encoder.embed.pos_enc.pe", "encoder.up_embed.pos_enc.pe", "mel2wav.stftWindow"])
+    }
+    func testGlobalVocoderRngCannotBeUsedByTwoAcousticWorkers() throws {
+        let lease = NativeAcousticProcessLease()
+        let first = try lease.acquire()
+        XCTAssertThrowsError(try lease.acquire())
+        lease.release(UUID())
+        XCTAssertThrowsError(try lease.acquire())
+        lease.release(first)
+        let second = try lease.acquire(); lease.release(second)
+    }
+    func testVocoderReflectionAndFusionMatchRegularReference() throws {
+        try Device.withDefaultDevice(.cpu) {
+            let x = MLXArray([Float(1), 2, 3, 4], [1, 1, 4])
+            let padded = try hifiganReflectLeft(x)
+            XCTAssertEqual(padded.asArray(Float.self), [2, 1, 2, 3, 4])
+            let fused = try hifiganExactFusion(x, MLXArray.ones([1, 1, 4]), stage: 0)
+            XCTAssertEqual(fused.asArray(Float.self), [2, 3, 4, 5])
+            XCTAssertThrowsError(try hifiganExactFusion(x, MLXArray.ones([1, 1, 3]), stage: 0))
+            XCTAssertThrowsError(try hifiganReflectLeft(MLXArray.ones([1, 1, 1])))
+        }
+    }
+    func testLosslessExportsDecodeToExactFramesAndDeclaredPrecision() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: false)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        // Non-packet-aligned length spanning multiple bounded read buffers.
+        let samples = (0..<144001).map { Float(sin(Double($0) * .pi * 2 * 220 / 24000)) * 0.7 }
+        let wave = try NativeAudioExport.write(samples, to: directory.appendingPathComponent("sample.wav"), lossless: false)
+        let alac = try NativeAudioExport.write(samples, to: directory.appendingPathComponent("sample.m4a"), lossless: true)
+        XCTAssertEqual(wave.frames, 144001); XCTAssertEqual(alac.frames, 144001)
+        XCTAssertTrue(wave.frameCountMatches); XCTAssertTrue(alac.frameCountMatches)
+        XCTAssertLessThan(alac.bytes, wave.bytes)
+        XCTAssertThrowsError(try NativeAudioExport.write([.nan], to: directory.appendingPathComponent("bad.wav"), lossless: false))
     }
     func testWrongRuntimeAssetFailsBeforeAnyMLXInitialization() throws {
         let path = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)

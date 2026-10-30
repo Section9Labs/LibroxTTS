@@ -50,6 +50,31 @@ final class RendererErrorTests: XCTestCase {
         XCTAssertNil(ChatterboxWatermarkPolicy(rawValue: "automatic-fallback"))
     }
 
+    actor StubAcoustics: ChatterboxAcousticSynthesizing {
+        func renderMeasured(tokens: [Int], conditioningFile: URL?) throws -> ChatterboxAcousticOutput {
+            .init(samples: [0.1], timings: .init())
+        }
+    }
+    func testExternalAcousticIdentityNeverReusesDefaultCache() throws {
+        let units = PipelineComputeUnits(encoder: .cpuOnly, cfm: .cpuOnly, vocoder: .cpuOnly, watermark: .cpuOnly)
+        let original = ChatterboxMLXRenderer.renderingProfileIdentifier(decoderProfile: .mixedFloat16Accurate, acousticComputeUnits: units)
+        let native = ChatterboxMLXRenderer.renderingProfileIdentifier(decoderProfile: .mixedFloat16Accurate,
+            acousticComputeUnits: units, acousticBackendIdentifier: "native-s3gen-f32-test-1")
+        XCTAssertNotEqual(original, native)
+        XCTAssertThrowsError(try ChatterboxAcousticBackend(identifier: "", watermarkPolicy: .perth, synthesizer: StubAcoustics()))
+        XCTAssertThrowsError(try ChatterboxAcousticBackend(identifier: "bad:profile", watermarkPolicy: .perth, synthesizer: StubAcoustics()))
+    }
+    func testBackendWatermarkMismatchFailsBeforeLoadingModels() async throws {
+        let backend = try ChatterboxAcousticBackend(identifier: "test-1", watermarkPolicy: .perth, synthesizer: StubAcoustics())
+        let missing = URL(fileURLWithPath: "/no-such-librox-test-model")
+        do {
+            _ = try await ChatterboxMLXRenderer(weightsFile: missing, oracleFile: missing, modelDirectory: missing,
+                defaultVoice: missing, watermarkDirectory: missing, acousticComputeUnits: .init(),
+                watermarkPolicy: .disabled, acousticBackend: backend)
+            XCTFail("mismatched output policy accepted")
+        } catch { XCTAssertEqual((error as NSError).code, 1) }
+    }
+
     func testExistingNSErrorCodesRemainStable() {
         let resource = ChatterboxMLXRenderer.ResourceGuardDetails(reason: .memory,
             minimumAvailableBytes: 1,

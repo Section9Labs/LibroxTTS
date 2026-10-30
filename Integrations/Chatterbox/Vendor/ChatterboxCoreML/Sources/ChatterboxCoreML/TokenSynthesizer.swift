@@ -11,7 +11,7 @@ public enum ChatterboxWatermarkPolicy: String, Sendable, Codable {
 
 /// Acoustic-only seam for an independently validated token decoder. Loads no
 /// Core ML T3 model. Calls are serialized; the host retains playback ownership.
-public actor ChatterboxTokenSynthesizer {
+public actor ChatterboxTokenSynthesizer: ChatterboxAcousticSynthesizing {
     private let synth: SynthRunner
     private let conditioning: Conditionals
     private let watermark: PerthWatermarker?

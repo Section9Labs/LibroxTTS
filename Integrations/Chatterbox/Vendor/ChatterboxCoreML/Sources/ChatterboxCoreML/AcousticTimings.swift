@@ -18,4 +18,26 @@ public struct ChatterboxAcousticTimings: Sendable, Codable {
 public struct ChatterboxAcousticOutput: Sendable {
     public let samples: [Float]
     public let timings: ChatterboxAcousticTimings
+    public init(samples: [Float], timings: ChatterboxAcousticTimings) {
+        self.samples = samples; self.timings = timings
+    }
+}
+
+/// Library-owned acoustic boundary. No tensors cross this actor boundary.
+public protocol ChatterboxAcousticSynthesizing: Sendable {
+    func renderMeasured(tokens: [Int], conditioningFile: URL?) async throws -> ChatterboxAcousticOutput
+}
+
+/// Explicit implementation and output policy, separated in rendered-audio keys.
+public struct ChatterboxAcousticBackend: Sendable {
+    public let identifier: String
+    public let watermarkPolicy: ChatterboxWatermarkPolicy
+    public let synthesizer: any ChatterboxAcousticSynthesizing
+    public init(identifier: String, watermarkPolicy: ChatterboxWatermarkPolicy,
+                synthesizer: any ChatterboxAcousticSynthesizing) throws {
+        guard !identifier.isEmpty, identifier.utf8.count <= 256,
+              identifier.unicodeScalars.allSatisfy({ CharacterSet.alphanumerics.contains($0) || "-_.".unicodeScalars.contains($0) })
+        else { throw ChatterboxError.invalidModelOutput("Invalid acoustic backend identity") }
+        self.identifier = identifier; self.watermarkPolicy = watermarkPolicy; self.synthesizer = synthesizer
+    }
 }

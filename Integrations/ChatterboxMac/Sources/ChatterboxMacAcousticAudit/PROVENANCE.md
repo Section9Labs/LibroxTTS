@@ -34,3 +34,22 @@ side effects; a future renderer must freeze/reset independent request/vocoder
 noise and never depend on constructor draw counts. Fixed CFM randNoise is created
 before the estimator/mixer, so this removal does not change its existing recipe.
 A fresh reviewed constructor gate is required; this is not runtime clearance.
+
+Native GPU candidate, 2026-10-30:
+The target now additionally provides a strict regular-S3Gen loader and an opt-in
+acoustic backend for the existing Standard decoder. All1367 learned tensors and
+four explicitly frozen CPU-derived buffers are checked; random leftovers,
+partial trajectories and silent shape cropping are rejected. Native vocoder
+reflection prepends x[:,:,1:2], equal-shape fusion throws on mismatch, and stacked
+resblock averaging follows the regular model. Vocoder RNG is reset to42, regular
+CFM uses10 cosine steps and guidance0.7, and the declared trim fade is retained.
+No new peak normalization is introduced. Mac Pro watermarking is disabled-only:
+there is no Perth model loading or application in this backend. Legacy default
+CoreML callers are separate and retain their existing policy behavior.
+
+The bounded native-full-narration-v02 run completed stock EN/ES Standard-decoder
+plus full-F32 acoustic generation, WAV-F32 and ALAC24 export and actual bounded
+readback verification. Both sample sets await Matt's listening approval. This is
+not acoustic waveform equivalence, full-chapter/cloud/concurrency qualification,
+5x playback performance or release clearance. The first run's export EOF failure
+is preserved independently. See the owned run receipts and output report.
