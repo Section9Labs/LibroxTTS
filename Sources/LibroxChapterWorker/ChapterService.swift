@@ -205,7 +205,7 @@ public protocol ChapterService: Sendable {
     func relinquishAfterJoining(session: ChapterAccountSession) async throws
 }
 
-private func validateServiceRequest(_ request: ChapterRenderRequest, session: ChapterAccountSession) throws {
+func validateServiceRequest(_ request: ChapterRenderRequest, session: ChapterAccountSession) throws {
     try request.validate()
     guard request.accountPartition == session.accountPartition else { throw ChapterWorkerError.accountMismatch }
     guard request.recipe.watermarkRevision == "disabled-1" else { throw ChapterServiceError.unsupportedPolicy }

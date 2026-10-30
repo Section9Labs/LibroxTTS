@@ -1,7 +1,8 @@
 # Exact chapter source custody
 
 `ChapterTextAsset` owns a verified private UTF-8 copy of the reader's exact
-extraction. It is the local prerequisite for a future source CKAsset transport,
+extraction. It backs the native source-only CKAsset prototype described in
+`docs/CLOUD-SOURCE-ASSET-TRANSPORT.md`,
 not an upload, durable adoption database, whole-chapter renderer or server-ready
 record. No CloudKit calls are made by this component. It contains no recording
 or voice-conditioning field.
@@ -52,3 +53,10 @@ is not a public factory and cannot bypass request/epoch checks in host code.
 Independent data-safety source review found no remaining blocker. This does not
 qualify live CloudKit source transfer, account changes during a real network
 operation, durable adoption/checkpoint recovery, chapter narration or playback.
+
+The native prototype reuses an internal synchronous capture inside CloudKit’s
+per-record callback, with cancellation checks between bounded chunks. Its outer
+transport revalidates the account epoch after Foundation completion. This avoids
+relying on continued staging-file availability after a callback. All66 combined
+chapter tests now pass, including staging removal and partial-copy cancellation.
+Live framework lifecycle behavior and durable adoption remain separate gates.

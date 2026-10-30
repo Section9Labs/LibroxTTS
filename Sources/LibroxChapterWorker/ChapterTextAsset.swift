@@ -31,6 +31,11 @@ public struct ChapterTextAssetManifest: Codable, Sendable, Equatable {
     }
     public func sourceKey() throws -> String {
         try validateHeader()
+        return try Self.sourceKey(for: source)
+    }
+    /// Content key only, not account authorization or proof of a stored asset.
+    public static func sourceKey(for source: ChapterSourceIdentity) throws -> String {
+        try source.validate()
         let e = JSONEncoder(); e.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
         return SHA256.hash(data: try e.encode(source)).map { String(format: "%02x", $0) }.joined()
     }
@@ -93,27 +98,41 @@ public final class ChapterTextAsset: Sendable {
         guard session.accountPartition == request.accountPartition else { throw ChapterWorkerError.accountMismatch }
         try await gate.validate(session); try Task.checkCancellation()
         let worker = Task.detached(priority: .utility) {
-            guard download.isFileURL, !download.path.utf8.contains(0) else { throw ChapterTextAssetError.invalidFile }
-            let fd = Darwin.open(download.path, O_RDONLY | O_CLOEXEC | O_NOFOLLOW | O_NONBLOCK)
-            guard fd >= 0 else { throw ChapterTextAssetError.invalidFile }
-            let input = FileHandle(fileDescriptor: fd, closeOnDealloc: true); defer { try? input.close() }
-            var info = stat()
-            guard fstat(fd, &info) == 0, info.st_mode & mode_t(S_IFMT) == mode_t(S_IFREG), info.st_size == manifest.byteCount
-            else { throw ChapterTextAssetError.invalidFile }
-            return try build(manifest: manifest, session: session, storage: storageDirectory) { output in
-                var copied = 0
-                while true {
-                    try Task.checkCancellation()
-                    let part = try input.read(upToCount: 65536) ?? Data()
-                    if part.isEmpty { break }
-                    guard part.count <= manifest.byteCount - copied else { throw ChapterTextAssetError.invalidFile }
-                    try output.write(contentsOf: part); copied += part.count
-                }
-                guard copied == manifest.byteCount else { throw ChapterTextAssetError.invalidFile }
-            }
+            try captureDownloadedFile(download: download, manifest: manifest, request: request,
+                session: session, storageDirectory: storageDirectory, check: { try Task.checkCancellation() })
         }
         let result = try await withTaskCancellationHandler { try await worker.value } onCancel: { worker.cancel() }
         try Task.checkCancellation(); try await gate.validate(session); try Task.checkCancellation()
+        return result
+    }
+    /// Internal synchronous CloudKit-callback capture. Does not authorize an
+    /// account: the transport fences the session before the operation and after
+    /// Foundation completion. Copy while staging URL is still in its callback.
+    static func captureDownloadedFile(download: URL, manifest: ChapterTextAssetManifest,
+        request: ChapterRenderRequest, session: ChapterAccountSession,
+        storageDirectory: URL, check: () throws -> Void) throws -> ChapterTextAsset {
+        try manifest.validate(for: request)
+        guard session.accountPartition == request.accountPartition else { throw ChapterWorkerError.accountMismatch }
+        try check()
+        guard download.isFileURL, !download.path.utf8.contains(0) else { throw ChapterTextAssetError.invalidFile }
+        let fd = Darwin.open(download.path, O_RDONLY | O_CLOEXEC | O_NOFOLLOW | O_NONBLOCK)
+        guard fd >= 0 else { throw ChapterTextAssetError.invalidFile }
+        let input = FileHandle(fileDescriptor: fd, closeOnDealloc: true); defer { try? input.close() }
+        var info = stat()
+        guard fstat(fd, &info) == 0, info.st_mode & mode_t(S_IFMT) == mode_t(S_IFREG), info.st_size == manifest.byteCount
+        else { throw ChapterTextAssetError.invalidFile }
+        let result = try build(manifest: manifest, session: session, storage: storageDirectory) { output in
+            var copied = 0
+            while true {
+                try check()
+                let part = try input.read(upToCount: 65536) ?? Data()
+                if part.isEmpty { break }
+                guard part.count <= manifest.byteCount - copied else { throw ChapterTextAssetError.invalidFile }
+                try output.write(contentsOf: part); copied += part.count
+            }
+            guard copied == manifest.byteCount else { throw ChapterTextAssetError.invalidFile }
+        }
+        try check()
         return result
     }
     public func text(session: ChapterAccountSession, gate: ChapterAccountSessionGate) async throws -> String {

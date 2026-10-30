@@ -72,10 +72,19 @@ and durable confirmation replay. No live CloudKit operation has been run. Schema
 is proposed only. See `docs/CLOUD-DEMAND-TRANSPORT.md` for exact construction,
 record types/fields and signed-host/lifecycle/publication gates still outstanding.
 
+## Native source transport prototype
+
+`ChapterCloudTextTransport` now implements exact-source metadata/CKAsset transfer,
+canonical account/source binding, one lost-ack reconciliation and owned native
+operation completion. Downloaded source is privately captured in the per-record
+callback before staging can disappear. All66 combined Release tests pass; no live
+CloudKit calls/schema or durable source adoption occurred. See
+`docs/CLOUD-SOURCE-ASSET-TRANSPORT.md`. This does not supply a ChapterService.
+
 ## Not yet implemented; required before live cloud/app integration
 
 - Cloud transport around the local outbox, crash-safe render checkpoint/adoption database, and atomic fake transport/interleaving tests.
-- Native demand-only conditional pair writes and offline lost-ack reconciliation now exist: see docs/CLOUD-DEMAND-TRANSPORT.md. Live signed-host acceptance, source/assets, worker job/lease/fence and atomic publication remain pending. Account/environment partitioning is canonical; host must supply actual signed environment/current user identity.
+- Native demand-only conditional pair writes and offline lost-ack reconciliation now exist: see docs/CLOUD-DEMAND-TRANSPORT.md. Live signed-host acceptance, durable source adoption, audio assets, worker job/lease/fence and atomic publication remain pending. Source-only native transfer now exists as a separately tested prototype. Account/environment partitioning is canonical; host must supply actual signed environment/current user identity.
 - Expired/uncertain lease behavior across system sleep/clock skew; no exactly-once physical rendering claim.
 - Whole-chapter text windowing and cadence checkpoint continuity beyond existing 32 KiB/128-unit session bounds.
 - Durable atomic local availability and actual downloaded CloudKit codec/source verification. Scoped WAV/ALAC verification exists; Cloud `ready` is never equivalent to phone `available`.
