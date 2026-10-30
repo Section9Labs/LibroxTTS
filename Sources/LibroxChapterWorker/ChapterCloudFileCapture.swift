@@ -132,6 +132,26 @@ final class ChapterCloudFileCapture: Sendable {
         try await gate.validate(session); try Task.checkCancellation()
         return value
     }
+    /// Bounded exact immutable bytes from the pinned FD. pread keeps concurrent
+    /// readers independent of a shared descriptor offset. This is not typed
+    /// source/media admission; callers still validate their expected envelope.
+    func data(session: ChapterAccountSession, gate: ChapterAccountSessionGate, maximum: Int64) async throws -> Data {
+        guard maximum > 0, maximum <= Self.maximumBytes, byteCount <= maximum else { throw ChapterCloudFileError.budget }
+        return try await withFileAccess(session: session, gate: gate) { _ in
+            var bytes = Data(); bytes.reserveCapacity(Int(self.byteCount))
+            while Int64(bytes.count) < self.byteCount {
+                try autoreleasepool {
+                    try Task.checkCancellation()
+                    let count = Int(min(65536, self.byteCount - Int64(bytes.count)))
+                    var buffer = [UInt8](repeating: 0, count: count)
+                    let received = buffer.withUnsafeMutableBytes { pread(self.custody.fileFD, $0.baseAddress, count, off_t(bytes.count)) }
+                    guard received > 0, received <= count else { throw ChapterCloudFileError.invalidFile }
+                    bytes.append(contentsOf: buffer.prefix(received))
+                }
+            }
+            return bytes
+        }
+    }
     private static func build(bytes: Int64, hash: String, session: ChapterAccountSession, storage: URL,
                               check: () throws -> Void, write: (FileHandle) throws -> Void) throws -> ChapterCloudFileCapture {
         try check(); let root = try Root(storage), name = "cloud-capture-" + UUID().uuidString
