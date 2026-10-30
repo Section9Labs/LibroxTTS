@@ -19,6 +19,14 @@ final class AcousticInventoryTests: XCTestCase {
         ]
         for (key, target) in cases { XCTAssertEqual(try AcousticInventory.route(key).target, target) }
     }
+    func testWrongRuntimeAssetFailsBeforeAnyMLXInitialization() throws {
+        let path = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: path) }
+        try Data([0]).write(to: path)
+        XCTAssertThrowsError(try AcousticRuntimeAsset(url: path))
+        try Data(repeating: 0, count: AcousticRuntimeAsset.bytes).write(to: path)
+        XCTAssertThrowsError(try AcousticRuntimeAsset(url: path))
+    }
     func testHeaderRejectsOverflowInvalidOffsetsAndPayloadSize() throws {
         try AcousticTensor(dtype: "F32", shape: [2, 3], data_offsets: [0, 24]).validate(payloadBytes: 24)
         for spec in [

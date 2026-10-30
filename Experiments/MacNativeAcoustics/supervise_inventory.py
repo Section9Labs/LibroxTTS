@@ -8,7 +8,7 @@ ROOT=pathlib.Path('/Volumes/T9.2025/LibroxTraining/runs/chatterbox-macos-pro-eva
 CHECKPOINT=pathlib.Path('/Volumes/T9.2025/LibroxTraining/models/chatterbox-multilingual-v3-mlx-evaluation-v01/model.safetensors')
 SHA='e702f2c441e040bd360e59a86c85d462539759d665e41cfd1938adadd74187a3'
 REQUIRED={'Package.swift','Package.resolved','AcousticInventory.swift','AcousticKeyMapping.swift',
-          'FlowMatching.swift','HiFTGenerator.swift','ConformerEncoder.swift','PROVENANCE.md','LICENSE',
+          'AcousticRuntimeAsset.swift','FlowMatching.swift','HiFTGenerator.swift','ConformerEncoder.swift','PROVENANCE.md','LICENSE',
           'main.swift','supervise_inventory.py','owned_process.py','native_resources.py'}
 
 def require(value,message):
@@ -44,7 +44,7 @@ def launch_owned(command,*,factory=subprocess.Popen,**kwargs):
 
 def run(manifest_path,expected_sha):
     manifest_path=pathlib.Path(manifest_path).resolve();root=manifest_path.parent
-    require(root.parent==ROOT.resolve() and root.name=='native-swift-acoustic-inventory-v02','Unowned stage')
+    require(root.parent==ROOT.resolve() and root.name=='native-swift-acoustic-inventory-v03','Unowned stage')
     result_file=root/'supervisor-result.json'
     require(not result_file.exists(),'Terminal run exists; no restart')
     # Failure status exists before preflight or any child creation. Never leave a
@@ -74,7 +74,7 @@ def run(manifest_path,expected_sha):
         raw=capped_read(manifest_path,1_048_576)
         require(hashlib.sha256(raw).hexdigest()==expected_sha,'Changed consumed manifest')
         result['manifest_sha256']=expected_sha;m=json.loads(raw)
-        require(m['stage']=='native-swift-acoustic-inventory-v02' and m['model_forwards_allowed']==0,'Wrong stage')
+        require(m['stage']=='native-swift-acoustic-inventory-v03' and m['model_forwards_allowed']==0,'Wrong stage')
         require(m['deadline_seconds']==180 and m['cleanup_seconds']==2 and m['rss_limit_bytes']==3*1024**3,'Wrong guard bounds')
         require(m['checkpoint_sha256']==SHA and pathlib.Path(m['checkpoint']).resolve()==CHECKPOINT,'Wrong checkpoint')
         require(m['meanflow'] is False and m['automatic_restart'] is False,'Wrong acoustic/restart policy')
@@ -92,9 +92,13 @@ def run(manifest_path,expected_sha):
         require(digest(native_resources.__file__,guard_stage)==source_index['native_resources.py'],'Wrong running resource helper')
         binary=pathlib.Path(m['executable']['path']).resolve()
         require(binary.parent==root and digest(binary,guard_stage)==m['executable']['sha256'],'Changed/unowned binary')
+        metal=pathlib.Path(m['runtime_metallib']['path']).resolve()
+        metal_sha='282550b064507602f7da8cfa2dab2ca8f10341c2802191234a1cbf17f892952f'
+        require(metal.parent==root and metal.stat().st_size==2401016 and m['runtime_metallib']['sha256']==metal_sha,'Wrong shared runtime asset')
+        require(digest(metal,guard_stage)==metal_sha,'Changed runtime library')
         guard_stage()
-        with open(root/'stdout.log','xb') as log:
-            child=launch_owned([str(binary),str(CHECKPOINT),str(root/'report.json')],
+        with open(root/'stdout.log' ,'xb') as log:
+            child=launch_owned([str(binary),str(CHECKPOINT),str(root/'report.json'),str(metal)],
                 env=dict(os.environ,MLX_ENABLE_TF32='0'),stdin=subprocess.DEVNULL,
                 stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
             write(root/'status.json',{'state':'running','owned_pid':child.pid,'deadline_seconds':180})
@@ -107,12 +111,13 @@ def run(manifest_path,expected_sha):
         result['owned_child_joined']=True
         data=capped_read(root/'report.json',8*1024**2);r=json.loads(data)
         require(r['state']=='INVENTORY_MATCH_NO_FORWARD_CLEARANCE' and not r['errors'],'Rejected inventory')
-        require(r['checkpointSHA256']==SHA and r['rawTensorCount']==2487,'Wrong child source/count')
+        require(r['checkpointSHA256']==SHA and r['rawTensorCount']==2487 and r['runtimeMetallibSHA256']==metal_sha,'Wrong child source/count/runtime')
         require(r['modelForwards']==0 and r['checkpointLoadedIntoModel'] is False and r['renderingQualified'] is False,'Wrong execution scope')
         require(r['constructorNoiseEvaluations']==1 and r['cpuModelConstructions']==1,'Wrong constructor scope')
         require(digest(binary,guard_stage)==m['executable']['sha256'],'Changed binary after child')
         for f in m['source_files']:require(digest(f['path'],guard_stage)==f['sha256'],'Changed source after child')
         require(capped_read(manifest_path,1_048_576)==raw,'Changed manifest after child')
+        require(digest(metal,guard_stage)==metal_sha,'Changed runtime library after child')
         next_guard=0;guard_stage()
         result.update(state='inventory_complete_no_forward_clearance',report_sha256=hashlib.sha256(data).hexdigest(),source_binary_unchanged=True)
     except BaseException as e:

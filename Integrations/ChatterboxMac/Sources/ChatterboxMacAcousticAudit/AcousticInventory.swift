@@ -35,6 +35,7 @@ struct AcousticRoute: Codable, Sendable, Equatable {
 public struct AcousticInventoryReport: Codable, Sendable {
     public let state: String
     public let checkpointSHA256: String
+    public let runtimeMetallibSHA256: String
     public let rawTensorCount: Int
     public let routedLearnedCount: Int
     public let constructorTensorCount: Int
@@ -106,7 +107,7 @@ public enum AcousticInventory {
                      reason: "pinned upstream regular S3Gen name mapping; no numeric/layout conversion")
     }
 
-    public static func run(modelFile: URL) throws -> AcousticInventoryReport {
+    public static func run(modelFile: URL, runtimeMetallib: URL) throws -> AcousticInventoryReport {
         let began = ContinuousClock.now
         func guardRun() throws {
             try Task.checkCancellation()
@@ -117,6 +118,7 @@ public enum AcousticInventory {
             else { throw AcousticInventoryError.unsafeResource }
         }
         try guardRun()
+        let runtimeAsset = try AcousticRuntimeAsset(url: runtimeMetallib)
         let handle = try FileHandle(forReadingFrom: modelFile)
         defer { try? handle.close() }
         var initial = stat()
@@ -174,6 +176,11 @@ public enum AcousticInventory {
         }
         // The prototype's random arrays are inspected for shape/type only. They
         // cannot enter a forward or substitute for checkpoint parameters.
+        // MLX bootstrap resolves its shared Metal library even for an explicit
+        // CPU stream. Supply the verified runtime asset before any MLX operation.
+        // This is runtime initialization, not a GPU model-forward qualification.
+        try runtimeAsset.verify()
+        GPU.metallib = runtimeAsset.url
         let constructor: [AcousticInventoryReport.Constructor] = try Device.withDefaultDevice(.cpu) {
             let model = CausalMaskedDiffWithXvec(meanflow: false)
             defer { Memory.clearCache() }
@@ -200,9 +207,10 @@ public enum AcousticInventory {
             return result
         }
         try guardRun()
+        try runtimeAsset.verify()
         let elapsed = began.duration(to: .now).components
         return .init(state: errors.isEmpty ? "INVENTORY_MATCH_NO_FORWARD_CLEARANCE" : "INVENTORY_REJECTED",
-            checkpointSHA256: digest, rawTensorCount: header.count, routedLearnedCount: routed.count,
+            checkpointSHA256: digest, runtimeMetallibSHA256: AcousticRuntimeAsset.sha256, rawTensorCount: header.count, routedLearnedCount: routed.count,
             constructorTensorCount: constructor.count, errors: errors, entries: entries,
             constructor: constructor, derivedState: derived,
             elapsedSeconds: Double(elapsed.attoseconds) / 1e18 + Double(elapsed.seconds),

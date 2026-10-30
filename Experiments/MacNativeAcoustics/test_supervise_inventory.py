@@ -32,7 +32,7 @@ class LifecycleTests(unittest.TestCase):
                 if child.poll() is None:os.killpg(child.pid,signal.SIGKILL);child.wait(timeout=1)
     def testManifestRejectionPublishesTerminalFailureWithoutSpawn(self):
         with tempfile.TemporaryDirectory() as tmp,patch.object(s,'ROOT',pathlib.Path(tmp)):
-            root=pathlib.Path(tmp)/'native-swift-acoustic-inventory-v02';root.mkdir();manifest=root/'manifest.json';manifest.write_text('{}')
+            root=pathlib.Path(tmp)/'native-swift-acoustic-inventory-v03';root.mkdir();manifest=root/'manifest.json';manifest.write_text('{}')
             with patch.object(s,'launch_owned') as launch,contextlib.redirect_stdout(io.StringIO()):
                 self.assertEqual(s.run(manifest,'0'*64),1);launch.assert_not_called()
             result=json.loads((root/'supervisor-result.json').read_text());self.assertEqual(result['state'],'failed')

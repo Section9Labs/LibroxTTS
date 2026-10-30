@@ -31,3 +31,15 @@ The separately reviewed v02 uses direct Darwin libproc/Mach resource queries and
 per-read autorelease pools during checkpoint hashing. Bounds remain 180 seconds,
 3 GiB RSS, 4 GiB available memory, 2 GiB storage and thermal/low-power stops. No
 external resource-query subprocesses are spawned. v01 is never restarted.
+
+The v02 child is terminal: its relocated executable could not find MLX's shared
+`default.metallib` during CPU-stream bootstrap. It exited255, its owned group
+joined, and no inventory/forward completed. Its observed identity-pass RSS was
+18.7MB; this is not resident model memory or a rendering benchmark.
+
+The separately versioned v03 copies and pins the shared MLX0.32.3 runtime library
+(size2401016, SHA282550b064507602f7da8cfa2dab2ca8f10341c2802191234a1cbf17f892952f),
+sets the documented metallib path before the first MLX operation, and retains
+path/descriptor/hash checks before and after CPU construction. MLX bootstrap can
+initialize the Metal runtime; no GPU model forward is permitted. This is a runtime
+dependency correction, not revival of an old CoreML GPU/ANE failure. No v02 retry.

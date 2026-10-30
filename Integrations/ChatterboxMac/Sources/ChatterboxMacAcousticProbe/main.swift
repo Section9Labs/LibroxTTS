@@ -13,11 +13,11 @@ import Darwin
     }
     private static func inspect() throws {
         let args = Array(CommandLine.arguments.dropFirst())
-        guard args.count == 2, ProcessInfo.processInfo.environment["MLX_ENABLE_TF32"] == "0"
+        guard args.count == 3, ProcessInfo.processInfo.environment["MLX_ENABLE_TF32"] == "0"
         else { throw AcousticInventoryError.input }
         let output = URL(fileURLWithPath: args[1])
         guard !FileManager.default.fileExists(atPath: output.path) else { throw AcousticInventoryError.input }
-        let report = try AcousticInventory.run(modelFile: URL(fileURLWithPath: args[0]))
+        let report = try AcousticInventory.run(modelFile: URL(fileURLWithPath: args[0]), runtimeMetallib: URL(fileURLWithPath: args[2]))
         try Task.checkCancellation()
         let encoder = JSONEncoder(); encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         try encoder.encode(report).write(to: output, options: .atomic)
