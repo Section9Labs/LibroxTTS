@@ -15,7 +15,7 @@ import shutil
 import sys
 import time
 
-ROOT = Path('/Volumes/T9.2025/LibroxTraining/runs/chatterbox-quantization-evaluation-v01')
+ROOT = Path('/Volumes/T9.2025/LibroxTraining/runs/chatterbox-macos-pro-evaluation-v01')
 SOURCE = Path('/Volumes/T9.2025/LibroxTraining/models/chatterbox-v3-coreml-evaluation/multilingual/S3CFM.mlpackage')
 MANIFEST_SHA = 'ad88323378459dbb1bd11b1dcb52585e490c8c6aabf9b4c123718b4800936a4f'
 MODEL_SHA = 'fe6fd80eec738c2f7716ddfca82a986855d7017e01e00aa0ac35fb010266ef09'

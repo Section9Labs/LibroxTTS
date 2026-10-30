@@ -10,7 +10,7 @@ Every component comparison is saved before strict loading, so an exception retai
 
 Bounds: one process, 180 seconds, 8GiB RSS, thermal/low-power/disk/cancellation guards, owned process-group TERM/KILL and join. Success receipt is last. Timeout/failure is terminal with no automatic retry.
 
-V01 is preserved unlaunched: review found implicit constructor evaluation and missing dependency identities. V02 preregistration is `/Volumes/T9.2025/LibroxTraining/runs/chatterbox-quantization-evaluation-v01/mac-mlx-v3-weight-audit-v02-preregistration.json`, SHA `5a5d1cfadb43e66284b0715f6284f34860ac166d2a2aee93f1c290e1506c05eb`. Existing Astra reviewed all1,380fingerprints, constructor scope, source delta and lifecycle before the one launch. Consult that run's durable report, never infer success from these source files.
+V01 is preserved unlaunched: review found implicit constructor evaluation and missing dependency identities. V02 preregistration is `/Volumes/T9.2025/LibroxTraining/runs/chatterbox-macos-pro-evaluation-v01/mac-mlx-v3-weight-audit-v02-preregistration.json`, SHA `5a5d1cfadb43e66284b0715f6284f34860ac166d2a2aee93f1c290e1506c05eb`. Existing Astra reviewed all1,380fingerprints, constructor scope, source delta and lifecycle before the one launch. Consult that run's durable report, never infer success from these source files.
 
 Focused metadata-gate tests:
 

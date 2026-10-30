@@ -7,7 +7,7 @@ import resource
 import sys
 import time
 
-ROOT = Path('/Volumes/T9.2025/LibroxTraining/runs/chatterbox-quantization-evaluation-v01')
+ROOT = Path('/Volumes/T9.2025/LibroxTraining/runs/chatterbox-macos-pro-evaluation-v01')
 
 
 def sha(path):

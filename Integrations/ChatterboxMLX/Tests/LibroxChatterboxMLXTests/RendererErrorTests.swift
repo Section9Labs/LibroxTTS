@@ -33,22 +33,9 @@ final class RendererErrorTests: XCTestCase {
         XCTAssertNotEqual(base, try key(cpu, reuse: true))
     }
 
-    func testCanonicalTrialHasSeparateCacheIdentityAndSamePinnedArtifacts() {
-        let original = ChatterboxMLXRenderer.DecoderProfile.mixedFloat16Accurate
-        let oldQ8 = ChatterboxMLXRenderer.DecoderProfile.q8ExperimentalV1
-        let canonical = ChatterboxMLXRenderer.DecoderProfile.q8CanonicalHalfV2
-        XCTAssertNotEqual(canonical.rawValue, oldQ8.rawValue)
-        XCTAssertNotEqual(canonical.rawValue, original.rawValue)
-        XCTAssertEqual(canonical.weightsSHA256, oldQ8.weightsSHA256)
-        XCTAssertEqual(canonical.oracleSHA256, oldQ8.oracleSHA256)
-        XCTAssertTrue(canonical.usesQ8Weights)
-        XCTAssertFalse(original.usesQ8Weights)
-        XCTAssertEqual(ChatterboxMLXRenderer.profile, original.rawValue)
-    }
-
     func testExplicitWatermarkOptOutHasSeparateAudioIdentity() throws {
         let units = PipelineComputeUnits(encoder: .cpuOnly, cfm: .cpuOnly, vocoder: .cpuOnly, watermark: .cpuOnly)
-        let profile = ChatterboxMLXRenderer.DecoderProfile.q8SemanticHalfV3
+        let profile = ChatterboxMLXRenderer.DecoderProfile.mixedFloat16Accurate
         let legacy = profile.rawValue + ":" + ChatterboxRequest.adapterRevision + ":acoustics=0,0,0,0:reuse=0"
         let marked = ChatterboxMLXRenderer.renderingProfileIdentifier(decoderProfile: profile, acousticComputeUnits: units)
         XCTAssertEqual(marked, legacy)
@@ -79,14 +66,14 @@ final class RendererErrorTests: XCTestCase {
 
     func testOracleFailureExportsOnlyFixedFixtureDiagnostics() throws {
         let details = ChatterboxMLXRenderer.OracleValidationDetails(stage: "es.decode.2",
-            profileIdentifier: ChatterboxMLXRenderer.DecoderProfile.q8ExperimentalV1.rawValue,
+            profileIdentifier: ChatterboxMLXRenderer.DecoderProfile.mixedFloat16Accurate.rawValue,
             reason: .numericalMismatch, actualCount: 16_388, expectedCount: 16_388,
             maximumAbsoluteError: 0.125, relativeL2: 0.003, top1Matches: false)
         let error = ChatterboxMLXRenderer.RendererError.oracleValidation(details) as NSError
         XCTAssertEqual(error.code, 7)
         XCTAssertEqual(error.userInfo["oracleStage"] as? String, "es.decode.2")
         XCTAssertEqual(error.userInfo["oracleProfile"] as? String,
-                       ChatterboxMLXRenderer.DecoderProfile.q8ExperimentalV1.rawValue)
+                       ChatterboxMLXRenderer.DecoderProfile.mixedFloat16Accurate.rawValue)
         XCTAssertEqual(error.userInfo["oracleMaximumAbsoluteError"] as? Double, 0.125)
         XCTAssertEqual(error.userInfo["oracleRelativeL2"] as? Double, 0.003)
         XCTAssertEqual(error.userInfo["oracleTop1Matches"] as? Bool, false)

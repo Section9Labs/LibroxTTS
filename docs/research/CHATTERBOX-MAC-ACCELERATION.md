@@ -1,12 +1,12 @@
 # Mac chapter rendering: acceleration candidates
 
-Research date: 29 October 2026 (America/Los_Angeles). Metadata/source inspection only; no candidate model download or inference is claimed here. The verified local machine is M3 Ultra / 256 GiB. Mac mini and iPhone results remain separate.
+Research date: 29 October 2026 (America/Los_Angeles). Full-quality weights and native source are downloaded and checksummed; acoustic-only Swift runtime qualification is pending, with no candidate forward claimed. The verified local machine is M3 Ultra / 256 GiB. Mac mini and iPhone results remain separate.
 
 ## Decision
 
 Prioritize a Mac companion worker, with its own menu-bar status, controlled from Librox. Preserve the Catalyst reader. Shared SDK owns requests, chapter planning, rendering, verification, scheduling and audio/source maps; app integration owns documents, account/network/lifecycle adapters, settings and playback. Production companion and rendering code must be Swift-native (MLX Swift, Metal, Core ML); Python is offline qualification tooling only. Stock voices first; private phone recordings/conditioning are not uploaded. Remote generation is not yet implemented or approved for distribution.
 
-Measure complete watermarked audio, not decoder token rate. Quality reference remains Standard. Target RTF <= 0.20; real time minimum and time to first ready chapter must be reported separately. The existing conservative CPU-acoustic sentence controls are not the best proven Mac configuration. Previously grouped/overlapped short Q8 V1 controls achieved RTF ~0.64–0.67 but failed their phone accuracy gate. Neither establishes current V3 sustained throughput.
+Measure complete audio with its explicitly selected watermark policy, not decoder token rate. Quality reference remains Standard. Target RTF <= 0.20; sustained throughput and time to first ready chapter must be reported separately. Matt permanently rejected the experimental quantized phone path on 29 October; its code/models/artifacts are removed under the retirement manifest. No further phone quantization tests are planned. The existing conservative CPU-acoustic controls do not establish accelerated Mac throughput.
 
 ## Candidate order
 
@@ -59,4 +59,4 @@ Use pinned full-precision MLX V3 with public stock/synthetic reference only and 
 
 ## Latest watermark result
 
-Native Swift explicit opt-out is implemented in SDK10a00d8; five focused Release tests passed. Default identity and the two default audio PCM streams are byte-identical to the prior control. A new paired short Standard EN/ES control completed with explicit disabled policy and a deliberately absent Perth directory: no hidden load/fallback, zero watermark work. Wall seconds marked→unmarked: EN9.358→9.255;ES10.183→10.389. This single pair does not show a reliable end-to-end speed win, and cadence can change slightly when the waveform changes. Keep the option and report it accurately; prioritize the acoustic GPU path. The final phone build remains pinned to the previously reviewed watermarked SDK e718bfe.
+Native Swift explicit opt-out is implemented in SDK10a00d8; five focused Release tests passed. Default identity and the two default audio PCM streams are byte-identical to the prior control. A new paired short Standard EN/ES control completed with explicit disabled policy and a deliberately absent Perth directory: no hidden load/fallback, zero watermark work. Wall seconds marked→unmarked: EN9.358→9.255;ES10.183→10.389. This single pair does not show a reliable end-to-end speed win, and cadence can change slightly when the waveform changes. Keep the option and report it accurately; prioritize the acoustic GPU path. The phone experiment is retired; no new local Pro trial or phone install is authorized.
