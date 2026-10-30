@@ -43,3 +43,13 @@ sets the documented metallib path before the first MLX operation, and retains
 path/descriptor/hash checks before and after CPU construction. MLX bootstrap can
 initialize the Metal runtime; no GPU model forward is permitted. This is a runtime
 dependency correction, not revival of an old CoreML GPU/ANE failure. No v02 retry.
+
+The v03 runtime bootstrapped correctly and the strict constructor gate rejected
+381 mismatches, preserved in its report: 190 missing/190 unexpected encoder-array
+names and one unsupported regular-mode Turbo mixer. The v04 correction maps only
+those anchored encoder prefixes and physically omits the unused mixer in regular
+mode. All1367 learned shapes/types match uniquely against the actual preserved
+v03 capture in a regression test. A fresh v04 constructor gate is still required;
+this regression does not waive any runtime parameter or qualify audio. The global
+RNG draw-count side effect of omitting an unused constructor is documented in
+PROVENANCE; future rendering must freeze independent request/vocoder noise.

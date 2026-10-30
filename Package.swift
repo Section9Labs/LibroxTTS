@@ -52,7 +52,7 @@ let package = Package(
         .executableTarget(name: "ChatterboxMacAcousticProbe", dependencies: ["ChatterboxMacAcousticAudit"],
             path: "Integrations/ChatterboxMac/Sources/ChatterboxMacAcousticProbe"),
         .testTarget(name: "ChatterboxMacAcousticAuditTests", dependencies: ["ChatterboxMacAcousticAudit"],
-            path: "Integrations/ChatterboxMac/Tests/ChatterboxMacAcousticAuditTests"),
+            path: "Integrations/ChatterboxMac/Tests/ChatterboxMacAcousticAuditTests", resources: [.copy("Fixtures")]),
         // Vendored for a Mac Catalyst availability fix; see its PROVENANCE.md.
         .target(name: "Safetensors", path: "Integrations/Chatterbox/Vendor/swift-safetensors/Sources/Safetensors"),
         .target(name: "ChatterboxExceptionTrap", path: "Integrations/Chatterbox/Vendor/ChatterboxCoreML/Sources/ChatterboxExceptionTrap"),

@@ -19,6 +19,32 @@ final class AcousticInventoryTests: XCTestCase {
         ]
         for (key, target) in cases { XCTAssertEqual(try AcousticInventory.route(key).target, target) }
     }
+    func testAllCapturedLearnedWeightsMapToActualConstructorShapes() throws {
+        struct Raw: Decodable { let raw: String; let dtype: String; let shape: [Int] }
+        struct Constructor: Decodable { let key: String; let dtype: String; let shape: [Int] }
+        struct Capture: Decodable {
+            let report_sha256: String; let raw: [Raw]; let constructor: [Constructor]
+        }
+        let url = try XCTUnwrap(Bundle.module.url(forResource: "v03-actual-metadata", withExtension: "json", subdirectory: "Fixtures"))
+        let capture = try JSONDecoder().decode(Capture.self, from: Data(contentsOf: url))
+        XCTAssertEqual(capture.report_sha256, "20ddc1347e30e10e7cc179b74550c31cf9686d3897dcdc77b5ea83af583bc83e")
+        XCTAssertEqual(capture.raw.count, 2487)
+        let constructor = Dictionary(uniqueKeysWithValues: capture.constructor.map { ($0.key, $0) })
+        var targets: Set<String> = []
+        for raw in capture.raw {
+            guard let target = try AcousticInventory.route(raw.raw).target else { continue }
+            XCTAssertTrue(targets.insert(target).inserted, "collision: \(target)")
+            let actual = try XCTUnwrap(constructor[target], target)
+            XCTAssertEqual(actual.shape, raw.shape, target)
+            XCTAssertEqual(actual.dtype, "float32", target); XCTAssertEqual(raw.dtype, "F32", target)
+        }
+        XCTAssertEqual(targets.count, 1367)
+        // This preserved capture is the REJECTED V03 graph, not a passing runtime
+        // reference. V04 must physically remove its mixer and pass a fresh gate.
+        XCTAssertEqual(Set(constructor.keys).subtracting(targets), [
+            "decoder.estimator.time_embed_mixer.weight", "decoder.randNoise",
+            "encoder.embed.pos_enc.pe", "encoder.up_embed.pos_enc.pe", "mel2wav.stftWindow"])
+    }
     func testWrongRuntimeAssetFailsBeforeAnyMLXInitialization() throws {
         let path = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: path) }

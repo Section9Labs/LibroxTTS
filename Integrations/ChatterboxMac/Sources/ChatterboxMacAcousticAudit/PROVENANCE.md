@@ -22,3 +22,15 @@ forward. No audio/conditioning/private input is accepted. The original upstream
 partial-cancellation behavior is not accepted for rendering: any later wrapper
 must check cancellation before accepting a trajectory. No permissive loading or
 peak normalization is copied. Rendering/quality/speed remain unqualified.
+
+V04 preparation, based on preserved V03 real constructor report SHA
+20ddc1347e30e10e7cc179b74550c31cf9686d3897dcdc77b5ea83af583bc83e:
+regular encoder `encoders_N`/`up_encoders_N` prefixes map to Swift array paths.
+All190 affected shapes/dtypes pair exactly. The Turbo-only `time_embed_mixer`
+module is now optional and is not created in regular mode; its absent checkpoint
+weight is never waived or replaced with a random value. No regular forward
+operation is changed. Removing a random constructor changes later global RNG
+side effects; a future renderer must freeze/reset independent request/vocoder
+noise and never depend on constructor draw counts. Fixed CFM randNoise is created
+before the estimator/mixer, so this removal does not change its existing recipe.
+A fresh reviewed constructor gate is required; this is not runtime clearance.

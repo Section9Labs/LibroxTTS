@@ -44,7 +44,7 @@ def launch_owned(command,*,factory=subprocess.Popen,**kwargs):
 
 def run(manifest_path,expected_sha):
     manifest_path=pathlib.Path(manifest_path).resolve();root=manifest_path.parent
-    require(root.parent==ROOT.resolve() and root.name=='native-swift-acoustic-inventory-v03','Unowned stage')
+    require(root.parent==ROOT.resolve() and root.name=='native-swift-acoustic-inventory-v04','Unowned stage')
     result_file=root/'supervisor-result.json'
     require(not result_file.exists(),'Terminal run exists; no restart')
     # Failure status exists before preflight or any child creation. Never leave a
@@ -74,7 +74,7 @@ def run(manifest_path,expected_sha):
         raw=capped_read(manifest_path,1_048_576)
         require(hashlib.sha256(raw).hexdigest()==expected_sha,'Changed consumed manifest')
         result['manifest_sha256']=expected_sha;m=json.loads(raw)
-        require(m['stage']=='native-swift-acoustic-inventory-v03' and m['model_forwards_allowed']==0,'Wrong stage')
+        require(m['stage']=='native-swift-acoustic-inventory-v04' and m['model_forwards_allowed']==0,'Wrong stage')
         require(m['deadline_seconds']==180 and m['cleanup_seconds']==2 and m['rss_limit_bytes']==3*1024**3,'Wrong guard bounds')
         require(m['checkpoint_sha256']==SHA and pathlib.Path(m['checkpoint']).resolve()==CHECKPOINT,'Wrong checkpoint')
         require(m['meanflow'] is False and m['automatic_restart'] is False,'Wrong acoustic/restart policy')

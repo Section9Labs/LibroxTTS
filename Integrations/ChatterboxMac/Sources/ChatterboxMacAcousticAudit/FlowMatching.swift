@@ -474,7 +474,7 @@ class S3GenConditionalDecoder: Module {
     let meanflow: Bool
 
     @ModuleInfo(key: "time_mlp") var timeMLP: S3GenTimestepEmbedding
-    @ModuleInfo(key: "time_embed_mixer") var timeEmbedMixer: Linear
+    @ModuleInfo(key: "time_embed_mixer") var timeEmbedMixer: Linear?
     @ModuleInfo(key: "down_blocks") var downBlocks: [S3GenDownBlock]
     @ModuleInfo(key: "mid_blocks") var midBlocks: [S3GenMidBlock]
     @ModuleInfo(key: "up_blocks") var upBlocks: [S3GenUpBlock]
@@ -499,7 +499,10 @@ class S3GenConditionalDecoder: Module {
             inChannels: inChannels, timeEmbedDim: timeEmbedDim)
 
         // Meanflow: concatenate t_emb + r_emb → mix down to timeEmbedDim
-        self._timeEmbedMixer.wrappedValue = Linear(timeEmbedDim * 2, timeEmbedDim, bias: false)
+        // Regular checkpoints do not contain this Turbo-only parameter. Do not
+        // retain an uninitialized random learned module in the regular graph.
+        self._timeEmbedMixer.wrappedValue = meanflow
+            ? Linear(timeEmbedDim * 2, timeEmbedDim, bias: false) : nil
 
         // Down blocks
         var downBlockList: [S3GenDownBlock] = []
@@ -557,6 +560,7 @@ class S3GenConditionalDecoder: Module {
 
         // Meanflow: mix t and r embeddings
         if meanflow, let r = r {
+            guard let timeEmbedMixer else { preconditionFailure("Missing explicit meanflow mixer") }
             let rEmb = timeMLP(sinusoidalPosEmb(r, dim: inChannels))
             let concatEmb = MLX.concatenated([tEmb, rEmb], axis: -1)
             tEmb = timeEmbedMixer(concatEmb)

@@ -5,6 +5,11 @@ import Foundation
 enum AcousticKeyMapping {
     static func remapRegularS3GenKey(_ key: String) -> String {
         var k = key
+        // The regular Python module uses named encoder arrays; Swift uses
+        // @ModuleInfo arrays. Actual v03 constructor evidence pairs all190
+        // tensors under these two prefixes with identical dtype/shape.
+        k = k.replacingOccurrences(of: #"^encoder\.(up_)?encoders_(\d+)\."#,
+            with: "encoder.$1encoders.$2.", options: .regularExpression)
 
         // --- 1. Block array naming: setattr → Swift [Module] arrays ---
         // Python uses `down_blocks_0`, Swift uses `down_blocks.0`
