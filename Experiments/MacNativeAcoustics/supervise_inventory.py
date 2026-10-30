@@ -2,13 +2,14 @@
 """Finite CPU constructor inventory. No forward, GPU run or automatic restart."""
 import hashlib,json,os,pathlib,re,shutil,signal,subprocess,sys,time
 import owned_process as owner
+import native_resources
 
 ROOT=pathlib.Path('/Volumes/T9.2025/LibroxTraining/runs/chatterbox-macos-pro-evaluation-v01')
 CHECKPOINT=pathlib.Path('/Volumes/T9.2025/LibroxTraining/models/chatterbox-multilingual-v3-mlx-evaluation-v01/model.safetensors')
 SHA='e702f2c441e040bd360e59a86c85d462539759d665e41cfd1938adadd74187a3'
 REQUIRED={'Package.swift','Package.resolved','AcousticInventory.swift','AcousticKeyMapping.swift',
           'FlowMatching.swift','HiFTGenerator.swift','ConformerEncoder.swift','PROVENANCE.md','LICENSE',
-          'main.swift','supervise_inventory.py','owned_process.py'}
+          'main.swift','supervise_inventory.py','owned_process.py','native_resources.py'}
 
 def require(value,message):
     if not value:raise ValueError(message)
@@ -29,13 +30,7 @@ def write(path,value):
     tmp=path.with_suffix('.tmp');tmp.write_text(json.dumps(value,indent=2)+'\n');tmp.replace(path)
 
 def available_bytes():
-    p=subprocess.run(['/usr/bin/vm_stat'],capture_output=True,text=True,timeout=1)
-    require(p.returncode==0,'Cannot query available memory')
-    page=re.search(r'page size of (\d+) bytes',p.stdout)
-    free=re.search(r'^Pages free:\s*(\d+)\.',p.stdout,re.M)
-    inactive=re.search(r'^Pages inactive:\s*(\d+)\.',p.stdout,re.M)
-    require(page and free and inactive,'Invalid available memory query')
-    return int(page[1])*(int(free[1])+int(inactive[1]))
+    return native_resources.shared().available_bytes()
 
 def launch_owned(command,*,factory=subprocess.Popen,**kwargs):
     owner.check_stop();child=None
@@ -49,7 +44,7 @@ def launch_owned(command,*,factory=subprocess.Popen,**kwargs):
 
 def run(manifest_path,expected_sha):
     manifest_path=pathlib.Path(manifest_path).resolve();root=manifest_path.parent
-    require(root.parent==ROOT.resolve() and root.name=='native-swift-acoustic-inventory-v01','Unowned stage')
+    require(root.parent==ROOT.resolve() and root.name=='native-swift-acoustic-inventory-v02','Unowned stage')
     result_file=root/'supervisor-result.json'
     require(not result_file.exists(),'Terminal run exists; no restart')
     # Failure status exists before preflight or any child creation. Never leave a
@@ -68,19 +63,18 @@ def run(manifest_path,expected_sha):
             host();require(shutil.disk_usage(root).free>=2*1024**3,'Storage guard')
             require(available_bytes()>=4*1024**3,'Available memory guard')
             if child is not None and child.poll() is None:
-                p=subprocess.run(['/bin/ps','-o','rss=','-p',str(child.pid)],capture_output=True,text=True,timeout=1)
-                if p.returncode!=0 or not p.stdout.strip():
+                try:
+                    rss=native_resources.shared().rss(child.pid)
+                    peak=max(peak,rss);require(rss<=3*1024**3,'Owned RSS guard')
+                except RuntimeError:
                     require(child.poll() is not None,'Cannot query owned child RSS')
-                else:
-                    rss=int(p.stdout.strip())*1024;peak=max(peak,rss)
-                    require(rss<=3*1024**3,'Owned RSS guard')
             next_guard=now+1
     try:
         host=owner.HostGuard()
         raw=capped_read(manifest_path,1_048_576)
         require(hashlib.sha256(raw).hexdigest()==expected_sha,'Changed consumed manifest')
         result['manifest_sha256']=expected_sha;m=json.loads(raw)
-        require(m['stage']=='native-swift-acoustic-inventory-v01' and m['model_forwards_allowed']==0,'Wrong stage')
+        require(m['stage']=='native-swift-acoustic-inventory-v02' and m['model_forwards_allowed']==0,'Wrong stage')
         require(m['deadline_seconds']==180 and m['cleanup_seconds']==2 and m['rss_limit_bytes']==3*1024**3,'Wrong guard bounds')
         require(m['checkpoint_sha256']==SHA and pathlib.Path(m['checkpoint']).resolve()==CHECKPOINT,'Wrong checkpoint')
         require(m['meanflow'] is False and m['automatic_restart'] is False,'Wrong acoustic/restart policy')
@@ -95,6 +89,7 @@ def run(manifest_path,expected_sha):
         source_index={pathlib.Path(f['path']).name:f['sha256'] for f in m['source_files']}
         require(digest(__file__,guard_stage)==source_index['supervise_inventory.py'],'Wrong running supervisor')
         require(digest(owner.__file__,guard_stage)==source_index['owned_process.py'],'Wrong running lifecycle helper')
+        require(digest(native_resources.__file__,guard_stage)==source_index['native_resources.py'],'Wrong running resource helper')
         binary=pathlib.Path(m['executable']['path']).resolve()
         require(binary.parent==root and digest(binary,guard_stage)==m['executable']['sha256'],'Changed/unowned binary')
         guard_stage()

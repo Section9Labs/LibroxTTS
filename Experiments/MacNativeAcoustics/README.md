@@ -23,3 +23,11 @@ Next stages are separately reviewed strict loading of every learned tensor,
 explicit constructor-state parity, then a fixed valid token/stock-conditioning
 trajectory with ten cosine/CFG steps and .7 guidance. Never use random constructor
 weights, permissive loading, peak normalization or partial cancellation output.
+
+The v01 run is terminal: spawned `ps` watchdog queries timed out under load; its
+Swift child exited on TERM, and later independent verification found its process
+group absent. No inventory/model forward completed, and its failure remains.
+The separately reviewed v02 uses direct Darwin libproc/Mach resource queries and
+per-read autorelease pools during checkpoint hashing. Bounds remain 180 seconds,
+3 GiB RSS, 4 GiB available memory, 2 GiB storage and thermal/low-power stops. No
+external resource-query subprocesses are spawned. v01 is never restarted.

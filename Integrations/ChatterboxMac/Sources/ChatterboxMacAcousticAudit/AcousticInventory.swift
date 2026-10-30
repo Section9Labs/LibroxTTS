@@ -142,8 +142,16 @@ public enum AcousticInventory {
         }
         guard end == payloadBytes, header.count == 2487 else { throw AcousticInventoryError.identity }
         var hash = SHA256(); hash.update(data: lengthBytes); hash.update(data: headerBytes)
-        while let data = try handle.read(upToCount: 4 * 1024 * 1024), !data.isEmpty {
-            try guardRun(); hash.update(data: data)
+        while true {
+            // Foundation can retain autoreleased read buffers until the outer
+            // pool drains. Keep the 2.7 GB identity pass bounded per chunk.
+            let hasData = try autoreleasepool {
+                try guardRun()
+                guard let data = try handle.read(upToCount: 4 * 1024 * 1024), !data.isEmpty else { return false }
+                hash.update(data: data)
+                return true
+            }
+            if !hasData { break }
         }
         let digest = hash.finalize().map { String(format: "%02x", $0) }.joined()
         var after = stat(), path = stat()

@@ -32,7 +32,7 @@ class LifecycleTests(unittest.TestCase):
                 if child.poll() is None:os.killpg(child.pid,signal.SIGKILL);child.wait(timeout=1)
     def testManifestRejectionPublishesTerminalFailureWithoutSpawn(self):
         with tempfile.TemporaryDirectory() as tmp,patch.object(s,'ROOT',pathlib.Path(tmp)):
-            root=pathlib.Path(tmp)/'native-swift-acoustic-inventory-v01';root.mkdir();manifest=root/'manifest.json';manifest.write_text('{}')
+            root=pathlib.Path(tmp)/'native-swift-acoustic-inventory-v02';root.mkdir();manifest=root/'manifest.json';manifest.write_text('{}')
             with patch.object(s,'launch_owned') as launch,contextlib.redirect_stdout(io.StringIO()):
                 self.assertEqual(s.run(manifest,'0'*64),1);launch.assert_not_called()
             result=json.loads((root/'supervisor-result.json').read_text());self.assertEqual(result['state'],'failed')
@@ -57,14 +57,45 @@ class LifecycleTests(unittest.TestCase):
             self.assertIsNotNone(child.poll());self.assertFalse(owner.group_alive(child.pid))
         finally:
             if child.poll() is None:child.kill();child.wait(timeout=1)
-    def testEpermRequiresVerifiedNumericMembership(self):
+    def testEpermRequiresVerifiedNativeMembership(self):
         with patch.object(os,'killpg',side_effect=PermissionError()):
-            for text,wanted in [('4 5 42\n',True),('4 5\n',False)]:
-                with patch.object(subprocess,'run',return_value=type('P',(),{'returncode':0,'stdout':text})()):
+            for members,wanted in [([42],True),([],False)]:
+                fake=type('N',(),{'group_members':lambda _,pid:members})()
+                with patch.object(owner.native_resources,'shared',return_value=fake):
                     self.assertEqual(owner.group_alive(42),wanted)
-            for code,text in [(1,''),(0,''),(0,'bad')]:
-                with patch.object(subprocess,'run',return_value=type('P',(),{'returncode':code,'stdout':text})()):
-                    with self.assertRaises((RuntimeError,ValueError)):owner.group_alive(42)
+            fake=type('N',(),{'group_members':lambda _,pid:(_ for _ in ()).throw(RuntimeError('query failed'))})()
+            with patch.object(owner.native_resources,'shared',return_value=fake):
+                with self.assertRaises(RuntimeError):owner.group_alive(42)
+    def testNativeQueriesMatchOwnedLiveProcessAndFailClosed(self):
+        native=owner.native_resources.shared()
+        self.assertGreater(native.rss(os.getpid()),0)
+        self.assertIn(os.getpid(),native.group_members(os.getpgrp()))
+        self.assertGreater(native.available_bytes(),0)
+        with self.assertRaises(RuntimeError):native.rss(2147483647)
+        with patch.object(native.proc,'proc_pidinfo',return_value=0):
+            with self.assertRaises(RuntimeError):native.rss(os.getpid())
+        for count,values in [(4,[0]),(3,[42]),(16384,[42]),(-1,[])]:
+            def query(kind,pid,buffer,size):
+                for i,v in enumerate(values):buffer[i]=v
+                return count
+            with patch.object(native.proc,'proc_listpids',query):
+                with self.assertRaises(RuntimeError):native.group_members(42)
+    def testNativeAvailableMemoryPreservesVmStatConservativePolicy(self):
+        native=owner.native_resources.shared()
+        def query(host,flavor,buffer,count):
+            buffer[0]=1000;buffer[2]=200;buffer[23]=50
+            import ctypes
+            ctypes.cast(count,ctypes.POINTER(ctypes.c_uint32))[0]=24
+            return 0
+        with patch.object(native.system,'host_statistics64',query):
+            self.assertEqual(native.available_bytes(),1150*native.page_size)
+        def invalid(host,flavor,buffer,count):
+            buffer[0]=1;buffer[23]=50
+            import ctypes
+            ctypes.cast(count,ctypes.POINTER(ctypes.c_uint32))[0]=24
+            return 0
+        with patch.object(native.system,'host_statistics64',invalid):
+            with self.assertRaises(RuntimeError):native.available_bytes()
     def testBoundedReadRejectsBeforeAllocatingFullInput(self):
         with tempfile.TemporaryDirectory() as tmp:
             path=pathlib.Path(tmp)/'data';path.write_bytes(b'12345')
@@ -72,7 +103,8 @@ class LifecycleTests(unittest.TestCase):
             with self.assertRaises(ValueError):s.capped_read(path,4)
     def testGuardChecksAreNotOptimizationDependentAssertions(self):
         with self.assertRaises(ValueError):s.require(False,'expected')
-        with patch.object(subprocess,'run',return_value=type('P',(),{'returncode':1,'stdout':''})()):
-            with self.assertRaises(ValueError):s.available_bytes()
+        fake=type('N',(),{'available_bytes':lambda _:(_ for _ in ()).throw(RuntimeError('query failed'))})()
+        with patch.object(s.native_resources,'shared',return_value=fake):
+            with self.assertRaises(RuntimeError):s.available_bytes()
 
 if __name__=='__main__':unittest.main()

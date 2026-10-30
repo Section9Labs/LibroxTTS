@@ -1,8 +1,17 @@
 import Foundation
 import ChatterboxMacAcousticAudit
 #if os(macOS)
+import Darwin
 @main struct InventoryProbe {
-    static func main() throws {
+    static func main() {
+        do { try inspect() }
+        catch {
+            let message = "inventory_failed: " + String(describing: error).prefix(512) + "\n"
+            FileHandle.standardError.write(Data(message.utf8))
+            exit(EXIT_FAILURE)
+        }
+    }
+    private static func inspect() throws {
         let args = Array(CommandLine.arguments.dropFirst())
         guard args.count == 2, ProcessInfo.processInfo.environment["MLX_ENABLE_TF32"] == "0"
         else { throw AcousticInventoryError.input }

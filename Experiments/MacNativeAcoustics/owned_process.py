@@ -4,7 +4,7 @@ Mac source snapshot. No model/reference/study code is imported or runnable.
 import ctypes
 import os
 import signal
-import subprocess
+import native_resources
 import time
 _stop_signal = None
 
@@ -19,15 +19,8 @@ def group_alive(pgid):
     except ProcessLookupError:
         return False
     except PermissionError:
-        # An immediate TERM during Darwin exec startup can leave killpg(0)
-        # returning EPERM during teardown. Never interpret EPERM as absence:
-        # require a successful, numeric system group-membership query instead.
-        query = subprocess.run(['/bin/ps', '-axo', 'pgid='], capture_output=True,
-                               text=True, timeout=.25)
-        if query.returncode != 0 or not query.stdout.strip():
-            raise RuntimeError('Cannot verify owned group after EPERM')
-        groups = [int(value) for value in query.stdout.split()]
-        return pgid in groups
+        # Never interpret EPERM as absence; verify complete native membership.
+        return bool(native_resources.shared().group_members(pgid))
 
 
 def terminate_owned(child):
