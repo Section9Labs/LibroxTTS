@@ -79,6 +79,16 @@ public struct ChapterRenderRecipe: Codable, Sendable, Equatable {
     }
 }
 
+/// Delivery changes encoded bytes, never the synthesis recipe. AAC is lossy;
+/// its nominal bitrate is an encoder request, not an audio-quality guarantee.
+public enum ChapterAudioDelivery: String, Codable, Sendable, CaseIterable {
+    case lossless = "alac24-1"
+    case smaller = "aac-lc-64k-1"
+
+    public var codecRevision: String { rawValue }
+    public var isLossless: Bool { self == .lossless }
+}
+
 public struct ChapterRenderRequest: Codable, Sendable, Equatable {
     public static let revision = "librox-chapter-request-1"
     public let schemaVersion: Int
@@ -86,9 +96,14 @@ public struct ChapterRenderRequest: Codable, Sendable, Equatable {
     public let accountPartition: String
     public let source: ChapterSourceIdentity
     public let recipe: ChapterRenderRecipe
+    /// nil preserves pre-format request identities and their WAV/ALAC admission.
+    /// New hosts must explicitly submit the user's selected delivery format.
+    public let delivery: ChapterAudioDelivery?
+    public var effectiveDelivery: ChapterAudioDelivery { delivery ?? .lossless }
 
-    public init(accountPartition: String, source: ChapterSourceIdentity, recipe: ChapterRenderRecipe) throws {
-        schemaVersion = 1; self.accountPartition = accountPartition; self.source = source; self.recipe = recipe
+    public init(accountPartition: String, source: ChapterSourceIdentity, recipe: ChapterRenderRecipe,
+                delivery: ChapterAudioDelivery? = nil) throws {
+        schemaVersion = 1; self.accountPartition = accountPartition; self.source = source; self.recipe = recipe; self.delivery = delivery
         try validate()
     }
 
@@ -100,9 +115,19 @@ public struct ChapterRenderRequest: Codable, Sendable, Equatable {
     /// Deterministic within and across devices; account partitioning is separate.
     public func renderKey() throws -> String {
         try validate()
-        struct Content: Encodable { let revision: String; let source: ChapterSourceIdentity; let recipe: ChapterRenderRecipe }
+        struct Content: Encodable {
+            let revision: String; let source: ChapterSourceIdentity; let recipe: ChapterRenderRecipe
+            let delivery: ChapterAudioDelivery?
+        }
         let encoder = JSONEncoder(); encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
-        return SHA256.hash(data: try encoder.encode(Content(revision: Self.revision, source: source, recipe: recipe)))
+        return SHA256.hash(data: try encoder.encode(Content(revision: Self.revision, source: source, recipe: recipe, delivery: delivery)))
             .map { String(format: "%02x", $0) }.joined()
+    }
+
+    /// Shared synthesis identity permits reuse of verified PCM when encoding
+    /// another delivery format. It must not substitute for the delivered asset key.
+    public func synthesisKey() throws -> String {
+        try validate()
+        return try ChapterRenderRequest(accountPartition: accountPartition, source: source, recipe: recipe).renderKey()
     }
 }

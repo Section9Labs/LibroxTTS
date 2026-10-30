@@ -42,17 +42,22 @@ public struct ChapterStockCapability: Sendable, Equatable {
     public let displayName: String
     public let recipe: ChapterRenderRecipe
     public let maximumSourceUTF16Length: Int
+    /// Advertise only formats supported through encoding, cloud transport and
+    /// verified local adoption. This is separate from listening approval.
+    public let deliveryFormats: [ChapterAudioDelivery]
     public let availability: Availability
     public let listeningApproval: ListeningApproval
     public init(id: String, displayName: String, recipe: ChapterRenderRecipe,
-                maximumSourceUTF16Length: Int, availability: Availability, listeningApproval: ListeningApproval) throws {
+                maximumSourceUTF16Length: Int, availability: Availability, listeningApproval: ListeningApproval,
+                deliveryFormats: [ChapterAudioDelivery] = [.lossless]) throws {
         try recipe.validate()
         guard recipe.watermarkRevision == "disabled-1" else { throw ChapterServiceError.unsupportedPolicy }
         guard boundedLabel(id, limit: 256), boundedLabel(displayName, limit: 256),
-              (1...10_000_000).contains(maximumSourceUTF16Length) else { throw ChapterServiceError.invalidCatalog }
+              (1...10_000_000).contains(maximumSourceUTF16Length), !deliveryFormats.isEmpty,
+              Set(deliveryFormats).count == deliveryFormats.count else { throw ChapterServiceError.invalidCatalog }
         self.id = id; self.displayName = displayName; self.recipe = recipe
         self.maximumSourceUTF16Length = maximumSourceUTF16Length
-        self.availability = availability; self.listeningApproval = listeningApproval
+        self.availability = availability; self.listeningApproval = listeningApproval; self.deliveryFormats = deliveryFormats
     }
 }
 

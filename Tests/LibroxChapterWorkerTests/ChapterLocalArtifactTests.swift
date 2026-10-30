@@ -34,14 +34,14 @@ private final class LocalFixture: Sendable {
         try data.write(to: incoming)
     }
     deinit { try? FileManager.default.removeItem(at: root) }
-    func request(watermark: String = "disabled-1") throws -> ChapterRenderRequest {
+    func request(watermark: String = "disabled-1", delivery: ChapterAudioDelivery? = nil) throws -> ChapterRenderRequest {
         try .init(accountPartition: String(repeating: "a", count: 64), source: .init(
             bookSHA256: String(repeating: "b", count: 64), chapterKey: "spine:0", textSHA256: digest(Data(text.utf8)),
             extractionRevision: "reader-1", utf16Length: text.utf16.count), recipe: .init(
                 language: "en", stockVoiceID: "stock", conditioningSHA256: String(repeating: "c", count: 64),
                 modelSHA256: String(repeating: "d", count: 64), rendererProfile: "standard", plannerRevision: "chapter-1",
                 expressionSHA256: String(repeating: "e", count: 64), synthesisOptionsSHA256: String(repeating: "f", count: 64),
-                seedPolicy: "fixed-1", watermarkRevision: watermark))
+                seedPolicy: "fixed-1", watermarkRevision: watermark), delivery: delivery)
     }
     func manifest(_ request: ChapterRenderRequest, frames: Int64 = 4, codec: String = "wav-f32-1",
                   hash: String? = nil, span: ChapterTextRange? = nil) throws -> ChapterArtifactManifest {
@@ -101,6 +101,40 @@ private final class LocalFixture: Sendable {
         #expect(asset.codec == .alac24)
         #expect(asset.decodedFrameCount == 144_001)
         #expect(asset.decodedPeak == 0.25)
+    }
+
+
+    @Test func explicitSmallerAACActuallyDecodesGaplessAcrossBuffersAndRejectsMislabeling() async throws {
+        let f = try LocalFixture(data: Data())
+        let encoded = f.root.appendingPathComponent("smaller.m4a")
+        let format = try #require(AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: 24_000, channels: 1, interleaved: false))
+        let buffer = try #require(AVAudioPCMBuffer(pcmFormat: format, frameCapacity: 144_001))
+        buffer.frameLength = 144_001
+        for index in 0..<144_001 { buffer.floatChannelData![0][index] = 0.2 * sin(Float(index) * 0.05) }
+        try autoreleasepool {
+            let writer = try AVAudioFile(forWriting: encoded, settings: [AVFormatIDKey: kAudioFormatMPEG4AAC,
+                AVSampleRateKey: 24_000, AVNumberOfChannelsKey: 1, AVEncoderBitRateKey: 64_000],
+                commonFormat: .pcmFormatFloat32, interleaved: false)
+            try writer.write(from: buffer)
+        }
+        try Data(contentsOf: encoded).write(to: f.incoming)
+        let request = try f.request(delivery: .smaller), session = try await f.session()
+        let asset = try await f.adopt(request, f.manifest(request, frames: 144_001, codec: "aac-lc-64k-1"), session)
+        #expect(asset.codec == .aac64)
+        #expect(asset.decodedFrameCount == 144_001)
+        #expect(asset.decodedPeak > 0.1 && asset.decodedPeak <= 1)
+        await #expect(throws: ChapterLocalArtifactError.invalidFrames) {
+            try await f.adopt(request, f.manifest(request, frames: 144_000, codec: "aac-lc-64k-1"), session)
+        }
+        let lossless = try f.request(delivery: .lossless)
+        await #expect(throws: ChapterLocalArtifactError.invalidFormat) {
+            try await f.adopt(lossless, f.manifest(lossless, frames: 144_001, codec: "alac24-1"), session)
+        }
+        // A WAV under a matching AAC manifest must still fail actual codec decoding.
+        try wav(Array(repeating: 0.125, count: 144_001)).write(to: f.incoming)
+        await #expect(throws: ChapterLocalArtifactError.invalidFormat) {
+            try await f.adopt(request, f.manifest(request, frames: 144_001, codec: "aac-lc-64k-1"), session)
+        }
     }
 
     @Test func nonPacketAlignedWAVSpansMultipleDecodeBuffers() async throws {

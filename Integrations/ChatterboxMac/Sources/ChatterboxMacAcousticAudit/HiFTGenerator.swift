@@ -18,6 +18,10 @@ func hifiganExactFusion(_ x: MLXArray, _ source: MLXArray, stage: Int) throws ->
     return x + source
 }
 struct NativeAcousticShapeError: Error { let stage: String; let actual, expected: [Int] }
+public enum NativeAcousticWaveformPolicy: String, Codable, Sendable {
+    case legacyAtomic = "legacy-atomic-1"
+    case deterministicGather = "deterministic-gather-2"
+}
 
 // MARK: - Conv1d Wrapper (matching Python Conv1dPT)
 
@@ -411,8 +415,9 @@ func hifigan_stft(x: MLXArray, nFft: Int, hopLength: Int, window: MLXArray) -> (
 /// Inverse STFT for HiFi-GAN waveform reconstruction.
 func hifigan_istft(
     magnitude: MLXArray, phase: MLXArray,
-    nFft: Int, hopLength: Int, window: MLXArray
-) -> MLXArray {
+    nFft: Int, hopLength: Int, window: MLXArray,
+    policy: NativeAcousticWaveformPolicy = .legacyAtomic
+) throws -> MLXArray {
     let clippedMag = MLX.minimum(magnitude, MLXArray(Float(1e2)))
 
     // Convert to complex
@@ -431,6 +436,12 @@ func hifigan_istft(
     // Apply window
     let windowExp = window.reshaped(1, -1, 1)
     frames = frames * windowExp
+
+    if policy == .deterministicGather {
+        let output = try hifiganDeterministicOverlapAdd(frames: frames, window: window, hopLength: hopLength)
+        let pad = nFft / 2
+        return output[0..., pad..<(output.dim(1) - pad)]
+    }
 
     // Overlap-add
     let outputLength = (numFrames - 1) * hopLength + nFft
@@ -468,6 +479,30 @@ func hifigan_istft(
     return output
 }
 
+/// Fixed frame-order sum for the regular N=16/H=4 vocoder. Each destination
+/// gathers its four contributors; no colliding floating-point atomic additions.
+/// Inputs are already windowed F32. Keep the original F32 division/clipping.
+func hifiganDeterministicOverlapAdd(frames: MLXArray, window: MLXArray, hopLength: Int) throws -> MLXArray {
+    guard frames.ndim == 3, frames.dtype == .float32, frames.dim(1) == 16,
+          (1...2).contains(frames.dim(0)), frames.dim(2) > 0, frames.dim(2) <= 720000,
+          window.shape == [16], window.dtype == .float32, hopLength == 4 else { throw AcousticInventoryError.input }
+    let batch = frames.dim(0), count = frames.dim(2), length = (count - 1) * 4 + 16
+    let time = MLXArray(0..<length).asType(.int32)
+    let quotient = time.floorDivide(4), remainder = time % 4
+    let data = frames.transposed(0, 2, 1).reshaped(batch, count * 16)
+    let squared = window * window
+    var output = MLXArray.zeros([batch, length]), normalization = MLXArray.zeros([length])
+    for lane in (0..<4).reversed() {
+        let frame = quotient - lane, local = remainder + lane * 4
+        let valid = MLX.logicalAnd(frame .>= 0, frame .< count)
+        let safeFrame = MLX.minimum(MLX.maximum(frame, MLXArray(Int32(0))), MLXArray(Int32(count - 1)))
+        let values = MLX.take(data, safeFrame * 16 + local, axis: 1)
+        output = output + MLX.where(valid.expandedDimensions(axis: 0), values, MLXArray(Float(0)))
+        normalization = normalization + MLX.where(valid, MLX.take(squared, local, axis: 0), MLXArray(Float(0)))
+    }
+    return output / MLX.maximum(normalization, MLXArray(Float(1e-8)))
+}
+
 // MARK: - Hann Window
 
 /// Create periodic Hann window matching scipy fftbins=True.
@@ -482,6 +517,7 @@ func hannWindowPeriodic(size: Int) -> MLXArray {
 
 /// HiFi-GAN with Neural Source Filter (HiFT-Net) generator.
 class HiFTGenerator: Module {
+    var waveformPolicy: NativeAcousticWaveformPolicy = .legacyAtomic
     let outChannels: Int = 1
     let nbHarmonics: Int
     let samplingRate: Int
@@ -688,9 +724,9 @@ class HiFTGenerator: Module {
         let phase = MLX.sin(h[0..., nFftHalf..., 0...])
 
         // Inverse STFT
-        var output = hifigan_istft(
+        var output = try hifigan_istft(
             magnitude: mag, phase: phase,
-            nFft: nFft, hopLength: hopLen, window: stftWindow)
+            nFft: nFft, hopLength: hopLen, window: stftWindow, policy: waveformPolicy)
 
         output = MLX.clip(output, min: -audioLimit, max: audioLimit)
         return output

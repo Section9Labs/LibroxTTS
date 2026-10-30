@@ -11,6 +11,7 @@ struct NativeAcousticLoadReport: Codable, Sendable {
     let learnedBytes: Int
     let seconds: Double
     let precision: String
+    let waveformPolicy: String
 }
 
 /// Full F32, regular multilingual S3Gen. No alternate decoder, random missing
@@ -22,7 +23,7 @@ final class NativeAcousticModel {
     private let runtime: AcousticRuntimeAsset
     private let derived: [String: MLXArray]
 
-    init(checkpoint: URL, metallib: URL, check: () throws -> Void) throws {
+    init(checkpoint: URL, metallib: URL, waveformPolicy: NativeAcousticWaveformPolicy = .legacyAtomic, check: () throws -> Void) throws {
         let began = Date()
         guard ProcessInfo.processInfo.environment["MLX_ENABLE_TF32"] == "0" else { throw AcousticInventoryError.input }
         let runtime = try AcousticRuntimeAsset(url: metallib)
@@ -51,6 +52,7 @@ final class NativeAcousticModel {
         }
         let built: (CausalMaskedDiffWithXvec, [String: MLXArray], Int) = try Device.withDefaultDevice(.gpu) {
             let candidate = CausalMaskedDiffWithXvec(meanflow: false)
+            candidate.vocoderModule.waveformPolicy = waveformPolicy
             candidate.train(false)
             let expected = Dictionary(uniqueKeysWithValues: candidate.parameters().flattened())
             let raw = try loadArrays(url: checkpoint, stream: .cpu) // lazy, only admitted S3 tensors are evaluated
@@ -88,7 +90,7 @@ final class NativeAcousticModel {
         try source.verify(); try runtime.verify(); try check()
         report = .init(checkpointSHA256: source.digest, learnedTensors: 1367,
             derivedSHA256: frozen.mapValues(\.sha), learnedBytes: built.2,
-            seconds: Date().timeIntervalSince(began), precision: "F32-all-acoustic-weights-and-state")
+            seconds: Date().timeIntervalSince(began), precision: "F32-all-acoustic-weights-and-state", waveformPolicy: waveformPolicy.rawValue)
     }
 
     func verify() throws { try source.verify(); try runtime.verify() }

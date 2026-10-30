@@ -43,6 +43,13 @@ public struct ChapterArtifactManifest: Codable, Sendable, Equatable {
               (1...1_073_741_824).contains(audioByteCount), decodedFrameCount > 0,
               !codecRevision.isEmpty, codecRevision.utf8.count <= 128,
               !units.isEmpty, units.count <= 100_000 else { throw ChapterWorkerError.invalidManifest }
+        if let delivery = request.delivery, codecRevision != delivery.codecRevision {
+            throw ChapterWorkerError.invalidManifest
+        }
+        // Legacy requests were lossless-only. Missing delivery must never admit AAC.
+        if request.delivery == nil, !["wav-f32-1", "alac24-1"].contains(codecRevision) {
+            throw ChapterWorkerError.invalidManifest
+        }
         var end: Int64 = 0, textEnd = 0
         for unit in units {
             guard unit.startFrame == end, unit.frameCount > 0,

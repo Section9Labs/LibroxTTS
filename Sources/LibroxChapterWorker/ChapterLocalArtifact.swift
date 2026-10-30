@@ -11,7 +11,7 @@ public enum ChapterLocalArtifactError: Error, Equatable {
 /// A verified private copy of a complete chapter. Only adopt() can construct one.
 /// This is local media custody, not a durable queue or an audio-content judgement.
 public final class ChapterLocalArtifact: Sendable {
-    public enum Codec: String, Sendable { case wavFloat32 = "wav-f32-1", alac24 = "alac24-1" }
+    public enum Codec: String, Sendable { case wavFloat32 = "wav-f32-1", alac24 = "alac24-1", aac64 = "aac-lc-64k-1" }
     public static let maximumDecodedFrames: Int64 = 518_400_000 // six hours at 24 kHz
     public static let maximumEncodedBytes: Int64 = 4 * 1_024 * 1_024 * 1_024
     public static let decodeChunkFrames: AVAudioFrameCount = 65_536
@@ -155,6 +155,10 @@ public final class ChapterLocalArtifact: Sendable {
             guard format.mFormatID == kAudioFormatAppleLossless,
                   format.mFormatFlags == kAppleLosslessFormatFlag_24BitSourceData
             else { throw ChapterLocalArtifactError.invalidFormat }
+        case .aac64:
+            // Actual AAC-LC at the declared rate/channel layout. Bitrate is not
+            // inferred from the label; frames and decoded samples are verified.
+            guard format.mFormatID == kAudioFormatMPEG4AAC else { throw ChapterLocalArtifactError.invalidFormat }
         }
         guard audio.length == expectedFrames else { throw ChapterLocalArtifactError.invalidFrames }
         guard let buffer = AVAudioPCMBuffer(pcmFormat: audio.processingFormat, frameCapacity: decodeChunkFrames)

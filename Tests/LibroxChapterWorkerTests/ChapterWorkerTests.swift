@@ -17,7 +17,7 @@ private func request(voice: String = "stock", profile: String = "standard:logica
 private func artifact(_ request: ChapterRenderRequest, bytes: Data = Data([1, 2, 3])) throws -> ChapterArtifactManifest {
     .init(renderKey: try request.renderKey(), audioSHA256: SHA256.hash(data: bytes).map { String(format: "%02x", $0) }.joined(),
           audioByteCount: Int64(bytes.count), decodedFrameCount: 240,
-          codecRevision: "fixture-only-not-playable", units: [
+          codecRevision: "wav-f32-1", units: [
             .init(source: .init(offset: 0, length: 20), fragments: [.init(offset: 0, length: 9), .init(offset: 10, length: 10)],
                   startFrame: 0, frameCount: 240)])
 }
@@ -37,6 +37,7 @@ private func artifact(_ request: ChapterRenderRequest, bytes: Data = Data([1, 2,
     json["accountPartition"] = partition; json["schemaVersion"] = 999
     let unknown = try JSONDecoder().decode(ChapterRenderRequest.self, from: JSONSerialization.data(withJSONObject: json))
     #expect(throws: ChapterWorkerError.invalidIdentity) { try unknown.renderKey() }
+    #expect(throws: ChapterWorkerError.invalidIdentity) { try unknown.synthesisKey() }
 }
 
 @Test func sourceMapBindsExactUnicodeTextAndRejectsSurrogateSplit() throws {
@@ -47,7 +48,7 @@ private func artifact(_ request: ChapterRenderRequest, bytes: Data = Data([1, 2,
                       extractionRevision: "epub-1", utf16Length: text.utf16.count), recipe: old.recipe)
     func mapped(_ span: ChapterTextRange) throws -> ChapterArtifactManifest {
         .init(renderKey: try r.renderKey(), audioSHA256: String(repeating: "0", count: 64), audioByteCount: 4,
-              decodedFrameCount: 240, codecRevision: "fixture", units: [
+              decodedFrameCount: 240, codecRevision: "wav-f32-1", units: [
                 .init(source: span, fragments: [span], startFrame: 0, frameCount: 240)])
     }
     try mapped(.init(offset: 0, length: 4)).validateSourceMap(text: text, for: r)
@@ -150,4 +151,46 @@ private func artifact(_ request: ChapterRenderRequest, bytes: Data = Data([1, 2,
     let link = dir.appendingPathComponent("link")
     try FileManager.default.createSymbolicLink(at: link, withDestinationURL: file)
     #expect(throws: ChapterWorkerError.invalidManifest) { try a.verifyBytes(at: link, for: r) }
+}
+
+@Test func deliveryChoiceSeparatesAssetsButPreservesSynthesisAndLegacyKeys() throws {
+    let legacy = try request()
+    let lossless = try ChapterRenderRequest(accountPartition: legacy.accountPartition, source: legacy.source,
+                                            recipe: legacy.recipe, delivery: .lossless)
+    let smaller = try ChapterRenderRequest(accountPartition: legacy.accountPartition, source: legacy.source,
+                                           recipe: legacy.recipe, delivery: .smaller)
+    #expect(lossless.recipe == smaller.recipe)
+    #expect(try lossless.synthesisKey() == smaller.synthesisKey())
+    #expect(try lossless.renderKey() != smaller.renderKey())
+    #expect(try legacy.renderKey() == legacy.synthesisKey())
+    struct OldContent: Encodable {
+        let revision: String; let source: ChapterSourceIdentity; let recipe: ChapterRenderRecipe
+    }
+    let encoder = JSONEncoder(); encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+    let oldBytes = try encoder.encode(OldContent(revision: ChapterRenderRequest.revision, source: legacy.source, recipe: legacy.recipe))
+    let oldKey = SHA256.hash(data: oldBytes).map { String(format: "%02x", $0) }.joined()
+    #expect(try legacy.renderKey() == oldKey)
+    for value in [legacy, lossless, smaller] {
+        let decoded = try JSONDecoder().decode(ChapterRenderRequest.self, from: JSONEncoder().encode(value))
+        #expect(decoded == value)
+        #expect(try decoded.renderKey() == value.renderKey())
+    }
+    var json = try #require(JSONSerialization.jsonObject(with: encoder.encode(smaller)) as? [String: Any])
+    json["delivery"] = "unknown-codec"
+    #expect(throws: DecodingError.self) {
+        try JSONDecoder().decode(ChapterRenderRequest.self, from: JSONSerialization.data(withJSONObject: json))
+    }
+    func manifest(_ r: ChapterRenderRequest, codec: String) throws -> ChapterArtifactManifest {
+        .init(renderKey: try r.renderKey(), audioSHA256: String(repeating: "0", count: 64), audioByteCount: 8,
+              decodedFrameCount: 240, codecRevision: codec, units: [
+                .init(source: .init(offset: 0, length: 40), fragments: [.init(offset: 0, length: 40)], startFrame: 0, frameCount: 240)])
+    }
+    try manifest(lossless, codec: ChapterAudioDelivery.lossless.codecRevision).validate(for: lossless)
+    try manifest(smaller, codec: ChapterAudioDelivery.smaller.codecRevision).validate(for: smaller)
+    for (r, codec) in [(lossless, ChapterAudioDelivery.smaller.codecRevision),
+                       (smaller, ChapterAudioDelivery.lossless.codecRevision),
+                       (legacy, ChapterAudioDelivery.smaller.codecRevision),
+                       (legacy, "aac-alias"), (legacy, "unknown-codec")] {
+        #expect(throws: ChapterWorkerError.invalidManifest) { try manifest(r, codec: codec).validate(for: r) }
+    }
 }

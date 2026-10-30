@@ -17,16 +17,18 @@ public actor ChatterboxMacAcousticSynthesizer: ChatterboxAcousticSynthesizing {
     private let voice: URL
     private var occupied = false
 
-    public init(checkpoint: URL, metallib: URL, stockConditioning: URL) throws {
+    public init(checkpoint: URL, metallib: URL, stockConditioning: URL,
+                waveformPolicy: NativeAcousticWaveformPolicy = .legacyAtomic) throws {
         self.voice = stockConditioning
         try Self.hostHealth(); try Self.verifyStock(stockConditioning)
         let lease = try NativeAcousticProcessLease.shared.acquire()
         do {
-            loaded = try NativeAcousticModel(checkpoint: checkpoint, metallib: metallib, check: Self.health)
+            loaded = try NativeAcousticModel(checkpoint: checkpoint, metallib: metallib, waveformPolicy: waveformPolicy, check: Self.health)
             try Self.health()
             let encoder = JSONEncoder(); encoder.outputFormatting = [.sortedKeys]
             let state = SHA256.hash(data: try encoder.encode(loaded.report.derivedSHA256)).map { String(format: "%02x", $0) }.joined()
-            profileIdentifier = Self.revision + "-" + loaded.report.checkpointSHA256 + "-" + state
+            profileIdentifier = Self.revision + "-" + loaded.report.checkpointSHA256 + "-" + state +
+                (waveformPolicy == .legacyAtomic ? "" : "-" + waveformPolicy.rawValue)
             processLease = lease
         } catch {
             NativeAcousticProcessLease.shared.release(lease)

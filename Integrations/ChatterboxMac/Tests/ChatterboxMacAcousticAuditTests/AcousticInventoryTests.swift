@@ -87,6 +87,77 @@ final class AcousticInventoryTests: XCTestCase {
         try Data(repeating: 0, count: AcousticRuntimeAsset.bytes).write(to: path)
         XCTAssertThrowsError(try AcousticRuntimeAsset(url: path))
     }
+    func testPCM16AndAACKeepExactGaplessFramesWithoutClaimingLossyEquivalence() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: false)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let samples = (0..<144001).map { Float(sin(Double($0) * .pi * 2 * 220 / 24000)) * 0.5 }
+        let pcm = try NativeAudioExport.write(samples, to: directory.appendingPathComponent("pcm.wav"), codec: .wavPCM16)
+        let aac = try NativeAudioExport.write(samples, to: directory.appendingPathComponent("aac.m4a"), codec: .aac64)
+        XCTAssertEqual(pcm.frames, 144001); XCTAssertEqual(aac.frames, 144001)
+        XCTAssertEqual(pcm.samplePrecisionChecked, true); XCTAssertEqual(aac.samplePrecisionChecked, false)
+        XCTAssertLessThanOrEqual(pcm.maximumSampleError!, 1.0/32768)
+        XCTAssertLessThan(aac.bytes, pcm.bytes)
+    }
+    func testOrderedOverlapAddMatchesIndependentScalarCPU() throws {
+        try checkOverlapAdd(device: .cpu, maximumULP: 0)
+    }
+    func testOrderedOverlapAddGPURepeatsAndScalarFidelity() throws {
+        guard ProcessInfo.processInfo.environment["LIBROX_TEST_GPU_OLA"] == "1",
+              let file = ProcessInfo.processInfo.environment["LIBROX_TEST_GPU_METALLIB"] else {
+            throw XCTSkip("Explicit isolated GPU operator qualification only")
+        }
+        let runtime = try ChatterboxMacRuntime(metallib: URL(fileURLWithPath: file))
+        try checkOverlapAdd(device: .gpu, maximumULP: 4)
+        try runtime.verify()
+    }
+    private func checkOverlapAdd(device: Device, maximumULP: Double) throws {
+        func health() throws {
+            try Task.checkCancellation()
+            let p = ProcessInfo.processInfo
+            guard !p.isLowPowerModeEnabled, p.thermalState != .serious, p.thermalState != .critical,
+                  Memory.activeMemory <= 128 * 1024 * 1024 else { throw AcousticInventoryError.unsafeResource }
+        }
+        for count in [1, 3, 17, 257, 2049] {
+            for batch in [1, 2] {
+                try health()
+                let window: [Float] = (0..<16).map { Float((1 - cos(Double($0) * .pi * 2 / 16))/2) }
+                let square = window.map { $0 * $0 }
+                let frames: [Float] = (0..<(batch * 16 * count)).map { i in
+                    Float((i * 37 % 1024) - 512) / 1024 * window[(i / count) % 16]
+                }
+                let length = (count - 1) * 4 + 16
+                var expected = [Float](repeating: 0, count: batch * length), normalization = [Float](repeating: 0, count: length)
+                for frame in 0..<count {
+                    for local in 0..<16 {
+                        let t = frame * 4 + local
+                        normalization[t] += square[local]
+                        for b in 0..<batch { expected[b * length + t] += frames[(b * 16 + local) * count + frame] }
+                    }
+                }
+                for b in 0..<batch { for t in 0..<length { expected[b * length + t] /= max(normalization[t], 1e-8) } }
+                try Device.withDefaultDevice(device) {
+                    let input = MLXArray(frames, [batch, 16, count]), win = MLXArray(window)
+                    var first: [UInt32]?
+                    for _ in 0..<8 {
+                        try health()
+                        let output = try hifiganDeterministicOverlapAdd(frames: input, window: win, hopLength: 4)
+                        eval(output)
+                        try health()
+                        let actual = output.asArray(Float.self), bits = actual.map(\.bitPattern)
+                        if let first { XCTAssertEqual(bits, first, "Repeated ordered sum changed") } else { first = bits }
+                        XCTAssertEqual(actual.count, expected.count)
+                        for i in actual.indices {
+                            XCTAssertTrue(actual[i].isFinite)
+                            let bound = Double(expected[i].ulp) * maximumULP
+                            XCTAssertLessThanOrEqual(abs(Double(actual[i]) - Double(expected[i])), bound,
+                                "Scalar fidelity count=\(count), batch=\(batch), index=\(i)")
+                        }
+                    }
+                }
+            }
+        }
+    }
     func testHeaderRejectsOverflowInvalidOffsetsAndPayloadSize() throws {
         try AcousticTensor(dtype: "F32", shape: [2, 3], data_offsets: [0, 24]).validate(payloadBytes: 24)
         for spec in [
