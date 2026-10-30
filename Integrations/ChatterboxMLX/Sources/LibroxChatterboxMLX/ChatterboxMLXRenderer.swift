@@ -42,18 +42,21 @@ public actor ChatterboxMLXRenderer {
         }
     }
     public nonisolated let decoderProfile: DecoderProfile
+    public nonisolated let watermarkPolicy: ChatterboxWatermarkPolicy
     /// Opaque rendering identity, including host-copy semantics and selected
     /// acoustic stages. Decoder selection/oracle IDs remain unchanged.
     public nonisolated let profileIdentifier: String
     public nonisolated static func renderingProfileIdentifier(
         decoderProfile: DecoderProfile, acousticComputeUnits: PipelineComputeUnits,
-        reuseAcousticInputs: Bool = false
+        reuseAcousticInputs: Bool = false, watermarkPolicy: ChatterboxWatermarkPolicy = .perth
     ) -> String {
         let stages = [acousticComputeUnits.encoder, acousticComputeUnits.cfm,
             acousticComputeUnits.vocoder, acousticComputeUnits.watermark]
             .map { $0.map { String($0.rawValue) } ?? "inherit" }.joined(separator: ",")
-        return decoderProfile.rawValue + ":" + ChatterboxRequest.adapterRevision +
+        let base = decoderProfile.rawValue + ":" + ChatterboxRequest.adapterRevision +
             ":acoustics=" + stages + ":reuse=" + (reuseAcousticInputs ? "1" : "0")
+        // Keep previously qualified watermarked identities byte-for-byte stable.
+        return watermarkPolicy == .perth ? base : base + ":watermark=" + watermarkPolicy.rawValue
     }
     public enum RendererError: Error, CustomNSError {
         case precisionPolicy, identityMismatch, oracleMismatch, busy
@@ -147,10 +150,13 @@ public actor ChatterboxMLXRenderer {
     public init(weightsFile: URL, oracleFile: URL, modelDirectory: URL,
                 defaultVoice: URL, watermarkDirectory: URL, acousticComputeUnits: PipelineComputeUnits,
                 decoderProfile: DecoderProfile = .mixedFloat16Accurate,
-                reuseAcousticInputs: Bool = false) async throws {
+                reuseAcousticInputs: Bool = false,
+                watermarkPolicy: ChatterboxWatermarkPolicy = .perth) async throws {
         self.decoderProfile = decoderProfile
+        self.watermarkPolicy = watermarkPolicy
         self.profileIdentifier = Self.renderingProfileIdentifier(decoderProfile: decoderProfile,
-            acousticComputeUnits: acousticComputeUnits, reuseAcousticInputs: reuseAcousticInputs)
+            acousticComputeUnits: acousticComputeUnits, reuseAcousticInputs: reuseAcousticInputs,
+            watermarkPolicy: watermarkPolicy)
         // Never change this process-global switch after another model initializes.
         guard ProcessInfo.processInfo.environment["MLX_ENABLE_TF32"] == "0" else { throw RendererError.precisionPolicy }
         try Self.healthy(minimumAvailable: 3 * 1_024 * 1_024 * 1_024)
@@ -184,7 +190,7 @@ public actor ChatterboxMLXRenderer {
         try Self.healthy(minimumAvailable: 1_024 * 1_024 * 1_024)
         synth = try await ChatterboxTokenSynthesizer(modelDirectory: modelDirectory,
             conditioningFile: defaultVoice, watermarkDirectory: watermarkDirectory,
-            computeUnits: acousticComputeUnits, reuseFlowInputs: reuseAcousticInputs)
+            computeUnits: acousticComputeUnits, reuseFlowInputs: reuseAcousticInputs, watermarkPolicy: watermarkPolicy)
         try Self.healthy()
     }
 

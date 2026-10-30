@@ -46,6 +46,23 @@ final class RendererErrorTests: XCTestCase {
         XCTAssertEqual(ChatterboxMLXRenderer.profile, original.rawValue)
     }
 
+    func testExplicitWatermarkOptOutHasSeparateAudioIdentity() throws {
+        let units = PipelineComputeUnits(encoder: .cpuOnly, cfm: .cpuOnly, vocoder: .cpuOnly, watermark: .cpuOnly)
+        let profile = ChatterboxMLXRenderer.DecoderProfile.q8SemanticHalfV3
+        let legacy = profile.rawValue + ":" + ChatterboxRequest.adapterRevision + ":acoustics=0,0,0,0:reuse=0"
+        let marked = ChatterboxMLXRenderer.renderingProfileIdentifier(decoderProfile: profile, acousticComputeUnits: units)
+        XCTAssertEqual(marked, legacy)
+        let unmarked = ChatterboxMLXRenderer.renderingProfileIdentifier(decoderProfile: profile,
+            acousticComputeUnits: units, watermarkPolicy: .disabled)
+        XCTAssertNotEqual(marked, unmarked)
+        let request = try ChatterboxRequest(text: "Hello.", language: "en", seed: 42)
+        let hash = String(repeating: "a", count: 64)
+        XCTAssertNotEqual(try request.cacheKey(modelManifestSHA256: hash, conditioningSHA256: hash, rendererProfile: marked),
+                          try request.cacheKey(modelManifestSHA256: hash, conditioningSHA256: hash, rendererProfile: unmarked))
+        XCTAssertEqual(ChatterboxWatermarkPolicy(rawValue: "disabled-1"), .disabled)
+        XCTAssertNil(ChatterboxWatermarkPolicy(rawValue: "automatic-fallback"))
+    }
+
     func testExistingNSErrorCodesRemainStable() {
         let resource = ChatterboxMLXRenderer.ResourceGuardDetails(reason: .memory,
             minimumAvailableBytes: 1,

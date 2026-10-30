@@ -31,6 +31,7 @@ public enum ChatterboxQuantizationDiagnostic {
         let kitDirection: String?
         let overlap: Bool?
         let reuseFlowInputs: Bool?
+        let watermarkPolicy: String?
         let exporterSourceSHA256: String?
         let prefillCacheFile: String?
         let ropeFixtureFile: String?
@@ -116,6 +117,7 @@ public enum ChatterboxQuantizationDiagnostic {
                 "87b8ab31eda9c63abbeecb8a9f0678bc8e0fe6980396ea0c4f9e16637ef618d2"
         else { throw Failure.configuration }
         guard c.kitDirection == nil || ["neutral", "storyteller"].contains(c.kitDirection!) else { throw Failure.configuration }
+        guard c.watermarkPolicy == nil || ChatterboxWatermarkPolicy(rawValue: c.watermarkPolicy!) != nil else { throw Failure.configuration }
         // Foreign-checkpoint embeddings differ from our V3 frontend. Running
         // audio with that hybrid is invalid even if a few logits look plausible.
         guard c.profile != "smdesai-q8-oracle-only" || c.samples.isEmpty else { throw Failure.configuration }
@@ -1015,7 +1017,8 @@ public enum ChatterboxQuantizationDiagnostic {
             defaultVoice: URL(fileURLWithPath: c.conditioningFile), watermarkDirectory: URL(fileURLWithPath: c.watermarkDirectory),
             acousticComputeUnits: .init(encoder: .cpuOnly, cfm: .cpuOnly, vocoder: .cpuOnly, watermark: .cpuOnly),
             decoderProfile: selectedProfile,
-            reuseAcousticInputs: c.reuseFlowInputs ?? false)
+            reuseAcousticInputs: c.reuseFlowInputs ?? false,
+            watermarkPolicy: c.watermarkPolicy.flatMap(ChatterboxWatermarkPolicy.init(rawValue:)) ?? .perth)
         let loadSeconds = Date().timeIntervalSince(began)
         let narrator = await renderer.makeNarrator(overlap: c.overlap ?? false)
         activeNarrator = narrator
@@ -1044,6 +1047,7 @@ public enum ChatterboxQuantizationDiagnostic {
             try write(["completed": false, "load_seconds": loadSeconds, "samples": reports,
                 "grouped": c.groupSentences ?? false, "overlap": c.overlap ?? false,
                 "kit_direction": c.kitDirection ?? "neutral",
+                "watermark_policy": renderer.watermarkPolicy.rawValue,
                 "reuse_flow_inputs": c.reuseFlowInputs ?? false, "profile": renderer.profileIdentifier,
                 "startup_implementation_checks": 18, "conditioning_sha256": try digest(URL(fileURLWithPath: c.conditioningFile)), "original_fp32_equivalent": false], to: out.appendingPathComponent("report.json"))
         }
@@ -1051,6 +1055,7 @@ public enum ChatterboxQuantizationDiagnostic {
         try write(["completed": true, "load_seconds": loadSeconds, "samples": reports,
             "grouped": c.groupSentences ?? false, "overlap": c.overlap ?? false,
                 "kit_direction": c.kitDirection ?? "neutral",
+            "watermark_policy": renderer.watermarkPolicy.rawValue,
             "reuse_flow_inputs": c.reuseFlowInputs ?? false, "profile": renderer.profileIdentifier,
             "startup_implementation_checks": 18, "conditioning_sha256": try digest(URL(fileURLWithPath: c.conditioningFile)), "original_fp32_equivalent": false], to: out.appendingPathComponent("report.json"))
         } catch {

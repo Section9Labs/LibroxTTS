@@ -2,15 +2,23 @@ import Foundation
 import CoreML
 import PerthCoreML
 
+/// Explicit output policy. A disabled watermark is never an automatic recovery
+/// from a failed Perth load. Rendered-audio caches must include this selection.
+public enum ChatterboxWatermarkPolicy: String, Sendable, Codable {
+    case perth = "perth-1"
+    case disabled = "disabled-1"
+}
+
 /// Acoustic-only seam for an independently validated token decoder. Loads no
 /// Core ML T3 model. Calls are serialized; the host retains playback ownership.
 public actor ChatterboxTokenSynthesizer {
     private let synth: SynthRunner
     private let conditioning: Conditionals
-    private let watermark: PerthWatermarker
+    private let watermark: PerthWatermarker?
 
     public init(modelDirectory: URL, conditioningFile: URL, watermarkDirectory: URL,
-                computeUnits: PipelineComputeUnits, reuseFlowInputs: Bool = false) async throws {
+                computeUnits: PipelineComputeUnits, reuseFlowInputs: Bool = false,
+                watermarkPolicy: ChatterboxWatermarkPolicy = .perth) async throws {
         let encoder = try await Self.compiled("S3Encoder", directory: modelDirectory)
         let flow = try await Self.compiled("S3CFM", directory: modelDirectory)
         let vocoder = try await Self.compiled("S3Vocoder", directory: modelDirectory)
@@ -24,7 +32,12 @@ public actor ChatterboxTokenSynthesizer {
         self.conditioning = conditioning
         synth = try SynthRunner(encoderURL: encoder, cfmURL: flow, vocoderURL: vocoder,
                                computeUnits: computeUnits, reuseFlowInputs: reuseFlowInputs)
-        watermark = try PerthWatermarker(modelDirectory: watermarkDirectory, computeUnits: computeUnits.watermark ?? .cpuOnly)
+        switch watermarkPolicy {
+        case .perth:
+            watermark = try PerthWatermarker(modelDirectory: watermarkDirectory, computeUnits: computeUnits.watermark ?? .cpuOnly)
+        case .disabled:
+            watermark = nil
+        }
     }
 
     private nonisolated static func compiled(_ name: String, directory: URL) async throws -> URL {
@@ -63,6 +76,11 @@ public actor ChatterboxTokenSynthesizer {
         try Task.checkCancellation()
         guard !samples.isEmpty, samples.count <= 24_000 * 120, samples.allSatisfy(\.isFinite)
         else { throw ChatterboxError.invalidModelOutput("Invalid synthesized audio") }
+        guard let watermark else {
+            var timings = output.timings
+            timings.watermarkSeconds = 0
+            return .init(samples: samples, timings: timings)
+        }
         let began = Date()
         let marked = try watermark.applyWatermark(samples, sampleRate: 24_000)
         guard marked.count == samples.count, marked.allSatisfy(\.isFinite)
