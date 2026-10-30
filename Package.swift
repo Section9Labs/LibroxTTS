@@ -22,6 +22,7 @@ let package = Package(
         .executable(name: "librox-chatterbox-probe", targets: ["ChatterboxProbe"]),
         .executable(name: "librox-chatterbox-voices", targets: ["ChatterboxVoices"]),
         .executable(name: "librox-chatterbox-mlx-probe", targets: ["ChatterboxMLXProbe"]),
+        .executable(name: "librox-chatterbox-mac-acoustic-audit", targets: ["ChatterboxMacAcousticProbe"]),
         .executable(name: "kokoro-probe", targets: ["KokoroProbe"]),
         .executable(name: "pronunciation-probe", targets: ["PronunciationProbe"]),
         .executable(name: "pronunciation-audio", targets: ["PronunciationAudioProbe"]),
@@ -41,6 +42,17 @@ let package = Package(
     targets: [
         .target(name: "LibroxChapterWorker"),
         .testTarget(name: "LibroxChapterWorkerTests", dependencies: ["LibroxChapterWorker"]),
+        // Offline Mac-only acoustic inventory. This is not a rendering backend.
+        .target(name: "ChatterboxMacAcousticAudit", dependencies: [
+            .product(name: "MLX", package: "mlx-swift"),
+            .product(name: "MLXNN", package: "mlx-swift"),
+            .product(name: "MLXFast", package: "mlx-swift"),
+            .product(name: "MLXFFT", package: "mlx-swift"),
+        ], path: "Integrations/ChatterboxMac/Sources/ChatterboxMacAcousticAudit", exclude: ["LICENSE", "PROVENANCE.md"]),
+        .executableTarget(name: "ChatterboxMacAcousticProbe", dependencies: ["ChatterboxMacAcousticAudit"],
+            path: "Integrations/ChatterboxMac/Sources/ChatterboxMacAcousticProbe"),
+        .testTarget(name: "ChatterboxMacAcousticAuditTests", dependencies: ["ChatterboxMacAcousticAudit"],
+            path: "Integrations/ChatterboxMac/Tests/ChatterboxMacAcousticAuditTests"),
         // Vendored for a Mac Catalyst availability fix; see its PROVENANCE.md.
         .target(name: "Safetensors", path: "Integrations/Chatterbox/Vendor/swift-safetensors/Sources/Safetensors"),
         .target(name: "ChatterboxExceptionTrap", path: "Integrations/Chatterbox/Vendor/ChatterboxCoreML/Sources/ChatterboxExceptionTrap"),
