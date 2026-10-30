@@ -40,6 +40,22 @@ Catalog display/availability/listening state and authenticated cross-process
 descriptor transport remain separate provider responsibilities; no placeholder
 source, fake recipe or available catalog is created here.
 
+The explicit public production boundary is
+`ChatterboxPreparedChapterService` in `LibroxChatterboxPlanning`, separate from
+the legacy `ChapterService` fixture API. `catalog(session:)` returns
+`ChatterboxStockCatalog`: one stock capability containing its descriptor,
+supported delivery formats and explicit availability/listening state. Defaults
+are unavailable/pending. There is no generic recipe field or empty-success
+catalog. `submit(_ prepared:)` consumes the **whole prepared pair**, and
+`download(_ prepared:)` carries that same expected source/options into actual
+Reader verification. The SDK service, not the app, persists the portable plan.
+`preparedSubmission(for:session:)` recovers the exact pair from SDK-owned durable
+references after reopen; it cannot infer defaults from hashes. Cancellation,
+updates and connection close retain existing exact receipt/epoch/join semantics.
+There is deliberately no legacy adapter that drops the plan. These are concrete
+public declarations for app source wiring; the provider implementation is still
+pending, and no factory becomes available from importing this protocol.
+
 ## Bounded Worker discovery
 
 `ChapterDurableIntentAuthority.wantedSnapshot(session:gate:)` discovers all fully

@@ -40,6 +40,18 @@ final class StockBindingCaptureTests: XCTestCase {
     }
 }
 @Suite struct StockSourceBoundBindingTests {
+    @Test func sourceBoundCatalogDefaultsToUnavailableAndHasNoPlaceholderRecipe() async throws {
+        let descriptor = try ChatterboxStockVoiceDescriptor(modelSHA256: CaptureStockBackend().modelSHA256,
+            conditioningSHA256: CaptureStockBackend().conditioningSHA256, rendererProfile: CaptureStockBackend().profile)
+        let gate = ChapterAccountSessionGate(), own = try await gate.open(accountPartition: String(repeating: "a", count: 64))
+        let capability = try ChatterboxStockCapability(descriptor: descriptor)
+        let catalog = try ChatterboxStockCatalog(session: own, voices: [capability])
+        #expect(catalog.voices[0].availability == .unavailable && catalog.voices[0].listeningApproval == .pending)
+        #expect(catalog.voices[0].deliveryFormats == [.smaller, .lossless])
+        #expect(throws: ChapterServiceError.invalidCatalog) { try ChatterboxStockCatalog(session: own, voices: []) }
+        #expect(throws: ChapterServiceError.invalidCatalog) { try ChatterboxStockCatalog(session: own, voices: [capability, capability]) }
+        #expect(throws: ChapterServiceError.invalidCatalog) { try ChatterboxStockCapability(descriptor: descriptor, deliveryFormats: [.smaller, .smaller]) }
+    }
     @Test func descriptorRequiresPreparedBackendAndCannotOutliveShutdown() async throws {
         let renderer = ChatterboxMacResidentRenderer(testFactory: { CaptureStockBackend() })
         await #expect(throws: ChatterboxMacRendererError.busy) { try await renderer.stockVoiceDescriptor() }
