@@ -49,6 +49,7 @@ struct Passage: Codable, Sendable {
     let index, firstFrame, frames, generatedFrames, sourceLocation, sourceLength, speechTokens: Int
     let arrivalSeconds, prefillSeconds, decodeSeconds, synthSeconds, watermarkSeconds: Double
     let acoustics: ChatterboxAcousticTimings?
+    let decodeSteps: DecodeStepTimings?
     let exaggeration, guidance, temperature: Float
 }
 actor Collector {
@@ -65,7 +66,7 @@ actor Collector {
             speechTokens: p.timings?.speechTokens ?? 0, arrivalSeconds: Date().timeIntervalSince(began),
             prefillSeconds: p.timings?.prefillSeconds ?? 0, decodeSeconds: p.timings?.decodeSeconds ?? 0,
             synthSeconds: p.timings?.synthSeconds ?? 0, watermarkSeconds: p.timings?.watermarkSeconds ?? 0,
-            acoustics: p.timings?.acoustics, exaggeration: p.unit.request.exaggeration,
+            acoustics: p.timings?.acoustics, decodeSteps: p.timings?.decodeSteps, exaggeration: p.unit.request.exaggeration,
             guidance: p.unit.request.guidance, temperature: p.unit.request.temperature))
         samples += p.samples
         let encoder = JSONEncoder(); encoder.outputFormatting = [.prettyPrinted, .sortedKeys]

@@ -112,3 +112,18 @@ final class RendererErrorTests: XCTestCase {
         XCTAssertEqual(decoded.maximumAbsoluteError, details.maximumAbsoluteError)
     }
 }
+
+final class NativeDecodeTimingContractTests: XCTestCase {
+    func testLegacyTimingsDecodeWithoutNativeGuardFieldAndRoundTrip() throws {
+        let old = Data(#"{"iterations":2,"inputPreparationSeconds":0.1,"predictionSeconds":0.2,"logitsCopyAndCFGSeconds":0.3,"samplingSeconds":0.4}"#.utf8)
+        let decoded = try JSONDecoder().decode(DecodeStepTimings.self, from: old)
+        XCTAssertNil(decoded.resourceGuardSeconds)
+        XCTAssertEqual(decoded.accountedSeconds, 1, accuracy: 1e-12)
+        var native = DecodeStepTimings()
+        native.iterations = 3; native.predictionSeconds = 0.6; native.resourceGuardSeconds = 0.02
+        let roundTrip = try JSONDecoder().decode(DecodeStepTimings.self, from: JSONEncoder().encode(native))
+        XCTAssertEqual(roundTrip.iterations, 3)
+        XCTAssertEqual(roundTrip.accountedSeconds, 0.62, accuracy: 1e-12)
+        XCTAssertEqual(roundTrip.resourceGuardSeconds, 0.02)
+    }
+}

@@ -22,7 +22,9 @@ Local changes are exhaustively recorded in `UPSTREAM-PATCH.diff`:
 - Cache one exact conditioning prefix per assembler, keyed by speaker float bits,
   prompt tokens and exaggeration bits; expose host timing/cache-hit diagnostics.
 - Add cooperative cancellation at prediction and hot-loop boundaries and before watermarking.
-- Expose optional aggregate decode profiling and reject complete text/generation
+- Expose optional aggregate decode profiling, with backward-compatible optional
+  native resource-guard timing and a public zero initializer; no extra model
+  evaluations or resource polling. Reject complete text/generation
   budgets that exceed the loaded prefill window or KV cache before inference.
 - Add an optional fixed-flow-padding override, retaining upstream defaults when nil.
 - Correct canonical V3 multilingual prefill: two position-zero BOS rows and
@@ -31,7 +33,9 @@ Local changes are exhaustively recorded in `UPSTREAM-PATCH.diff`:
   is tested separately from encoder and acoustic parity.
 - Add canonical EN/ES prompt/speech-input assembly and an acoustic-only,
   serialized token synthesizer for separately validated native decoders. The
-  latter loads no Core ML T3 model and requires successful Perth watermarking.
+  latter loads no Core ML T3 model and uses an explicit watermark policy;
+  enabled Perth must succeed, while explicitly disabled output has a separate
+  rendering/cache identity.
   A public sampler wrapper retains the existing host sampling policy.
 - Add bounded multilingual V3 conditioning-file validation for private saved
   voice profiles (shape/dtype/offset/token/finite checks; not identity validation).

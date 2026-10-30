@@ -215,6 +215,7 @@ public actor ChatterboxMLXRenderer {
             watermarkSeconds: output.timings.watermarkSeconds, speechTokens: decoded.tokens.count,
             decodeBackend: profile, hostAssemblySeconds: decoded.assemblySeconds)
         timings.acoustics = output.timings
+        timings.decodeSteps = decoded.stepTimings
         return try .init(samples: output.samples, timings: timings)
     }
 
@@ -264,6 +265,7 @@ public actor ChatterboxMLXRenderer {
         let prefillSeconds: Double
         let decodeSeconds: Double
         let assemblySeconds: Double
+        let stepTimings: DecodeStepTimings?
     }
 
     @inline(never)
@@ -272,39 +274,67 @@ public actor ChatterboxMLXRenderer {
         let prefix = try frontend.prepare(text: request.text, language: request.language, conditioningFile: voice,
             exaggeration: request.exaggeration, guidance: request.guidance, maxTokens: request.maxTokens)
         let assemblySeconds = Date().timeIntervalSince(assemblyBegan)
+        let profileDecode = ProcessInfo.processInfo.environment["CHATTERBOX_PROFILE_DECODE"] == "1"
+        var stepTimings = DecodeStepTimings()
+        if profileDecode { stepTimings.resourceGuardSeconds = 0 }
+        let initialPreparation = profileDecode ? ContinuousClock.now : nil
         let cache = (0..<30).map { _ in KVCache() }
         var input = MLXArray(prefix.embeddings, [2, prefix.length, 1024])
         var sampler = ChatterboxSpeechSampler(options: .multilingual(language: request.language,
             exaggeration: request.exaggeration, cfgWeight: request.guidance, temperature: request.temperature,
             maxTokens: request.maxTokens, seed: request.seed))
         var tokens: [Int] = [], stopped = false
+        if profileDecode { stepTimings.inputPreparationSeconds += Self.elapsed(initialPreparation) }
         var prefillSeconds = 0.0
         let began = Date()
         for step in 0..<request.maxTokens {
+            let guardStart = profileDecode ? ContinuousClock.now : nil
             try Self.healthy()
+            if profileDecode { stepTimings.resourceGuardSeconds = (stepTimings.resourceGuardSeconds ?? 0) + Self.elapsed(guardStart) }
             let start = Date()
-            let values = predict(input, cache: cache)
+            let values = predict(input, cache: cache, profile: profileDecode, timings: &stepTimings)
             if step == 0 { prefillSeconds = Date().timeIntervalSince(start) }
+            let cfgStart = profileDecode ? ContinuousClock.now : nil
             guard values.count == 16_388, values.allSatisfy(\.isFinite) else { throw RendererError.oracleMismatch }
             let guided = (0..<8194).map { values[$0] + request.guidance * (values[$0] - values[8194 + $0]) }
+            if profileDecode { stepTimings.logitsCopyAndCFGSeconds += Self.elapsed(cfgStart) }
+            let samplingStart = profileDecode ? ContinuousClock.now : nil
             let token = sampler.sample(logits: guided, previous: tokens, minTokensReached: tokens.count >= 2)
+            if profileDecode {
+                stepTimings.samplingSeconds += Self.elapsed(samplingStart)
+                stepTimings.iterations += 1
+            }
             if token == 6562, tokens.count >= 2 { stopped = true; break }
+            let preparationStart = profileDecode ? ContinuousClock.now : nil
             tokens.append(token)
             let embedding = try frontend.speechInput(token: token, position: step + 1)
             input = MLXArray(embedding + embedding, [2, 1, 1024])
+            if profileDecode { stepTimings.inputPreparationSeconds += Self.elapsed(preparationStart) }
         }
         guard stopped else { throw RendererError.generationLimit }
         let decodeSeconds = Date().timeIntervalSince(began) - prefillSeconds
         let valid = tokens.filter { $0 < 6561 }
         return .init(tokens: valid, prefillSeconds: prefillSeconds,
-                     decodeSeconds: decodeSeconds, assemblySeconds: assemblySeconds)
+                     decodeSeconds: decodeSeconds, assemblySeconds: assemblySeconds,
+                     stepTimings: profileDecode ? stepTimings : nil)
     }
 
-    private func predict(_ input: MLXArray, cache: [KVCache]) -> [Float] {
+    private static func elapsed(_ start: ContinuousClock.Instant?) -> TimeInterval {
+        guard let start else { return 0 }
+        let value = start.duration(to: .now).components
+        return Double(value.seconds) + Double(value.attoseconds) / 1e18
+    }
+    private func predict(_ input: MLXArray, cache: [KVCache], profile: Bool,
+                         timings: inout DecodeStepTimings) -> [Float] {
         Device.withDefaultDevice(.gpu) {
+            let predictionStart = profile ? ContinuousClock.now : nil
             let logits = decoder.logits(input, cache: cache)
             eval(logits)
-            return logits.asArray(Float.self)
+            if profile { timings.predictionSeconds += Self.elapsed(predictionStart) }
+            let copyStart = profile ? ContinuousClock.now : nil
+            let values = logits.asArray(Float.self)
+            if profile { timings.logitsCopyAndCFGSeconds += Self.elapsed(copyStart) }
+            return values
         }
     }
 
