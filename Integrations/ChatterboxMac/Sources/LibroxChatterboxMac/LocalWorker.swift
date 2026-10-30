@@ -39,6 +39,8 @@ private final class LocalWorkerCancellation: Sendable {
 }
 
 public struct ChatterboxMacWorkerPublication: Sendable {
+    let producerSession: ChapterAccountSession
+    let producerFence: @Sendable () throws -> Void
     public let readSet: ChapterIntentReadSet
     public let reference: ChapterLocalHandoffReference
     public let decodedFrames: Int64
@@ -102,6 +104,7 @@ public actor ChatterboxMacLocalWorker {
         self.renderer = renderer; self.journal = journal; self.session = session; self.gate = gate; self.directories = directories; self.hooks = hooks
         self.artifactBudget = artifactBudget
     }
+    deinit { cancellation.stop(terminal: true) }
     public func state() -> Phase { phase }
     public func checkpoint(for request: ChapterRenderRequest) async throws -> ChapterWorkerCheckpoint? {
         try await gate.validate(session); try Task.checkCancellation()
@@ -153,7 +156,10 @@ public actor ChatterboxMacLocalWorker {
         try await ChapterLocalIntentSnapshot.requireCurrent(readSet, authority: authority, session: session, gate: gate)
         guard enabled, cancellation.accepting, cancellation.revision == stamp, !closed else { throw CancellationError() }
         let seconds = started.duration(to: .now).seconds
-        return .init(readSet: readSet, reference: result.reference, decodedFrames: result.frames, reusedCompletedAudio: result.reused,
+        let fence = cancellation
+        return .init(producerSession: session, producerFence: {
+            guard fence.accepting, fence.revision == stamp else { throw CancellationError() }
+        }, readSet: readSet, reference: result.reference, decodedFrames: result.frames, reusedCompletedAudio: result.reused,
             completeWallSeconds: seconds, modelLoadingSeconds: result.loadingSeconds, completeWarmSeconds: max(0, seconds - result.loadingSeconds))
     }
     private func runOwned(_ readSet: ChapterIntentReadSet, authority: any ChapterIntentAuthority, recovery: Recovery) async throws -> OwnedResult {

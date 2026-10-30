@@ -10,6 +10,21 @@ package enum ChapterImmutableBlob {
     package static func publish(_ data: Data, identifier: String, directory: URL, maximumBytes: Int,
                         beforeCommit: @Sendable () async throws -> Void) async throws {
         guard isDigest(identifier), !data.isEmpty, data.count <= maximumBytes, hash(data) == identifier else { throw ChapterLocalSourceError.invalidRecord }
+        try await publishStored(data, leaf: identifier + ".json", directory: directory, maximumBytes: maximumBytes, beforeCommit: beforeCommit)
+    }
+    /// Fixed namespace for intent-keyed completion metadata. Callers must verify
+    /// the canonical body checksum and exact read-set key; never use for source blobs.
+    package static func publishCompletionPayload(_ data: Data, key: String, directory: URL, maximumBytes: Int,
+                                                 beforeCommit: @Sendable () async throws -> Void) async throws {
+        guard isDigest(key), !data.isEmpty, data.count <= maximumBytes else { throw ChapterLocalSourceError.invalidRecord }
+        try await publishStored(data, leaf: "completion-" + key + ".json", directory: directory, maximumBytes: maximumBytes, beforeCommit: beforeCommit)
+    }
+    package static func readCompletionPayloadIfPresent(_ key: String, directory: URL, maximumBytes: Int) throws -> Data? {
+        guard isDigest(key) else { throw ChapterLocalSourceError.invalidReference }
+        return try readStored(leaf: "completion-" + key + ".json", expectedHash: nil, root: Root(directory), maximumBytes: maximumBytes, allowMissing: true)
+    }
+    private static func publishStored(_ data: Data, leaf: String, directory: URL, maximumBytes: Int,
+                                      beforeCommit: @Sendable () async throws -> Void) async throws {
         try Task.checkCancellation()
         let root = try Root(directory)
         let name = ".source-" + UUID().uuidString
@@ -51,10 +66,9 @@ package enum ChapterImmutableBlob {
               same(identity, afterRead), same(identity, stagedPath), afterRead.st_size == staged.st_size,
               afterRead.st_mtimespec.tv_sec == staged.st_mtimespec.tv_sec,
               afterRead.st_mtimespec.tv_nsec == staged.st_mtimespec.tv_nsec else { throw ChapterLocalSourceError.invalidRecord }
-        let leaf = identifier + ".json"
         if linkat(root.fd, name, root.fd, leaf, 0) != 0 {
             guard errno == EEXIST else { throw ChapterLocalSourceError.storage }
-            guard try read(identifier, root: root, maximumBytes: maximumBytes) == data else { throw ChapterLocalSourceError.invalidRecord }
+            guard try readStored(leaf: leaf, expectedHash: hash(data), root: root, maximumBytes: maximumBytes) == data else { throw ChapterLocalSourceError.invalidRecord }
         }
         // Also synchronize a matched existing entry after an ambiguous prior
         // commit. Presence/hash equality alone is not a durability receipt.
@@ -62,14 +76,18 @@ package enum ChapterImmutableBlob {
         try root.validate()
     }
     package static func read(_ identifier: String, directory: URL, maximumBytes: Int) throws -> Data {
-        try read(identifier, root: Root(directory), maximumBytes: maximumBytes)
-    }
-    private static func read(_ identifier: String, root: Root, maximumBytes: Int) throws -> Data {
         guard isDigest(identifier) else { throw ChapterLocalSourceError.invalidReference }
+        guard let data = try readStored(leaf: identifier + ".json", expectedHash: identifier, root: Root(directory), maximumBytes: maximumBytes)
+        else { throw ChapterLocalSourceError.invalidRecord }; return data
+    }
+    private static func readStored(leaf: String, expectedHash: String?, root: Root, maximumBytes: Int,
+                                   allowMissing: Bool = false) throws -> Data? {
         try root.validate(); try Task.checkCancellation()
-        let leaf = identifier + ".json"
         let fd = openat(root.fd, leaf, O_RDONLY | O_CLOEXEC | O_NOFOLLOW | O_NONBLOCK)
-        guard fd >= 0 else { throw ChapterLocalSourceError.invalidRecord }
+        if fd < 0 {
+            if allowMissing, errno == ENOENT { try root.validate(); try Task.checkCancellation(); return nil }
+            throw ChapterLocalSourceError.invalidRecord
+        }
         let input = FileHandle(fileDescriptor: fd, closeOnDealloc: true); defer { try? input.close() }
         var original = stat()
         guard fstat(fd, &original) == 0, original.st_mode & S_IFMT == S_IFREG,
@@ -87,7 +105,8 @@ package enum ChapterImmutableBlob {
         guard fstat(fd, &after) == 0, fstatat(root.fd, leaf, &path, AT_SYMLINK_NOFOLLOW) == 0,
               same(original, after), same(original, path), original.st_size == after.st_size,
               original.st_mtimespec.tv_sec == after.st_mtimespec.tv_sec,
-              original.st_mtimespec.tv_nsec == after.st_mtimespec.tv_nsec, hash(data) == identifier else { throw ChapterLocalSourceError.invalidRecord }
+              original.st_mtimespec.tv_nsec == after.st_mtimespec.tv_nsec,
+              expectedHash == nil || hash(data) == expectedHash else { throw ChapterLocalSourceError.invalidRecord }
         try root.validate(); try Task.checkCancellation()
         return data
     }

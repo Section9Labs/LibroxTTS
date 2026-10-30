@@ -446,5 +446,132 @@ private final class LocalWorkerFixture: Sendable {
         #expect(FileManager.default.fileExists(atPath: unknown.path))
         try await worker.shutdown(); await outbox.close()
     }
+    @Test func joinedWorkerCompletionIsImmutableIdempotentAndReaderVerifiesAudioSeparately() async throws {
+        let f = try LocalWorkerFixture(), budget = try f.budget()
+        let (worker, submission, outbox, readSet, authority) = try await f.setup(artifactBudget: budget)
+        #expect(try await ChapterLocalCompletion.receiveIfPresent(for: readSet, session: submission.session,
+            gate: f.readerGate, authority: authority, directory: f.directories.publications) == nil)
+        try await worker.enable()
+        let result = try await worker.render(readSet, authority: authority)
+        let first = try await ChatterboxMacLocalCompletionPublisher.publish(result, gate: f.workerGate, authority: authority,
+            budget: budget, directory: f.directories.publications)
+        let second = try await ChatterboxMacLocalCompletionPublisher.publish(result, gate: f.workerGate, authority: authority,
+            budget: budget, directory: f.directories.publications)
+        #expect(first.handoffReference == second.handoffReference && first.readSet == readSet)
+        let freshReader = try await f.readerGate.open(accountPartition: f.partition)
+        await #expect(throws: ChapterWorkerError.accountMismatch) {
+            try await ChapterLocalCompletion.receiveIfPresent(for: readSet, session: submission.session,
+                gate: f.readerGate, authority: authority, directory: f.directories.publications)
+        }
+        let freshSubmission = try ChapterSubmission(request: submission.request, originalText: submission.originalText, session: freshReader)
+        let receipt = try await #require(ChapterLocalCompletion.receiveIfPresent(for: readSet, session: freshReader,
+            gate: f.readerGate, authority: authority, directory: f.directories.publications))
+        #expect(receipt.handoffReference == result.reference)
+        #expect(try await outbox.retainedHandoff(for: submission.request) == nil)
+        let received = try await ChapterLocalHandoff.receive(receipt.handoffReference, submission: freshSubmission, gate: f.readerGate,
+            directory: f.directories.publications, storageDirectory: f.readerCustody)
+        let accepted = try await outbox.acceptVerifiedHandoff(received, submission: freshSubmission, readSet: readSet, gate: f.readerGate)
+        #expect(accepted.artifact.decodedFrameCount == result.decodedFrames)
+        let key = try ChapterLocalCompletion.lookupKey(for: readSet)
+        let bytes = try Data(contentsOf: f.directories.publications.appendingPathComponent("completion-" + key + ".json"))
+        let json = String(decoding: bytes, as: UTF8.self)
+        #expect(!json.contains(result.producerSession.epoch.uuidString) && !json.contains("completeWarmSeconds"))
+        try await worker.shutdown(); await outbox.close()
+    }
+    @Test func completionLostAcknowledgementPreservesCompleteRecordAndSkipsNoVerification() async throws {
+        let f = try LocalWorkerFixture(), budget = try f.budget()
+        let (worker, submission, outbox, readSet, authority) = try await f.setup(artifactBudget: budget)
+        try await worker.enable(); let result = try await worker.render(readSet, authority: authority)
+        await #expect(throws: CancellationError.self) {
+            try await ChatterboxMacLocalCompletionPublisher.publish(result, gate: f.workerGate, authority: authority,
+                budget: budget, directory: f.directories.publications) { if case .afterCommit = $0 { throw CancellationError() } }
+        }
+        let record = try await #require(ChapterLocalCompletion.receiveIfPresent(for: readSet, session: submission.session,
+            gate: f.readerGate, authority: authority, directory: f.directories.publications))
+        #expect(record.handoffReference == result.reference)
+        #expect(try await outbox.retainedHandoff(for: submission.request) == nil)
+        _ = try await ChatterboxMacLocalCompletionPublisher.publish(result, gate: f.workerGate, authority: authority,
+            budget: budget, directory: f.directories.publications)
+        let counts = await f.signals.counts(); #expect(counts.0 == 1 && counts.1 == 1)
+        try await worker.shutdown(); await outbox.close()
+    }
+    @Test func stoppedWorkerPublicationCannotEmitCompletionAfterReenable() async throws {
+        let f = try LocalWorkerFixture(), budget = try f.budget()
+        let (worker, _, outbox, readSet, authority) = try await f.setup(artifactBudget: budget)
+        try await worker.enable(); let result = try await worker.render(readSet, authority: authority)
+        try await worker.disable(); try await worker.enable()
+        await #expect(throws: CancellationError.self) {
+            try await ChatterboxMacLocalCompletionPublisher.publish(result, gate: f.workerGate, authority: authority,
+                budget: budget, directory: f.directories.publications)
+        }
+        let key = try ChapterLocalCompletion.lookupKey(for: readSet)
+        #expect(!FileManager.default.fileExists(atPath: f.directories.publications.appendingPathComponent("completion-" + key + ".json").path))
+        try await worker.shutdown(); await outbox.close()
+    }
+    @Test func completionPublisherCancellationJoinsBeforeAllowanceAndUnknownFilesRelease() async throws {
+        let f = try LocalWorkerFixture(), budget = try f.budget()
+        let (worker, _, outbox, readSet, authority) = try await f.setup(artifactBudget: budget)
+        try await worker.enable(); let result = try await worker.render(readSet, authority: authority)
+        let keep = f.directories.publications.appendingPathComponent("keep"); try Data("keep".utf8).write(to: keep)
+        let publish = Task {
+            try await ChatterboxMacLocalCompletionPublisher.publish(result, gate: f.workerGate, authority: authority,
+                budget: budget, directory: f.directories.publications) {
+                    if case .beforeCommit = $0 { await f.signals.signal("completion-entered"); await f.signals.wait("completion-release") }
+                }
+        }
+        await f.signals.wait("completion-entered"); publish.cancel()
+        await #expect(throws: ChapterStorageBudgetError.busy) { try await budget.close() }
+        await f.signals.signal("completion-release")
+        await #expect(throws: CancellationError.self) { try await publish.value }
+        let token = try await budget.reserve(bytes: 1); try await budget.releaseAfterJoining(token)
+        #expect(try String(contentsOf: keep, encoding: .utf8) == "keep")
+        try await worker.shutdown(); await outbox.close()
+    }
+    @Test func staleReaderIntentAndRevokedProducerEpochRejectCompletion() async throws {
+        let f = try LocalWorkerFixture(), budget = try f.budget()
+        let (worker, submission, outbox, readSet, authority) = try await f.setup(artifactBudget: budget)
+        try await worker.enable(); let result = try await worker.render(readSet, authority: authority)
+        await #expect(throws: ChapterLocalIntentError.staleIntent) {
+            try await ChatterboxMacLocalCompletionPublisher.publish(result, gate: f.workerGate, authority: authority,
+                budget: budget, directory: f.directories.publications) {
+                    if case .beforeCommit = $0 { _ = try await outbox.setDemand(false, for: submission.request) }
+                }
+        }
+        _ = try await f.workerGate.open(accountPartition: f.partition)
+        await #expect(throws: ChapterWorkerError.accountMismatch) {
+            try await ChatterboxMacLocalCompletionPublisher.publish(result, gate: f.workerGate, authority: authority,
+                budget: budget, directory: f.directories.publications)
+        }
+        try await worker.shutdown(); await outbox.close()
+    }
+    @Test func conflictingReceiptAndCorruptOrSymlinkRecordsAreNeverReplacedOrAccepted() async throws {
+        let f = try LocalWorkerFixture(), budget = try f.budget()
+        let (worker, submission, outbox, readSet, authority) = try await f.setup(artifactBudget: budget)
+        try await worker.enable(); let result = try await worker.render(readSet, authority: authority)
+        _ = try await ChatterboxMacLocalCompletionPublisher.publish(result, gate: f.workerGate, authority: authority,
+            budget: budget, directory: f.directories.publications)
+        let key = try ChapterLocalCompletion.lookupKey(for: readSet)
+        let file = f.directories.publications.appendingPathComponent("completion-" + key + ".json")
+        let original = try Data(contentsOf: file)
+        await #expect(throws: ChapterLocalSourceError.invalidRecord) {
+            try await ChapterLocalCompletion.publish(readSet: readSet, handoffReference: .init(identifier: String(repeating: "f", count: 64)),
+                session: result.producerSession, gate: f.workerGate, authority: authority, directory: f.directories.publications,
+                producerFence: result.producerFence)
+        }
+        #expect(try Data(contentsOf: file) == original)
+        try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: file.path)
+        try Data("corrupt".utf8).write(to: file)
+        await #expect(throws: (any Error).self) {
+            try await ChapterLocalCompletion.receiveIfPresent(for: readSet, session: submission.session,
+                gate: f.readerGate, authority: authority, directory: f.directories.publications)
+        }
+        try FileManager.default.removeItem(at: file)
+        try FileManager.default.createSymbolicLink(at: file, withDestinationURL: f.voice)
+        await #expect(throws: ChapterLocalSourceError.invalidRecord) {
+            try await ChapterLocalCompletion.receiveIfPresent(for: readSet, session: submission.session,
+                gate: f.readerGate, authority: authority, directory: f.directories.publications)
+        }
+        try await worker.shutdown(); await outbox.close()
+    }
 }
 #endif
