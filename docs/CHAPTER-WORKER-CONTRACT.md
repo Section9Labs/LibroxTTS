@@ -1,6 +1,6 @@
 # Mac companion and chapter queue: first SDK foundation
 
-Status: implementation in progress. This is an initial model-independent value/state layer, NOT a CloudKit worker or installed companion. No release, schema deployment, cloud writes or phone workload.
+Status: implementation in progress. This is an model-independent value/state, verified-artifact and local-outbox layers, NOT a CloudKit worker or installed companion. No release, schema deployment, cloud writes or phone workload.
 
 The app remains Catalyst. The companion is a separately packaged native macOS process sharing LibroxKit, with its own menu-bar status and an opt-in Librox enable/disable setting. The menu should show imported books, queued/rendering/publishing/ready/failed chapters, measured progress, model capability, storage and pause state. Imported/queued/prepared are distinct states. Disabling stops new claims; cancel and join active rendering before relinquishing its claim. Preserve queued demands, completed audio, books, voices and reading location. Login registration and signing remain app-owner integration work.
 
@@ -13,14 +13,41 @@ The app remains Catalyst. The companion is a separately packaged native macOS pr
 
 Frame ranges are half-open. Units partition the full decoded frame timeline in order. Frame counts include boundary cadence as measured after rendering. Fragment ranges carry no per-fragment or word timestamps. Use `validateSourceMap(text:for:)` to bind UTF-16 ranges to the exact hashed extraction and reject ranges splitting surrogate pairs; metadata validation alone checks integer bounds/order. No character-duration estimate is an alignment map.
 
+## Additional local stages validated 2026-10-30
+
+- `ChapterLocalArtifact`: nonforgeable private adopted WAV-F32/ALAC24 custody,
+  actual bounded decoding at24kHz/mono, exact frame count, finite peak<=1,
+  source-map and account-session validation around awaits. New Mac Pro policy is
+  `disabled-1` only. Caller retains the handle throughout playback and must stop
+  immediately on lifecycle revocation. This is scoped custody, not a durable
+  crash-recovery availability database.
+- `ChapterDemandOutbox`: per-account/per-device local demand intents with
+  monotonic revisions and exact-intent acknowledgements. A late acknowledgement
+  cannot erase a newer cancellation/re-request. Acknowledged tombstones preserve
+  revision counters. Exclusive ownership, bounded/checksummed journal,
+  descriptor-relative directory access, fsync+atomic rename, ambiguous-write
+  poisoning and reopening reconciliation are implemented. Tests cover real
+  reopen, late acknowledgements, account/owner isolation, injected post-rename
+  failure, cancellation, corruption/checksum tampering and ancestor replacement.
+  This establishes local process-crash recovery semantics, not power-loss proof,
+  server delivery, distributed ownership or exactly-once rendering. At8192
+  distinct retained intents /32MiB, admission fails without deleting old state.
+  A transport must reconcile the versioned device demand in conditional server
+  transactions before calling local `acknowledge`; local acknowledgement is not
+  delivery evidence. Host must use current account epochs around every await.
+
+Twenty-three Release chapter-worker tests pass, including nine real-codec
+artifact tests and seven filesystem/outbox tests. No real CloudKit writes,
+account synchronization or cross-device playback were performed.
+
 ## Not yet implemented; required before live cloud/app integration
 
-- Durable outbox, crash-safe local checkpoint/adoption and atomic fake transport/interleaving tests.
+- Cloud transport around the local outbox, crash-safe render checkpoint/adoption database, and atomic fake transport/interleaving tests.
 - Conditional change-tag transactions atomically checking job/intent/worker lease/fence; ambiguous lost-ack reconciliation; per-device versioned demand IDs and account/environment partitions.
 - Expired/uncertain lease behavior across system sleep/clock skew; no exactly-once physical rendering claim.
 - Whole-chapter text windowing and cadence checkpoint continuity beyond existing 32 KiB/128-unit session bounds.
-- Codec/decoded-frame/watermark verification and atomic local availability. Cloud `ready` is never equivalent to phone `available`.
+- Durable atomic local availability and actual downloaded CloudKit codec/source verification. Scoped WAV/ALAC verification exists; Cloud `ready` is never equivalent to phone `available`.
 - Resource-qualified renderer scheduling, one-vs-two chapter concurrency, real throughput/latency and safe shutdown under disable/account changes.
-- CloudKit custom-zone adapter, actual signed helper/menu UI, Librox settings and prepared playback driver. T3 owns app document/account/network/lifecycle/playback integration; SDK owns transport/rendering/verification contracts and algorithms.
+- CloudKit custom-zone adapter, actual signed helper/menu UI, Librox settings and prepared playback driver. Dedicated Codex app chat01a18a96-6a01-7ff3-851f-edd02d086e6e owns app document/account/network/lifecycle/playback integration; SDK owns transport/rendering/verification contracts and algorithms. T3 is frozen.
 
-The research checklist in `codex-mac-icloud-chapter-render-research.json` is authoritative for the remaining six acceptance groups. Current tests establish only the implemented subset. T3 may audit interfaces and prepare adapters but must not claim a working remote feature from these values.
+The research checklist in `codex-mac-icloud-chapter-render-research.json` is authoritative for the remaining six acceptance groups. Current tests establish only the implemented subset. The app owner may audit interfaces and prepare adapters but must not claim a working remote feature from these values.
