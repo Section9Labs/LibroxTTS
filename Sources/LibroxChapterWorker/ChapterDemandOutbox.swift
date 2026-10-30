@@ -17,6 +17,28 @@ public struct ChapterConfirmedDemand: Sendable, Equatable {
     public let intent: ChapterDemandIntent
     public let serverRevision: ChapterServerRevision
 }
+/// A recovery identity, not a delivery acknowledgement or playable handle.
+/// Re-adopt with exact source and the receiver's current account session/gate.
+public struct ChapterRetainedHandoff: Sendable, Equatable {
+    public let request: ChapterRenderRequest
+    public let reference: ChapterLocalHandoffReference
+    public let recordedAtIntentRevision: UInt64
+}
+/// Reader-owned durable intent/source pair. This snapshot does not claim work,
+/// acknowledge delivery or authorize an account; worker admission remains separate.
+public struct ChapterStoredSubmission: Sendable, Equatable {
+    public let intent: ChapterDemandIntent
+    public let sourceReference: ChapterLocalSourceReference
+    public let renderPlanReference: ChapterLocalRenderPlanReference?
+}
+/// Live Reader-only optimistic admission. Not a durable intent, epoch grant or
+/// portable Worker authority. Another intent command invalidates this token.
+public struct ChapterDemandAdmission: Sendable {
+    fileprivate let owner, commandStamp: UUID
+    fileprivate let request: ChapterRenderRequest
+    fileprivate let renderKey: String
+    fileprivate let priorIntent: ChapterDemandIntent?
+}
 
 /// Crash-safe local intent journal. It never renders, uploads, claims work or
 /// marks an audio asset ready. A transport must reconcile a pending revision
@@ -25,10 +47,17 @@ public struct ChapterConfirmedDemand: Sendable, Equatable {
 public actor ChapterDemandOutbox {
     public static let maximumEntries = 8192
     public static let maximumJournalBytes = 32 * 1024 * 1024
+    private struct StoredHandoff: Codable, Equatable {
+        let reference: ChapterLocalHandoffReference
+        let recordedAtIntentRevision: UInt64
+    }
     private struct Entry: Codable, Equatable {
         let intent: ChapterDemandIntent
         var pending: Bool
         var serverRevision: String? = nil
+        var handoff: StoredHandoff? = nil
+        var sourceReference: ChapterLocalSourceReference? = nil
+        var renderPlanReference: ChapterLocalRenderPlanReference? = nil
     }
     private struct Journal: Codable {
         let version: Int
@@ -36,7 +65,10 @@ public actor ChapterDemandOutbox {
         let deviceID: UUID
         let entries: [String: Entry]
         let checksum: String
+        var authority: ChapterDurableIntentDescriptor? = nil
     }
+    private struct Loaded { let entries: [String: Entry]; let authority: ChapterDurableIntentDescriptor? }
+    private struct AuthorityChecksum: Encodable { let entries: [String: Entry]; let authority: ChapterDurableIntentDescriptor }
     private final class Ownership: Sendable {
         let directory: Int32
         let lock: Int32
@@ -47,7 +79,14 @@ public actor ChapterDemandOutbox {
     public let deviceID: UUID
     private var ownership: Ownership?
     private var entries: [String: Entry]
+    private let admissionOwner = UUID()
+    private var admissionCommandStamp = UUID()
     private var uncertain = false
+    private var authorityBinding: ChapterDurableIntentDescriptor?
+    private var headWriter: ChapterIntentHeadWriter?
+    private var authorityReady = true
+    private var authorityFaultForTesting: (@Sendable (AuthorityEvent) throws -> Void)?
+    enum AuthorityEvent: Sendable { case afterBlocked, afterJournal, afterArchive, afterReady }
     // Exact crash boundary exercised by tests; no production injection API.
     private var afterRenameForTesting: (@Sendable () throws -> Void)?
 
@@ -57,7 +96,7 @@ public actor ChapterDemandOutbox {
     }
 
     init(directory: URL, accountPartition: String, deviceID: UUID,
-         afterAccountOpenForTesting: (@Sendable () throws -> Void)?) throws {
+         afterAccountOpenForTesting: (@Sendable () throws -> Void)?, authorityDirectory: URL? = nil) throws {
         guard directory.isFileURL, !directory.path.utf8.contains(0), isDigest(accountPartition)
         else { throw ChapterWorkerError.invalidIdentity }
         // The caller supplies an existing app-owned base. All descendants are
@@ -75,26 +114,157 @@ public actor ChapterDemandOutbox {
         var lockInfo = stat()
         guard fstat(lock, &lockInfo) == 0, lockInfo.st_mode & mode_t(S_IFMT) == mode_t(S_IFREG),
               flock(lock, LOCK_EX | LOCK_NB) == 0 else { throw ChapterOutboxError.alreadyOpen }
+        let storedBinding = try ChapterAuthorityBindingFile.read(dir)
+        let writer: ChapterIntentHeadWriter?
+        let loaded: Loaded
+        if let authorityDirectory {
+            if let storedBinding {
+                let candidate = try ChapterIntentHeadWriter(directory: authorityDirectory, partition: accountPartition, device: deviceID, expected: storedBinding)
+                try candidate.block() // Both locks and immutable owner binding verified before touching channel.
+                loaded = try Self.load(directory: dir, partition: accountPartition, deviceID: deviceID, expectedAuthority: storedBinding, requireJournal: true)
+                writer = candidate
+            } else {
+                loaded = try Self.load(directory: dir, partition: accountPartition, deviceID: deviceID)
+                let candidate = try ChapterIntentHeadWriter(directory: authorityDirectory, partition: accountPartition, device: deviceID, expected: nil)
+                try ChapterAuthorityBindingFile.publish(candidate.descriptor, directory: dir)
+                try candidate.block()
+                writer = candidate
+            }
+        } else {
+            guard storedBinding == nil else { throw ChapterDurableAuthorityError.configurationRequired }
+            loaded = try Self.load(directory: dir, partition: accountPartition, deviceID: deviceID)
+            writer = nil
+        }
         self.accountPartition = accountPartition; self.deviceID = deviceID
-        entries = try Self.load(directory: dir, partition: accountPartition, deviceID: deviceID)
+        entries = loaded.entries; authorityBinding = writer?.descriptor; headWriter = writer
+        authorityReady = writer == nil
         ownership = owner
+    }
+
+    /// Explicit Reader-only mode. Keeps V5 and its pinned authority binding even
+    /// for an empty journal; plain/older writers cannot bypass its barrier.
+    public static func openWithDurableAuthority(directory: URL, authorityDirectory: URL,
+                                                accountPartition: String, deviceID: UUID) async throws -> ChapterDemandOutbox {
+        try await openWithDurableAuthority(directory: directory, authorityDirectory: authorityDirectory,
+            accountPartition: accountPartition, deviceID: deviceID, afterRecoveryForTesting: { _ in })
+    }
+    static func openWithDurableAuthority(directory: URL, authorityDirectory: URL,
+                                         accountPartition: String, deviceID: UUID,
+                                         afterRecoveryForTesting: @escaping @Sendable (ChapterDemandOutbox) async throws -> Void) async throws -> ChapterDemandOutbox {
+        try Task.checkCancellation()
+        let value = try ChapterDemandOutbox(directory: directory, accountPartition: accountPartition, deviceID: deviceID,
+            afterAccountOpenForTesting: nil, authorityDirectory: authorityDirectory)
+        do {
+            try await value.recoverAuthority()
+            try await afterRecoveryForTesting(value)
+            try Task.checkCancellation()
+            return value
+        } catch { await value.blockAndCloseAfterFailure(); throw error }
+    }
+    private func blockAndCloseAfterFailure() {
+        uncertain = true
+        try? headWriter?.block(ignoreCancellation: true)
+        close()
+    }
+    private func recoverAuthority() throws {
+        guard let headWriter, authorityBinding != nil else { throw ChapterDurableAuthorityError.configurationRequired }
+        do {
+            try persist(entries) // V5 is durable BEFORE a ready head, including empty initialization.
+            try headWriter.publish(Self.readSets(entries))
+            try Task.checkCancellation()
+            authorityReady = true
+        } catch {
+            uncertain = true
+            try? headWriter.block(ignoreCancellation: true)
+            throw error
+        }
+    }
+    public func durableIntentDescriptor() throws -> ChapterDurableIntentDescriptor {
+        try writable()
+        guard let authorityBinding else { throw ChapterDurableAuthorityError.configurationRequired }
+        return authorityBinding
+    }
+    private static func readSets(_ values: [String: Entry]) throws -> [ChapterIntentReadSet] {
+        try values.sorted(by: { $0.key < $1.key }).compactMap { _, entry in
+            guard entry.intent.wanted, let source = entry.sourceReference, let plan = entry.renderPlanReference else { return nil }
+            return try .init(intent: entry.intent, sourceReference: source, renderPlanReference: plan)
+        }
     }
 
     /// Same wanted value is idempotent, including after acknowledgement. Keep
     /// acknowledged tombstones so future cancel/re-request revisions never reset.
     @discardableResult
     public func setDemand(_ wanted: Bool, for request: ChapterRenderRequest) throws -> ChapterDemandIntent {
+        try setDemandOwned(wanted, request: request, sourceReference: nil)
+    }
+    /// Call only after immutable exact source publication. The pending intent
+    /// and reference commit in one Reader-owned journal snapshot. A crash may
+    /// leave an orphan source publication; source existence alone is never work.
+    @discardableResult
+    public func setDemand(_ wanted: Bool, for request: ChapterRenderRequest,
+                          source: ChapterLocalSourcePublication) throws -> ChapterDemandIntent {
+        try writable(); try Task.checkCancellation()
+        guard source.accountPartition == accountPartition else { throw ChapterWorkerError.accountMismatch }
+        guard try ChapterTextAssetManifest.sourceKey(for: source.source) == ChapterTextAssetManifest.sourceKey(for: request.source)
+        else { throw ChapterWorkerError.invalidIdentity }
+        return try setDemandOwned(wanted, request: request, sourceReference: source.reference)
+    }
+    /// Atomically attaches exact source and portable options to this Reader intent.
+    /// A publication is not a worker claim; current intent must be checked again.
+    @discardableResult
+    public func setDemand(_ wanted: Bool, for request: ChapterRenderRequest,
+                          source: ChapterLocalSourcePublication,
+                          renderPlan: ChapterLocalRenderPlanPublication) throws -> ChapterDemandIntent {
+        try writable(); try Task.checkCancellation()
+        guard source.accountPartition == accountPartition, renderPlan.accountPartition == accountPartition
+        else { throw ChapterWorkerError.accountMismatch }
+        guard try ChapterTextAssetManifest.sourceKey(for: source.source) == ChapterTextAssetManifest.sourceKey(for: request.source),
+              renderPlan.sourceReference == source.reference, renderPlan.renderKey == (try request.renderKey())
+        else { throw ChapterWorkerError.invalidIdentity }
+        return try setDemandOwned(wanted, request: request, sourceReference: source.reference, renderPlanReference: renderPlan.reference)
+    }
+    /// Snapshot before asynchronous source/plan production, including absence.
+    public func observeAdmission(for request: ChapterRenderRequest) throws -> ChapterDemandAdmission {
+        try writable(); try Task.checkCancellation(); try request.validate()
+        guard request.accountPartition == accountPartition else { throw ChapterWorkerError.accountMismatch }
+        let key = try request.renderKey()
+        return .init(owner: admissionOwner, commandStamp: admissionCommandStamp, request: request,
+            renderKey: key, priorIntent: entries[key]?.intent)
+    }
+    /// The current-intent comparison and triple attachment share this actor turn.
+    /// Even an idempotent cancel/re-request invalidates an earlier admission.
+    @discardableResult
+    public func setDemand(_ wanted: Bool, for request: ChapterRenderRequest,
+                          source: ChapterLocalSourcePublication, renderPlan: ChapterLocalRenderPlanPublication,
+                          admission: ChapterDemandAdmission) throws -> ChapterDemandIntent {
+        try writable(); try Task.checkCancellation()
+        guard admission.owner == admissionOwner, admission.commandStamp == admissionCommandStamp,
+              admission.request.accountPartition == request.accountPartition,
+              admission.renderKey == (try request.renderKey()), try entries[request.renderKey()]?.intent == admission.priorIntent
+        else { throw ChapterLocalIntentError.staleIntent }
+        return try setDemand(wanted, for: request, source: source, renderPlan: renderPlan)
+    }
+    private func setDemandOwned(_ wanted: Bool, request: ChapterRenderRequest,
+                                sourceReference: ChapterLocalSourceReference?,
+                                renderPlanReference: ChapterLocalRenderPlanReference? = nil) throws -> ChapterDemandIntent {
         try writable(); try Task.checkCancellation(); try request.validate()
         guard request.accountPartition == accountPartition else { throw ChapterWorkerError.accountMismatch }
         guard request.recipe.watermarkRevision == "disabled-1" else { throw ChapterOutboxError.unsupportedPolicy }
+        // A fixed-size live command fence, deliberately conservative across
+        // chapters. Do not let an idempotent cancel disappear during publication.
+        admissionCommandStamp = UUID()
         let key = try request.renderKey()
-        if let old = entries[key], old.intent.wanted == wanted { return old.intent }
+        let nextSource = sourceReference ?? entries[key]?.sourceReference
+        let nextPlan = renderPlanReference ?? entries[key]?.renderPlanReference
+        if let old = entries[key], old.intent.wanted == wanted, old.sourceReference == nextSource, old.renderPlanReference == nextPlan { return old.intent }
         guard entries[key] != nil || entries.count < Self.maximumEntries,
               (entries[key]?.intent.revision ?? 0) < .max else { throw ChapterOutboxError.budgetExceeded }
         let intent = ChapterDemandIntent(request: request, deviceID: deviceID,
             revision: (entries[key]?.intent.revision ?? 0) + 1, wanted: wanted)
-        var next = entries; next[key] = Entry(intent: intent, pending: true)
-        try persist(next); entries = next; return intent
+        // Completed encoded assets survive cancellation/re-request. This is
+        // independent of the new intent's pending/server confirmation state.
+        var next = entries; next[key] = Entry(intent: intent, pending: true, handoff: entries[key]?.handoff, sourceReference: nextSource, renderPlanReference: nextPlan)
+        try persist(next, intentMutation: true); entries = next; return intent
     }
 
     public func pending() throws -> [ChapterDemandIntent] {
@@ -141,13 +311,93 @@ public actor ChapterDemandOutbox {
         return .init(intent: entry.intent, serverRevision: try .init(opaqueValue: version))
     }
 
-    public func close() { ownership = nil }
+    /// Remember only for the exact current wanted intent. A late producer
+    /// callback cannot overwrite a newer cancellation/re-request. This never
+    /// clears pending demand, supplies serverRevision or asserts availability.
+    @discardableResult
+    public func rememberHandoff(_ reference: ChapterLocalHandoffReference, for intent: ChapterDemandIntent) throws -> Bool {
+        try writable(); try Task.checkCancellation()
+        guard intent.deviceID == deviceID, intent.request.accountPartition == accountPartition else { throw ChapterWorkerError.accountMismatch }
+        let key = try intent.request.renderKey()
+        guard var old = entries[key], old.intent == intent, intent.wanted else { return false }
+        let stored = StoredHandoff(reference: reference, recordedAtIntentRevision: intent.revision)
+        if old.handoff == stored { return true }
+        old.handoff = stored
+        var next = entries; next[key] = old
+        try persist(next); entries = next
+        return true
+    }
+
+    /// Reader-only acceptance AFTER actual complete audio receive/adoption. The
+    /// exact wanted revision and retained handoff update share this journal actor;
+    /// an observation from the Worker is never a substitute for this comparison.
+    public func acceptVerifiedHandoff(_ artifact: ChapterLocalArtifact, submission: ChapterSubmission,
+                                      readSet: ChapterIntentReadSet, gate: ChapterAccountSessionGate) async throws -> ChapterReaderArtifactAcceptance {
+        try await acceptVerifiedHandoff(artifact, submission: submission, readSet: readSet, gate: gate, afterCommitForTesting: {})
+    }
+    func acceptVerifiedHandoff(_ artifact: ChapterLocalArtifact, submission: ChapterSubmission,
+                               readSet: ChapterIntentReadSet, gate: ChapterAccountSessionGate,
+                               afterCommitForTesting: @escaping @Sendable () async throws -> Void) async throws -> ChapterReaderArtifactAcceptance {
+        try writable(); try Task.checkCancellation()
+        try await gate.validate(submission.session); try Task.checkCancellation()
+        guard submission.session.accountPartition == accountPartition,
+              try submission.request.renderKey() == readSet.intent.request.renderKey(),
+              try ChapterLocalSource.contentReference(for: submission) == readSet.sourceReference else { throw ChapterWorkerError.accountMismatch }
+        let reference = try ChapterLocalHandoff.contentReference(for: artifact, submission: submission)
+        guard try validateCurrent(readSet) else { throw ChapterLocalIntentError.staleIntent }
+        // No await between current-intent comparison and the atomic journal save.
+        guard try rememberHandoff(reference, for: readSet.intent) else { throw ChapterLocalIntentError.staleIntent }
+        try await afterCommitForTesting()
+        try await gate.validate(submission.session); try Task.checkCancellation()
+        guard try validateCurrent(readSet) else { throw ChapterLocalIntentError.staleIntent }
+        return .init(artifact: artifact, readSet: readSet, reference: reference)
+    }
+
+    /// Retained independently of current wanted/pending state; completed audio
+    /// is not deleted on cancel. The original intent revision remains explicit.
+    /// A missing/corrupt publication still fails verified receiver adoption.
+    public func retainedHandoff(for request: ChapterRenderRequest) throws -> ChapterRetainedHandoff? {
+        try writable(); try Task.checkCancellation(); try request.validate()
+        guard request.accountPartition == accountPartition else { throw ChapterWorkerError.accountMismatch }
+        guard let entry = entries[try request.renderKey()], let handoff = entry.handoff else { return nil }
+        guard entry.intent.request == request else { throw ChapterOutboxError.corrupt }
+        return .init(request: request, reference: handoff.reference, recordedAtIntentRevision: handoff.recordedAtIntentRevision)
+    }
+    public func storedSubmission(for request: ChapterRenderRequest) throws -> ChapterStoredSubmission? {
+        try writable(); try Task.checkCancellation(); try request.validate()
+        guard request.accountPartition == accountPartition else { throw ChapterWorkerError.accountMismatch }
+        guard let entry = entries[try request.renderKey()], let source = entry.sourceReference else { return nil }
+        guard entry.intent.request == request else { throw ChapterOutboxError.corrupt }
+        return .init(intent: entry.intent, sourceReference: source, renderPlanReference: entry.renderPlanReference)
+    }
+
+    /// Reader-owned atomic read of the exact wanted intent plus both durable
+    /// references. Legacy/incomplete/cancelled entries are not render work.
+    public func wantedReadSet(for request: ChapterRenderRequest) throws -> ChapterIntentReadSet? {
+        try writable(); try Task.checkCancellation(); try request.validate()
+        guard request.accountPartition == accountPartition else { throw ChapterWorkerError.accountMismatch }
+        guard let entry = entries[try request.renderKey()], entry.intent.wanted,
+              let source = entry.sourceReference, let plan = entry.renderPlanReference else { return nil }
+        return try .init(intent: entry.intent, sourceReference: source, renderPlanReference: plan)
+    }
+    /// Call in the Reader owner; remote Worker access uses only authenticated
+    /// read-only authority messages, never opening this mutable journal itself.
+    public func validateCurrent(_ readSet: ChapterIntentReadSet) throws -> Bool {
+        try writable(); try Task.checkCancellation()
+        guard readSet.intent.deviceID == deviceID, readSet.intent.request.accountPartition == accountPartition
+        else { throw ChapterWorkerError.accountMismatch }
+        return try wantedReadSet(for: readSet.intent.request) == readSet
+    }
+
+    public func close() { headWriter = nil; ownership = nil }
+    func failAuthorityForTesting(_ callback: (@Sendable (AuthorityEvent) throws -> Void)?) { authorityFaultForTesting = callback }
     func failAfterNextRenameForTesting() { afterRenameForTesting = { throw ChapterOutboxError.storage } }
     func cancelAfterNextRenameForTesting() { afterRenameForTesting = { withUnsafeCurrentTask { $0?.cancel() } } }
 
     private func writable() throws {
         guard ownership != nil else { throw ChapterOutboxError.closed }
         guard !uncertain else { throw ChapterOutboxError.ambiguousWrite }
+        guard authorityReady else { throw ChapterDurableAuthorityError.configurationRequired }
     }
     private static func childDirectory(parent: Int32, name: String) throws -> Int32 {
         if mkdirat(parent, name, mode_t(0o700)) != 0, errno != EEXIST { throw ChapterOutboxError.storage }
@@ -162,11 +412,13 @@ public actor ChapterDemandOutbox {
     }
     private static func digest(_ data: Data) -> String { SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined() }
 
-    private static func load(directory: Int32, partition: String, deviceID: UUID) throws -> [String: Entry] {
+    private static func load(directory: Int32, partition: String, deviceID: UUID,
+                             expectedAuthority: ChapterDurableIntentDescriptor? = nil, requireJournal: Bool = false) throws -> Loaded {
         let descriptor = openat(directory, "journal.json", O_RDONLY | O_NOFOLLOW | O_CLOEXEC | O_NONBLOCK)
         if descriptor < 0 {
             guard errno == ENOENT else { throw ChapterOutboxError.corrupt }
-            return [:]
+            guard !requireJournal else { throw ChapterOutboxError.corrupt }
+            return .init(entries: [:], authority: nil)
         }
         let file = FileHandle(fileDescriptor: descriptor, closeOnDealloc: true); defer { try? file.close() }
         var info = stat()
@@ -177,8 +429,14 @@ public actor ChapterDemandOutbox {
         let journal: Journal
         do { journal = try JSONDecoder().decode(Journal.self, from: bytes) }
         catch { throw ChapterOutboxError.corrupt }
-        guard journal.version == 1, journal.partition == partition, journal.deviceID == deviceID,
-              journal.entries.count <= maximumEntries, digest(try encoded(journal.entries)) == journal.checksum
+        // Once the immutable mode binding exists, recovery never treats an
+        // older/downgraded journal as a fresh activation. Preserve uncertainty.
+        guard !requireJournal || journal.authority == expectedAuthority else { throw ChapterOutboxError.corrupt }
+        if journal.authority != nil, expectedAuthority == nil { throw ChapterDurableAuthorityError.configurationRequired }
+        guard journal.authority == nil || journal.authority == expectedAuthority else { throw ChapterOutboxError.corrupt }
+        let expectedVersion = journal.authority == nil ? Self.version(journal.entries) : 5
+        guard journal.version == expectedVersion, journal.partition == partition, journal.deviceID == deviceID,
+              journal.entries.count <= maximumEntries, try checksum(journal.entries, authority: journal.authority) == journal.checksum
         else { throw ChapterOutboxError.corrupt }
         for (key, entry) in journal.entries {
             guard entry.intent.revision > 0, entry.intent.deviceID == deviceID,
@@ -190,15 +448,45 @@ public actor ChapterDemandOutbox {
                 do { _ = try ChapterServerRevision(opaqueValue: version) }
                 catch { throw ChapterOutboxError.corrupt }
             }
+            if entry.renderPlanReference != nil, entry.sourceReference == nil { throw ChapterOutboxError.corrupt }
+            if let handoff = entry.handoff {
+                guard handoff.recordedAtIntentRevision > 0, handoff.recordedAtIntentRevision <= entry.intent.revision
+                else { throw ChapterOutboxError.corrupt }
+            }
         }
-        return journal.entries
+        return .init(entries: journal.entries, authority: journal.authority)
     }
 
-    private func persist(_ next: [String: Entry]) throws {
+    private static func checksum(_ entries: [String: Entry], authority: ChapterDurableIntentDescriptor?) throws -> String {
+        if let authority { return digest(try encoded(AuthorityChecksum(entries: entries, authority: authority))) }
+        return digest(try encoded(entries))
+    }
+    private func persist(_ next: [String: Entry], intentMutation: Bool = false) throws {
         guard let ownership else { throw ChapterOutboxError.closed }
-        let data = try Self.encoded(Journal(version: 1, partition: accountPartition, deviceID: deviceID,
-                                           entries: next, checksum: Self.digest(try Self.encoded(next))))
+        let data = try Self.encoded(Journal(version: authorityBinding == nil ? Self.version(next) : 5, partition: accountPartition, deviceID: deviceID,
+                                           entries: next, checksum: Self.checksum(next, authority: authorityBinding), authority: authorityBinding))
         guard data.count <= Self.maximumJournalBytes else { throw ChapterOutboxError.budgetExceeded }
+        if intentMutation, let headWriter {
+            do {
+                try headWriter.block()
+                try authorityFaultForTesting?(.afterBlocked)
+                try saveJournal(data, ownership: ownership)
+                try authorityFaultForTesting?(.afterJournal)
+                try headWriter.publish(Self.readSets(next)) { try authorityFaultForTesting?(.afterArchive) }
+                try authorityFaultForTesting?(.afterReady)
+                try Task.checkCancellation()
+                return
+            } catch {
+                uncertain = true
+                // Failure cleanup ignores task cancellation. If the OS refuses
+                // this write, retain ambiguous evidence; never restore old ready.
+                try? headWriter.block(ignoreCancellation: true)
+                throw ChapterOutboxError.ambiguousWrite
+            }
+        }
+        try saveJournal(data, ownership: ownership)
+    }
+    private func saveJournal(_ data: Data, ownership: Ownership) throws {
         let name = ".pending-" + UUID().uuidString
         let fd = openat(ownership.directory, name, O_WRONLY | O_CREAT | O_EXCL | O_NOFOLLOW | O_CLOEXEC, mode_t(0o600))
         guard fd >= 0 else { throw ChapterOutboxError.storage }
@@ -217,5 +505,12 @@ public actor ChapterDemandOutbox {
             // stale memory: close/reopen and reconcile the journal first.
             uncertain = true; throw ChapterOutboxError.ambiguousWrite
         }
+    }
+    private static func version(_ entries: [String: Entry]) -> Int {
+        // Existing encodings/checksums remain unchanged until a new field is
+        // actually stored. Older writers must fail closed instead of stripping it.
+        if entries.values.contains(where: { $0.renderPlanReference != nil }) { return 4 }
+        if entries.values.contains(where: { $0.sourceReference != nil }) { return 3 }
+        return entries.values.contains(where: { $0.handoff != nil }) ? 2 : 1
     }
 }

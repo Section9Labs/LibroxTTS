@@ -53,8 +53,34 @@ public actor ChatterboxBookSession {
                        performanceDirections: ChatterboxPerformanceDirections? = nil, characterVoices: [String: String] = [:],
                        preparation: Preparation = .playbackLookahead,
                        receive: @escaping @Sendable (ChatterboxPreparedPassage) async throws -> Void) async throws {
+        try await streamScoped(source, language: language, narratorID: narratorID, conditioningFiles: conditioningFiles,
+            conditioningSHA256: conditioningSHA256, direction: direction, grouping: grouping, seed: seed,
+            reviewedDialogue: reviewedDialogue, performanceDirections: performanceDirections, characterVoices: characterVoices,
+            preparation: preparation, scope: .excerpt, receive: receive)
+    }
+    /// Finite complete-chapter stream within explicit chapter bounds. Planning
+    /// sees the entire exact source; cadence and global indices never reset at
+    /// the library's bounded three-unit synthesis windows. Caller owns output.
+    public func streamChapter(_ source: String, language: String, narratorID: String,
+        conditioningFiles: [String: URL], conditioningSHA256: [String: String]? = nil,
+        direction: ChatterboxBookDirector.Direction = .storyteller,
+        grouping: ChatterboxBookDirector.Grouping = .compatibleNarration(maxCharacters: 160), seed: UInt64? = nil,
+        reviewedDialogue: [DialogueAnnotation]? = nil, performanceDirections: ChatterboxPerformanceDirections? = nil,
+        characterVoices: [String: String] = [:],
+        receive: @escaping @Sendable (ChatterboxPreparedPassage) async throws -> Void) async throws {
+        try await streamScoped(source, language: language, narratorID: narratorID, conditioningFiles: conditioningFiles,
+            conditioningSHA256: conditioningSHA256, direction: direction, grouping: grouping, seed: seed,
+            reviewedDialogue: reviewedDialogue, performanceDirections: performanceDirections, characterVoices: characterVoices,
+            preparation: .finiteExcerpt, scope: .chapterV1, receive: receive)
+    }
+    private func streamScoped(_ source: String, language: String, narratorID: String,
+        conditioningFiles: [String: URL], conditioningSHA256: [String: String]?,
+        direction: ChatterboxBookDirector.Direction, grouping: ChatterboxBookDirector.Grouping, seed: UInt64?,
+        reviewedDialogue: [DialogueAnnotation]?, performanceDirections: ChatterboxPerformanceDirections?,
+        characterVoices: [String: String], preparation: Preparation, scope: ChatterboxNarrationScope,
+        receive: @escaping @Sendable (ChatterboxPreparedPassage) async throws -> Void) async throws {
         guard !occupied else { throw ChatterboxNarrationError.busy }
-        guard source.utf8.count <= 32_768 else { throw ChatterboxNarrationError.textTooLong }
+        try scope.validate(source)
         occupied = true
         let generation = UUID()
         generationID = generation; completedPlayback = -1; highestPublished = -1
@@ -72,7 +98,7 @@ public actor ChatterboxBookSession {
         try Task.checkCancellation()
         let originalUnits = try ChatterboxBookDirector.plan(source, language: language, narratorID: narratorID,
             conditioningFiles: conditioningFiles, direction: direction, grouping: grouping,
-            reviewedDialogue: reviewedDialogue, performanceDirections: performanceDirections, characterVoices: characterVoices, seed: seed)
+            reviewedDialogue: reviewedDialogue, performanceDirections: performanceDirections, characterVoices: characterVoices, seed: seed, scope: scope)
         var hashes: [String: String] = [:]
         var frozenFiles: [String: URL] = [:]
         for id in Set(originalUnits.compactMap { $0.request.sourceContext?.voiceID }) {
@@ -100,7 +126,7 @@ public actor ChatterboxBookSession {
             return .init(request: request, timingContext: unit.timingContext, performance: unit.performance,
                          sourceFragments: unit.sourceFragments)
         }
-        let profile = rendererProfile + ":" + ChatterboxBookDirector.revision + ":" + grouping.cacheRevision
+        let profile = rendererProfile + ":" + ChatterboxBookDirector.revision + ":" + grouping.cacheRevision + scope.cacheSuffix
         var base = 0
         while base < units.count {
             try Task.checkCancellation()

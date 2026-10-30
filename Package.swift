@@ -19,6 +19,8 @@ let package = Package(
         .library(name: "LibroxChatterbox", targets: ["LibroxChatterbox"]),
         .library(name: "LibroxChatterboxUI", targets: ["LibroxChatterboxUI"]),
         .library(name: "LibroxChatterboxMLX", targets: ["LibroxChatterboxMLX"]),
+        .library(name: "LibroxChatterboxMac", targets: ["LibroxChatterboxMac"]),
+        .library(name: "LibroxChatterboxPlanning", targets: ["LibroxChatterboxPlanning"]),
         .executable(name: "librox-chatterbox-probe", targets: ["ChatterboxProbe"]),
         .executable(name: "librox-chatterbox-voices", targets: ["ChatterboxVoices"]),
         .executable(name: "librox-chatterbox-mlx-probe", targets: ["ChatterboxMLXProbe"]),
@@ -43,7 +45,7 @@ let package = Package(
     targets: [
         .target(name: "LibroxChapterWorker"),
         .testTarget(name: "LibroxChapterWorkerTests", dependencies: ["LibroxChapterWorker"]),
-        // Offline Mac-only acoustic inventory. This is not a rendering backend.
+        // Shared native Mac acoustic implementation and offline audit utilities.
         .target(name: "ChatterboxMacAcousticAudit", dependencies: [
             "ChatterboxCoreML",
             .product(name: "MLX", package: "mlx-swift"),
@@ -57,6 +59,12 @@ let package = Package(
             path: "Integrations/ChatterboxMac/Sources/ChatterboxMacNarrationProbe"),
         .testTarget(name: "ChatterboxMacAcousticAuditTests", dependencies: ["ChatterboxMacAcousticAudit"],
             path: "Integrations/ChatterboxMac/Tests/ChatterboxMacAcousticAuditTests", resources: [.copy("Fixtures")]),
+        .target(name: "LibroxChatterboxPlanning", dependencies: ["LibroxChatterbox", "LibroxChapterWorker", "KokoroNarration"],
+            path: "Integrations/ChatterboxPlanning/Sources/LibroxChatterboxPlanning"),
+        .target(name: "LibroxChatterboxMac", dependencies: ["LibroxChatterboxPlanning", "ChatterboxMacAcousticAudit", "LibroxChatterboxMLX", "LibroxChatterbox", "LibroxChapterWorker", "ChatterboxCoreML", "KokoroNarration"],
+            path: "Integrations/ChatterboxMac/Sources/LibroxChatterboxMac"),
+        .testTarget(name: "LibroxChatterboxMacTests", dependencies: ["LibroxChatterboxMac", "LibroxChatterbox", "ChatterboxCoreML"],
+            path: "Integrations/ChatterboxMac/Tests/LibroxChatterboxMacTests"),
         // Vendored for a Mac Catalyst availability fix; see its PROVENANCE.md.
         .target(name: "Safetensors", path: "Integrations/Chatterbox/Vendor/swift-safetensors/Sources/Safetensors"),
         .target(name: "ChatterboxExceptionTrap", path: "Integrations/Chatterbox/Vendor/ChatterboxCoreML/Sources/ChatterboxExceptionTrap"),

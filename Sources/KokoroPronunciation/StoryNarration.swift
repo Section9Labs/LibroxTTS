@@ -32,10 +32,29 @@ public struct StoryNarrator: Sendable {
 
     public func plan(_ text: String, narratorVoiceID: String, characterVoices: [String: String] = [:],
                      dialogue: [DialogueAnnotation] = [], mode: Mode = .singleNarrator) throws -> [StoryReadingSpan] {
-        guard text.unicodeScalars.count <= PronunciationEngine.maximumInputScalars else {
-            throw PronunciationError.inputTooLong(limit: PronunciationEngine.maximumInputScalars)
+        try boundedPlan(text, narratorVoiceID: narratorVoiceID, characterVoices: characterVoices,
+            dialogue: dialogue, mode: mode, maximumScalars: PronunciationEngine.maximumInputScalars, maximumAnnotations: 256)
+    }
+    public static let chapterMaximumUTF16 = 131_072
+    public static let chapterMaximumUTF8Bytes = 393_216
+    /// Metadata-only chapter admission. Does not enlarge phonemizer input guards.
+    public func planChapter(_ text: String, narratorVoiceID: String, characterVoices: [String: String] = [:],
+                            dialogue: [DialogueAnnotation] = [], mode: Mode = .singleNarrator) throws -> [StoryReadingSpan] {
+        try Self.validateChapter(text)
+        return try boundedPlan(text, narratorVoiceID: narratorVoiceID, characterVoices: characterVoices,
+            dialogue: dialogue, mode: mode, maximumScalars: Self.chapterMaximumUTF16, maximumAnnotations: 4096)
+    }
+    private static func validateChapter(_ text: String) throws {
+        guard text.utf16.count <= chapterMaximumUTF16, text.utf8.count <= chapterMaximumUTF8Bytes else {
+            throw PronunciationError.inputTooLong(limit: chapterMaximumUTF16)
         }
-        guard dialogue.count <= 256 else { throw PlanningError.tooManyAnnotations }
+    }
+    private func boundedPlan(_ text: String, narratorVoiceID: String, characterVoices: [String: String],
+        dialogue: [DialogueAnnotation], mode: Mode, maximumScalars: Int, maximumAnnotations: Int) throws -> [StoryReadingSpan] {
+        guard text.unicodeScalars.count <= maximumScalars else {
+            throw PronunciationError.inputTooLong(limit: maximumScalars)
+        }
+        guard dialogue.count <= maximumAnnotations else { throw PlanningError.tooManyAnnotations }
         guard !narratorVoiceID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
               characterVoices.count <= 64,
               characterVoices.allSatisfy({ !$0.key.isEmpty && !$0.value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }) else {
@@ -72,8 +91,15 @@ public struct StoryNarrator: Sendable {
     /// are not reliably distinguishable here. No identity or alternation inference.
     /// Unsupported or unmatched quotation styles remain ordinary narration.
     public func quotedCandidates(in text: String) throws -> [DialogueAnnotation] {
-        guard text.unicodeScalars.count <= PronunciationEngine.maximumInputScalars else {
-            throw PronunciationError.inputTooLong(limit: PronunciationEngine.maximumInputScalars)
+        try boundedQuotedCandidates(in: text, maximumScalars: PronunciationEngine.maximumInputScalars, maximumAnnotations: 256)
+    }
+    public func quotedChapterCandidates(in text: String) throws -> [DialogueAnnotation] {
+        try Self.validateChapter(text)
+        return try boundedQuotedCandidates(in: text, maximumScalars: Self.chapterMaximumUTF16, maximumAnnotations: 4096)
+    }
+    private func boundedQuotedCandidates(in text: String, maximumScalars: Int, maximumAnnotations: Int) throws -> [DialogueAnnotation] {
+        guard text.unicodeScalars.count <= maximumScalars else {
+            throw PronunciationError.inputTooLong(limit: maximumScalars)
         }
         let pairs: [Character: Character] = ["«": "»", "“": "”", "\"": "\""]
         var opener: String.Index?
@@ -86,7 +112,7 @@ public struct StoryNarrator: Sendable {
                 if !nested {
                     let range = NSRange(start..<text.index(after: index), in: text)
                     result.append(.init(offset: range.location, length: range.length))
-                    guard result.count <= 256 else { throw PlanningError.tooManyAnnotations }
+                    guard result.count <= maximumAnnotations else { throw PlanningError.tooManyAnnotations }
                 }
                 opener = nil; closing = nil; nested = false
             } else if opener == nil, let end = pairs[char] {

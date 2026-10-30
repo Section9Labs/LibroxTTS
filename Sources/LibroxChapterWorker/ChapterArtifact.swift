@@ -87,6 +87,37 @@ public struct ChapterArtifactManifest: Codable, Sendable, Equatable {
         }
     }
 
+    /// Explicit complete-chapter admission, preserving the older range-only API.
+    /// First local chapter scope is bounded to131072UTF16. Only whitespace and
+    /// attachment placeholders may occupy unspoken gaps; graphemes never split.
+    public func validateCompleteSourceMap(text: String, for request: ChapterRenderRequest) throws {
+        guard request.source.utf16Length <= 131072, text.utf16.count <= 131072 else { throw ChapterWorkerError.invalidManifest }
+        try validateSourceMap(text: text, for: request)
+        let source = text as NSString
+        let boundaries = Set(text.indices).union([text.endIndex])
+        func ignored(_ start: Int, _ end: Int) -> Bool {
+            source.substring(with: NSRange(location: start, length: end - start))
+                .allSatisfy { $0.isWhitespace || $0 == "\u{FFFC}" }
+        }
+        var end = 0
+        for unit in units {
+            for part in [unit.source] + unit.fragments {
+                guard let range = Range(NSRange(location: part.offset, length: part.length), in: text),
+                      boundaries.contains(range.lowerBound), boundaries.contains(range.upperBound)
+                else { throw ChapterWorkerError.invalidManifest }
+            }
+            guard ignored(end, unit.source.offset) else { throw ChapterWorkerError.invalidManifest }
+            var fragmentEnd = unit.source.offset
+            for fragment in unit.fragments {
+                guard ignored(fragmentEnd, fragment.offset) else { throw ChapterWorkerError.invalidManifest }
+                fragmentEnd = fragment.offset + fragment.length
+            }
+            end = unit.source.offset + unit.source.length
+            guard ignored(fragmentEnd, end) else { throw ChapterWorkerError.invalidManifest }
+        }
+        guard ignored(end, source.length) else { throw ChapterWorkerError.invalidManifest }
+    }
+
     /// Streaming bounded byte verification. A codec adapter must ALSO decode and
     /// validate format, frame count, finite samples, peak policy and watermark.
     /// Passing this method alone never makes a chapter playable.

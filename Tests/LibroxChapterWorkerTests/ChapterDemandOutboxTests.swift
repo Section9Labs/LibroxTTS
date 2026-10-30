@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+import CryptoKit
 @testable import LibroxChapterWorker
 
 private let outboxPartition = String(repeating: "a", count: 64)
@@ -166,4 +167,104 @@ private func outboxDirectory() throws -> URL {
     #expect(try await !store.confirm(first, serverRevision: version))
     #expect(try await store.pending() == [cancelled])
     await store.close()
+}
+
+@Test func outboxRetainsHandoffAcrossReopenWithoutAcknowledgingDemand() async throws {
+    let root = try outboxDirectory(), device = UUID(), request = try outboxRequest()
+    defer { try? FileManager.default.removeItem(at: root) }
+    let store = try ChapterDemandOutbox(directory: root, accountPartition: outboxPartition, deviceID: device)
+    let wanted = try await store.setDemand(true, for: request)
+    let reference = try ChapterLocalHandoffReference(identifier: String(repeating: "7", count: 64))
+    #expect(try await store.rememberHandoff(reference, for: wanted))
+    #expect(try await store.pending() == [wanted])
+    #expect(try await store.confirmation(for: request) == nil)
+    await store.close()
+    let reopened = try ChapterDemandOutbox(directory: root, accountPartition: outboxPartition, deviceID: device)
+    let saved = try await #require(reopened.retainedHandoff(for: request))
+    #expect(saved.reference == reference && saved.recordedAtIntentRevision == 1 && saved.request == request)
+    #expect(try await reopened.pending() == [wanted])
+    let file = root.appendingPathComponent(outboxPartition).appendingPathComponent(device.uuidString.lowercased()).appendingPathComponent("journal.json")
+    let json = try #require(JSONSerialization.jsonObject(with: Data(contentsOf: file)) as? [String: Any])
+    #expect((json["version"] as? Int) == 2)
+    await reopened.close()
+}
+
+@Test func outboxCancellationPreservesReferenceAndRejectsLateReplacement() async throws {
+    let root = try outboxDirectory(), device = UUID(), request = try outboxRequest()
+    defer { try? FileManager.default.removeItem(at: root) }
+    let store = try ChapterDemandOutbox(directory: root, accountPartition: outboxPartition, deviceID: device)
+    let first = try await store.setDemand(true, for: request)
+    let a = try ChapterLocalHandoffReference(identifier: String(repeating: "7", count: 64))
+    let b = try ChapterLocalHandoffReference(identifier: String(repeating: "8", count: 64))
+    #expect(try await store.rememberHandoff(a, for: first))
+    let cancelled = try await store.setDemand(false, for: request)
+    #expect(try await !store.rememberHandoff(b, for: first))
+    #expect(try await !store.rememberHandoff(b, for: cancelled))
+    let old = try await #require(store.retainedHandoff(for: request))
+    #expect(old.reference == a && old.recordedAtIntentRevision == first.revision)
+    #expect(try await store.pending() == [cancelled])
+    let again = try await store.setDemand(true, for: request)
+    #expect(try await store.retainedHandoff(for: request)?.reference == a)
+    #expect(try await store.rememberHandoff(b, for: again))
+    let new = try await #require(store.retainedHandoff(for: request))
+    #expect(new.reference == b && new.recordedAtIntentRevision == again.revision)
+    #expect(try await store.pending() == [again])
+    #expect(try await store.confirmation(for: request) == nil)
+    await store.close()
+}
+
+@Test func outboxReopensAmbiguousReferenceWriteWithoutDiscardingIt() async throws {
+    let root = try outboxDirectory(), device = UUID(), request = try outboxRequest()
+    defer { try? FileManager.default.removeItem(at: root) }
+    let store = try ChapterDemandOutbox(directory: root, accountPartition: outboxPartition, deviceID: device)
+    let intent = try await store.setDemand(true, for: request)
+    let reference = try ChapterLocalHandoffReference(identifier: String(repeating: "7", count: 64))
+    await store.failAfterNextRenameForTesting()
+    await #expect(throws: ChapterOutboxError.ambiguousWrite) { try await store.rememberHandoff(reference, for: intent) }
+    await #expect(throws: ChapterOutboxError.ambiguousWrite) { try await store.retainedHandoff(for: request) }
+    await store.close()
+    let reopened = try ChapterDemandOutbox(directory: root, accountPartition: outboxPartition, deviceID: device)
+    #expect(try await reopened.retainedHandoff(for: request)?.reference == reference)
+    #expect(try await reopened.pending() == [intent])
+    await reopened.close()
+}
+
+@Test func outboxReferenceIsScopedToItsAccountDeviceAndCurrentIntent() async throws {
+    let root = try outboxDirectory(), device = UUID(), request = try outboxRequest()
+    defer { try? FileManager.default.removeItem(at: root) }
+    let first = try ChapterDemandOutbox(directory: root, accountPartition: outboxPartition, deviceID: device)
+    let other = try ChapterDemandOutbox(directory: root, accountPartition: outboxPartition, deviceID: UUID())
+    let intent = try await first.setDemand(true, for: request)
+    let reference = try ChapterLocalHandoffReference(identifier: String(repeating: "7", count: 64))
+    await #expect(throws: ChapterWorkerError.accountMismatch) { try await other.rememberHandoff(reference, for: intent) }
+    await #expect(throws: ChapterWorkerError.accountMismatch) { try await first.retainedHandoff(for: outboxRequest(partition: String(repeating: "1", count: 64))) }
+    #expect(try await other.retainedHandoff(for: request) == nil)
+    await first.close(); await other.close()
+}
+
+@Test func outboxRejectsStructurallyInvalidReferenceEvenWithRecomputedChecksum() async throws {
+    for revision in [0, 2] {
+        let root = try outboxDirectory(), device = UUID(), request = try outboxRequest()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let store = try ChapterDemandOutbox(directory: root, accountPartition: outboxPartition, deviceID: device)
+        let intent = try await store.setDemand(true, for: request)
+        #expect(try await store.rememberHandoff(.init(identifier: String(repeating: "7", count: 64)), for: intent))
+        await store.close()
+        let path = root.appendingPathComponent(outboxPartition).appendingPathComponent(device.uuidString.lowercased()).appendingPathComponent("journal.json")
+        var value = try #require(JSONSerialization.jsonObject(with: Data(contentsOf: path)) as? [String: Any])
+        var entries = try #require(value["entries"] as? [String: [String: Any]])
+        // Establish that the independent JSON encoder agrees on this valid
+        // snapshot, so the later rejection tests structure, not a bad checksum.
+        let originalChecksum = SHA256.hash(data: try JSONSerialization.data(withJSONObject: entries, options: [.sortedKeys, .withoutEscapingSlashes]))
+            .map { String(format: "%02x", $0) }.joined()
+        #expect((value["checksum"] as? String) == originalChecksum)
+        let key = try request.renderKey(); var entry = try #require(entries[key])
+        var handoff = try #require(entry["handoff"] as? [String: Any]); handoff["recordedAtIntentRevision"] = revision
+        entry["handoff"] = handoff; entries[key] = entry; value["entries"] = entries
+        value["checksum"] = SHA256.hash(data: try JSONSerialization.data(withJSONObject: entries, options: [.sortedKeys, .withoutEscapingSlashes]))
+            .map { String(format: "%02x", $0) }.joined()
+        let corrupted = try JSONSerialization.data(withJSONObject: value, options: [.sortedKeys, .withoutEscapingSlashes]); try corrupted.write(to: path)
+        #expect(throws: ChapterOutboxError.corrupt) { try ChapterDemandOutbox(directory: root, accountPartition: outboxPartition, deviceID: device) }
+        #expect(try Data(contentsOf: path) == corrupted)
+    }
 }

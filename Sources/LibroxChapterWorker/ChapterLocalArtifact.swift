@@ -115,13 +115,17 @@ public final class ChapterLocalArtifact: Sendable {
         defer { try? output.close() }
         var hash = SHA256(), copied: Int64 = 0
         while true {
+            let done = try autoreleasepool {
             try Task.checkCancellation()
             let part = try input.read(upToCount: 65_536) ?? Data()
-            if part.isEmpty { break }
+            if part.isEmpty { return true }
             guard Int64(part.count) <= manifest.audioByteCount - copied else { throw ChapterLocalArtifactError.invalidFile }
             hash.update(data: part)
             try output.write(contentsOf: part)
             copied += Int64(part.count)
+            return false
+            }
+            if done { break }
         }
         guard copied == manifest.audioByteCount,
               hash.finalize().map({ String(format: "%02x", $0) }).joined() == manifest.audioSHA256
@@ -165,6 +169,7 @@ public final class ChapterLocalArtifact: Sendable {
         else { throw ChapterLocalArtifactError.budgetExceeded }
         var frames: Int64 = 0, peak: Float = 0
         while frames < expectedFrames {
+            try autoreleasepool {
             try Task.checkCancellation()
             let requested = AVAudioFrameCount(min(Int64(decodeChunkFrames), expectedFrames - frames))
             try audio.read(into: buffer, frameCount: requested)
@@ -177,6 +182,7 @@ public final class ChapterLocalArtifact: Sendable {
                 peak = max(peak, abs(sample))
             }
             frames += count
+            }
         }
         // AVAudioFile may throw an opaque error on an extra read past EOF.
         // All declared frames were actually decoded; require exact final position.

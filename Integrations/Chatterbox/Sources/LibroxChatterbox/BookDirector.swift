@@ -35,8 +35,11 @@ public enum ChatterboxBookDirector {
                             grouping: Grouping = .sentences,
                             reviewedDialogue: [DialogueAnnotation]? = nil,
                             performanceDirections: ChatterboxPerformanceDirections? = nil,
-                            characterVoices: [String: String] = [:], seed: UInt64? = nil) throws -> [ChatterboxDirectedUnit] {
+                            characterVoices: [String: String] = [:], seed: UInt64? = nil,
+                            scope: ChatterboxNarrationScope = .excerpt) throws -> [ChatterboxDirectedUnit] {
         guard ["en", "es"].contains(language) else { throw ChatterboxNarrationError.unsupportedLanguage(language) }
+        if scope == .chapterV1 { try Task.checkCancellation(); try scope.validate(source) }
+        if let performanceDirections, performanceDirections.scope != scope { throw ChatterboxPerformanceDirections.Failure.invalidRange }
         try performanceDirections?.validate(source: source)
         var usedAnnotations: Set<Int> = []
         let characterBudget: Int
@@ -49,14 +52,18 @@ public enum ChatterboxBookDirector {
         let story = StoryNarrator()
         // Unreviewed quotes supply possible delivery boundaries only. They never
         // identify a character or alternate model voices.
-        let annotations = try reviewedDialogue ?? story.quotedCandidates(in: source)
-        let spans = try story.plan(source, narratorVoiceID: narratorID, characterVoices: characterVoices,
-            dialogue: annotations, mode: reviewedDialogue == nil ? .singleNarrator : .characterVoices)
+        let annotations = try reviewedDialogue ?? (scope == .excerpt ? story.quotedCandidates(in: source) : story.quotedChapterCandidates(in: source))
+        let spans = try scope == .excerpt
+            ? story.plan(source, narratorVoiceID: narratorID, characterVoices: characterVoices,
+                dialogue: annotations, mode: reviewedDialogue == nil ? .singleNarrator : .characterVoices)
+            : story.planChapter(source, narratorVoiceID: narratorID, characterVoices: characterVoices,
+                dialogue: annotations, mode: reviewedDialogue == nil ? .singleNarrator : .characterVoices)
         let original = source as NSString
         var result: [ChatterboxDirectedUnit] = []
         var previous: BookNarrationUnit?
         var previousAnnotationIndex: Int?
         for span in spans {
+            if scope == .chapterV1 { try Task.checkCancellation() }
             let tokenizer = NLTokenizer(unit: .sentence)
             tokenizer.setLanguage(NLLanguage(rawValue: language)); tokenizer.string = span.text
             let sentences = tokenizer.tokens(for: span.text.startIndex..<span.text.endIndex)
@@ -67,6 +74,7 @@ public enum ChatterboxBookDirector {
             for index in 0..<(cuts.count - 1) {
                 var remaining = cuts[index]..<cuts[index + 1]
                 while !remaining.isEmpty {
+                    if scope == .chapterV1 { try Task.checkCancellation() }
                     var end = span.text.index(remaining.lowerBound, offsetBy: characterBudget, limitedBy: remaining.upperBound) ?? remaining.upperBound
                     if end < remaining.upperBound {
                         guard let space = span.text[remaining.lowerBound..<end].lastIndex(where: \.isWhitespace), space > remaining.lowerBound
@@ -114,7 +122,7 @@ public enum ChatterboxBookDirector {
                        let merged = try merged(last, candidate, source: original, maximum: characterBudget) {
                         result[result.count - 1] = merged
                     } else { result.append(candidate) }
-                    guard result.count <= 128 else { throw PlanningError.tooManyUnits }
+                    guard result.count <= scope.maximumUnits else { throw PlanningError.tooManyUnits }
                     previous = unit; previousAnnotationIndex = annotationIndex
                 }
             }

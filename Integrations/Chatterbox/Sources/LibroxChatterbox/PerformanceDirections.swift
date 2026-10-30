@@ -42,14 +42,16 @@ public struct ChatterboxPerformanceAnnotation: Sendable {
 public struct ChatterboxPerformanceDirections: Sendable {
     public static let revision = "chatterbox-reviewed-directions-1"
     public enum Failure: Error, Equatable { case invalidRange, overlappingRanges, sourceMismatch, partialUnit, unusedAnnotation }
+    public let scope: ChatterboxNarrationScope
     public let sourceSHA256: String
     public let annotations: [ChatterboxPerformanceAnnotation]
     /// Bind this into a chapter recipe's expressionSHA256. Distinct delivery
     /// strengths and source ranges have distinct identities, independent of codec.
     public let expressionSHA256: String
 
-    public init(source: String, annotations: [ChatterboxPerformanceAnnotation]) throws {
-        guard !source.isEmpty, source.utf8.count <= 32_768, annotations.count <= 128 else { throw Failure.invalidRange }
+    public init(source: String, annotations: [ChatterboxPerformanceAnnotation], scope: ChatterboxNarrationScope = .excerpt) throws {
+        guard !source.isEmpty, source.utf8.count <= scope.maximumSourceUTF8Bytes, annotations.count <= scope.maximumAnnotations,
+              scope == .excerpt || source.utf16.count <= 131_072 else { throw Failure.invalidRange }
         let original = source as NSString
         let boundaries = Set(source.indices).union([source.endIndex])
         let sorted = annotations.sorted { $0.range.location < $1.range.location }
@@ -71,13 +73,13 @@ public struct ChatterboxPerformanceDirections: Sendable {
             let controls: Controls?
         }
         struct Identity: Encodable { let revision, sourceSHA256: String; let annotations: [Item] }
-        let identity = Identity(revision: Self.revision, sourceSHA256: digest, annotations: sorted.map {
+        let identity = Identity(revision: Self.revision + scope.cacheSuffix, sourceSHA256: digest, annotations: sorted.map {
             .init(location: $0.range.location, length: $0.range.length, textSHA256: Self.hash(Data($0.originalText.utf8)),
                   delivery: $0.performance.delivery.rawValue, strength: $0.performance.strength.rawValue,
                   controls: $0.controls.map { .init(exaggeration: $0.exaggeration, guidance: $0.guidance, temperature: $0.temperature) })
         })
         let encoder = JSONEncoder(); encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
-        sourceSHA256 = digest; self.annotations = sorted
+        self.scope = scope; sourceSHA256 = digest; self.annotations = sorted
         expressionSHA256 = Self.hash(try encoder.encode(identity))
     }
 
