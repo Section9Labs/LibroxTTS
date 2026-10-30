@@ -44,6 +44,18 @@ package struct ChapterBookEntryContentIdentity: Codable, Sendable, Equatable {
     package func key() throws -> String { "be-" + ChapterCloudFileCapture.digest(try encoded()) }
 }
 enum ChapterCloudBookEntryError: Error, Equatable { case busy, absent, invalidRecord, conflict }
+/// PAST immutable-content acknowledgement only, never a current book/lease grant.
+package struct ChapterBookContentServerReceipt: Sendable {
+    package enum Evidence: Sendable { case acknowledgedUpload, verifiedExistingBytes }
+    package let identity: ChapterBookEntryContentIdentity
+    package let session: ChapterAccountSession
+    package let revision: ChapterServerRevision
+    package let evidence: Evidence
+    fileprivate init(identity: ChapterBookEntryContentIdentity, session: ChapterAccountSession,
+                     revision: ChapterServerRevision, evidence: Evidence) {
+        self.identity = identity; self.session = session; self.revision = revision; self.evidence = evidence
+    }
+}
 struct ChapterCloudBookEntrySnapshot: Sendable {
     let key, tag: String
     let metadata: Data
@@ -71,6 +83,8 @@ package actor ChapterCloudBookEntryTransport {
     private let captureStorage: URL
     private let authorize: @Sendable () async throws -> Void
     private var occupied = false
+    package var boundSession: ChapterAccountSession { session }
+    package var captureDirectory: URL { captureStorage }
     package init(container: CKContainer, account: ChapterCloudAccountIdentity, session: ChapterAccountSession,
                  gate: ChapterAccountSessionGate, captureStorage: URL,
                  authorizeAssetTransfer: @escaping @Sendable () async throws -> Void) throws {
@@ -94,6 +108,15 @@ package actor ChapterCloudBookEntryTransport {
     private static func validate(_ found: ChapterCloudBookEntrySnapshot, identity: ChapterBookEntryContentIdentity) throws {
         guard found.key == (try identity.key()), !found.tag.isEmpty, found.tag.utf8.count <= 1024,
               try ChapterBookEntryContentIdentity.decode(found.metadata) == identity else { throw ChapterCloudBookEntryError.invalidRecord }
+    }
+    private func receipt(_ snapshot: ChapterCloudBookEntrySnapshot, identity: ChapterBookEntryContentIdentity,
+                         evidence: ChapterBookContentServerReceipt.Evidence) throws -> ChapterBookContentServerReceipt {
+        try Self.validate(snapshot, identity: identity)
+        let encoder = JSONEncoder(); encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+        let data = try encoder.encode([session.accountPartition, snapshot.key, snapshot.tag,
+            ChapterCloudFileCapture.digest(snapshot.metadata)])
+        return .init(identity: identity, session: session,
+            revision: try .init(opaqueValue: ChapterCloudFileCapture.digest(data)), evidence: evidence)
     }
     private func fetch(_ identity: ChapterBookEntryContentIdentity, capture: ChapterCloudBookEntryCapture? = nil) async throws -> ChapterCloudBookEntrySnapshot? {
         try await authorized(identity)
@@ -123,10 +146,13 @@ package actor ChapterCloudBookEntryTransport {
     /// Byte acceptance only. Caller retains its exact source/plan durably until
     /// authoritative cloud control acknowledgement, and revalidates typed bytes
     /// under the receiver epoch. No public arbitrary-file/voice upload seam.
-    package func upload(_ payload: Data, identity: ChapterBookEntryContentIdentity) async throws {
+    @discardableResult package func upload(_ payload: Data, identity: ChapterBookEntryContentIdentity) async throws -> ChapterBookContentServerReceipt {
         try await valid(identity); try identity.verify(payload)
         guard !occupied else { throw ChapterCloudBookEntryError.busy }; occupied = true; defer { occupied = false }
-        if let metadata = try await fetch(identity) { _ = try await verifiedBytes(metadata, identity: identity); return }
+        if let metadata = try await fetch(identity) {
+            _ = try await verifiedBytes(metadata, identity: identity)
+            return try receipt(metadata, identity: identity, evidence: .verifiedExistingBytes)
+        }
         do {
             let session = session, gate = gate, storage = captureStorage
             let producer = Task.detached(priority: .utility) {
@@ -139,6 +165,7 @@ package actor ChapterCloudBookEntryTransport {
                 return try await self.store.insert(key: identity.key(), metadata: identity.encoded(), content: url)
             }
             try await valid(identity); try Self.validate(saved, identity: identity)
+            return try receipt(saved, identity: identity, evidence: .acknowledgedUpload)
         } catch {
             try await valid(identity)
             // Only native conflict/uncertain acknowledgement reconciles ONCE.
@@ -147,6 +174,7 @@ package actor ChapterCloudBookEntryTransport {
                   errorKind == .conflict || errorKind == .uncertain,
                   let metadata = try await fetch(identity) else { throw error }
             _ = try await verifiedBytes(metadata, identity: identity)
+            return try receipt(metadata, identity: identity, evidence: .verifiedExistingBytes)
         }
     }
     private static func read(_ url: URL, identity: ChapterBookEntryContentIdentity) throws -> Data {

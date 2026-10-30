@@ -65,9 +65,11 @@ independent host/server identity. OS-refused cleanup remains ambiguous.
 
 ## Remaining integration
 
-The native immutable content transport is separate. A real Reader service still
-must own upload/reconciliation tasks, persist actual acknowledgements and replay
-them before publishing authoritative whole-book cloud controls. Current-intent
+The finite `ChatterboxBookContentUpload` connector now reads this queue, obtains
+an actual native content receipt, joins/settles and confirms exact current
+content without acknowledging the book; see `CHAPTER-BOOK-CONTENT-UPLOAD.md`.
+A real Reader service must own/cancel/join its calling tasks and replay this
+state before publishing authoritative whole-book cloud controls. Current-intent
 transactions, authenticated prepared catalog, Worker generations/claims/clock-
 lease policy, ordered segment heads/seals, actual current-book audio acceptance
 and separate-host factories/runtime qualification are unfinished. This component

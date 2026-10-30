@@ -2,7 +2,7 @@
 import Foundation
 import CryptoKit
 import Testing
-import LibroxChapterWorker
+@testable import LibroxChapterWorker
 import LibroxChatterbox
 @testable import LibroxChatterboxPlanning
 
@@ -13,7 +13,7 @@ private actor ContentJoinSignal {
     func wait(_ name: String) async { if !names.contains(name) { await withCheckedContinuation { continuations[name, default: []].append($0) } } }
 }
 private final class BookContentAdmissionFixture: Sendable {
-    let root, sources, plans, content, control: URL
+    let root, sources, plans, content, captures, control: URL
     let partition = String(repeating: "a", count: 64), device = UUID()
     let gate = ChapterAccountSessionGate()
     let text = "Cafe\u{301} 🐈.\r\nSigue."
@@ -21,7 +21,8 @@ private final class BookContentAdmissionFixture: Sendable {
         root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         sources = root.appendingPathComponent("Sources"); plans = root.appendingPathComponent("Plans")
         content = root.appendingPathComponent("Content"); control = root.appendingPathComponent("BookOutbox")
-        for path in [sources, plans, content, control] { try FileManager.default.createDirectory(at: path, withIntermediateDirectories: true) }
+        captures = root.appendingPathComponent("Captures")
+        for path in [sources, plans, content, captures, control] { try FileManager.default.createDirectory(at: path, withIntermediateDirectories: true) }
     }
     deinit { try? FileManager.default.removeItem(at: root) }
     func outbox() throws -> ChapterBookOutbox { try .init(directory: control, accountPartition: partition, deviceID: device) }
@@ -32,7 +33,7 @@ private final class BookContentAdmissionFixture: Sendable {
                     direction: .storyteller, grouping: .sentences, seed: .max), session: session)
     }
     func budget(maximum: UInt64 = 64 * 1024 * 1024) throws -> ChapterArtifactStorageBudget {
-        try .init(controlDirectory: content, managedDirectories: [sources, plans, content],
+        try .init(controlDirectory: content, managedDirectories: [sources, plans, content, captures],
             policy: .init(maximumManagedBytes: maximum, minimumAvailableBytes: 0))
     }
     func silent(_ book: ChatterboxPreparedBookSubmission, _ session: ChapterAccountSession) throws -> ChatterboxBookEntryContent {

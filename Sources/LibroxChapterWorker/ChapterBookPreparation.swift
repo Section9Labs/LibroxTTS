@@ -122,3 +122,10 @@ package struct ChapterBookAdmission: Sendable {
     let chapterIndex: Int
     package let prior: ChapterBookStoredChapter?
 }
+
+/// Atomic Reader snapshot for ONE pending content transfer, not a Worker claim.
+package struct ChapterBookPendingContentUpload: Sendable {
+    package let scope: ChapterBookPreparationScope
+    package let intent: ChapterBookDemandIntent
+    package let chapter: ChapterBookStoredChapter
+}

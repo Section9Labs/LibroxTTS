@@ -274,6 +274,22 @@ public actor ChapterBookOutbox {
         return entry.chapters.values.filter { $0.contentIdentity != nil && $0.contentServerRevision == nil }
             .sorted { order($0.chapterIndex) < order($1.chapterIndex) }.prefix(maximum).map { $0 }
     }
+    package func observePendingContentUpload(scopeID: String) throws -> ChapterBookPendingContentUpload? {
+        try writable()
+        guard let entry = entries[scopeID] else { throw ChapterBookJournalError.notFound }
+        guard entry.intent.wanted, let chapter = try pendingContent(scopeID: scopeID, maximum: 1).first else { return nil }
+        return .init(scope: try .decode(entry.scope), intent: entry.intent, chapter: chapter)
+    }
+    package func pendingContentUploadIsCurrent(_ observation: ChapterBookPendingContentUpload) throws -> Bool {
+        try writable()
+        guard observation.intent.accountPartition == accountPartition, observation.intent.deviceID == deviceID else {
+            throw ChapterWorkerError.accountMismatch
+        }
+        guard let entry = entries[observation.intent.scopeID] else { return false }
+        return entry.intent == observation.intent && entry.intent.wanted &&
+            entry.chapters[String(observation.chapter.chapterIndex)] == observation.chapter &&
+            observation.chapter.contentIdentity != nil && observation.chapter.contentServerRevision == nil
+    }
     /// Immutable content receipt only. Never clears this device's pending BOOK
     /// intent or accepts a late cancel/seek/re-request callback as current.
     package func confirmContent(_ identity: ChapterBookEntryContentIdentity, intent: ChapterBookDemandIntent,
