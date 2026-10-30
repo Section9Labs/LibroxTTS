@@ -19,6 +19,10 @@ public actor ChapterBookOutbox {
         let partition: String
         let deviceID, publisherID: UUID
         let directoryDevice, directoryInode: UInt64
+        func upgraded() -> Self {
+            .init(domain: domain, version: 2, partition: partition, deviceID: deviceID, publisherID: publisherID,
+                  directoryDevice: directoryDevice, directoryInode: directoryInode)
+        }
     }
     private struct State: Codable {
         let domain: String
@@ -30,7 +34,8 @@ public actor ChapterBookOutbox {
     public let accountPartition: String
     public let deviceID: UUID
     private let owner = UUID()
-    private let binding: Binding
+    private var binding: Binding
+    private var journalVersion: Int
     private var root: ChapterBookJournalFiles?
     private var entries: [String: Entry]
     private var commands: [String: UUID] = [:]
@@ -41,15 +46,34 @@ public actor ChapterBookOutbox {
     /// lock for its lifetime. Established missing/corrupt state never resets.
     public init(directory: URL, accountPartition: String, deviceID: UUID) throws {
         let files = try ChapterBookJournalFiles(directory: directory, partition: accountPartition, deviceID: deviceID)
-        let binding: Binding, entries: [String: Entry]
+        var binding: Binding
+        let entries: [String: Entry], journalVersion: Int
         if let bytes = try files.read("book-established.json", maximum: 16384) {
             binding = try Self.decode(Binding.self, bytes)
             try Self.validate(binding, files: files, partition: accountPartition, deviceID: deviceID)
             guard let bytes = try files.read("journal.json", maximum: Self.maximumJournalBytes) else { throw ChapterBookJournalError.corrupt }
             let state = try Self.decode(State.self, bytes)
-            guard state.domain == "librox-reader-book-outbox-1", state.version == 1, state.binding == binding else { throw ChapterBookJournalError.corrupt }
+            guard state.domain == "librox-reader-book-outbox-1", (1...2).contains(state.version),
+                  (1...2).contains(state.binding.version),
+                  state.binding.upgraded() == binding.upgraded(), state.binding.version <= binding.version,
+                  state.version >= binding.version else { throw ChapterBookJournalError.corrupt }
             try Self.validate(state.entries, partition: accountPartition, deviceID: deviceID)
+            if state.version == 1 {
+                guard binding.version == 1, state.binding == binding,
+                      state.entries.values.allSatisfy({ $0.chapters.values.allSatisfy { $0.contentIdentity == nil && $0.contentServerRevision == nil } })
+                else { throw ChapterBookJournalError.corrupt }
+            } else {
+                // Recover ONLY the reviewed journalV2 -> bindingV2 -> boundV2
+                // activation sequence. No old wanted head is ever restored.
+                let upgraded = binding.upgraded()
+                if binding != upgraded { try files.write(Self.encode(upgraded), leaf: "book-established.json") }
+                if state.binding != upgraded {
+                    try files.write(Self.encode(State(domain: state.domain, version: 2, binding: upgraded, entries: state.entries)), leaf: "journal.json")
+                }
+                binding = upgraded
+            }
             entries = state.entries
+            journalVersion = state.version
         } else {
             // Do not reinterpret existing chapter/Worker/unknown state as an
             // empty book store. A failed first activation remains fail-closed.
@@ -60,9 +84,11 @@ public actor ChapterBookOutbox {
             entries = [:]
             let state = State(domain: "librox-reader-book-outbox-1", version: 1, binding: binding, entries: entries)
             try files.write(Self.encode(state), leaf: "journal.json")
+            journalVersion = 1
         }
         self.accountPartition = accountPartition; self.deviceID = deviceID; self.binding = binding
         self.root = files; self.entries = entries
+        self.journalVersion = journalVersion
     }
     public func stored(scopeID: String) throws -> ChapterBookStoredPreparation? {
         try writable()
@@ -141,6 +167,7 @@ public actor ChapterBookOutbox {
     }
     private func attach(_ value: ChapterBookStoredChapter, admission: ChapterBookAdmission,
                         entry old: Entry, scope: ChapterBookPreparationScope) throws -> ChapterBookDemandIntent {
+        var value = value
         try value.validate(scope: scope)
         if let prior = old.chapters[String(value.chapterIndex)] {
             if let before = prior.request, let after = value.request {
@@ -149,6 +176,12 @@ public actor ChapterBookOutbox {
             } else {
                 guard prior.request == nil, value.request == nil, prior.silentTextSHA256 == value.silentTextSHA256,
                       prior.silentUTF16Length == value.silentUTF16Length else { throw ChapterWorkerError.invalidIdentity }
+            }
+            var withoutContent = prior; withoutContent.contentIdentity = nil; withoutContent.contentServerRevision = nil
+            if withoutContent == value {
+                // An unchanged source/plan re-admission cannot erase its durable
+                // content/ack. A changed plan gets a new content identity later.
+                value.contentIdentity = prior.contentIdentity; value.contentServerRevision = prior.contentServerRevision
             }
         }
         if old.intent.priority.chapterIndex == value.chapterIndex {
@@ -184,6 +217,76 @@ public actor ChapterBookOutbox {
         var next = entries; next[intent.scopeID] = entry; try persist(next); return true
     }
     public func close() { root = nil; commands.removeAll() }
+    /// Durable format fence, including an EMPTY enabled store. Old writers
+    /// reject journalV2 before binding upgrade and bindingV2 afterward.
+    package func activateContentQueue(checkpoint: @Sendable (Int) throws -> Void = { _ in }) throws {
+        try writable()
+        guard journalVersion == 1 else { return }
+        guard let root else { throw ChapterBookJournalError.closed }
+        uncertain = true
+        do {
+            try root.write(Self.encode(State(domain: "librox-reader-book-outbox-1", version: 2, binding: binding, entries: entries)), leaf: "journal.json")
+            try checkpoint(1)
+            let upgraded = binding.upgraded()
+            try root.write(Self.encode(upgraded), leaf: "book-established.json")
+            try checkpoint(2)
+            try root.write(Self.encode(State(domain: "librox-reader-book-outbox-1", version: 2, binding: upgraded, entries: entries)), leaf: "journal.json")
+            try checkpoint(3)
+            try Task.checkCancellation(); try root.validate()
+            binding = upgraded; journalVersion = 2; uncertain = false
+        } catch { throw ChapterBookJournalError.ambiguousWrite }
+    }
+    /// Caller has joined exact immutable content publication and settled its
+    /// allowance. This stores a pending upload, not a cloud/demand acknowledgement.
+    package func attachContent(_ identity: ChapterBookEntryContentIdentity, request: ChapterRenderRequest?,
+                               silent: ChapterBookSilentSource?, originalText: String, admission: ChapterBookAdmission) throws -> ChapterBookDemandIntent {
+        let (old, scope) = try current(admission)
+        guard journalVersion == 2, binding.version == 2 else { throw ChapterBookJournalError.corrupt }
+        try identity.validate()
+        guard identity.accountPartition == accountPartition, identity.scopeID == scope.identifier,
+              identity.chapterIndex == admission.chapterIndex else { throw ChapterWorkerError.invalidIdentity }
+        var value: ChapterBookStoredChapter
+        if let request {
+            guard identity.kind == .chapter, silent == nil, let prior = admission.prior, let stored = prior.request,
+                  try stored.renderKey() == request.renderKey(), prior.sourceReference != nil, prior.renderPlanReference != nil else {
+                throw ChapterBookJournalError.staleAdmission
+            }
+            try request.source.validate(text: originalText); value = prior
+        } else {
+            guard identity.kind == .silent, let silent, silent.chapterIndex == admission.chapterIndex,
+                  try silent.book.sha256() == scope.book.sha256() else { throw ChapterWorkerError.invalidIdentity }
+            try silent.validate(text: originalText)
+            value = ChapterBookStoredChapter(chapterIndex: admission.chapterIndex, request: nil, sourceReference: nil,
+                renderPlanReference: nil, silentTextSHA256: silent.textSHA256, silentUTF16Length: silent.utf16Length)
+        }
+        if value.contentIdentity != identity { value.contentServerRevision = nil }
+        if let prior = admission.prior, prior.contentIdentity == identity { value.contentServerRevision = prior.contentServerRevision }
+        value.contentIdentity = identity
+        return try attach(value, admission: admission, entry: old, scope: scope)
+    }
+    package func pendingContent(scopeID: String, maximum: Int = 16) throws -> [ChapterBookStoredChapter] {
+        try writable()
+        guard (1...64).contains(maximum) else { throw ChapterBookJournalError.budget }
+        guard let entry = entries[scopeID], entry.intent.wanted else { return [] }
+        let count = try ChapterBookPreparationScope.decode(entry.scope).book.chapterKeys.count
+        let first = entry.intent.priority.chapterIndex
+        func order(_ index: Int) -> Int { index >= first ? index - first : count - first + index }
+        return entry.chapters.values.filter { $0.contentIdentity != nil && $0.contentServerRevision == nil }
+            .sorted { order($0.chapterIndex) < order($1.chapterIndex) }.prefix(maximum).map { $0 }
+    }
+    /// Immutable content receipt only. Never clears this device's pending BOOK
+    /// intent or accepts a late cancel/seek/re-request callback as current.
+    package func confirmContent(_ identity: ChapterBookEntryContentIdentity, intent: ChapterBookDemandIntent,
+                                serverRevision: ChapterServerRevision) throws -> Bool {
+        try writable()
+        guard journalVersion == 2, intent.accountPartition == accountPartition, intent.deviceID == deviceID else {
+            throw ChapterWorkerError.accountMismatch
+        }
+        guard var entry = entries[intent.scopeID], entry.intent == intent, intent.wanted,
+              var chapter = entry.chapters[String(identity.chapterIndex)], chapter.contentIdentity == identity else { return false }
+        chapter.contentServerRevision = serverRevision.opaqueValue; entry.chapters[String(identity.chapterIndex)] = chapter
+        var next = entries; next[intent.scopeID] = entry; try persist(next); return true
+    }
     func failAfterNextRenameForTesting() { afterRenameForTesting = { throw ChapterBookJournalError.storage } }
     func cancelAfterNextRenameForTesting() { afterRenameForTesting = { withUnsafeCurrentTask { $0?.cancel() } } }
     private func snapshot(_ entry: Entry) throws -> ChapterBookStoredPreparation {
@@ -214,7 +317,7 @@ public actor ChapterBookOutbox {
     }
     private func persist(_ next: [String: Entry]) throws {
         guard let root else { throw ChapterBookJournalError.closed }
-        let data = try Self.encode(State(domain: "librox-reader-book-outbox-1", version: 1, binding: binding, entries: next))
+        let data = try Self.encode(State(domain: "librox-reader-book-outbox-1", version: journalVersion, binding: binding, entries: next))
         guard data.count <= Self.maximumJournalBytes else { throw ChapterBookJournalError.budget }
         do {
             let fault = afterRenameForTesting; afterRenameForTesting = nil
@@ -223,7 +326,7 @@ public actor ChapterBookOutbox {
         } catch { uncertain = true; throw ChapterBookJournalError.ambiguousWrite }
     }
     private static func validate(_ value: Binding, files: ChapterBookJournalFiles, partition: String, deviceID: UUID) throws {
-        guard value.domain == "librox-reader-book-binding-1", value.version == 1, value.partition == partition,
+        guard value.domain == "librox-reader-book-binding-1", (1...2).contains(value.version), value.partition == partition,
               value.deviceID == deviceID, value.directoryDevice == files.device, value.directoryInode == files.inode else {
             throw ChapterBookJournalError.corrupt
         }

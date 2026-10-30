@@ -21,6 +21,82 @@ private final class BookJournalFixture: Sendable {
     }
 }
 @Suite(.serialized) struct ChapterBookOutboxTests {
+    @Test func emptyContentQueueActivationPermanentlyRejectsVersionOneWriters() async throws {
+        let f = try BookJournalFixture(), box = try f.open(), scope = try f.scope()
+        func version(_ name: String) throws -> Int {
+            let object = try #require(JSONSerialization.jsonObject(with: Data(contentsOf: f.store.appendingPathComponent(name))) as? [String: Any])
+            return try #require((object["value"] as? [String: Any])?["version"] as? Int)
+        }
+        #expect(try version("journal.json") == 1); #expect(try version("book-established.json") == 1)
+        try await box.activateContentQueue()
+        #expect(try version("journal.json") == 2); #expect(try version("book-established.json") == 2)
+        await box.close()
+        let reopened = try f.open()
+        #expect(try await reopened.stored(scopeID: scope.identifier) == nil)
+        _ = try await reopened.setWanted(false, scope: scope, priority: .init(chapterIndex: 0, sourceUTF16Offset: 0))
+        #expect(try version("journal.json") == 2); #expect(try version("book-established.json") == 2)
+        // Frozen V1 open checked BOTH binding.version==1 and state.version==1.
+        #expect(try version("journal.json") != 1 && version("book-established.json") != 1)
+        await reopened.close()
+    }
+    @Test func everyActivationBoundaryRecoversForwardAndNeverRollsBackVersionOneOrLosesIntent() async throws {
+        enum Fault: Error { case simulatedCrash }
+        for phase in 1...3 {
+            let f = try BookJournalFixture(), scope = try f.scope(), box = try f.open()
+            let wanted = try await box.setWanted(true, scope: scope, priority: .init(chapterIndex: 2, sourceUTF16Offset: 7))
+            await #expect(throws: ChapterBookJournalError.ambiguousWrite) {
+                try await box.activateContentQueue { if $0 == phase { throw Fault.simulatedCrash } }
+            }
+            await #expect(throws: ChapterBookJournalError.ambiguousWrite) { try await box.stored(scopeID: scope.identifier) }
+            await box.close()
+            let reopened = try f.open(), stored = try #require(await reopened.stored(scopeID: scope.identifier))
+            #expect(stored.intent == wanted); #expect(stored.pending)
+            try await reopened.activateContentQueue()
+            let object = try #require(JSONSerialization.jsonObject(with: Data(contentsOf: f.store.appendingPathComponent("book-established.json"))) as? [String: Any])
+            #expect((object["value"] as? [String: Any])?["version"] as? Int == 2)
+            await reopened.close()
+        }
+    }
+    @Test func cancellationAtLastActivationBoundaryCannotReportSuccessfulLiveActivation() async throws {
+        let f = try BookJournalFixture(), box = try f.open()
+        let producer = Task {
+            try await box.activateContentQueue { if $0 == 3 { withUnsafeCurrentTask { $0?.cancel() } } }
+        }
+        await #expect(throws: ChapterBookJournalError.ambiguousWrite) { try await producer.value }
+        await box.close()
+        let reopened = try f.open(); try await reopened.activateContentQueue(); await reopened.close()
+    }
+    @Test func upgradedBindingRejectsChecksummedJournalDowngradeAndMissingStateWithoutReset() async throws {
+        let f = try BookJournalFixture(), box = try f.open()
+        try await box.activateContentQueue(); await box.close()
+        let path = f.store.appendingPathComponent("journal.json"), original = try Data(contentsOf: path)
+        var object = try #require(JSONSerialization.jsonObject(with: original) as? [String: Any])
+        var value = try #require(object["value"] as? [String: Any]), binding = try #require(value["binding"] as? [String: Any])
+        binding["version"] = 1; value["version"] = 1; value["binding"] = binding; object["value"] = value
+        let raw = try JSONSerialization.data(withJSONObject: value, options: [.sortedKeys, .withoutEscapingSlashes])
+        object["checksum"] = SHA256.hash(data: raw).map { String(format: "%02x", $0) }.joined()
+        try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys, .withoutEscapingSlashes]).write(to: path, options: .atomic)
+        #expect(throws: ChapterBookJournalError.corrupt) { try f.open() }
+        try FileManager.default.removeItem(at: path)
+        #expect(throws: ChapterBookJournalError.corrupt) { try f.open() }
+    }
+    @Test func unsupportedEmbeddedBindingVersionCannotBecomeRecognizedActivationOrRewriteAnyMetadata() async throws {
+        let f = try BookJournalFixture(), box = try f.open()
+        try await box.activateContentQueue(); await box.close()
+        let path = f.store.appendingPathComponent("journal.json"), original = try Data(contentsOf: path)
+        let marker = f.store.appendingPathComponent("book-established.json"), markerBytes = try Data(contentsOf: marker)
+        for version in [-1, 0, 3] {
+            var object = try #require(JSONSerialization.jsonObject(with: original) as? [String: Any])
+            var value = try #require(object["value"] as? [String: Any]), binding = try #require(value["binding"] as? [String: Any])
+            binding["version"] = version; value["binding"] = binding; object["value"] = value
+            let raw = try JSONSerialization.data(withJSONObject: value, options: [.sortedKeys, .withoutEscapingSlashes])
+            object["checksum"] = SHA256.hash(data: raw).map { String(format: "%02x", $0) }.joined()
+            let malformed = try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys, .withoutEscapingSlashes])
+            try malformed.write(to: path, options: .atomic)
+            #expect(throws: ChapterBookJournalError.corrupt) { try f.open() }
+            #expect(try Data(contentsOf: path) == malformed); #expect(try Data(contentsOf: marker) == markerBytes)
+        }
+    }
     @Test func durablePreparationPriorityAndExactAcknowledgementsSurviveReopen() async throws {
         let f = try BookJournalFixture(), outbox = try f.open(), scope = try f.scope()
         let first = try await outbox.setWanted(true, scope: scope, priority: .init(chapterIndex: 2, sourceUTF16Offset: 7))

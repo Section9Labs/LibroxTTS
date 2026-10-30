@@ -77,6 +77,9 @@ public struct ChapterBookStoredChapter: Codable, Sendable, Equatable {
     public let renderPlanReference: ChapterLocalRenderPlanReference?
     public let silentTextSHA256: String?
     public let silentUTF16Length: Int?
+    /// Reader's durable exact upload content, never a current cloud grant.
+    package var contentIdentity: ChapterBookEntryContentIdentity? = nil
+    package var contentServerRevision: String? = nil
     package func validate(scope: ChapterBookPreparationScope) throws {
         guard scope.book.chapterKeys.indices.contains(chapterIndex) else { throw ChapterWorkerError.invalidIdentity }
         if let request {
@@ -91,6 +94,14 @@ public struct ChapterBookStoredChapter: Codable, Sendable, Equatable {
                 throw ChapterWorkerError.invalidIdentity
             }
         }
+        if let identity = contentIdentity {
+            try identity.validate()
+            guard identity.accountPartition == scope.accountPartition, identity.scopeID == scope.identifier,
+                  identity.chapterIndex == chapterIndex, identity.kind == (request == nil ? .silent : .chapter) else {
+                throw ChapterWorkerError.invalidIdentity
+            }
+            if let revision = contentServerRevision { _ = try ChapterServerRevision(opaqueValue: revision) }
+        } else if contentServerRevision != nil { throw ChapterWorkerError.invalidIdentity }
     }
 }
 
@@ -109,5 +120,5 @@ package struct ChapterBookAdmission: Sendable {
     let scopeID: String
     let wantedRevision: UInt64
     let chapterIndex: Int
-    let prior: ChapterBookStoredChapter?
+    package let prior: ChapterBookStoredChapter?
 }

@@ -73,6 +73,11 @@ These guarantees concern the private Reader store. There is NO filesystem
 offline head here that a remote Worker may treat as current authority, and no
 Worker is allowed to open the mutable book journal.
 
+The optional content-upload queue has an explicit permanent V2 activation and
+forward crash recovery; see `CHAPTER-BOOK-CONTENT-QUEUE.md`. This is the sole
+SDK-authorized version upgrade of the otherwise fixed publisher/root binding.
+Unactivated V1 journals preserve their original encoding.
+
 ## Lazy exact entry admission
 
 `preparedBook.prepareEntry` classifies each original spine entry with the SDK.
