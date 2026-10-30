@@ -118,12 +118,31 @@ final class NativeDecodeTimingContractTests: XCTestCase {
         let old = Data(#"{"iterations":2,"inputPreparationSeconds":0.1,"predictionSeconds":0.2,"logitsCopyAndCFGSeconds":0.3,"samplingSeconds":0.4}"#.utf8)
         let decoded = try JSONDecoder().decode(DecodeStepTimings.self, from: old)
         XCTAssertNil(decoded.resourceGuardSeconds)
+        XCTAssertNil(decoded.graphConstructionSeconds); XCTAssertNil(decoded.evaluationSeconds)
         XCTAssertEqual(decoded.accountedSeconds, 1, accuracy: 1e-12)
         var native = DecodeStepTimings()
         native.iterations = 3; native.predictionSeconds = 0.6; native.resourceGuardSeconds = 0.02
+        native.graphConstructionSeconds = 0.1; native.evaluationSeconds = 0.5
         let roundTrip = try JSONDecoder().decode(DecodeStepTimings.self, from: JSONEncoder().encode(native))
         XCTAssertEqual(roundTrip.iterations, 3)
         XCTAssertEqual(roundTrip.accountedSeconds, 0.62, accuracy: 1e-12)
         XCTAssertEqual(roundTrip.resourceGuardSeconds, 0.02)
+    }
+}
+
+final class ResidentBufferPolicyTests: XCTestCase {
+    func testResidentCacheIsExplicitBoundedAndNativeMacOnly() throws {
+        let original = ChatterboxMLXRenderer.BufferRetention.trimBetweenUnits
+        let resident = ChatterboxMLXRenderer.BufferRetention.boundedResidentMac
+        XCTAssertEqual(original.suffix, "")
+        XCTAssertNotEqual(resident.suffix, original.suffix)
+        XCTAssertTrue(original.trims); XCTAssertFalse(resident.trims)
+        for bytes in [0, 256 * 1024 * 1024, 512 * 1024 * 1024] {
+            XCTAssertNoThrow(try resident.validate(cacheLimit: bytes, isNativeMac: true))
+            XCTAssertThrowsError(try resident.validate(cacheLimit: bytes, isNativeMac: false))
+        }
+        for bytes in [-1, 512 * 1024 * 1024 + 1, Int.max] {
+            XCTAssertThrowsError(try resident.validate(cacheLimit: bytes, isNativeMac: true))
+        }
     }
 }

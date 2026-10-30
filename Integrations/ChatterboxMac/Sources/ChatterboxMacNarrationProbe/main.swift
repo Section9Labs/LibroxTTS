@@ -35,10 +35,20 @@ struct Configuration: Decodable {
     let residentControls: Bool?
     let waveformPolicy: String?
     let bookAudition: BookAudition?
+    let bookSchedulingControls: Bool?
+    let referencePCM: String?
+    let referencePassages: [PassageDescriptor]?
 }
 struct Trial: Codable {
     let id: String
     let grouped, overlap: Bool
+    var residentBuffers: Bool? = nil
+    static let bookScheduling = [Trial(id: "warmup", grouped: true, overlap: false),
+        Trial(id: "legacy-serial", grouped: true, overlap: false),
+        Trial(id: "legacy-overlap", grouped: true, overlap: true),
+        Trial(id: "resident-serial", grouped: true, overlap: false, residentBuffers: true),
+        Trial(id: "resident-overlap", grouped: true, overlap: true, residentBuffers: true),
+        Trial(id: "legacy-serial-repeat", grouped: true, overlap: false)]
     static let resident = [Trial(id: "sentences-serial", grouped: false, overlap: false),
         Trial(id: "sentences-overlap", grouped: false, overlap: true),
         Trial(id: "grouped160-serial", grouped: true, overlap: false),
@@ -51,6 +61,15 @@ struct Passage: Codable, Sendable {
     let acoustics: ChatterboxAcousticTimings?
     let decodeSteps: DecodeStepTimings?
     let exaggeration, guidance, temperature: Float
+}
+struct PassageDescriptor: Codable, Equatable {
+    let index, firstFrame, frames, generatedFrames, sourceLocation, sourceLength, speechTokens: Int
+    let exaggeration, guidance, temperature: Float
+    init(_ p: Passage) {
+        index=p.index; firstFrame=p.firstFrame; frames=p.frames; generatedFrames=p.generatedFrames
+        sourceLocation=p.sourceLocation; sourceLength=p.sourceLength; speechTokens=p.speechTokens
+        exaggeration=p.exaggeration; guidance=p.guidance; temperature=p.temperature
+    }
 }
 actor Collector {
     var samples: [Float] = []
@@ -83,6 +102,8 @@ struct LanguageResult: Codable {
     let grouped, overlap: Bool
     let audioSeconds, renderSeconds, exportSeconds, completeWarmSeconds, completeWarmRTF, playbackMultiple, firstPassageSeconds: Double
     let peak, rms: Float
+    let memoryAtStart, memoryAtEnd: ChatterboxMLXRenderer.MemorySnapshot?
+    let profilingEnabled, initialAllocatorCleared: Bool?
     let passages: [Passage]
     let exports: [Export]
 }
@@ -90,6 +111,7 @@ struct ProgramResult: Codable {
     let state, variant, watermark, decoderWeightsSHA256, acousticCheckpointSHA256, stockSHA256: String
     let overlap, grouped: Bool
     let coldLoadSeconds, totalColdWallSeconds: Double
+    let bootWarmupSeconds: Double?
     let results: [LanguageResult]
     let trials: [Trial]
     let pcmIdentityValidated: Bool?
@@ -102,7 +124,8 @@ struct ProgramResult: Codable {
     static func main() async {
         do {
             let args = Array(CommandLine.arguments.dropFirst())
-            if args.count == 2, args[0] == "--codecs" { try MacCodecBenchmark.run(configuration: args[1]) }
+            if args.count == 2, args[0] == "--decoder-profile" { try await MacDecoderProfileBenchmark.run(configuration: args[1]) }
+            else if args.count == 2, args[0] == "--codecs" { try MacCodecBenchmark.run(configuration: args[1]) }
             else { try await run() }
         }
         catch {
@@ -132,7 +155,14 @@ struct ProgramResult: Codable {
         if c.residentControls == true {
             guard c.variant == "native", !c.overlap, !c.grouped else { throw AcousticInventoryError.input }
         }
-        let trials = c.residentControls == true ? Trial.resident : [Trial(id: "default", grouped: c.grouped, overlap: c.overlap)]
+        if c.bookSchedulingControls == true {
+            guard c.bookAudition != nil, c.residentControls != true, let reference = c.referencePCM,
+                  reference.utf8.count == 64, reference.utf8.allSatisfy({ (48...57).contains($0) || (97...102).contains($0) }),
+                  let descriptors = c.referencePassages, !descriptors.isEmpty, descriptors.count <= 128,
+                  ProcessInfo.processInfo.environment["CHATTERBOX_PROFILE_DECODE"] == "0" else { throw AcousticInventoryError.input }
+        }
+        let trials = c.bookSchedulingControls == true ? Trial.bookScheduling :
+            (c.residentControls == true ? Trial.resident : [Trial(id: "default", grouped: c.grouped, overlap: c.overlap)])
         let output = URL(fileURLWithPath: c.outputDirectory)
         guard !FileManager.default.fileExists(atPath: output.path) else { throw AcousticInventoryError.input }
         try FileManager.default.createDirectory(at: output, withIntermediateDirectories: false)
@@ -164,13 +194,18 @@ struct ProgramResult: Codable {
         if trial.id != "default" { try FileManager.default.createDirectory(at: trialOutput, withIntermediateDirectories: false) }
         for language in languages {
             try Task.checkCancellation(); try runtime.verify()
+            if c.bookSchedulingControls == true { ChatterboxMLXRenderer.trimUnusedMemory() }
+            let profilingEnabled = ProcessInfo.processInfo.environment["CHATTERBOX_PROFILE_DECODE"] == "1"
+            let memoryAtStart = ChatterboxMLXRenderer.memorySnapshot()
             let start = Date(), collector = Collector(began: start, metrics: trialOutput.appendingPathComponent(language + "-passages-incomplete.json"))
-            let narrator = await renderer.makeNarrator(overlap: trial.overlap)
+            let endpoint = try await renderer.makeEndpoint(overlap: trial.overlap,
+                bufferRetention: trial.residentBuffers == true ? .boundedResidentMac : .trimBetweenUnits)
+            let narrator = endpoint.narrator
             let cache = trialOutput.appendingPathComponent(language + "-cache")
             let manifest = SHA256.hash(data: Data((ChatterboxMLXRenderer.DecoderProfile.mixedFloat16Accurate.weightsSHA256 +
                 (c.variant == "native" ? AcousticInventory.checkpointSHA256 : "standard-coreml") + c.watermark).utf8)).map { String(format: "%02x", $0) }.joined()
             let session = try ChatterboxBookSession(narrator: narrator, cacheDirectory: cache,
-                modelManifestSHA256: manifest, rendererProfile: renderer.profileIdentifier)
+                modelManifestSHA256: manifest, rendererProfile: endpoint.profileIdentifier)
             stage = trial.id + "/rendering-" + language
             try json(Status(completed: false, stage: stage)).write(to: output.appendingPathComponent("status.json"), options: .atomic)
             do {
@@ -202,16 +237,25 @@ struct ProgramResult: Codable {
             let duration = Double(samples.count) / 24000
             // Raw-PCM identity is an analysis control outside product delivery timing.
             let pcmSHA = samples.withUnsafeBufferPointer { SHA256.hash(data: Data(buffer: $0)).map { String(format: "%02x", $0) }.joined() }
-            let result = LanguageResult(language: language, text: c.texts[language]!, rendererProfile: renderer.profileIdentifier,
+            let result = LanguageResult(language: language, text: c.texts[language]!, rendererProfile: endpoint.profileIdentifier,
                 trialID: trial.id, pcmSHA256: pcmSHA, deliveryMode: c.bookAudition != nil ? "AAC64-only" : (c.residentControls == true ? "ALAC24-only" : "WAVF32+ALAC24"),
                 grouped: trial.grouped, overlap: trial.overlap,
                 audioSeconds: duration, renderSeconds: renderSeconds, exportSeconds: exportSeconds,
                 completeWarmSeconds: complete, completeWarmRTF: complete/duration, playbackMultiple: duration/complete,
                 firstPassageSeconds: passages.first!.arrivalSeconds,
                 peak: samples.reduce(0, { max($0, abs($1)) }), rms: sqrt(samples.reduce(0, { $0 + $1*$1 })/Float(samples.count)),
+                memoryAtStart: memoryAtStart, memoryAtEnd: ChatterboxMLXRenderer.memorySnapshot(),
+                profilingEnabled: profilingEnabled, initialAllocatorCleared: c.bookSchedulingControls == true,
                 passages: passages, exports: exports)
             results.append(result)
             try json(result).write(to: trialOutput.appendingPathComponent(language + "-report.json"), options: .atomic)
+            if c.bookSchedulingControls == true {
+                stage = "reference-control-validation/" + trial.id
+                guard result.pcmSHA256 == c.referencePCM,
+                      result.passages.map(PassageDescriptor.init) == c.referencePassages,
+                      !profilingEnabled, ProcessInfo.processInfo.environment["CHATTERBOX_PROFILE_DECODE"] == "0",
+                      passages.allSatisfy({ $0.decodeSteps == nil }) else { throw AcousticInventoryError.identity }
+            }
             print("\(trial.id)/\(language) complete: audio=\(duration)s wall=\(complete)s multiple=\(duration/complete)");fflush(stdout)
         }
         }
@@ -225,17 +269,24 @@ struct ProgramResult: Codable {
                 }
             }
         }
+        if c.bookSchedulingControls == true {
+            guard results.count == Trial.bookScheduling.count,
+                  results.allSatisfy({ $0.pcmSHA256 == c.referencePCM }) else { throw AcousticInventoryError.identity }
+        }
         try runtime.verify(); try Task.checkCancellation()
         let result = ProgramResult(state: "complete", variant: c.variant, watermark: c.watermark,
             decoderWeightsSHA256: ChatterboxMLXRenderer.DecoderProfile.mixedFloat16Accurate.weightsSHA256,
             acousticCheckpointSHA256: c.variant == "native" ? AcousticInventory.checkpointSHA256 : "standard-coreml-assets",
             stockSHA256: ChatterboxMacAcousticSynthesizer.stockSHA256,
             overlap: c.overlap, grouped: c.grouped, coldLoadSeconds: loaded,
-            totalColdWallSeconds: Date().timeIntervalSince(began), results: results, trials: trials,
-            pcmIdentityValidated: c.residentControls == true ? true : nil,
+            totalColdWallSeconds: Date().timeIntervalSince(began),
+            bootWarmupSeconds: results.first(where: { $0.trialID == "warmup" })?.completeWarmSeconds,
+            results: results, trials: trials,
+            pcmIdentityValidated: (c.residentControls == true || c.bookSchedulingControls == true) ? true : nil,
             waveformPolicy: c.variant == "native" ? waveformPolicy.rawValue : "standard-coreml-existing", bookAudition: c.bookAudition,
             userListeningApproved: false, fiveTimesPlaybackEstablished: false, cloudUploadMeasured: false)
         try json(Status(completed: true, stage: "complete")).write(to: output.appendingPathComponent("status.json"), options: .atomic)
+        try runtime.verify(); try Task.checkCancellation()
         try json(result).write(to: output.appendingPathComponent("report.json"), options: .atomic)
         _ = native
         } catch {

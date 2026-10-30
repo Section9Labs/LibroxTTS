@@ -15,6 +15,9 @@ public struct DecodeStepTimings: Sendable, Codable {
     /// Native MLX's existing per-step resource/cancellation guard. nil in older
     /// receipts and backends that do not instrument that boundary.
     public var resourceGuardSeconds: TimeInterval? = nil
+    /// Nested parts of native predictionSeconds, never added to accountedSeconds.
+    public var graphConstructionSeconds: TimeInterval? = nil
+    public var evaluationSeconds: TimeInterval? = nil
     public init() {}
 
     public var accountedSeconds: TimeInterval {

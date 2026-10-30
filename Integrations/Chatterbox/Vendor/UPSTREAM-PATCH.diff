@@ -375,7 +375,7 @@
 +}
 --- /dev/null
 +++ b/Sources/ChatterboxCoreML/DecodeStepTimings.swift
-@@ -0,0 +1,23 @@
+@@ -0,0 +1,26 @@
 +import Foundation
 +
 +/// Opt-in aggregate timings for the autoregressive loop. Prediction measures the
@@ -393,6 +393,9 @@
 +    /// Native MLX's existing per-step resource/cancellation guard. nil in older
 +    /// receipts and backends that do not instrument that boundary.
 +    public var resourceGuardSeconds: TimeInterval? = nil
++    /// Nested parts of native predictionSeconds, never added to accountedSeconds.
++    public var graphConstructionSeconds: TimeInterval? = nil
++    public var evaluationSeconds: TimeInterval? = nil
 +    public init() {}
 +
 +    public var accountedSeconds: TimeInterval {

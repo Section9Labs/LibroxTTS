@@ -25,6 +25,22 @@ public actor ChatterboxMLXRenderer {
             }
         }
     }
+    /// Allocation lifetime only: no precision, arithmetic or output changes.
+    public enum BufferRetention: String, Sendable {
+        case trimBetweenUnits = "trim-between-units-1"
+        case boundedResidentMac = "bounded-resident-mac-1"
+        var trims: Bool { self == .trimBetweenUnits }
+        func validate(cacheLimit: Int, isNativeMac: Bool) throws {
+            if self == .boundedResidentMac {
+                guard isNativeMac, (0...536_870_912).contains(cacheLimit) else { throw RendererError.precisionPolicy }
+            }
+        }
+        var suffix: String { trims ? "" : ":buffers=" + rawValue }
+    }
+    public struct NarrationEndpoint: Sendable {
+        public let narrator: ChatterboxNarrator
+        public let profileIdentifier: String
+    }
     public nonisolated let decoderProfile: DecoderProfile
     public nonisolated let watermarkPolicy: ChatterboxWatermarkPolicy
     /// Opaque rendering identity, including host-copy semantics and selected
@@ -187,18 +203,44 @@ public actor ChatterboxMLXRenderer {
         return ChatterboxNarrator(rendering: { request in try await self.render(request) })
     }
 
+    /// Use the paired profileIdentifier for caches. Bounded retention is explicit,
+    /// native-Mac-only, and rejects a process cache budget above512MiB. The host
+    /// still owns process-wide budgets; resource/output guards remain in force.
+    public func makeEndpoint(overlap: Bool = false, bufferRetention: BufferRetention = .trimBetweenUnits) throws -> NarrationEndpoint {
+        try validate(bufferRetention)
+        let narrator: ChatterboxNarrator
+        if overlap {
+            narrator = ChatterboxNarrator(rendering: { request in try await self.render(request, buffers: bufferRetention) },
+                batchRendering: { requests, receive in try await self.renderBatch(requests, buffers: bufferRetention, receive: receive) })
+        } else {
+            narrator = ChatterboxNarrator(rendering: { request in try await self.render(request, buffers: bufferRetention) })
+        }
+        return .init(narrator: narrator, profileIdentifier: profileIdentifier + bufferRetention.suffix)
+    }
+    private func validate(_ policy: BufferRetention) throws {
+        guard !policy.trims else { return }
+        #if os(macOS)
+        try policy.validate(cacheLimit: Memory.cacheLimit, isNativeMac: true)
+        #else
+        try policy.validate(cacheLimit: Memory.cacheLimit, isNativeMac: false)
+        #endif
+    }
     public func render(_ request: ChatterboxRequest) async throws -> ChatterboxAudioChunk {
+        try await render(request, buffers: .trimBetweenUnits)
+    }
+    private func render(_ request: ChatterboxRequest, buffers: BufferRetention) async throws -> ChatterboxAudioChunk {
         guard !occupied else { throw RendererError.busy }
         occupied = true; defer { occupied = false }
         // ARC releases the decode helper's arrays before this phase boundary.
         // On failure the helper has also unwound before this deferred trim runs.
-        defer { Self.trimUnusedMemory() }
-        Self.trimUnusedMemory()
+        defer { if buffers.trims { Self.trimUnusedMemory() } }
+        try validate(buffers)
+        if buffers.trims { Self.trimUnusedMemory() }
         try Self.healthy()
         let voice = request.conditioningFile ?? defaultVoice
         try ChatterboxVoiceFile.validate(at: voice)
         let decoded = try decode(request, voice: voice)
-        Self.trimUnusedMemory()
+        if buffers.trims { Self.trimUnusedMemory() }
         try Self.healthy()
         return try await Self.synthesize(decoded, voice: voice, using: synth, profile: decoderProfile.rawValue)
     }
@@ -221,21 +263,23 @@ public actor ChatterboxMLXRenderer {
 
     /// One decoder plus one acoustic worker, at most one completed/active prior
     /// unit. Cancellation joins the worker before the busy lease is released.
-    private func renderBatch(_ requests: [ChatterboxRequest],
+    private func renderBatch(_ requests: [ChatterboxRequest], buffers: BufferRetention = .trimBetweenUnits,
         receive: @escaping @Sendable (ChatterboxBatchChunk) async throws -> Void) async throws {
         guard !occupied else { throw RendererError.busy }
         guard (1...8).contains(requests.count) else { throw ChatterboxNarrationError.invalidBatch }
         occupied = true
-        defer { occupied = false; Self.trimUnusedMemory() }
+        defer { occupied = false; if buffers.trims { Self.trimUnusedMemory() } }
+        try validate(buffers)
         try await withThrowingTaskGroup(of: ChatterboxAudioChunk.self) { group in
             var hasPending = false
             var previous = 0
             for (index, request) in requests.enumerated() {
+                try validate(buffers)
                 try Self.healthy()
                 let voice = request.conditioningFile ?? defaultVoice
                 try ChatterboxVoiceFile.validate(at: voice)
                 let decoded = try decode(request, voice: voice)
-                Self.trimUnusedMemory()
+                if buffers.trims { Self.trimUnusedMemory() }
                 if hasPending {
                     guard let audio = try await group.next() else { throw RendererError.oracleMismatch }
                     try Task.checkCancellation()
@@ -276,7 +320,10 @@ public actor ChatterboxMLXRenderer {
         let assemblySeconds = Date().timeIntervalSince(assemblyBegan)
         let profileDecode = ProcessInfo.processInfo.environment["CHATTERBOX_PROFILE_DECODE"] == "1"
         var stepTimings = DecodeStepTimings()
-        if profileDecode { stepTimings.resourceGuardSeconds = 0 }
+        if profileDecode {
+            stepTimings.resourceGuardSeconds = 0
+            stepTimings.graphConstructionSeconds = 0; stepTimings.evaluationSeconds = 0
+        }
         let initialPreparation = profileDecode ? ContinuousClock.now : nil
         let cache = (0..<30).map { _ in KVCache() }
         var input = MLXArray(prefix.embeddings, [2, prefix.length, 1024])
@@ -329,8 +376,13 @@ public actor ChatterboxMLXRenderer {
         Device.withDefaultDevice(.gpu) {
             let predictionStart = profile ? ContinuousClock.now : nil
             let logits = decoder.logits(input, cache: cache)
+            if profile { timings.graphConstructionSeconds = (timings.graphConstructionSeconds ?? 0) + Self.elapsed(predictionStart) }
+            let evaluationStart = profile ? ContinuousClock.now : nil
             eval(logits)
-            if profile { timings.predictionSeconds += Self.elapsed(predictionStart) }
+            if profile {
+                timings.evaluationSeconds = (timings.evaluationSeconds ?? 0) + Self.elapsed(evaluationStart)
+                timings.predictionSeconds += Self.elapsed(predictionStart)
+            }
             let copyStart = profile ? ContinuousClock.now : nil
             let values = logits.asArray(Float.self)
             if profile { timings.logitsCopyAndCFGSeconds += Self.elapsed(copyStart) }
