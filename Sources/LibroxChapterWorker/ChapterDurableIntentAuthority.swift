@@ -26,6 +26,15 @@ public struct ChapterDurableIntentDescriptor: Codable, Sendable, Equatable {
     private enum CodingKeys: String, CodingKey { case accountPartition, deviceID, publisherID, directoryDevice, directoryInode }
 }
 
+/// A bounded, current publication observation. Never a claim, acceptance,
+/// monotonic clock or permission to skip per-work current-intent validation.
+public struct ChapterWantedSnapshot: Sendable {
+    public let descriptor: ChapterDurableIntentDescriptor
+    public let publicationID: UUID
+    public let archiveSHA256: String
+    public let readSets: [ChapterIntentReadSet]
+}
+
 /// Reads only Reader-published authority, including while Reader is closed.
 /// This is an instantaneous observation, NOT a worker lease or acceptance lock.
 public struct ChapterDurableIntentAuthority: ChapterIntentAuthority {
@@ -39,29 +48,47 @@ public struct ChapterDurableIntentAuthority: ChapterIntentAuthority {
     }
     func validateCurrent(_ readSet: ChapterIntentReadSet,
                          afterArchiveRead: @escaping @Sendable () async throws -> Void) async throws -> Bool {
+        guard readSet.intent.deviceID == descriptor.deviceID,
+              readSet.intent.request.accountPartition == descriptor.accountPartition else { throw ChapterWorkerError.accountMismatch }
+        guard let snapshot = try await readSnapshot(afterArchiveRead: afterArchiveRead) else { return false }
+        let key = try readSet.intent.request.renderKey()
+        let result = try snapshot.readSets.first(where: { try $0.intent.request.renderKey() == key }) == readSet
+        try Task.checkCancellation(); return result
+    }
+    /// Explicit bounded discovery for the Worker's OWN current session. A blocked,
+    /// missing or concurrently changed head is unavailable, never an empty queue.
+    /// A genuinely ready empty archive can return an empty readSets array.
+    public func wantedSnapshot(session: ChapterAccountSession, gate: ChapterAccountSessionGate) async throws -> ChapterWantedSnapshot {
+        try await wantedSnapshot(session: session, gate: gate, afterArchiveRead: {})
+    }
+    func wantedSnapshot(session: ChapterAccountSession, gate: ChapterAccountSessionGate,
+                        afterArchiveRead: @escaping @Sendable () async throws -> Void) async throws -> ChapterWantedSnapshot {
+        try Task.checkCancellation(); try await gate.validate(session); try Task.checkCancellation()
+        guard session.accountPartition == descriptor.accountPartition else { throw ChapterWorkerError.accountMismatch }
+        guard let result = try await readSnapshot(afterArchiveRead: afterArchiveRead) else { throw ChapterDurableAuthorityError.busy }
+        try Task.checkCancellation(); try await gate.validate(session); try Task.checkCancellation()
+        return result
+    }
+    private func readSnapshot(afterArchiveRead: @escaping @Sendable () async throws -> Void) async throws -> ChapterWantedSnapshot? {
         try Task.checkCancellation()
-        let task = Task.detached(priority: .utility) { [directory, descriptor] in
+        let task = Task.detached(priority: .utility) { [directory, descriptor] () async throws -> ChapterWantedSnapshot? in
             let root = try IntentAuthorityRoot(directory)
             try root.validate(descriptor)
-            guard readSet.intent.deviceID == descriptor.deviceID,
-                  readSet.intent.request.accountPartition == descriptor.accountPartition else { throw ChapterWorkerError.accountMismatch }
-            guard let before = try root.read("current.json", maximum: 16384) else { return false }
+            guard let before = try root.read("current.json", maximum: 16384) else { return nil }
             let barrier = try IntentAuthorityCodec.decode(IntentAuthorityBarrier.self, before)
             guard barrier.version == 1, barrier.descriptor == descriptor else { throw ChapterDurableAuthorityError.invalidRecord }
             guard barrier.ready else {
-                guard barrier.archive == nil else { throw ChapterDurableAuthorityError.invalidRecord }; return false
+                guard barrier.archive == nil else { throw ChapterDurableAuthorityError.invalidRecord }; return nil
             }
             guard let reference = barrier.archive, isDigest(reference) else { throw ChapterDurableAuthorityError.invalidRecord }
             let bytes = try root.required(reference + ".json", maximum: IntentAuthorityCodec.maximumArchiveBytes)
             guard IntentAuthorityCodec.hash(bytes) == reference else { throw ChapterDurableAuthorityError.invalidRecord }
             let archive = try IntentAuthorityCodec.decode(IntentAuthorityArchive.self, bytes)
             try archive.validate(descriptor)
-            let key = try readSet.intent.request.renderKey()
-            let matches = try archive.readSets.first(where: { try $0.intent.request.renderKey() == key }) == readSet
             try await afterArchiveRead()
-            guard try root.read("current.json", maximum: 16384) == before else { return false }
+            guard try root.read("current.json", maximum: 16384) == before else { return nil }
             try root.validate(descriptor); try Task.checkCancellation()
-            return matches
+            return .init(descriptor: descriptor, publicationID: barrier.generation, archiveSHA256: reference, readSets: archive.readSets)
         }
         let result = try await withTaskCancellationHandler { try await task.value } onCancel: { task.cancel() }
         try Task.checkCancellation(); return result

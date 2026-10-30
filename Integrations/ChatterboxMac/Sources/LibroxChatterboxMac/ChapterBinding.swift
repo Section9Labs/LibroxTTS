@@ -55,17 +55,9 @@ public struct ChatterboxMacChapterBinding: Sendable {
 
     init(source: ChapterSourceIdentity, localRequest: ChatterboxMacChapterRequest,
          rendererID: UUID, backend: any ResidentChapterBackend, session: ChapterAccountSession) throws {
-        try source.validate(text: localRequest.text)
-        let recipe = try ChapterRenderRecipe(language: localRequest.language, stockVoiceID: "librox-narrator",
-            conditioningSHA256: backend.conditioningSHA256, modelSHA256: backend.modelSHA256,
-            rendererProfile: backend.profile,
-            plannerRevision: ChatterboxBookDirector.revision + ":chapterV1:" + ConversationCadence.revision,
-            expressionSHA256: localRequest.expressionIdentity(),
-            synthesisOptionsSHA256: localRequest.synthesisIdentity(rendererProfile: backend.profile),
-            seedPolicy: "fixed-per-unit-1:\(localRequest.seed)", watermarkRevision: "disabled-1")
-        let request = try ChapterRenderRequest(accountPartition: session.accountPartition, source: source,
-            recipe: recipe, delivery: localRequest.delivery)
-        submission = try ChapterSubmission(request: request, originalText: localRequest.text, session: session)
+        let descriptor = try ChatterboxStockVoiceDescriptor(modelSHA256: backend.modelSHA256,
+            conditioningSHA256: backend.conditioningSHA256, rendererProfile: backend.profile)
+        submission = try descriptor.prepareChapter(source: source, options: localRequest, session: session).submission
         self.localRequest = localRequest; self.rendererID = rendererID
         settingsSHA256 = try localRequest.deliveryIdentity(rendererProfile: backend.profile)
     }

@@ -48,6 +48,42 @@ private final class DurableFixture: Sendable {
     }
 }
 @Suite(.serialized) struct ChapterDurableIntentAuthorityTests {
+    @Test func workerDiscoversExactWantedSnapshotAfterReaderClosesWithoutOpeningReaderJournal() async throws {
+        let f = try DurableFixture(), store = try await f.open(), readSet = try await f.complete(store), authority = try await f.authority(store)
+        let workerGate = ChapterAccountSessionGate(), own = try await workerGate.open(accountPartition: f.partition)
+        let first = try await authority.wantedSnapshot(session: own, gate: workerGate)
+        #expect(first.readSets == [readSet] && first.descriptor == authority.descriptor)
+        await store.close(); await f.gate.close()
+        let offline = try await authority.wantedSnapshot(session: own, gate: workerGate)
+        #expect(offline.publicationID == first.publicationID && offline.archiveSHA256 == first.archiveSHA256)
+        #expect(offline.readSets == [readSet])
+    }
+    @Test func readyEmptyIsDifferentFromMissingOrBlockedAuthority() async throws {
+        let f = try DurableFixture(), store = try await f.open(), authority = try await f.authority(store)
+        let workerGate = ChapterAccountSessionGate(), own = try await workerGate.open(accountPartition: f.partition)
+        #expect(try await authority.wantedSnapshot(session: own, gate: workerGate).readSets.isEmpty)
+        let current = f.published.appendingPathComponent("current.json"), ready = try Data(contentsOf: current)
+        await store.close(); try FileManager.default.removeItem(at: current)
+        await #expect(throws: ChapterDurableAuthorityError.busy) { try await authority.wantedSnapshot(session: own, gate: workerGate) }
+        try ready.write(to: current)
+        let reopened = try await f.open(), readSet = try await f.complete(reopened)
+        await reopened.failAuthorityForTesting { event in if case .afterBlocked = event { throw ChapterDurableAuthorityError.storage } }
+        await #expect(throws: ChapterOutboxError.ambiguousWrite) { try await reopened.setDemand(false, for: readSet.intent.request) }
+        await #expect(throws: ChapterDurableAuthorityError.busy) { try await authority.wantedSnapshot(session: own, gate: workerGate) }
+        await reopened.close()
+    }
+    @Test func changedHeadAndRevokedWorkerEpochRejectDiscoveryInsteadOfReturningStaleWork() async throws {
+        let f = try DurableFixture(), store = try await f.open(), readSet = try await f.complete(store), authority = try await f.authority(store)
+        let workerGate = ChapterAccountSessionGate(), own = try await workerGate.open(accountPartition: f.partition)
+        await #expect(throws: ChapterDurableAuthorityError.busy) {
+            try await authority.wantedSnapshot(session: own, gate: workerGate) { _ = try await store.setDemand(false, for: readSet.intent.request) }
+        }
+        #expect(try await authority.wantedSnapshot(session: own, gate: workerGate).readSets.isEmpty)
+        await #expect(throws: ChapterWorkerError.accountMismatch) {
+            try await authority.wantedSnapshot(session: own, gate: workerGate) { await workerGate.close() }
+        }
+        await store.close()
+    }
     @Test func currentWantedSurvivesReaderCloseAndRecoveryWithSamePinnedIdentity() async throws {
         let f = try DurableFixture(), store = try await f.open(), readSet = try await f.complete(store), authority = try await f.authority(store)
         #expect(try await authority.validateCurrent(readSet))

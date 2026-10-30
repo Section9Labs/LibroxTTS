@@ -5,6 +5,7 @@ import CryptoKit
 import LibroxChatterbox
 import LibroxChatterboxMLX
 import LibroxChapterWorker
+import LibroxChatterboxPlanning
 import ChatterboxCoreML
 import ChatterboxMacAcousticAudit
 import KokoroNarration
@@ -100,6 +101,13 @@ public actor ChatterboxMacResidentRenderer {
         assets = nil; self.testFactory = testFactory
     }
     public func state() -> State { current }
+    /// Actual prepared backend identity, not an available/approved catalog entry.
+    /// Reader-side canonical planning uses this value without importing MLX.
+    public func stockVoiceDescriptor() throws -> ChatterboxStockVoiceDescriptor {
+        guard current != .closing, current != .closed else { throw ChatterboxMacRendererError.closed }
+        guard current == .ready, let backend else { throw ChatterboxMacRendererError.busy }
+        return try .init(modelSHA256: backend.modelSHA256, conditioningSHA256: backend.conditioningSHA256, rendererProfile: backend.profile)
+    }
     public func prepare() async throws -> LoadingReport {
         try Task.checkCancellation()
         guard current != .closing, current != .closed else { throw ChatterboxMacRendererError.closed }
