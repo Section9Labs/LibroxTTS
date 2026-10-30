@@ -28,14 +28,15 @@ private actor PlanPause {
 }
 private final class PlanStorageFixture: Sendable {
     let root = FileManager.default.temporaryDirectory.appendingPathComponent("plan-store-" + UUID().uuidString)
-    let sourceDirectory: URL, planDirectory: URL, outboxDirectory: URL
+    let sourceDirectory: URL, planDirectory: URL, outboxDirectory: URL, authorityDirectory: URL
     let reader = ChapterAccountSessionGate(), worker = ChapterAccountSessionGate()
     let text = "Cafe\u{301} 🐈.\r\n¡Sigue adelante!"
     init() throws {
         sourceDirectory = root.appendingPathComponent("Sources")
         planDirectory = root.appendingPathComponent("Plans")
         outboxDirectory = root.appendingPathComponent("Outbox")
-        for path in [root, sourceDirectory, planDirectory, outboxDirectory] {
+        authorityDirectory = root.appendingPathComponent("Authority")
+        for path in [root, sourceDirectory, planDirectory, outboxDirectory, authorityDirectory] {
             try FileManager.default.createDirectory(at: path, withIntermediateDirectories: false, attributes: [.posixPermissions: 0o700])
         }
     }
@@ -56,6 +57,15 @@ private final class PlanStorageFixture: Sendable {
         await renderer.shutdown()
         let published = try await ChapterLocalSource.publish(binding.submission, gate: reader, directory: sourceDirectory)
         return (binding.submission, try .init(request: options), published)
+    }
+    func durableStore(_ submission: ChapterSubmission, plan: ChatterboxChapterRenderPlan,
+                      source: ChapterLocalSourcePublication) async throws -> ChapterDemandOutbox {
+        let published = try await ChatterboxLocalRenderPlan.publish(plan, submission: submission, source: source,
+            gate: reader, directory: planDirectory)
+        let store = try await ChapterDemandOutbox.openWithDurableAuthority(directory: outboxDirectory,
+            authorityDirectory: authorityDirectory, accountPartition: submission.request.accountPartition, deviceID: UUID())
+        _ = try await store.setDemand(true, for: submission.request, source: source, renderPlan: published)
+        return store
     }
     func path(_ ref: ChapterLocalRenderPlanReference) -> URL { planDirectory.appendingPathComponent(ref.identifier + ".json") }
     func workerSubmission(_ request: ChapterRenderRequest, source: ChapterLocalSourceReference) async throws -> ChapterSubmission {
@@ -200,6 +210,117 @@ private final class PlanStorageFixture: Sendable {
             }
         }
         #expect(FileManager.default.fileExists(atPath: f.path(publication.reference).path))
+    }
+    @Test func preparedPairRecoversExactAuthoredBitsAfterReaderReopen() async throws {
+        let f = try PlanStorageFixture(), (submission, plan, source) = try await f.values()
+        let store = try await f.durableStore(submission, plan: plan, source: source)
+        let descriptor = try await store.durableIntentDescriptor()
+        await store.close()
+        let reopened = try await ChapterDemandOutbox.openWithDurableAuthority(directory: f.outboxDirectory,
+            authorityDirectory: f.authorityDirectory, accountPartition: submission.request.accountPartition, deviceID: descriptor.deviceID)
+        let session = try await f.reader.open(accountPartition: submission.request.accountPartition)
+        let before = try await reopened.storedSubmission(for: submission.request)
+        let recovered = try await #require(ChatterboxLocalPreparedSubmission.recover(for: submission.request,
+            session: session, gate: f.reader, outbox: reopened, sourceDirectory: f.sourceDirectory, planDirectory: f.planDirectory))
+        #expect(recovered.submission.session == session && session.epoch != submission.session.epoch)
+        #expect(Data(recovered.submission.originalText.utf8) == Data(f.text.utf8))
+        #expect(recovered.plan.encoded() == plan.encoded())
+        let options = try recovered.plan.restore(source: recovered.submission.originalText)
+        #expect(options.seed == .max && options.delivery == .smaller)
+        #expect(options.performanceDirections?.annotations.first?.controls?.guidance.bitPattern == 0x80000000)
+        #expect(try await reopened.storedSubmission(for: submission.request) == before)
+        #expect(try await reopened.confirmation(for: submission.request) == nil)
+        await reopened.close()
+    }
+    @Test func cancelledPairRecoveryDoesNotRestoreDemandOrAcknowledgement() async throws {
+        let f = try PlanStorageFixture(), (submission, plan, source) = try await f.values()
+        let store = try await f.durableStore(submission, plan: plan, source: source)
+        let cancelled = try await store.setDemand(false, for: submission.request)
+        let before = try await store.pending()
+        #expect(try await ChatterboxLocalPreparedSubmission.recover(for: submission.request,
+            session: submission.session, gate: f.reader, outbox: store, sourceDirectory: f.sourceDirectory, planDirectory: f.planDirectory) != nil)
+        #expect(try await store.storedSubmission(for: submission.request)?.intent == cancelled)
+        #expect(try await store.pending() == before)
+        #expect(try await store.wantedReadSet(for: submission.request) == nil)
+        #expect(try await store.retainedHandoff(for: submission.request) == nil)
+        await store.close()
+    }
+    @Test func absentAndIncompletePairsReturnNilButPlainWriterRejects() async throws {
+        let f = try PlanStorageFixture(), (submission, _, source) = try await f.values()
+        let plain = try ChapterDemandOutbox(directory: f.outboxDirectory, accountPartition: submission.request.accountPartition, deviceID: UUID())
+        await #expect(throws: ChapterDurableAuthorityError.configurationRequired) {
+            try await ChatterboxLocalPreparedSubmission.recover(for: submission.request, session: submission.session,
+                gate: f.reader, outbox: plain, sourceDirectory: f.sourceDirectory, planDirectory: f.planDirectory)
+        }
+        await plain.close()
+        let store = try await ChapterDemandOutbox.openWithDurableAuthority(directory: f.outboxDirectory,
+            authorityDirectory: f.authorityDirectory, accountPartition: submission.request.accountPartition, deviceID: UUID())
+        #expect(try await ChatterboxLocalPreparedSubmission.recover(for: submission.request,
+            session: submission.session, gate: f.reader, outbox: store, sourceDirectory: f.sourceDirectory, planDirectory: f.planDirectory) == nil)
+        _ = try await store.setDemand(true, for: submission.request, source: source)
+        #expect(try await ChatterboxLocalPreparedSubmission.recover(for: submission.request,
+            session: submission.session, gate: f.reader, outbox: store, sourceDirectory: f.sourceDirectory, planDirectory: f.planDirectory) == nil)
+        await store.close()
+    }
+    @Test func intentChangeDuringPairRecoveryRejectsWithoutRewritingFiles() async throws {
+        let f = try PlanStorageFixture(), (submission, plan, source) = try await f.values()
+        let store = try await f.durableStore(submission, plan: plan, source: source)
+        let paths = try FileManager.default.contentsOfDirectory(atPath: f.planDirectory.path)
+        await #expect(throws: ChapterLocalIntentError.staleIntent) {
+            try await ChatterboxLocalPreparedSubmission.recover(for: submission.request, session: submission.session,
+                gate: f.reader, outbox: store, sourceDirectory: f.sourceDirectory, planDirectory: f.planDirectory) {
+                    if case .afterSource = $0 { _ = try await store.setDemand(false, for: submission.request) }
+                }
+        }
+        #expect(try FileManager.default.contentsOfDirectory(atPath: f.planDirectory.path) == paths)
+        #expect(try await store.wantedReadSet(for: submission.request) == nil)
+        await store.close()
+    }
+    @Test(arguments: [false, true]) func recoveryRejectsEpochRevocationOrJournalCloseAfterPlan(closeJournal: Bool) async throws {
+        let f = try PlanStorageFixture(), (submission, plan, source) = try await f.values()
+        let store = try await f.durableStore(submission, plan: plan, source: source)
+        await #expect(throws: (any Error).self) {
+            try await ChatterboxLocalPreparedSubmission.recover(for: submission.request, session: submission.session,
+                gate: f.reader, outbox: store, sourceDirectory: f.sourceDirectory, planDirectory: f.planDirectory) {
+                    if case .afterPlan = $0 {
+                        if closeJournal { await store.close() } else { _ = try await f.reader.open(accountPartition: submission.request.accountPartition) }
+                    }
+                }
+        }
+        await store.close()
+    }
+    @Test func pairRecoveryCancellationJoinsOwnedReadsAndPreservesUnknownFiles() async throws {
+        let f = try PlanStorageFixture(), (submission, plan, source) = try await f.values(), pause = PlanPause()
+        let store = try await f.durableStore(submission, plan: plan, source: source)
+        let keep = f.planDirectory.appendingPathComponent("keep"); try Data("keep".utf8).write(to: keep)
+        let task = Task {
+            try await ChatterboxLocalPreparedSubmission.recover(for: submission.request, session: submission.session,
+                gate: f.reader, outbox: store, sourceDirectory: f.sourceDirectory, planDirectory: f.planDirectory) {
+                    if case .afterSource = $0 { await pause.pause() }
+                }
+        }
+        await pause.wait(); task.cancel()
+        await pause.open()
+        await #expect(throws: CancellationError.self) { try await task.value }
+        #expect(try String(contentsOf: keep, encoding: .utf8) == "keep")
+        #expect(try await store.wantedReadSet(for: submission.request) != nil)
+        await store.close()
+    }
+    @Test(arguments: [false, true]) func missingOrCorruptReferencedPlanThrowsRatherThanReturningNil(corrupt: Bool) async throws {
+        let f = try PlanStorageFixture(), (submission, plan, source) = try await f.values()
+        let store = try await f.durableStore(submission, plan: plan, source: source)
+        let stored = try await #require(store.storedSubmission(for: submission.request))
+        let path = f.path(try #require(stored.renderPlanReference))
+        if corrupt {
+            try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: path.path)
+            try Data("corrupt".utf8).write(to: path)
+        } else { try FileManager.default.removeItem(at: path) }
+        await #expect(throws: (any Error).self) {
+            try await ChatterboxLocalPreparedSubmission.recover(for: submission.request, session: submission.session,
+                gate: f.reader, outbox: store, sourceDirectory: f.sourceDirectory, planDirectory: f.planDirectory)
+        }
+        #expect(try await store.storedSubmission(for: submission.request) == stored)
+        await store.close()
     }
 }
 #endif
