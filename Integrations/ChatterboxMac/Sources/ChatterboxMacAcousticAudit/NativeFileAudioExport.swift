@@ -12,7 +12,13 @@ import CryptoKit
 public enum NativeFileAudioExport {
     public static let maximumFrames: Int64 = 6 * 60 * 60 * 24_000
     public static let maximumEncodedBytes: Int64 = 1_073_741_824
-    public enum Failure: Error, Equatable { case input, sourceIdentity, sourceHash, destinationExists, storage, encodedBudget }
+    public enum Failure: Error, Equatable {
+        case input, sourceIdentity, sourceHash, destinationExists, storage, encodedBudget
+        /// Source PCM and encoder admission already passed. Lossy reconstruction
+        /// can overshoot even when every source sample is in range. Preserve the
+        /// same finite/absolute-peak guard and report its exact readback failure.
+        case decodedSampleRange(codec: String, index: Int64, value: Float)
+    }
     public static func write(rawPCM: URL, frames: Int64, pcmSHA256: String, to destination: URL,
                              codec: NativeAudioExport.Codec) throws -> NativeAudioExportReport {
         try encode(rawPCM: rawPCM, frames: frames, pcmSHA256: pcmSHA256, to: destination, codec: codec, check: health)
@@ -90,7 +96,9 @@ public enum NativeFileAudioExport {
             let reference = try read(input, bytes: count * 4, check: check); secondHash.update(data: reference)
             for i in 0..<count {
                 let expected = sample(reference, i), value = actual[i]
-                guard value.isFinite, abs(value) <= 1 else { throw Failure.input }
+                guard value.isFinite, abs(value) <= 1 else {
+                    throw Failure.decodedSampleRange(codec: codec.rawValue, index: offset + Int64(i), value: value)
+                }
                 let error = abs(value - expected)
                 if let tolerance, error > tolerance {
                     throw NativeAudioExport.Failure.decodedSample(codec: codec.rawValue, index: Int(offset) + i,

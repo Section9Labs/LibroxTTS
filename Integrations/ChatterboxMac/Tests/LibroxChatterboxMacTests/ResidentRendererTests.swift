@@ -1,6 +1,7 @@
 #if os(macOS)
 import XCTest
 import Foundation
+import CryptoKit
 import LibroxChatterbox
 import LibroxChapterWorker
 @testable import ChatterboxCoreML
@@ -46,6 +47,10 @@ private struct SyntheticResidentBackend: ResidentChapterBackend {
         try await narrator.unload()
     }
 }
+private actor SegmentTestCollector {
+    var values: [ChatterboxMacSegmentExport] = []
+    func append(_ value: ChatterboxMacSegmentExport) -> Bool { values.append(value); return values.count == 1 }
+}
 final class ResidentRendererTests: XCTestCase {
     private func fixture() throws -> (URL, URL) {
         let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
@@ -83,6 +88,116 @@ final class ResidentRendererTests: XCTestCase {
         await renderer.shutdown()
         let closed = await renderer.state(); XCTAssertEqual(closed, .closed)
         XCTAssertTrue(FileManager.default.fileExists(atPath: aac.audioFile.path))
+    }
+    func testSegmentsEmitBeforeChapterFinishesAndRetainExactPCMContextAndSourceMaps() async throws {
+        let (dir, voice) = try fixture(); defer { try? FileManager.default.removeItem(at: dir) }
+        let renderer = ChatterboxMacResidentRenderer(testFactory: { SyntheticResidentBackend(voice: voice, gate: nil, omitAudio: false) })
+        _ = try await renderer.prepare()
+        let text = "Cafe\u{301} 🐈 waited.\n\nShe said, “Keep going!”\n\nThen they left.\n"
+        let options = try ChatterboxMacChapterRequest(text: text, language: "en", delivery: .lossless)
+        let source = try ChapterSourceIdentity(bookSHA256: String(repeating: "b", count: 64), chapterKey: "spine:1",
+            textSHA256: ChatterboxMacChapterRequest.hash(Data(text.utf8)), extractionRevision: "test-1", utf16Length: text.utf16.count)
+        let gate = ChapterAccountSessionGate(), session = try await gate.open(accountPartition: String(repeating: "a", count: 64))
+        let binding = try await renderer.bindChapter(source: source, request: options, session: session, gate: gate)
+        let whole = try await renderer.renderChapter(binding, gate: gate, outputDirectory: dir)
+        let collector = SegmentTestCollector(), progress = ResidentTestGate()
+        let task = Task {
+            try await renderer.renderSegments(binding, gate: gate, outputDirectory: dir) { value in
+                if await collector.append(value) {
+                    await progress.signal("first")
+                    await progress.wait("continue")
+                }
+            }
+        }
+        await progress.wait("first")
+        let active = await renderer.state(); XCTAssertEqual(active, .rendering)
+        let observed = await collector.values
+        let first = try XCTUnwrap(observed.first)
+        let storage = dir.appendingPathComponent("reader-segments")
+        try FileManager.default.createDirectory(at: storage, withIntermediateDirectories: false)
+        let adopted = try await ChapterLocalSegmentArtifact.adopt(download: first.audioFile, manifest: first.manifest,
+            request: binding.submission.request, originalText: text, session: session, gate: gate, storageDirectory: storage)
+        XCTAssertEqual(adopted.manifest.segmentIndex, 0)
+        let sealPath = first.audioFile.deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("chapter-seal.json")
+        XCTAssertFalse(FileManager.default.fileExists(atPath: sealPath.path))
+        await progress.signal("continue")
+        let seal = try await task.value, segments = await collector.values
+        XCTAssertGreaterThan(segments.count, 1)
+        var prefix = try ChapterSegmentPrefix(request: binding.submission.request, originalText: text), digest = SHA256()
+        for segment in segments {
+            try prefix.append(segment.manifest)
+            let raw = try Data(contentsOf: segment.audioFile.deletingLastPathComponent().appendingPathComponent("chapter.f32"))
+            digest.update(data: raw)
+        }
+        try prefix.validate(seal)
+        XCTAssertEqual(digest.finalize().map { String(format: "%02x", $0) }.joined(), whole.receipt.pcmSHA256)
+        XCTAssertEqual(seal.decodedFrameCount, whole.receipt.export.frames)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: sealPath.path))
+        await renderer.shutdown()
+    }
+    func testSegmentShutdownJoinsBlockedReceiverAndDoesNotSealPartialChapter() async throws {
+        let (dir, voice) = try fixture(); defer { try? FileManager.default.removeItem(at: dir) }
+        let renderer = ChatterboxMacResidentRenderer(testFactory: { SyntheticResidentBackend(voice: voice, gate: nil, omitAudio: false) })
+        _ = try await renderer.prepare()
+        let text = "First sentence.\n\nSecond sentence.", options = try ChatterboxMacChapterRequest(text: text, language: "en")
+        let source = try ChapterSourceIdentity(bookSHA256: String(repeating: "b", count: 64), chapterKey: "spine:1",
+            textSHA256: ChatterboxMacChapterRequest.hash(Data(text.utf8)), extractionRevision: "test-1", utf16Length: text.utf16.count)
+        let gate = ChapterAccountSessionGate(), session = try await gate.open(accountPartition: String(repeating: "a", count: 64))
+        let binding = try await renderer.bindChapter(source: source, request: options, session: session, gate: gate)
+        let progress = ResidentTestGate(), collector = SegmentTestCollector()
+        let task = Task {
+            try await renderer.renderSegments(binding, gate: gate, outputDirectory: dir) { value in
+                _ = await collector.append(value); await progress.signal("first")
+                await withTaskCancellationHandler { await progress.wait("release") } onCancel: {
+                    Task { await progress.signal("cancelled") }
+                }
+                try Task.checkCancellation()
+            }
+        }
+        await progress.wait("first")
+        let stop = Task { await renderer.shutdown() }
+        await progress.wait("cancelled")
+        let closing = await renderer.state(); XCTAssertEqual(closing, .closing)
+        await progress.signal("release"); await stop.value
+        do { _ = try await task.value; XCTFail("Partial stream returned seal") } catch { XCTAssertTrue(error is CancellationError) }
+        let observed = await collector.values
+        let first = try XCTUnwrap(observed.first)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: first.audioFile.path))
+        XCTAssertFalse(FileManager.default.fileExists(atPath: first.audioFile.deletingLastPathComponent()
+            .deletingLastPathComponent().appendingPathComponent("chapter-seal.json").path))
+        let closed = await renderer.state(); XCTAssertEqual(closed, .closed)
+    }
+    func testSegmentShutdownJoinsFinalAsynchronousAdmissionAfterSealWrite() async throws {
+        let (dir, voice) = try fixture(); defer { try? FileManager.default.removeItem(at: dir) }
+        let renderer = ChatterboxMacResidentRenderer(testFactory: { SyntheticResidentBackend(voice: voice, gate: nil, omitAudio: false) })
+        _ = try await renderer.prepare()
+        let text = "One sentence.", options = try ChatterboxMacChapterRequest(text: text, language: "en")
+        let source = try ChapterSourceIdentity(bookSHA256: String(repeating: "b", count: 64), chapterKey: "spine:1",
+            textSHA256: ChatterboxMacChapterRequest.hash(Data(text.utf8)), extractionRevision: "test-1", utf16Length: text.utf16.count)
+        let gate = ChapterAccountSessionGate(), session = try await gate.open(accountPartition: String(repeating: "a", count: 64))
+        let binding = try await renderer.bindChapter(source: source, request: options, session: session, gate: gate)
+        let progress = ResidentTestGate(), collector = SegmentTestCollector()
+        let task = Task {
+            try await renderer.renderSegments(binding, gate: gate, outputDirectory: dir, admission: {
+                let values = await collector.values
+                if let first = values.first,
+                   FileManager.default.fileExists(atPath: first.audioFile.deletingLastPathComponent()
+                    .deletingLastPathComponent().appendingPathComponent("chapter-seal.json").path) {
+                    await progress.signal("final-admission")
+                    await withTaskCancellationHandler { await progress.wait("release-final") } onCancel: {
+                        Task { await progress.signal("final-cancelled") }
+                    }
+                    try Task.checkCancellation()
+                }
+            }, receive: { value in _ = await collector.append(value) })
+        }
+        await progress.wait("final-admission")
+        let stop = Task { await renderer.shutdown() }
+        await progress.wait("final-cancelled")
+        let state = await renderer.state(); XCTAssertEqual(state, .closing)
+        await progress.signal("release-final"); await stop.value
+        do { _ = try await task.value; XCTFail("Cancelled final admission returned success") } catch { XCTAssertTrue(error is CancellationError) }
+        let closed = await renderer.state(); XCTAssertEqual(closed, .closed)
     }
     func testShutdownCancelsAndJoinsBeforeClosedAndPreservesExistingFiles() async throws {
         let (dir, voice) = try fixture(); defer { try? FileManager.default.removeItem(at: dir) }

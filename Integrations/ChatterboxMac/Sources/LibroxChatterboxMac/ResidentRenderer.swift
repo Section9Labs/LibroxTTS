@@ -91,6 +91,7 @@ public actor ChatterboxMacResidentRenderer {
     private var backend: (any ResidentChapterBackend)?
     private var loading: Task<LoadingReport, Error>?
     private var rendering: Task<ChatterboxMacChapterArtifact, Error>?
+    private var segmenting: Task<ChapterSegmentCompletionSeal, Error>?
     private var current: State = .cold
     private var loadReport: LoadingReport?
     private nonisolated let cancellation = ResidentCancellation()
@@ -210,6 +211,49 @@ public actor ChatterboxMacResidentRenderer {
             authorization: MacChapterAuthorization(session: binding.submission.session, gate: gate,
                 renderKey: binding.submission.request.renderKey(), admission: admission))
     }
+    /// Emits each complete, readback-verified passage file before the chapter
+    /// finishes. Same globally planned backend stream/context/cadence as the
+    /// chapter API; no per-segment replanning or second model. The receiver is
+    /// awaited and owned by this operation. It must join any transport work.
+    /// These exports are NOT cloud acknowledgements or Reader playback grants.
+    public func renderSegments(_ binding: ChatterboxMacChapterBinding, gate: ChapterAccountSessionGate,
+                               outputDirectory: URL,
+                               admission: @escaping @Sendable () async throws -> Void = {},
+                               receive: @escaping @Sendable (ChatterboxMacSegmentExport) async throws -> Void)
+        async throws -> ChapterSegmentCompletionSeal {
+        try Task.checkCancellation()
+        guard binding.rendererID == rendererID else { throw ChapterWorkerError.invalidManifest }
+        guard current != .closing, current != .closed else { throw ChatterboxMacRendererError.closed }
+        guard current == .ready, let backend else { throw ChatterboxMacRendererError.busy }
+        let authorization = try MacChapterAuthorization(session: binding.submission.session, gate: gate,
+            renderKey: binding.submission.request.renderKey(), admission: admission)
+        current = .rendering
+        let task = Task {
+            try await authorization.validate(); try Task.checkCancellation(); try self.runtime?.verify()
+            let writer = try ResidentSegmentWriter(submission: binding.submission, directory: outputDirectory)
+            try await backend.stream(binding.localRequest, cache: writer.cacheDirectory) { passage in
+                try await authorization.validate()
+                try await writer.append(passage) { export in
+                    try await authorization.validate(); try Task.checkCancellation()
+                    try await receive(export)
+                    try await authorization.validate(); try Task.checkCancellation()
+                }
+            }
+            try await authorization.validate(); try Task.checkCancellation(); try self.runtime?.verify()
+            let seal = try await writer.finish()
+            // Final asynchronous authority work remains in this exact owned
+            // task. Shutdown must join it before releasing runtime resources.
+            try await authorization.validate(); try Task.checkCancellation(); try self.runtime?.verify()
+            return seal
+        }
+        segmenting = task
+        let token = cancellation.register { task.cancel() }
+        defer { segmenting = nil; cancellation.clear(token); if current == .rendering { current = .ready } }
+        let result = try await withTaskCancellationHandler { try await task.value } onCancel: { task.cancel() }
+        try await gate.validate(binding.submission.session); try Task.checkCancellation()
+        guard current == .rendering else { throw CancellationError() }
+        return result
+    }
     private func startRender(_ request: ChatterboxMacChapterRequest, outputDirectory: URL,
                              authorization: MacChapterAuthorization?) async throws -> ChatterboxMacChapterArtifact {
         try Task.checkCancellation()
@@ -299,10 +343,11 @@ public actor ChatterboxMacResidentRenderer {
     private func shutdownOwned() async {
         if current == .closed { return }
         current = .closing
-        let load = loading, render = rendering
-        load?.cancel(); render?.cancel()
+        let load = loading, render = rendering, segments = segmenting
+        load?.cancel(); render?.cancel(); segments?.cancel()
         if let load { _ = try? await load.value }
         if let render { _ = try? await render.value }
+        if let segments { _ = try? await segments.value }
         backend = nil; acoustic = nil; runtime = nil; loadReport = nil
         current = .closed
     }

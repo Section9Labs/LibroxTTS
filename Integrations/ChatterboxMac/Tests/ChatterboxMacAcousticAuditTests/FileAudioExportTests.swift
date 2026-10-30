@@ -94,6 +94,29 @@ final class FileAudioExportTests: XCTestCase {
         }
         XCTAssertEqual(try children(dir), ["fifo.f32", "link.f32", "source.f32"])
     }
+    func testAACReconstructionOvershootIsTypedAndNeverPublished() throws {
+        let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
+        let raw = dir.appendingPathComponent("source.f32"), out = dir.appendingPathComponent("out.m4a")
+        // Deterministic in-range square wave, not model/audio fixture data.
+        // Lossy transform reconstruction can exceed its source sample peaks.
+        var bytes = Data()
+        for i in 0..<48001 {
+            var bits = Float(i % 240 < 120 ? 0.99 : -0.99).bitPattern.littleEndian
+            withUnsafeBytes(of: &bits) { bytes.append(contentsOf: $0) }
+        }
+        try bytes.write(to: raw)
+        let hash = SHA256.hash(data: bytes).map { String(format: "%02x", $0) }.joined()
+        XCTAssertThrowsError(try NativeFileAudioExport.write(rawPCM: raw, frames: 48001,
+            pcmSHA256: hash, to: out, codec: .aac64)) { error in
+            guard case let NativeFileAudioExport.Failure.decodedSampleRange(codec, index, value) = error else {
+                return XCTFail("Wrong readback classification: \(error)")
+            }
+            XCTAssertEqual(codec, "AAC-LC-64k-requested"); XCTAssertGreaterThanOrEqual(index, 0)
+            XCTAssertTrue(!value.isFinite || abs(value) > 1)
+        }
+        XCTAssertEqual(try Data(contentsOf: raw), bytes)
+        XCTAssertEqual(try children(dir), ["source.f32"])
+    }
     func testDestinationCreatedDuringEncodeCannotBeReplaced() throws {
         let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
         let raw = dir.appendingPathComponent("source.f32"), hash = try pcm(raw, count: 144001)

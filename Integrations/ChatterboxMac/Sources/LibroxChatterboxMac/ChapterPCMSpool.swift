@@ -47,11 +47,15 @@ actor ChapterPCMSpool {
     private var closed = false
     private var failed = false
     private var completed = false
+    private let firstPassageIndex: Int
 
-    init(source: String, directory: URL) throws {
+    init(source: String, directory: URL, coverageStart: Int = 0, firstPassageIndex: Int = 0) throws {
         guard !source.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
               source.utf16.count <= 131072, source.utf8.count <= 393216,
-              directory.isFileURL, !directory.path.utf8.contains(0) else { throw ChatterboxMacRendererError.invalidSource }
+              directory.isFileURL, !directory.path.utf8.contains(0),
+              coverageStart >= 0, coverageStart < source.utf16.count,
+              (0..<4096).contains(firstPassageIndex),
+              Range(NSRange(location: coverageStart, length: 0), in: source) != nil else { throw ChatterboxMacRendererError.invalidSource }
         let values = try directory.resourceValues(forKeys: [.isDirectoryKey, .isSymbolicLinkKey])
         guard values.isDirectory == true, values.isSymbolicLink != true else { throw ChatterboxMacRendererError.storage }
         let file = directory.appendingPathComponent("chapter.f32")
@@ -64,6 +68,7 @@ actor ChapterPCMSpool {
         self.file = file; self.handle = FileHandle(fileDescriptor: fd, closeOnDealloc: true)
         self.identity = info; self.source = source; self.original = source as NSString
         self.boundaries = Set(source.indices).union([source.endIndex])
+        self.textEnd = coverageStart; self.firstPassageIndex = firstPassageIndex
     }
     deinit {
         try? handle.close()
@@ -91,7 +96,7 @@ actor ChapterPCMSpool {
         guard !closed, !failed else { throw ChatterboxMacRendererError.closed }
         do {
             try Task.checkCancellation()
-            guard index == units.count, index < 4096, self.generation == nil || self.generation == generation,
+            guard index == firstPassageIndex + units.count, index < 4096, self.generation == nil || self.generation == generation,
                   valid(range), range.location >= textEnd, Data(original.substring(with: range).utf8) == Data(text.utf8),
                   ignored(NSRange(location: textEnd, length: range.location - textEnd)),
                   !fragments.isEmpty, fragments.count <= 128,
@@ -124,11 +129,13 @@ actor ChapterPCMSpool {
             try verify()
         } catch { failed = true; throw error }
     }
-    func finish() throws -> Result {
+    func finish(coverageEnd: Int? = nil) throws -> Result {
         guard !closed, !failed else { throw ChatterboxMacRendererError.closed }
         closed = true
         try Task.checkCancellation()
-        guard !units.isEmpty, ignored(NSRange(location: textEnd, length: original.length - textEnd)) else {
+        let end = coverageEnd ?? original.length
+        guard !units.isEmpty, end >= textEnd, end <= original.length,
+              ignored(NSRange(location: textEnd, length: end - textEnd)) else {
             throw ChatterboxMacRendererError.sourceCoverage
         }
         try verify()
