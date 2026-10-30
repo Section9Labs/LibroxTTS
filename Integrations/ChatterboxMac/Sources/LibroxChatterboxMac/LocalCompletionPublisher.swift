@@ -2,7 +2,7 @@
 import Foundation
 import LibroxChapterWorker
 
-/// The forthcoming SDK service supervisor owns this task AFTER render returns,
+/// The SDK Worker supervisor owns this task AFTER render returns,
 /// cancels/joins it BEFORE worker shutdown, and never exposes it as app glue.
 /// A live publication can only be created after the owned render chain joins.
 package enum ChatterboxMacLocalCompletionPublisher {

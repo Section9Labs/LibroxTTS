@@ -5,7 +5,7 @@ import LibroxChapterWorker
 import LibroxChatterboxPlanning
 import ChatterboxMacAcousticAudit
 
-private final class LocalWorkerCancellation: Sendable {
+final class LocalWorkerCancellation: Sendable {
     private struct Value: Sendable {
         var blocked = true, terminal = false
         var revision: UInt64 = 0
@@ -28,10 +28,12 @@ private final class LocalWorkerCancellation: Sendable {
         }
         callback?()
     }
-    func register(_ callback: @escaping @Sendable () -> Void) -> UUID {
+    func register(enablingAtRevision: UInt64? = nil, _ callback: @escaping @Sendable () -> Void) -> UUID {
         let token = UUID()
         let cancel = value.withLock { v in
-            v.token = token; v.cancel = callback; return v.blocked || v.terminal
+            v.token = token; v.cancel = callback
+            if let enablingAtRevision { return v.terminal || v.revision != enablingAtRevision }
+            return v.blocked || v.terminal
         }
         if cancel { callback() }; return token
     }

@@ -11,6 +11,8 @@ import LibroxChatterbox
 private actor WorkerSignals {
     private var signals: Set<String> = []
     private var waiters: [String: [CheckedContinuation<Void, Never>]] = [:]
+    var workerSession: ChapterAccountSession?
+    func recordWorkerSession(_ session: ChapterAccountSession) { workerSession = session }
     var loads = 0, streams = 0
     func counts() -> (Int, Int) { (loads, streams) }
     func loaded() { loads += 1 }
@@ -69,6 +71,7 @@ private final class LocalWorkerFixture: Sendable {
     deinit { try? FileManager.default.removeItem(at: root) }
     func setup(pauseLoad: Bool = false, pauseRender: Bool = false, mismatchedProfile: Bool = false, disabledOnCancel: Bool = false, hooks: LocalWorkerLifecycleHooks = .init(), artifactBudget: ChapterArtifactStorageBudget? = nil) async throws -> (ChatterboxMacLocalWorker, ChapterSubmission, ChapterDemandOutbox, ChapterIntentReadSet, ChapterDurableIntentAuthority) {
         let reader = try await readerGate.open(accountPartition: partition), worker = try await workerGate.open(accountPartition: partition)
+        await signals.recordWorkerSession(worker)
         let directions = try ChatterboxPerformanceDirections(source: text, annotations: [
             .init(range: NSRange(location: 0, length: text.utf16.count), originalText: text,
                 performance: .init(delivery: .urgent, strength: .strong), controls: .init(exaggeration: 0.9, guidance: 0.3, temperature: 0.8))
@@ -572,6 +575,152 @@ private final class LocalWorkerFixture: Sendable {
                 gate: f.readerGate, authority: authority, directory: f.directories.publications)
         }
         try await worker.shutdown(); await outbox.close()
+    }
+    @Test func supervisorPublishesOnceAndUnchangedIntentObservesOnlyMetadata() async throws {
+        let f = try LocalWorkerFixture(), budget = try f.budget()
+        let (worker, _, outbox, readSet, authority) = try await f.setup(artifactBudget: budget)
+        let session = try #require(await f.signals.workerSession)
+        let supervisor = ChatterboxMacLocalWorkerSupervisor(worker: worker, session: session, gate: f.workerGate,
+            budget: budget, directory: f.directories.publications)
+        try await supervisor.enable()
+        let first = try await supervisor.renderAndPublish(readSet, authority: authority)
+        #expect(first.newPublication != nil)
+        let generation = try await worker.checkpoint(for: readSet.intent.request)?.generation
+        let second = try await supervisor.renderAndPublish(readSet, authority: authority)
+        #expect(second.newPublication == nil && second.receipt.handoffReference == first.receipt.handoffReference)
+        #expect(try await worker.checkpoint(for: readSet.intent.request)?.generation == generation)
+        let counts = await f.signals.counts(); #expect(counts.0 == 1 && counts.1 == 1)
+        #expect(try await outbox.retainedHandoff(for: readSet.intent.request) == nil)
+        try await supervisor.shutdown(); await outbox.close()
+    }
+    @Test func supervisorStopJoinsPausedMetadataBeforeWorkerAndBudgetShutdown() async throws {
+        let f = try LocalWorkerFixture(), budget = try f.budget()
+        let hooks = LocalWorkerLifecycleHooks(beforeStop: { await f.signals.signal("inner-worker-stop") })
+        let (worker, _, outbox, readSet, authority) = try await f.setup(hooks: hooks, artifactBudget: budget)
+        let session = try #require(await f.signals.workerSession)
+        let supervisor = ChatterboxMacLocalWorkerSupervisor(worker: worker, session: session, gate: f.workerGate,
+            budget: budget, directory: f.directories.publications, checkpoint: {
+                if case .beforeCommit = $0 { await f.signals.signal("metadata-entered"); await f.signals.wait("metadata-release") }
+            })
+        try await supervisor.enable()
+        let render = Task { try await supervisor.renderAndPublish(readSet, authority: authority) }
+        await f.signals.wait("metadata-entered")
+        supervisor.stopClaims() // Direct same-turn admission/cancellation fence.
+        await #expect(throws: ChatterboxMacWorkerError.disabled) { try await supervisor.renderAndPublish(readSet, authority: authority) }
+        let stop = Task { await f.signals.signal("outer-stop-entered"); try await supervisor.shutdown(); await f.signals.signal("outer-stopped") }
+        await f.signals.wait("outer-stop-entered")
+        await #expect(throws: ChapterStorageBudgetError.busy) { try await budget.close() }
+        let innerStop = await f.signals.has("inner-worker-stop"), outerStopped = await f.signals.has("outer-stopped")
+        #expect(!innerStop && !outerStopped)
+        await f.signals.signal("metadata-release")
+        await #expect(throws: CancellationError.self) { try await render.value }
+        try await stop.value
+        #expect(await worker.state() == .closed)
+        await outbox.close()
+    }
+    @Test func supervisorLostReceiptCallbackReconcilesWithoutNewInference() async throws {
+        let f = try LocalWorkerFixture(), budget = try f.budget(), counter = WorkerHookCounter()
+        let (worker, _, outbox, readSet, authority) = try await f.setup(artifactBudget: budget)
+        let session = try #require(await f.signals.workerSession)
+        let supervisor = ChatterboxMacLocalWorkerSupervisor(worker: worker, session: session, gate: f.workerGate,
+            budget: budget, directory: f.directories.publications, checkpoint: {
+                if case .afterCommit = $0, await counter.next() == 1 { throw CancellationError() }
+            })
+        try await supervisor.enable()
+        await #expect(throws: CancellationError.self) { try await supervisor.renderAndPublish(readSet, authority: authority) }
+        let recovered = try await supervisor.renderAndPublish(readSet, authority: authority)
+        #expect(recovered.newPublication == nil)
+        let counts = await f.signals.counts(); #expect(counts.0 == 1 && counts.1 == 1)
+        try await supervisor.shutdown(); await outbox.close()
+    }
+    @Test func supervisorMetadataWithoutPrivateWorkerCheckpointCannotAuthorizeRender() async throws {
+        let f = try LocalWorkerFixture(), budget = try f.budget()
+        let (worker, _, outbox, readSet, authority) = try await f.setup(artifactBudget: budget)
+        let session = try #require(await f.signals.workerSession)
+        _ = try await ChapterLocalCompletion.publish(readSet: readSet,
+            handoffReference: .init(identifier: String(repeating: "f", count: 64)), session: session,
+            gate: f.workerGate, authority: authority, directory: f.directories.publications, producerFence: {})
+        let supervisor = ChatterboxMacLocalWorkerSupervisor(worker: worker, session: session, gate: f.workerGate,
+            budget: budget, directory: f.directories.publications)
+        try await supervisor.enable()
+        await #expect(throws: ChapterLocalCompletionError.invalidRecord) { try await supervisor.renderAndPublish(readSet, authority: authority) }
+        let counts = await f.signals.counts(); #expect(counts.0 == 0 && counts.1 == 0)
+        try await supervisor.shutdown(); await outbox.close()
+    }
+    @Test func supervisorChangedIntentReverifiesCompletedAudioWithoutFreshModelWork() async throws {
+        let f = try LocalWorkerFixture(), budget = try f.budget()
+        let (worker, submission, outbox, readSet, authority) = try await f.setup(artifactBudget: budget)
+        let session = try #require(await f.signals.workerSession)
+        let supervisor = ChatterboxMacLocalWorkerSupervisor(worker: worker, session: session, gate: f.workerGate,
+            budget: budget, directory: f.directories.publications)
+        try await supervisor.enable()
+        _ = try await supervisor.renderAndPublish(readSet, authority: authority)
+        _ = try await outbox.setDemand(false, for: submission.request)
+        await #expect(throws: ChapterLocalIntentError.staleIntent) { try await supervisor.renderAndPublish(readSet, authority: authority) }
+        _ = try await outbox.setDemand(true, for: submission.request)
+        let newReadSet = try await #require(outbox.wantedReadSet(for: submission.request))
+        let result = try await supervisor.renderAndPublish(newReadSet, authority: authority)
+        #expect(result.newPublication?.reusedCompletedAudio == true && result.receipt.readSet == newReadSet)
+        let counts = await f.signals.counts(); #expect(counts.0 == 1 && counts.1 == 1)
+        try await supervisor.shutdown(); await outbox.close()
+    }
+    @Test func supervisorStopDuringOwnedEnableCannotLeaveClaimsEnabled() async throws {
+        let f = try LocalWorkerFixture(), budget = try f.budget()
+        let hooks = LocalWorkerLifecycleHooks(beforeEnableCommit: { await f.signals.signal("enable-entered"); await f.signals.wait("enable-release") })
+        let (worker, _, outbox, readSet, authority) = try await f.setup(hooks: hooks, artifactBudget: budget)
+        let session = try #require(await f.signals.workerSession)
+        let supervisor = ChatterboxMacLocalWorkerSupervisor(worker: worker, session: session, gate: f.workerGate,
+            budget: budget, directory: f.directories.publications)
+        let enable = Task { try await supervisor.enable() }
+        await f.signals.wait("enable-entered"); supervisor.stopClaims()
+        let stop = Task { try await supervisor.disable() }
+        await f.signals.signal("enable-release")
+        await #expect(throws: CancellationError.self) { try await enable.value }
+        try await stop.value
+        await #expect(throws: ChatterboxMacWorkerError.disabled) { try await supervisor.renderAndPublish(readSet, authority: authority) }
+        try await supervisor.shutdown(); await outbox.close()
+    }
+    @Test(arguments: [false, true]) func supervisorRefreshesAuthorityAfterProducerBeforeAcceptance(revokeEpoch: Bool) async throws {
+        let f = try LocalWorkerFixture(), budget = try f.budget()
+        let (worker, submission, outbox, readSet, authority) = try await f.setup(artifactBudget: budget)
+        let session = try #require(await f.signals.workerSession)
+        let supervisor = ChatterboxMacLocalWorkerSupervisor(worker: worker, session: session, gate: f.workerGate,
+            budget: budget, directory: f.directories.publications, beforeAcceptance: {
+                await f.signals.signal("acceptance-entered"); await f.signals.wait("acceptance-release")
+            })
+        try await supervisor.enable()
+        let render = Task { try await supervisor.renderAndPublish(readSet, authority: authority) }
+        await f.signals.wait("acceptance-entered")
+        await #expect(throws: ChatterboxMacWorkerError.busy) { try await supervisor.renderAndPublish(readSet, authority: authority) }
+        if revokeEpoch { _ = try await f.workerGate.open(accountPartition: f.partition) }
+        else { _ = try await outbox.setDemand(false, for: submission.request) }
+        await f.signals.signal("acceptance-release")
+        if revokeEpoch { await #expect(throws: ChapterWorkerError.accountMismatch) { try await render.value } }
+        else { await #expect(throws: ChapterLocalIntentError.staleIntent) { try await render.value } }
+        #expect(try await outbox.retainedHandoff(for: submission.request) == nil)
+        try await supervisor.shutdown(); await outbox.close()
+    }
+    @Test func supervisorStopAlsoJoinsPostProducerAcceptanceTask() async throws {
+        let f = try LocalWorkerFixture(), budget = try f.budget()
+        let hooks = LocalWorkerLifecycleHooks(beforeStop: { await f.signals.signal("acceptance-inner-stop") })
+        let (worker, _, outbox, readSet, authority) = try await f.setup(hooks: hooks, artifactBudget: budget)
+        let session = try #require(await f.signals.workerSession)
+        let supervisor = ChatterboxMacLocalWorkerSupervisor(worker: worker, session: session, gate: f.workerGate,
+            budget: budget, directory: f.directories.publications, beforeAcceptance: {
+                await f.signals.signal("acceptance-entered"); await f.signals.wait("acceptance-release")
+            })
+        try await supervisor.enable()
+        let render = Task { try await supervisor.renderAndPublish(readSet, authority: authority) }
+        await f.signals.wait("acceptance-entered"); supervisor.stopClaims()
+        let stop = Task { await f.signals.signal("acceptance-stop-entered"); try await supervisor.shutdown(); await f.signals.signal("acceptance-stopped") }
+        await f.signals.wait("acceptance-stop-entered")
+        let innerStopped = await f.signals.has("acceptance-inner-stop"), stopped = await f.signals.has("acceptance-stopped")
+        #expect(!innerStopped && !stopped)
+        await f.signals.signal("acceptance-release")
+        await #expect(throws: CancellationError.self) { try await render.value }
+        try await stop.value
+        #expect(await worker.state() == .closed)
+        await outbox.close()
     }
 }
 #endif

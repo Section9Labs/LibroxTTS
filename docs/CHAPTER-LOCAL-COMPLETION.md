@@ -12,10 +12,11 @@ nonretaining lifecycle fence: stopping, re-enabling, shutting down or destroying
 the originating Worker invalidates it. Neither that fence, the producer epoch,
 nor ephemeral timing/cache measurements are serialized.
 
-The forthcoming SDK service supervisor must own the publication task after
-`render` returns. It must cancel and join that exact task before shutting down
-the Worker. `Worker.disable()` alone does not join this separate metadata task.
-The supervisor/provider is not implemented by this component.
+The SDK `ChatterboxMacLocalWorkerSupervisor` owns the publication task after
+`render` returns. It cancels and joins that exact task before disabling or shutting
+down the Worker. `Worker.disable()` alone does not join a separately invoked
+metadata task. See `CHATTERBOX-MAC-LOCAL-SUPERVISOR.md`; the concrete Reader
+service/provider remains pending.
 
 Each canonical checksummed V1 envelope is limited to 128 KiB. Its deterministic
 leaf is `completion-<SHA256 of canonical exact read set>.json`. Bounded no-follow
@@ -50,6 +51,6 @@ Signed separate-process/App Group access, power-loss behavior, actual narration,
 live account and cloud transport remain unqualified. Tests use synthetic
 narration and real AAC export/copy/readback, with no production model forwards.
 
-The concrete prepared service, supervised receipt task lifecycle, durable
-catalog/reconciliation and authenticated descriptor transport remain subsequent
-SDK work. No app factory or runtime is activated by this component.
+The concrete prepared service, catalog transport and authenticated descriptor
+transport remain subsequent SDK work. No app factory or runtime is activated by
+this component.
