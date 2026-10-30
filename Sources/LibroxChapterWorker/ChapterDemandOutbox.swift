@@ -13,6 +13,10 @@ public struct ChapterDemandIntent: Codable, Sendable, Equatable {
     public let revision: UInt64
     public let wanted: Bool
 }
+public struct ChapterConfirmedDemand: Sendable, Equatable {
+    public let intent: ChapterDemandIntent
+    public let serverRevision: ChapterServerRevision
+}
 
 /// Crash-safe local intent journal. It never renders, uploads, claims work or
 /// marks an audio asset ready. A transport must reconcile a pending revision
@@ -24,6 +28,7 @@ public actor ChapterDemandOutbox {
     private struct Entry: Codable, Equatable {
         let intent: ChapterDemandIntent
         var pending: Bool
+        var serverRevision: String? = nil
     }
     private struct Journal: Codable {
         let version: Int
@@ -111,8 +116,34 @@ public actor ChapterDemandOutbox {
         try persist(next); entries = next; return true
     }
 
+    /// Persist the server version and cleared pending bit in ONE journal save.
+    /// Later batch failure/cancellation cannot lose an already accepted receipt.
+    @discardableResult
+    public func confirm(_ intent: ChapterDemandIntent, serverRevision: ChapterServerRevision) throws -> Bool {
+        try writable(); try Task.checkCancellation()
+        guard intent.deviceID == deviceID, intent.request.accountPartition == accountPartition
+        else { throw ChapterWorkerError.accountMismatch }
+        let key = try intent.request.renderKey()
+        guard var old = entries[key], old.intent == intent else { return false }
+        if !old.pending, old.serverRevision == serverRevision.opaqueValue { return true }
+        old.pending = false; old.serverRevision = serverRevision.opaqueValue
+        var next = entries; next[key] = old
+        try persist(next); entries = next; return true
+    }
+
+    /// Latest exact intent confirmation, replayable across batch errors and
+    /// process/account-epoch reopen. Caller rebinds it to a freshly validated
+    /// matching session; this version is not a new observation of server state.
+    public func confirmation(for request: ChapterRenderRequest) throws -> ChapterConfirmedDemand? {
+        try writable(); try Task.checkCancellation(); try request.validate()
+        guard request.accountPartition == accountPartition else { throw ChapterWorkerError.accountMismatch }
+        guard let entry = entries[try request.renderKey()], !entry.pending, let version = entry.serverRevision else { return nil }
+        return .init(intent: entry.intent, serverRevision: try .init(opaqueValue: version))
+    }
+
     public func close() { ownership = nil }
     func failAfterNextRenameForTesting() { afterRenameForTesting = { throw ChapterOutboxError.storage } }
+    func cancelAfterNextRenameForTesting() { afterRenameForTesting = { withUnsafeCurrentTask { $0?.cancel() } } }
 
     private func writable() throws {
         guard ownership != nil else { throw ChapterOutboxError.closed }
@@ -154,6 +185,11 @@ public actor ChapterDemandOutbox {
                   entry.intent.request.accountPartition == partition,
                   entry.intent.request.recipe.watermarkRevision == "disabled-1",
                   try entry.intent.request.renderKey() == key else { throw ChapterOutboxError.corrupt }
+            if let version = entry.serverRevision {
+                guard !entry.pending else { throw ChapterOutboxError.corrupt }
+                do { _ = try ChapterServerRevision(opaqueValue: version) }
+                catch { throw ChapterOutboxError.corrupt }
+            }
         }
         return journal.entries
     }
@@ -174,7 +210,7 @@ public actor ChapterDemandOutbox {
         guard renameat(ownership.directory, name, ownership.directory, "journal.json") == 0
         else { throw ChapterOutboxError.storage }
         do {
-            try afterRenameForTesting?()
+            let hook = afterRenameForTesting; afterRenameForTesting = nil; try hook?()
             guard fsync(ownership.directory) == 0 else { throw ChapterOutboxError.storage }
         } catch {
             // Rename may have committed. Never accept another write based on

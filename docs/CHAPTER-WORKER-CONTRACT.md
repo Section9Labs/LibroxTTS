@@ -36,8 +36,9 @@ Frame ranges are half-open. Units partition the full decoded frame timeline in o
   transactions before calling local `acknowledge`; local acknowledgement is not
   delivery evidence. Host must use current account epochs around every await.
 
-Thirty Release chapter-worker tests pass, including nine real-codec artifact
-tests, seven filesystem/outbox tests, and seven service-contract tests. No real CloudKit writes,
+Forty-five Release chapter-worker tests pass across artifact, local journal,
+service contracts and offline conditional-demand reconciliation. These include
+actual filesystem/codec checks; offline CAS fakes are not CloudKit acceptance. No real CloudKit writes,
 account synchronization or cross-device playback were performed.
 
 ## Frozen host interface, not a backend
@@ -53,17 +54,28 @@ Catalog capability availability means the end-to-end service can admit a source
 within its explicit UTF-16 limit; merely installed weights and short-excerpt
 success are insufficient. Listening approval is separate. No invented production
 catalog/recipe values are supplied by these interfaces. New policy is disabled-1.
-A demand receipt distinguishes durable local intent, network submission and an
+Full updates retain the latest exact local-device receipt through coalescing;
+global phases cannot acknowledge this device's cancellation. A demand receipt
+distinguishes durable local intent, network submission and an
 adapter-issued server acknowledgement. Opaque server revisions are deliberately
 not Comparable and are not clocks, leases or proof of delivery. Only an actual
 `ChapterLocalArtifact` can represent playable; remoteReady remains metadata.
 The test-only stream fake validates bounded cancellation/coalescing mechanics,
 not CloudKit or production subscription implementation.
 
+## Demand-only CloudKit implementation, not live integration
+
+`ChapterCloudAccountIdentity`, `ChapterCloudDemandTransport` and
+`ChapterDemandReconciler` implement canonical account/environment/zone scope,
+private custom-zone demand+intent conditional pair writes, finite reconciliation
+and durable confirmation replay. No live CloudKit operation has been run. Schema
+is proposed only. See `docs/CLOUD-DEMAND-TRANSPORT.md` for exact construction,
+record types/fields and signed-host/lifecycle/publication gates still outstanding.
+
 ## Not yet implemented; required before live cloud/app integration
 
 - Cloud transport around the local outbox, crash-safe render checkpoint/adoption database, and atomic fake transport/interleaving tests.
-- Conditional change-tag transactions atomically checking job/intent/worker lease/fence; ambiguous lost-ack reconciliation; per-device versioned demand IDs and account/environment partitions.
+- Native demand-only conditional pair writes and offline lost-ack reconciliation now exist: see docs/CLOUD-DEMAND-TRANSPORT.md. Live signed-host acceptance, source/assets, worker job/lease/fence and atomic publication remain pending. Account/environment partitioning is canonical; host must supply actual signed environment/current user identity.
 - Expired/uncertain lease behavior across system sleep/clock skew; no exactly-once physical rendering claim.
 - Whole-chapter text windowing and cadence checkpoint continuity beyond existing 32 KiB/128-unit session bounds.
 - Durable atomic local availability and actual downloaded CloudKit codec/source verification. Scoped WAV/ALAC verification exists; Cloud `ready` is never equivalent to phone `available`.

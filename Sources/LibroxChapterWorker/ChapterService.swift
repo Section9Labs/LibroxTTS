@@ -129,10 +129,18 @@ public struct ChapterServiceUpdate: Sendable {
     public let session: ChapterAccountSession
     public let sequence: UInt64
     public let state: ChapterServiceState
+    /// Latest known receipt for this service's durable local device. Retain it
+    /// in subsequent FULL snapshots so bufferingNewest(1) cannot erase an ack.
+    /// Consumers also match device/revision/wanted against their current intent.
+    /// wanted=false may coexist with queued/ready demand from other devices.
+    public let demandReceipt: ChapterDemandReceipt?
     public init(request: ChapterRenderRequest, session: ChapterAccountSession, sequence: UInt64,
-                state: ChapterServiceState) throws {
+                state: ChapterServiceState, demandReceipt: ChapterDemandReceipt? = nil) throws {
         try validateServiceRequest(request, session: session)
         guard sequence > 0 else { throw ChapterServiceError.invalidUpdate }
+        if let receipt = demandReceipt {
+            guard receipt.request == request, receipt.session == session else { throw ChapterServiceError.invalidUpdate }
+        }
         switch state {
         case .rendering(let progress):
             guard progress == nil || progress?.unit == .renderedUnits else { throw ChapterServiceError.invalidProgress }
@@ -148,6 +156,7 @@ public struct ChapterServiceUpdate: Sendable {
         default: break
         }
         self.request = request; self.session = session; self.sequence = sequence; self.state = state
+        self.demandReceipt = demandReceipt
     }
 }
 
@@ -166,6 +175,8 @@ public protocol ChapterService: Sendable {
     /// Cancellation releases subscription work; account close finishes the stream.
     /// Observation does not submit demand or start a download. Never emit playable
     /// from a remote-ready record or from a previous epoch's cached handle.
+    /// Include the latest local-device demand receipt in every subsequent full
+    /// snapshot; a global job phase cannot acknowledge this device's cancellation.
     func updates(for request: ChapterRenderRequest, session: ChapterAccountSession) async throws
         -> AsyncThrowingStream<ChapterServiceUpdate, Error>
     /// Owns cancellable network transfer and SDK adoption with exact source text.

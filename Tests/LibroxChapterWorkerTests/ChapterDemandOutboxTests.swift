@@ -152,3 +152,18 @@ private func outboxDirectory() throws -> URL {
         try ChapterDemandOutbox(directory: root, accountPartition: outboxPartition, deviceID: device)
     }
 }
+
+@Test func outboxNewIntentInvalidatesOlderStickyServerConfirmation() async throws {
+    let root = try outboxDirectory(), device = UUID(), request = try outboxRequest()
+    defer { try? FileManager.default.removeItem(at: root) }
+    let store = try ChapterDemandOutbox(directory: root, accountPartition: outboxPartition, deviceID: device)
+    let first = try await store.setDemand(true, for: request)
+    let version = try ChapterServerRevision(opaqueValue: "test-server-version")
+    #expect(try await store.confirm(first, serverRevision: version))
+    #expect(try await store.confirmation(for: request)?.intent == first)
+    let cancelled = try await store.setDemand(false, for: request)
+    #expect(try await store.confirmation(for: request) == nil)
+    #expect(try await !store.confirm(first, serverRevision: version))
+    #expect(try await store.pending() == [cancelled])
+    await store.close()
+}
