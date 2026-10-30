@@ -5,6 +5,7 @@ let package = Package(
     name: "LibroxTTS",
     platforms: [.macOS(.v15), .iOS(.v18), .macCatalyst(.v18)],
     products: [
+        .library(name: "LibroxChapterWorker", targets: ["LibroxChapterWorker"]),
         .library(name: "QwenANE", targets: ["QwenANE"]),
         .library(name: "LibroxTTS", targets: ["LibroxTTS"]),
         .library(name: "KokoroCatalog", targets: ["KokoroCatalog"]),
@@ -39,6 +40,8 @@ let package = Package(
         .package(url: "https://github.com/ml-explore/mlx-swift.git", exact: "0.32.3"),
     ],
     targets: [
+        .target(name: "LibroxChapterWorker"),
+        .testTarget(name: "LibroxChapterWorkerTests", dependencies: ["LibroxChapterWorker"]),
         // Vendored for a Mac Catalyst availability fix; see its PROVENANCE.md.
         .target(name: "Safetensors", path: "Integrations/Chatterbox/Vendor/swift-safetensors/Sources/Safetensors"),
         .target(name: "ChatterboxExceptionTrap", path: "Integrations/Chatterbox/Vendor/ChatterboxCoreML/Sources/ChatterboxExceptionTrap"),
