@@ -5,6 +5,7 @@ let package = Package(
     name: "LibroxTTS",
     platforms: [.macOS(.v15), .iOS(.v18), .macCatalyst(.v18)],
     products: [
+        .executable(name: "LibroxCompanion", targets: ["LibroxCompanion"]),
         .library(name: "LibroxChapterWorker", targets: ["LibroxChapterWorker"]),
         .library(name: "QwenANE", targets: ["QwenANE"]),
         .library(name: "LibroxTTS", targets: ["LibroxTTS"]),
@@ -36,6 +37,8 @@ let package = Package(
     // Branch-tracking upstreams are pinned to the reviewed revisions so a
     // resolve can never pick up unreviewed model-runtime code.
     dependencies: [
+        .package(url: "https://github.com/weichsel/ZIPFoundation.git", exact: "0.9.20"),
+        .package(url: "https://github.com/scinfu/SwiftSoup.git", exact: "2.13.5"),
         .package(url: "https://github.com/huggingface/swift-transformers.git", exact: "1.3.5"),
         .package(url: "https://github.com/huggingface/swift-huggingface.git", exact: "0.13.0"),
         .package(url: "https://github.com/iliasaz/ruaccent-coreml.git", revision: "fbf86aaa01a6c7ee104c1ecff19ae317579203a3"),
@@ -43,6 +46,11 @@ let package = Package(
         .package(url: "https://github.com/ml-explore/mlx-swift.git", exact: "0.32.3"),
     ],
     targets: [
+        .executableTarget(name: "LibroxCompanion", dependencies: ["LibroxChatterboxMac", "LibroxChatterboxPlanning", "LibroxChapterWorker",
+            .product(name: "ZIPFoundation", package: "ZIPFoundation"), .product(name: "SwiftSoup", package: "SwiftSoup")],
+            path: "Apps/LibroxCompanion/Sources"),
+        .testTarget(name: "LibroxCompanionTests", dependencies: ["LibroxCompanion", .product(name: "ZIPFoundation", package: "ZIPFoundation")],
+            path: "Apps/LibroxCompanion/Tests"),
         .target(name: "LibroxChapterWorker"),
         .testTarget(name: "LibroxChapterWorkerTests", dependencies: ["LibroxChapterWorker"]),
         // Shared native Mac acoustic implementation and offline audit utilities.

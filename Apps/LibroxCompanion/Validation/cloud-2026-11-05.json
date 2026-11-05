@@ -1,0 +1,9 @@
+{
+  "accountAvailable" : "true",
+  "check" : "signed-private-cloud",
+  "environment" : "development",
+  "listedBooks" : "0",
+  "modelLoaded" : "false",
+  "passed" : "true",
+  "zoneReady" : "true"
+}

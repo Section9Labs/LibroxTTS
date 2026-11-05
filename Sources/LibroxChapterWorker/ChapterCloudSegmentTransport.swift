@@ -23,7 +23,15 @@ protocol ChapterCloudSegmentStore: Sendable {
 /// acknowledge intent or grant a lease. The eventual service must authenticate
 /// the expected manifest from its current fenced ordered head BEFORE calling it.
 /// No zone creation/schema deployment or production factory activation.
-actor ChapterCloudSegmentTransport {
+package struct ChapterCloudSegmentServerReceipt: Sendable {
+    package let key, tag, manifestSHA256: String
+    package let session: ChapterAccountSession
+    fileprivate init(_ snapshot: ChapterCloudSegmentSnapshot, manifest: ChapterSegmentManifest, session: ChapterAccountSession) throws {
+        key = snapshot.key; tag = snapshot.tag; manifestSHA256 = try manifest.sha256(); self.session = session
+    }
+}
+
+package actor ChapterCloudSegmentTransport {
     static let recordType = "LibroxChapterSegmentV1"
     static let manifestField = "manifestV1", audioField = "audioV1"
     private let store: any ChapterCloudSegmentStore
@@ -32,7 +40,7 @@ actor ChapterCloudSegmentTransport {
     private let captureStorage, custodyStorage: URL
     private let authorize: @Sendable () async throws -> Void
     private var occupied = false
-    init(container: CKContainer, account: ChapterCloudAccountIdentity, session: ChapterAccountSession,
+    package init(container: CKContainer, account: ChapterCloudAccountIdentity, session: ChapterAccountSession,
          gate: ChapterAccountSessionGate, captureStorage: URL, custodyStorage: URL,
          authorizeAssetTransfer: @escaping @Sendable () async throws -> Void) throws {
         let capturePath = captureStorage.resolvingSymlinksInPath().standardizedFileURL.path
@@ -89,7 +97,7 @@ actor ChapterCloudSegmentTransport {
     }
     /// Expected metadata must already belong to the exact current ordered head;
     /// this method does not infer currentness from immutable content existence.
-    func download(manifest: ChapterSegmentManifest, request: ChapterRenderRequest, originalText: String) async throws -> ChapterLocalSegmentArtifact {
+    package func download(manifest: ChapterSegmentManifest, request: ChapterRenderRequest, originalText: String) async throws -> ChapterLocalSegmentArtifact {
         guard !occupied else { throw ChapterCloudSegmentError.busy }; occupied = true; defer { occupied = false }
         try await valid(request); try manifest.validate(for: request, originalText: originalText)
         guard let metadata = try await fetch("s-" + manifest.sha256(), request: request) else { throw ChapterCloudSegmentError.absent }
@@ -97,7 +105,7 @@ actor ChapterCloudSegmentTransport {
     }
     /// Successful return means immutable content is confirmed, NOT ordered-head
     /// publication, Reader acceptance, demand acknowledgement or book completion.
-    func upload(_ artifact: ChapterLocalSegmentArtifact, originalText: String) async throws -> ChapterCloudSegmentSnapshot {
+    package func upload(_ artifact: ChapterLocalSegmentArtifact, originalText: String) async throws -> ChapterCloudSegmentServerReceipt {
         guard !occupied else { throw ChapterCloudSegmentError.busy }; occupied = true; defer { occupied = false }
         let request = artifact.request, manifest = artifact.manifest
         guard artifact.session == session else { throw ChapterWorkerError.accountMismatch }
@@ -105,7 +113,7 @@ actor ChapterCloudSegmentTransport {
         let key = "s-" + (try manifest.sha256()), payload = try manifest.encoded()
         if let existing = try await fetch(key, request: request) {
             _ = try await copy(existing, manifest: manifest, request: request, text: originalText)
-            return existing
+            return try .init(existing, manifest: manifest, session: session)
         }
         do {
             let session = session, gate = gate, captureStorage = captureStorage
@@ -122,7 +130,7 @@ actor ChapterCloudSegmentTransport {
                 }
             }
             try await valid(request); try validate(saved, expected: manifest, request: request, text: originalText)
-            return saved
+            return try .init(saved, manifest: manifest, session: session)
         } catch {
             try await valid(request)
             // Only native uncertain/conflict acknowledgements reconcile, once.
@@ -130,7 +138,7 @@ actor ChapterCloudSegmentTransport {
             guard let failure = error as? ChapterDemandTransportError, failure == .uncertain || failure == .conflict,
                   let existing = try await fetch(key, request: request) else { throw error }
             _ = try await copy(existing, manifest: manifest, request: request, text: originalText)
-            return existing
+            return try .init(existing, manifest: manifest, session: session)
         }
     }
 }

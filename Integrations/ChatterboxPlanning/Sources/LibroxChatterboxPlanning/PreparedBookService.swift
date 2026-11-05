@@ -110,14 +110,16 @@ public struct ChatterboxBookServiceUpdate: Sendable {
     /// Real admitted/complete entry counts. Neither counts nor metadata provide
     /// media custody; full book completion additionally requires verified seals.
     public let admittedSpineEntries, completeSpineEntries, totalSpineEntries: Int
+    public let lastFailure: String?
     package init(receipt: ChatterboxBookDemandReceipt, sequence: UInt64, phase: ChatterboxBookPhase,
-                 admittedSpineEntries: Int, completeSpineEntries: Int, totalSpineEntries: Int) throws {
+                 admittedSpineEntries: Int, completeSpineEntries: Int, totalSpineEntries: Int, lastFailure: String? = nil) throws {
         guard sequence > 0, (1...4096).contains(totalSpineEntries), (0...totalSpineEntries).contains(admittedSpineEntries),
               (0...admittedSpineEntries).contains(completeSpineEntries) else { throw ChapterWorkerError.invalidManifest }
         if case .complete = phase, completeSpineEntries != totalSpineEntries { throw ChapterWorkerError.invalidManifest }
         session = receipt.session; scopeID = receipt.localIntent.scopeID; self.sequence = sequence
         demandReceipt = receipt; self.phase = phase; self.admittedSpineEntries = admittedSpineEntries
         self.completeSpineEntries = completeSpineEntries; self.totalSpineEntries = totalSpineEntries
+        self.lastFailure = lastFailure
     }
 }
 

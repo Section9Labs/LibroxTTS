@@ -4,6 +4,8 @@ Offline speech synthesis and book narration for iPhone, iPad and Mac. The Kokoro
 
 [![Swift](https://github.com/Section9Labs/LibroxTTS/actions/workflows/swift.yml/badge.svg)](https://github.com/Section9Labs/LibroxTTS/actions/workflows/swift.yml)
 
+The development branch also includes the native [Librox Companion menu bar app](Apps/LibroxCompanion/README.md), its Chatterbox Multilingual Mac worker, and the concrete private-iCloud reader service. See the [iOS integration handoff](docs/LIBROX-IOS-INTEGRATION-PROMPT.md) for connecting the phone app.
+
 ## Install
 
 The repository is now `https://github.com/Section9Labs/LibroxTTS`. The module rename and narration improvements are currently unreleased. To test this checkout, add it as a local package in Xcode, or use:
@@ -12,7 +14,7 @@ The repository is now `https://github.com/Section9Labs/LibroxTTS`. The module re
 .package(path: "../LibroxTTS")
 ```
 
-Products: `LibroxTTS` (synthesis), `KokoroCatalog` (voices/assets), and `KokoroPronunciation` (text to model phonemes). There are no remote Swift dependencies. Swift 6 is required. Source targets support iOS/Catalyst 17+ and macOS 13+; the supplied Core ML assets require **iOS/Catalyst 18+ and macOS 15+**. Apple system language facilities are required, so Linux is not supported.
+Core products: `LibroxTTS` (synthesis), `KokoroCatalog` (voices/assets), and `KokoroPronunciation` (text to model phonemes). Swift 6 is required. This development package targets **iOS/Catalyst 18+ and macOS 15+** and resolves additional dependencies for its optional Chatterbox integrations and companion app. Apple system language facilities are required, so Linux is not supported.
 
 The development branch also provides `KokoroNarration` (book planning and persistent cast metadata) and `KokoroAudio` (bounded voice enhancement). They are opt-in. The historical v0.1.0 tag still uses the old module name and does not include this development API; it must not be used with the examples below. Remote consumers should pin a reviewed commit containing the rename once it is published. Neither module changes the default synthesis engine or silently enables effects.
 
