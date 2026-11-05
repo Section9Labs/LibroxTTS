@@ -1,0 +1,19 @@
+{
+  "book": "Broken Stars",
+  "environment": "Production",
+  "firstAudio": {
+    "bytes": 131640,
+    "codec": "aac-lc-64k-1",
+    "decodedFrames": 287040,
+    "durationSeconds": 11.96,
+    "sampleRate": 24000,
+    "sha256": "b8800d3aba2ef847c550c05609571b267e26b86d80254d1791f321127e26c9dc"
+  },
+  "installedExecutableSHA256": "9f1e4f5cac552a3bd6b9c27a576621a5755a1c7ef0def58bc71192d2143201a3",
+  "leftRunning": true,
+  "observedUI": "Preparing audiobook \u00b7 Broken Stars \u00b7 Chapter 2 of 63 \u00b7 1 audio parts sent",
+  "requestConfirmed": true,
+  "scopeID": "e06a3b806375c5f961e37e1459d4f0435f2a95ffc1c0f8d40fb1cd17dbb9b677",
+  "sourcePartsUploaded": 63,
+  "wholeBookComplete": false
+}

@@ -8,9 +8,13 @@ import Synchronization
 package enum ChapterCloudOperation {
     package static func run<Value: Sendable>(_ operation: CKDatabaseOperation, database: CKDatabase,
                                      configure: (@escaping @Sendable (Result<Value, Error>) -> Void) -> Void) async throws -> Value {
-        operation.configuration.timeoutIntervalForRequest = 15
-        operation.configuration.timeoutIntervalForResource = 30
-        operation.qualityOfService = .utility
+        // These operations advance a requested preparation or reader action.
+        // Utility QoS becomes discretionary while a menu-bar app is inactive;
+        // it can spend the entire deadline waiting in the background scheduler.
+        operation.configuration.timeoutIntervalForRequest = 60
+        operation.configuration.timeoutIntervalForResource = 120
+        operation.configuration.qualityOfService = .userInitiated
+        operation.qualityOfService = .userInitiated
         let outcome = Mutex<Result<Value, Error>?>(nil)
         return try await withTaskCancellationHandler {
             try Task.checkCancellation()
