@@ -8,10 +8,12 @@ import LibroxChatterboxPlanning
 enum BookImport {
     enum Failure: LocalizedError {
         case invalid, tooLarge, encrypted, unsupported
+        case limit(String)
         var errorDescription: String? {
             switch self {
             case .invalid: "This book could not be read. Try exporting it again from Librox."
-            case .tooLarge: "This book exceeds the current narration import limits."
+            case .tooLarge: "This book exceeds the 100 MB file limit."
+            case .limit(let reason): reason
             case .encrypted: "This EPUB is protected. Import an unprotected copy that you can read."
             case .unsupported: "Choose an EPUB, a UTF-8 text file, or a Librox book export."
             }
@@ -40,15 +42,41 @@ enum BookImport {
         default: throw Failure.unsupported
         }
     }
+    /// Bounded render inputs retain every extracted byte. Keys added by the
+    /// EPUB importer map each part back to its original spine and UTF-16 range.
+    static func narrationParts(_ text: String) throws -> [String] {
+        if text.utf16.count <= 131072, text.utf8.count <= 393216 { return [text] }
+        var parts: [String] = [], start = text.startIndex
+        while start < text.endIndex {
+            try Task.checkCancellation()
+            var end = start, units = 0, bytes = 0
+            var sentence: String.Index?, whitespace: String.Index?
+            while end < text.endIndex {
+                let character = text[end], next = text.index(after: end)
+                let value = String(character)
+                guard units + value.utf16.count <= 100_000, bytes + value.utf8.count <= 300_000 else { break }
+                units += value.utf16.count; bytes += value.utf8.count
+                if units >= 50_000 {
+                    if character.isWhitespace { whitespace = next }
+                    if ".!?。！？".contains(character), next == text.endIndex || text[next].isWhitespace { sentence = next }
+                }
+                end = next
+            }
+            guard end > start else { throw Failure.limit("This book contains a single Unicode character too large to narrate safely.") }
+            if end < text.endIndex { end = sentence ?? whitespace ?? end }
+            parts.append(String(text[start..<end])); start = end
+        }
+        return parts
+    }
     private static func epub(_ data: Data, hash: String, fallbackTitle: String) throws -> ChatterboxBookDocument {
         let archive = try Archive(data: data, accessMode: .read)
         func read(_ path: String) throws -> Data {
             guard !path.hasPrefix("/"), !path.split(separator: "/").contains(".."),
                   let entry = archive[path], entry.type == .file else { throw Failure.invalid }
-            guard entry.uncompressedSize <= 4 * 1024 * 1024 else { throw Failure.tooLarge }
+            guard entry.uncompressedSize <= 4 * 1024 * 1024 else { throw Failure.limit("An EPUB resource exceeds the 4 MB expanded-file limit.") }
             var bytes = Data()
             _ = try archive.extract(entry) { chunk in
-                guard bytes.count + chunk.count <= 4 * 1024 * 1024 else { throw Failure.tooLarge }
+                guard bytes.count + chunk.count <= 4 * 1024 * 1024 else { throw Failure.limit("An EPUB resource exceeds the 4 MB expanded-file limit.") }
                 bytes.append(chunk)
             }
             return bytes
@@ -61,6 +89,7 @@ enum BookImport {
         let base = URL(fileURLWithPath: "/" + opf).deletingLastPathComponent()
         var chapters: [String] = [], keys: [String] = [], total = 0
         for (number, id) in index.spine.enumerated() {
+            try Task.checkCancellation()
             guard let href = index.items[id], let decoded = href.removingPercentEncoding,
                   !decoded.contains(":") else { throw Failure.invalid }
             let path = base.appendingPathComponent(decoded).standardizedFileURL.path.dropFirst()
@@ -69,13 +98,20 @@ enum BookImport {
             let document = try SwiftSoup.parse(string)
             try document.select("script, style, head").remove()
             let text = try document.body()?.text() ?? document.text()
-            guard text.utf16.count <= 131072, text.utf8.count <= 393216 else { throw Failure.tooLarge }
             total += text.utf8.count
-            guard total <= 32 * 1024 * 1024 else { throw Failure.tooLarge }
-            chapters.append(text); keys.append("spine:\(number)")
+            guard total <= 32 * 1024 * 1024 else { throw Failure.limit("This book exceeds the 32 MB extracted-text limit.") }
+            let parts = try narrationParts(text)
+            guard chapters.count + parts.count <= 4096 else { throw Failure.limit("This book needs more than 4,096 narration sections.") }
+            var start = 0
+            for part in parts {
+                let end = start + part.utf16.count
+                chapters.append(part)
+                keys.append(parts.count == 1 ? "spine:\(number)" : "spine:\(number):utf16:\(start)-\(end)")
+                start = end
+            }
         }
         return try .init(title: index.title.isEmpty ? fallbackTitle : index.title,
-            book: .init(bookSHA256: hash, extractionRevision: "companion-epub-swiftsoup-text-1", chapterKeys: keys), chapters: chapters)
+            book: .init(bookSHA256: hash, extractionRevision: "companion-epub-swiftsoup-parts-2", chapterKeys: keys), chapters: chapters)
     }
 }
 

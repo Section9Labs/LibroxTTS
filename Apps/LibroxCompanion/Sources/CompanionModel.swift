@@ -510,7 +510,11 @@ struct CompanionBook: Codable, Identifiable, Sendable {
                 }
                 report["queueSchemaProbe"] = "available"
             } catch { report["queueSchemaProbe"] = String(describing: error) }
-            let chosen = result.first(where: { $0.canPrepare && $0.title.localizedCaseInsensitiveContains("Alice") }) ?? result.first(where: { $0.canPrepare })
+            let titleFlag = CommandLine.arguments.firstIndex(of: "--check-library-title")
+            let requestedTitle = titleFlag.flatMap { CommandLine.arguments.indices.contains($0 + 1) ? CommandLine.arguments[$0 + 1] : nil }
+            let chosen = result.first(where: { $0.canPrepare && $0.title.localizedCaseInsensitiveContains(requestedTitle ?? "Alice") })
+                ?? (requestedTitle == nil ? result.first(where: { $0.canPrepare }) : nil)
+            if requestedTitle != nil, chosen == nil { throw ChatterboxCloudLibraryError.invalidRecord }
             if let book = chosen {
                 report["stage"] = "download"
                 let file = try await client.download(book, to: output.deletingPathExtension())
@@ -520,7 +524,11 @@ struct CompanionBook: Codable, Identifiable, Sendable {
                 report["stage"] = "import"
                 let task = Task.detached { try BookImport.load(file) }
                 let document = try await withTaskCancellationHandler { try await task.value } onCancel: { task.cancel() }
-                report["originalSpineEntries"] = String(document.chapters.count)
+                report["narrationSections"] = String(document.chapters.count)
+                report["maximumSectionUTF16"] = String(document.chapters.map { $0.utf16.count }.max() ?? 0)
+                report["splitSpineEntries"] = String(Set(document.book.chapterKeys.filter { $0.contains(":utf16:") }.map { $0.components(separatedBy: ":utf16:")[0] }).count)
+                report["originalSpineEntries"] = String(Set(document.book.chapterKeys.map { $0.components(separatedBy: ":utf16:")[0] }).count)
+                report["extractionRevision"] = document.book.extractionRevision
             }
             report["stage"] = "complete"
             report["passed"] = "true"

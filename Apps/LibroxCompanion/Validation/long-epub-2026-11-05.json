@@ -1,0 +1,14 @@
+{
+  "bookSHA256": "07309c2c9afcb0c6614d6c075b6cd003c2120976d8d730be3a6ec4fe01f6ff65",
+  "extractionRevision": "companion-epub-swiftsoup-parts-2",
+  "focusedTestsPassed": 6,
+  "installedExecutableSHA256": "8c3c53fe4ecc6e57f3280de0d42c7c6f92397e7bc36b57421c7f3b16d55ed527",
+  "maximumNarrationSectionUTF16": 122122,
+  "maximumOriginalSpineUTF16": 138085,
+  "narrationSections": 63,
+  "originalSpineEntries": 62,
+  "passed": true,
+  "productionCloudCheck": "Two attempts timed out before library discovery; narration restart not verified",
+  "splitSpineEntries": 1,
+  "verificationSource": "existing Librox local EPUB cache"
+}
