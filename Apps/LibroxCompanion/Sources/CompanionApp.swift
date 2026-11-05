@@ -28,8 +28,12 @@ import ServiceManagement
     private var diagnostic: Task<Void, Never>?
     func applicationDidFinishLaunching(_ notification: Notification) {
         if CommandLine.arguments.contains("--review-light") { NSApp.appearance = NSAppearance(named: .aqua) }
-        let checking = CommandLine.arguments.contains("--check-cloud") || CommandLine.arguments.contains("--check-delivery")
-        model.start(restoreEnabled: !checking)
+        let checking = CommandLine.arguments.contains("--check-cloud") || CommandLine.arguments.contains("--check-delivery") || CommandLine.arguments.contains("--check-library")
+        model.start(restoreEnabled: !checking && !CommandLine.arguments.contains("--library-only"), browseLibrary: !checking)
+        if let index = CommandLine.arguments.firstIndex(of: "--check-library"), CommandLine.arguments.count > index + 1 {
+            let output = URL(fileURLWithPath: CommandLine.arguments[index + 1])
+            diagnostic = Task { await model.checkLibrary(to: output); diagnostic = nil; NSApp.terminate(nil) }
+        }
         if CommandLine.arguments.contains("--review-window") { showPanel() }
         if let index = CommandLine.arguments.firstIndex(of: "--check-cloud"), CommandLine.arguments.count > index + 1 {
             let output = URL(fileURLWithPath: CommandLine.arguments[index + 1])
@@ -107,26 +111,55 @@ struct CompanionPanel: View {
                     Spacer()
                     Image(systemName: model.enabled ? "pause.fill" : "play.fill")
                 }
-            }.disabled(model.changing).buttonStyle(.borderedProminent)
+            }.disabled(model.changing || (!model.enabled && !model.queueSchemaReady)).buttonStyle(.borderedProminent)
                 .help("Pausing this Mac preserves requests and completed audio.")
             Divider()
             HStack {
-                Text("Books").font(.headline)
+                Text("Your Library").font(.headline)
                 Spacer()
+                Button("Refresh Library", systemImage: "arrow.clockwise", action: model.refreshLibrary)
+                    .labelStyle(.iconOnly).buttonStyle(.borderless).help("Refresh from iCloud")
                 Button("Add Book…", systemImage: "plus", action: model.importBook).labelStyle(.iconOnly)
                     .buttonStyle(.borderless).help("Add an EPUB, text file, or Librox book export")
             }
-            if model.books.isEmpty && model.remoteBooks.isEmpty {
-                VStack(alignment: .leading, spacing: Layout.row) {
-                    Text("Your next audiobook starts here.").font(.callout)
-                    Text("Add a book, or request preparation in Librox on your iPhone.")
-                        .font(.callout).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
-                    Button("Add Book…", action: model.importBook)
-                }
-            } else {
-                ScrollView {
-                    LazyVStack(alignment: .leading, spacing: Layout.group) {
-                        ForEach(model.books) { book in
+            if model.libraryBooks.count > 8 {
+                TextField("Find a book", text: $model.librarySearch).textFieldStyle(.roundedBorder)
+            }
+            Text(model.libraryStatus).font(.caption).foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: Layout.group) {
+                    if model.visibleLibraryBooks.isEmpty, !model.librarySearch.isEmpty {
+                        Text("No matching books.").font(.callout).foregroundStyle(.secondary)
+                    }
+                    ForEach(model.visibleLibraryBooks) { book in
+                        HStack(alignment: .top, spacing: Layout.row) {
+                            Image(systemName: book.isFinished ? "checkmark.circle" : "book.closed").foregroundStyle(.secondary)
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(book.title).lineLimit(2).help(book.title)
+                                if let author = book.author, !author.isEmpty {
+                                    Text(author).font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                                }
+                                if let opened = book.lastOpened {
+                                    Text("Opened \(opened.formatted(date: .abbreviated, time: .omitted)) · \(Int(book.progress * 100))%")
+                                        .font(.caption).foregroundStyle(.secondary)
+                                }
+                            }
+                            Spacer(minLength: Layout.row)
+                            if model.selectingBook == book.id { ProgressView().controlSize(.small) }
+                            else {
+                                Button("Prepare Audiobook", systemImage: "play.fill") { model.selectLibraryBook(book) }
+                                    .labelStyle(.iconOnly).buttonStyle(.borderless)
+                                    .disabled(!book.canPrepare || model.selectingBook != nil || model.changing)
+                                    .help(book.canPrepare ? "Prepare \(book.title) on this Mac" : "Narration currently supports EPUB and text books.")
+                            }
+                        }
+                    }
+                    if !model.visiblePreparations.isEmpty || model.remoteBooks.contains(where: \.requested) {
+                        Divider()
+                        Text("Preparation").font(.headline)
+                    }
+                        ForEach(model.visiblePreparations) { book in
                             HStack(alignment: .top, spacing: Layout.row) {
                                 Image(systemName: "book.closed").foregroundStyle(.secondary)
                                 VStack(alignment: .leading, spacing: 4) {
@@ -139,21 +172,20 @@ struct CompanionPanel: View {
                                     .help("Prepare \(book.title)")
                             }.contextMenu {
                                 Button("Prepare Audiobook") { model.prepare(book.id) }.disabled(!model.canPrepare)
-                                if book.scopeID != nil { Button("Stop This Request") { model.cancel(book.id) } }
+                                if book.scopeID != nil || book.detail == "Waiting for this Mac" { Button("Stop This Request") { model.cancel(book.id) } }
                             }
                         }
-                        ForEach(model.remoteBooks.filter { remote in !model.books.contains { $0.scopeID == remote.scopeID } }) { book in
+                        ForEach(model.remoteBooks.filter { remote in remote.requested && !model.books.contains { $0.scopeID == remote.scopeID } }) { book in
                             HStack(alignment: .top, spacing: Layout.row) {
-                                Image(systemName: "iphone").foregroundStyle(.secondary)
+                                Image(systemName: "icloud").foregroundStyle(.secondary)
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(book.title).lineLimit(2)
-                                    Text(book.requested ? "Requested from Librox" : "Request stopped").font(.caption).foregroundStyle(.secondary)
+                                    Text("Requested in Librox").font(.caption).foregroundStyle(.secondary)
                                 }
                             }
                         }
                     }
-                }.frame(maxHeight: 220)
-            }
+                }.frame(height: 260)
             if let failure = model.failure {
                 VStack(alignment: .leading, spacing: Layout.row) {
                     Label(failure, systemImage: "exclamationmark.circle").font(.callout)

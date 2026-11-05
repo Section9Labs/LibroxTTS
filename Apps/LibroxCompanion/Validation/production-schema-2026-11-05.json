@@ -1,0 +1,50 @@
+{
+  "environment": "Production",
+  "recordTypes": {
+    "LibroxBookDirectoryV1": [
+      "payloadV1",
+      "fenceV1"
+    ],
+    "LibroxStockCatalogV1": [
+      "payloadV1",
+      "fenceV1"
+    ],
+    "LibroxBookDemandV1": [
+      "payloadV1",
+      "fenceV1",
+      "accountV1",
+      "scopeV1"
+    ],
+    "LibroxBookDeviceV1": [
+      "payloadV1",
+      "fenceV1"
+    ],
+    "LibroxBookWorkerClaimV1": [
+      "payloadV1",
+      "fenceV1"
+    ],
+    "LibroxBookSegmentHeadV1": [
+      "payloadV1",
+      "fenceV1"
+    ],
+    "LibroxBookSegmentIndexV1": [
+      "payloadV1",
+      "fenceV1"
+    ],
+    "LibroxBookEntryV1": [
+      "manifestV1",
+      "contentV1"
+    ],
+    "LibroxBookReadSetV1": [
+      "manifestV1",
+      "contentV1"
+    ],
+    "LibroxChapterSegmentV1": [
+      "manifestV1",
+      "audioV1"
+    ]
+  },
+  "missing": {},
+  "passed": true,
+  "exportSHA256": "b97cf690e85348b9a4236b1e031d98eb87cd1b85c69d3113ee94d5b9a7488944"
+}

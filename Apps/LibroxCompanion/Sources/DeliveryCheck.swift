@@ -36,7 +36,10 @@ enum CompanionDeliveryCheck {
         do {
             guard !_isDebugAssertConfiguration() else { throw Failure(message: "Real inference requires the Release build.") }
             let environment = try model.signedEnvironment()
-            guard environment == .development else { throw Failure(message: "The bounded delivery check requires Development iCloud.") }
+            guard environment == .development || CommandLine.arguments.contains("--allow-production-check") else {
+                throw Failure(message: "Use Development iCloud or explicitly pass --allow-production-check for this bounded self-authored check.")
+            }
+            await evidence.set("environment", environment.rawValue)
             let container = CKContainer(identifier: "iCloud.com.section9labs.Libros")
             guard try await container.accountStatus() == .available else { throw CompanionFailure.iCloud }
             let user = try await container.userRecordID()
@@ -69,8 +72,8 @@ enum CompanionDeliveryCheck {
                 try await Task.sleep(for: .seconds(2))
             }
             guard let descriptor else { throw Failure(message: "Timed out waiting for the prepared native catalog.") }
-            let chapters = ["The morning was quiet. A small boat waited beside the old bridge.",
-                            "At sunset, the friends returned home. Their adventure had only just begun."]
+            let chapters = ["The morning was still. A small boat waited beside the old bridge.",
+                            "At sunset, the friends returned home. Their adventure had only just started."]
             let bytes = Data(chapters.joined(separator: "\n\n").utf8)
             let hash = SHA256.hash(data: bytes).map { String(format: "%02x", $0) }.joined()
             let source = try ChapterBookSource(bookSHA256: hash, extractionRevision: "companion-self-authored-check-1",
@@ -96,7 +99,11 @@ enum CompanionDeliveryCheck {
                     let delivered = try await r.download(segment, session: rs)
                     let path = root.appendingPathComponent("verified-\(segment.chapterIndex)-\(segment.manifest.segmentIndex).m4a")
                     try await delivered.artifact.withFileAccess(session: rs, gate: readerGate) { file in
-                        try FileManager.default.copyItem(at: file, to: path)
+                        if FileManager.default.fileExists(atPath: path.path) {
+                            guard try Data(contentsOf: file) == Data(contentsOf: path) else {
+                                throw Failure(message: "Existing diagnostic audio differs from the newly verified download.")
+                            }
+                        } else { try FileManager.default.copyItem(at: file, to: path) }
                     }
                     verified += 1; lastSegment = segment; lastCompletion = nil
                     await evidence.set("verifiedReaderSegments", String(verified))

@@ -88,7 +88,9 @@ package actor ChapterCloudDirectory {
     package func failure(scopeID: String) async throws -> String? {
         guard isDigest(scopeID) else { throw ChapterWorkerError.invalidIdentity }
         try await check()
-        let key = ChapterCloudMetadataKey(key: "book-failure-" + scopeID, type: "LibroxBookFailureV1")
+        // Per-book directory status uses the same opaque metadata schema as
+        // discovery. Its distinct ID and payload validation separate the forms.
+        let key = ChapterCloudMetadataKey(key: "book-failure-" + scopeID, type: "LibroxBookDirectoryV1")
         guard let record = try await store.fetch([key])[key.key] else { return nil }
         let value = try ChapterBookWorkWire.decode(Failure.self, record.payload)
         guard value.version == 1, value.account == session.accountPartition, value.scope == scopeID,
@@ -98,7 +100,7 @@ package actor ChapterCloudDirectory {
     package func reportFailure(_ message: String?, scopeID: String) async throws {
         guard isDigest(scopeID), (message?.utf8.count ?? 0) <= 4096 else { throw ChapterWorkerError.invalidIdentity }
         try await check()
-        let key = ChapterCloudMetadataKey(key: "book-failure-" + scopeID, type: "LibroxBookFailureV1")
+        let key = ChapterCloudMetadataKey(key: "book-failure-" + scopeID, type: "LibroxBookDirectoryV1")
         let old = try await store.fetch([key])[key.key]
         let bytes = try ChapterBookWorkWire.encode(Failure(version: 1, account: session.accountPartition, scope: scopeID, message: message))
         if old?.payload == bytes { return }

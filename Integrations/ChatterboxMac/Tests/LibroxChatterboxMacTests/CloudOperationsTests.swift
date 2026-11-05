@@ -16,8 +16,33 @@ private actor CloudJoinProbe {
     func release() { continuation?.resume(); continuation = nil }
     func markJoined() { joined = true }
 }
+private actor CloudReadProbe {
+    var calls = 0
+    func snapshot(conflicts: Int) throws -> Int {
+        calls += 1
+        if calls <= conflicts { throw ChapterDemandTransportError.conflict }
+        return 42
+    }
+    func revoked() throws -> Int { calls += 1; throw ChapterWorkerError.accountMismatch }
+}
 
 @Suite struct CloudOperationsTests {
+    @Test func concurrentPublicationRetriesTheEntireStrictRead() async throws {
+        let operations = ChatterboxCloudOperations(), probe = CloudReadProbe()
+        let value = try await operations.read { try await probe.snapshot(conflicts: 2) }
+        #expect(value == 42); #expect(await probe.calls == 3)
+    }
+    @Test func unstableReadsAreBoundedAndAccountRevocationIsNotRetried() async throws {
+        let operations = ChatterboxCloudOperations(), changing = CloudReadProbe(), revoked = CloudReadProbe()
+        await #expect(throws: ChapterDemandTransportError.conflict) {
+            try await operations.read { try await changing.snapshot(conflicts: 100) }
+        }
+        #expect(await changing.calls == 4)
+        await #expect(throws: ChapterWorkerError.accountMismatch) {
+            try await operations.read { try await revoked.revoked() }
+        }
+        #expect(await revoked.calls == 1)
+    }
     @Test func stopJoinsAnUncooperativeOriginalBeforeClosing() async throws {
         let operations = ChatterboxCloudOperations(), probe = CloudJoinProbe()
         let original = Task { try await operations.run { await probe.run() } }

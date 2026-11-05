@@ -11,7 +11,7 @@ enum BookImport {
         var errorDescription: String? {
             switch self {
             case .invalid: "This book could not be read. Try exporting it again from Librox."
-            case .tooLarge: "This book exceeds the current narration chapter limit. Open it in Librox to prepare its chapters."
+            case .tooLarge: "This book exceeds the current narration import limits."
             case .encrypted: "This EPUB is protected. Import an unprotected copy that you can read."
             case .unsupported: "Choose an EPUB, a UTF-8 text file, or a Librox book export."
             }

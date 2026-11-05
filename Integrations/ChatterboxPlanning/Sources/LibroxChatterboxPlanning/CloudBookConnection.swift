@@ -56,6 +56,28 @@ package final class ChatterboxCloudOperations: Sendable {
         let entries = state.withLock { value in value.stopped = true; return Array(value.entries.values) }
         entries.forEach { $0.cancel() }
     }
+    /// A publisher may advance the strict snapshot between its two reads.
+    /// Retry the entire read under the same owned task; never weaken the fence
+    /// or retry an account/intent revocation as if it were a network conflict.
+    package func read<T: Sendable>(_ operation: @escaping @Sendable () async throws -> T) async throws -> T {
+        try await run {
+            for attempt in 0..<4 {
+                try self.check()
+                do { return try await operation() }
+                catch {
+                    try self.check()
+                    let transient: Bool
+                    if let error = error as? ChapterDemandTransportError {
+                        transient = [.conflict, .uncertain, .inconsistentSnapshot, .busy].contains(error)
+                    } else if let error = error as? ChapterWorkerError { transient = error == .busy }
+                    else { transient = false }
+                    guard transient, attempt < 3 else { throw error }
+                    try await Task.sleep(for: .milliseconds(100 * (1 << attempt)))
+                }
+            }
+            throw ChapterDemandTransportError.conflict
+        }
+    }
     package func join() async {
         stop()
         let entries = state.withLock { Array($0.entries.values) }

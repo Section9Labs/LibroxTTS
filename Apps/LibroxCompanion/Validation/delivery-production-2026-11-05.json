@@ -1,0 +1,14 @@
+{
+  "check": "native-model-private-icloud-reader-custody",
+  "delivery": "ALAC24 (explicit test policy)",
+  "environment": "production",
+  "joined": "true",
+  "passed": "true",
+  "physicalPhonePlayback": "false",
+  "publishedSegments": "0",
+  "scopeID": "88c8db40f438afbcc0e2f03ce9c41f270bd3c76f2794d3dd828f43b106441723",
+  "verifiedAudioDirectory": "/tmp/librox-companion-evidence/delivery-production-2",
+  "verifiedReaderSegments": "4",
+  "wallSeconds": "362.4341620206833",
+  "workerPhase": "stopped"
+}

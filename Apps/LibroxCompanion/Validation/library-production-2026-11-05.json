@@ -1,0 +1,15 @@
+{
+  "books": "51",
+  "check": "read-only-existing-librox-library",
+  "downloadVerified": "true",
+  "environment": "production",
+  "fileBytes": "189249",
+  "joined": "true",
+  "modelLoaded": "false",
+  "originalSpineEntries": "15",
+  "passed": "true",
+  "queueReady": "true",
+  "queueSchemaProbe": "Present; recordName query index absent (not required by ID-based narration)",
+  "recentlyOpenedBooks": "32",
+  "stage": "complete"
+}

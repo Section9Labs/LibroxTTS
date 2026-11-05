@@ -13,11 +13,25 @@ struct CompanionBook: Codable, Identifiable, Sendable {
     let file: String
     var scopeID: String?
     var detail: String
+    var cloudLibraryID: String? = nil
+    var cloudContentHash: String? = nil
+    var cloudAccountPartition: String? = nil
 }
 
 @MainActor final class CompanionModel: ObservableObject {
     @Published private(set) var books: [CompanionBook] = []
     @Published private(set) var remoteBooks: [ChatterboxCloudBookSummary] = []
+    @Published private(set) var libraryBooks: [ChatterboxCloudLibraryBook] = []
+    @Published private(set) var libraryStatus = "Loading your iCloud library…"
+    @Published private(set) var selectingBook: String?
+    @Published private(set) var queueSchemaReady = false
+    @Published var librarySearch = ""
+    private var cloudLibrary: ChatterboxCloudLibrary?
+    private var libraryTask: Task<Void, Never>?
+    private var libraryEpoch = UUID()
+    private var libraryAccountPartition: String?
+    private var queuedSelections: Set<UUID> = []
+    private var preparing: Set<UUID> = []
     @Published private(set) var status = "Ready when you are"
     @Published private(set) var detail = "Prepare books here or request them from Librox on your iPhone."
     @Published private(set) var failure: String?
@@ -55,11 +69,12 @@ struct CompanionBook: Codable, Identifiable, Sendable {
     private var libraryURL: URL { root.appendingPathComponent("library.json") }
     var canPrepare: Bool { enabled && connected && !changing }
 
-    func start(restoreEnabled: Bool = true) {
+    func start(restoreEnabled: Bool = true, browseLibrary: Bool = true) {
         do {
             try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true, attributes: [.posixPermissions: 0o700])
             if FileManager.default.fileExists(atPath: libraryURL.path) {
                 books = try JSONDecoder().decode([CompanionBook].self, from: Data(contentsOf: libraryURL))
+                queuedSelections = Set(books.filter { $0.detail == "Waiting for this Mac" }.map(\.id))
             }
         } catch { show(error) }
         observers.append(NotificationCenter.default.addObserver(forName: .CKAccountChanged, object: nil, queue: .main) { [weak self] _ in
@@ -75,7 +90,106 @@ struct CompanionBook: Codable, Identifiable, Sendable {
                 self.setEnabled(true)
             }
         })
-        if restoreEnabled, UserDefaults.standard.bool(forKey: "enabled") { setEnabled(true) }
+        if restoreEnabled, !browseLibrary, UserDefaults.standard.bool(forKey: "enabled") { setEnabled(true) }
+        if browseLibrary { startLibrary() }
+    }
+    var visibleLibraryBooks: [ChatterboxCloudLibraryBook] {
+        let query = librarySearch.trimmingCharacters(in: .whitespacesAndNewlines)
+        return libraryBooks.filter { query.isEmpty || $0.title.localizedCaseInsensitiveContains(query) || ($0.author?.localizedCaseInsensitiveContains(query) ?? false) }
+    }
+    var visiblePreparations: [CompanionBook] {
+        books.filter { $0.cloudLibraryID == nil || $0.cloudAccountPartition == libraryAccountPartition }
+    }
+    private func startLibrary() {
+        let previous = libraryTask, stamp = UUID()
+        libraryEpoch = stamp; libraryTask?.cancel(); cloudLibrary?.stopRequests()
+        libraryBooks = []; remoteBooks = []; libraryAccountPartition = nil; queueSchemaReady = false
+        libraryStatus = "Loading your iCloud library…"
+        libraryTask = Task { [self] in
+            await previous?.value
+            let libraryGate = ChapterAccountSessionGate()
+            var client: ChatterboxCloudLibrary?
+            do {
+                try Task.checkCancellation()
+                let container = CKContainer(identifier: "iCloud.com.section9labs.Libros")
+                guard try await container.accountStatus() == .available else { throw CompanionFailure.iCloud }
+                let user = try await container.userRecordID()
+                let account = try ChapterCloudAccountIdentity(containerIdentifier: "iCloud.com.section9labs.Libros",
+                    environment: signedEnvironment(), userRecordName: user.recordName)
+                let session = try await libraryGate.open(accountPartition: account.accountPartition)
+                let library = try ChatterboxCloudLibrary(container: container, account: account, session: session, gate: libraryGate)
+                client = library
+                if libraryEpoch == stamp { cloudLibrary = library; libraryAccountPartition = account.accountPartition }
+                while !Task.isCancelled {
+                    do {
+                        let result = try await library.refresh()
+                        try Task.checkCancellation()
+                        guard libraryEpoch == stamp else { break }
+                        libraryBooks = result
+                        libraryStatus = result.isEmpty ? "Books you add in Librox will appear here after iCloud syncs." : "\(result.count) books · Recently opened first"
+                        let ready = try await library.queueSchemaAvailable()
+                        guard libraryEpoch == stamp, !Task.isCancelled else { break }
+                        queueSchemaReady = ready
+                        if !ready {
+                            status = "Your library is connected"
+                            detail = "Audiobook preparation is waiting for iCloud setup. You can still choose books."
+                        } else if UserDefaults.standard.bool(forKey: "enabled"), !enabled, !changing,
+                                  !CommandLine.arguments.contains("--library-only") { setEnabled(true) }
+                        if let requests = try? await library.preparationRequests(), libraryEpoch == stamp, !Task.isCancelled {
+                            remoteBooks = requests
+                        }
+                    } catch {
+                        if Task.isCancelled { break }
+                        if libraryEpoch == stamp { libraryStatus = error.localizedDescription }
+                    }
+                    try await Task.sleep(for: .seconds(45))
+                }
+            } catch { if !Task.isCancelled, libraryEpoch == stamp { libraryStatus = error.localizedDescription } }
+            client?.stopRequests(); await client?.close(); await libraryGate.close()
+            if libraryEpoch == stamp { cloudLibrary = nil }
+        }
+    }
+    func refreshLibrary() {
+        guard let cloudLibrary else { startLibrary(); return }
+        let stamp = libraryEpoch
+        runAction { [self] in
+            let result = try await cloudLibrary.refresh()
+            guard stamp == libraryEpoch else { return }
+            libraryBooks = result
+            libraryStatus = "\(result.count) books · Recently opened first"
+        }
+    }
+    func selectLibraryBook(_ book: ChatterboxCloudLibraryBook) {
+        guard selectingBook == nil, let cloudLibrary else { return }
+        selectingBook = book.id
+        let stamp = libraryEpoch
+        runAction { [self] in
+            defer { selectingBook = nil }
+            let id: UUID
+            if book.contentSHA256 != nil, let existing = books.first(where: { $0.cloudLibraryID == book.id && $0.cloudContentHash == book.contentSHA256 && $0.cloudAccountPartition == libraryAccountPartition }) {
+                id = existing.id
+            } else {
+                let file = try await cloudLibrary.download(book, to: root.appendingPathComponent("LibraryDownloads"))
+                defer { try? FileManager.default.removeItem(at: file) }
+                let task = Task.detached(priority: .userInitiated) { try BookImport.load(file) }
+                let parsed = try await withTaskCancellationHandler { try await task.value } onCancel: { task.cancel() }
+                try Task.checkCancellation()
+                guard stamp == libraryEpoch else { throw CancellationError() }
+                let document = try ChatterboxBookDocument(title: book.title, book: parsed.book, chapters: parsed.chapters)
+                id = UUID(); let filename = id.uuidString + ".libroxbook"
+                try document.encoded().write(to: root.appendingPathComponent(filename), options: .withoutOverwriting)
+                books.insert(.init(id: id, title: book.title, file: filename, scopeID: nil, detail: "Waiting for this Mac",
+                                   cloudLibraryID: book.id, cloudContentHash: book.contentSHA256,
+                                   cloudAccountPartition: libraryAccountPartition), at: 0)
+                try saveLibrary()
+            }
+            guard stamp == libraryEpoch else { throw CancellationError() }
+            if let index = books.firstIndex(where: { $0.id == id }) {
+                books[index].detail = "Waiting for this Mac"; try saveLibrary()
+            }
+            if canPrepare { prepare(id) }
+            else { queuedSelections.insert(id); if !enabled, queueSchemaReady { setEnabled(true) } }
+        }
     }
     private func saveLibrary() throws {
         try JSONEncoder().encode(books).write(to: libraryURL, options: .atomic)
@@ -107,8 +221,11 @@ struct CompanionBook: Codable, Identifiable, Sendable {
         }
     }
     func prepare(_ id: UUID) {
-        guard canPrepare, let reader, let session, let book = books.first(where: { $0.id == id }) else { return }
+        guard canPrepare, !preparing.contains(id), let reader, let session, let book = books.first(where: { $0.id == id }) else { return }
+        guard book.cloudAccountPartition == nil || book.cloudAccountPartition == session.accountPartition else { return }
+        preparing.insert(id)
         runAction { [self] in
+            defer { preparing.remove(id) }
             let doc = try ChatterboxBookDocument.decode(Data(contentsOf: root.appendingPathComponent(book.file)))
             let catalog = try await reader.catalog(session: session)
             guard let voice = catalog.voices.first else { throw ChatterboxCloudServiceError.notReady }
@@ -120,10 +237,16 @@ struct CompanionBook: Codable, Identifiable, Sendable {
             try await gate.validate(session); try Task.checkCancellation()
             if let index = books.firstIndex(where: { $0.id == id }) {
                 books[index].scopeID = prepared.scope.identifier; books[index].detail = "Preparing"; try saveLibrary()
+                queuedSelections.remove(id)
             }
         }
     }
     func cancel(_ id: UUID) {
+        if let index = books.firstIndex(where: { $0.id == id }), books[index].scopeID == nil {
+            queuedSelections.remove(id); books[index].detail = "Stopped"
+            do { try saveLibrary() } catch { show(error) }
+            return
+        }
         guard let reader, let session, let book = books.first(where: { $0.id == id }), let scope = book.scopeID else { return }
         runAction { [self] in
             _ = try await reader.cancelPreparation(scopeID: scope, session: session)
@@ -203,6 +326,10 @@ struct CompanionBook: Codable, Identifiable, Sendable {
                     _ = try await reader.catalog(session: session)
                     try await gate.validate(session)
                     connected = true
+                    if !changing {
+                        let selected = queuedSelections
+                        for id in selected { prepare(id) }
+                    }
                     try await reader.retryPending(session: session)
                     for book in books where book.scopeID != nil && book.detail == "Preparing" {
                         if let scope = book.scopeID {
@@ -244,6 +371,7 @@ struct CompanionBook: Codable, Identifiable, Sendable {
         }
     }
     private func accountChanged() {
+        queuedSelections.removeAll(); startLibrary()
         reconnectAfterJoin = false
         UserDefaults.standard.set(false, forKey: "enabled")
         epoch = UUID(); worker?.stopClaims(); reader?.stopRequests(); lifecycle?.cancel()
@@ -270,11 +398,12 @@ struct CompanionBook: Codable, Identifiable, Sendable {
         }
     }
     func prepareForExit() {
+        libraryTask?.cancel(); cloudLibrary?.stopRequests()
         terminating = true; epoch = UUID(); worker?.stopClaims(); reader?.stopRequests()
         lifecycle?.cancel(); poll?.cancel(); actions.values.forEach { $0.cancel() }
     }
     func stopForExit() async {
-        prepareForExit(); await lifecycle?.value; await stop()
+        prepareForExit(); await lifecycle?.value; await stop(); await libraryTask?.value
     }
     private func stop() async {
         epoch = UUID(); worker?.stopClaims(); reader?.stopRequests()
@@ -354,6 +483,54 @@ struct CompanionBook: Codable, Identifiable, Sendable {
             throw CompanionFailure.signing
         }
         return parsed
+    }
+    func checkLibrary(to output: URL) async {
+        var report: [String: String] = ["check": "read-only-existing-librox-library", "modelLoaded": "false"]
+        let libraryGate = ChapterAccountSessionGate()
+        var library: ChatterboxCloudLibrary?
+        do {
+            let container = CKContainer(identifier: "iCloud.com.section9labs.Libros")
+            let environment = try signedEnvironment()
+            report["environment"] = environment.rawValue
+            guard try await container.accountStatus() == .available else { throw CompanionFailure.iCloud }
+            let user = try await container.userRecordID()
+            let account = try ChapterCloudAccountIdentity(containerIdentifier: "iCloud.com.section9labs.Libros", environment: environment, userRecordName: user.recordName)
+            let session = try await libraryGate.open(accountPartition: account.accountPartition)
+            let client = try ChatterboxCloudLibrary(container: container, account: account, session: session, gate: libraryGate)
+            library = client
+            let result = try await client.refresh()
+            report["books"] = String(result.count)
+            report["recentlyOpenedBooks"] = String(result.filter { $0.lastOpened != nil }.count)
+            report["queueReady"] = String(try await client.queueSchemaAvailable())
+            let schemaProbe = CKQueryOperation(query: CKQuery(recordType: "LibroxStockCatalogV1", predicate: NSPredicate(value: true)))
+            schemaProbe.resultsLimit = 1; schemaProbe.desiredKeys = []
+            do {
+                let _: Void = try await ChapterCloudOperation.run(schemaProbe, database: container.privateCloudDatabase) { @Sendable done in
+                    schemaProbe.queryResultBlock = { done($0.map { _ in () }) }
+                }
+                report["queueSchemaProbe"] = "available"
+            } catch { report["queueSchemaProbe"] = String(describing: error) }
+            let chosen = result.first(where: { $0.canPrepare && $0.title.localizedCaseInsensitiveContains("Alice") }) ?? result.first(where: { $0.canPrepare })
+            if let book = chosen {
+                report["stage"] = "download"
+                let file = try await client.download(book, to: output.deletingPathExtension())
+                defer { try? FileManager.default.removeItem(at: file) }
+                report["downloadVerified"] = "true"
+                report["fileBytes"] = String(try file.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0)
+                report["stage"] = "import"
+                let task = Task.detached { try BookImport.load(file) }
+                let document = try await withTaskCancellationHandler { try await task.value } onCancel: { task.cancel() }
+                report["originalSpineEntries"] = String(document.chapters.count)
+            }
+            report["stage"] = "complete"
+            report["passed"] = "true"
+        } catch { report["passed"] = "false"; report["error"] = String(describing: error) }
+        library?.stopRequests(); await library?.close(); await libraryGate.close()
+        report["joined"] = "true"
+        do {
+            try FileManager.default.createDirectory(at: output.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try JSONSerialization.data(withJSONObject: report, options: [.prettyPrinted, .sortedKeys]).write(to: output, options: .atomic)
+        } catch { show(error) }
     }
     private struct Asset: Decodable { let parameter: String; let path: String }
     private struct AssetManifest: Decodable { let assets: [Asset] }

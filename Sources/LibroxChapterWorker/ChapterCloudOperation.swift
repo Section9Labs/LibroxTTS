@@ -5,8 +5,8 @@ import Synchronization
 /// One native operation stays owned until Foundation completion, including
 /// cancellation. Asset callbacks must privately capture staging files in their
 /// result blocks; retaining CKRecord/fileURL alone is not file custody.
-enum ChapterCloudOperation {
-    static func run<Value: Sendable>(_ operation: CKDatabaseOperation, database: CKDatabase,
+package enum ChapterCloudOperation {
+    package static func run<Value: Sendable>(_ operation: CKDatabaseOperation, database: CKDatabase,
                                      configure: (@escaping @Sendable (Result<Value, Error>) -> Void) -> Void) async throws -> Value {
         operation.configuration.timeoutIntervalForRequest = 15
         operation.configuration.timeoutIntervalForResource = 30

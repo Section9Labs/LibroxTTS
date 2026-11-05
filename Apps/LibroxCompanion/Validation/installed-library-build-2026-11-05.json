@@ -1,0 +1,9 @@
+{
+  "appPath": "/Applications/Librox Companion.app",
+  "executableSHA256": "545c04971765c70fe0544dfdba2d5b5a88a74ddfdca88478786daa73bec1b1c2",
+  "cloudKitEnvironment": "Production",
+  "signingKind": "local development certificate",
+  "strictSignatureVerified": true,
+  "focusedTestsPassed": 13,
+  "physicalPhonePlaybackVerified": false
+}

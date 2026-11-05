@@ -3,6 +3,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 MODE="${1:-run}"
 CONFIGURATION="${CONFIGURATION:-release}"
+CLOUD_ENVIRONMENT="${COMPANION_CLOUD_ENVIRONMENT:-Production}"
 APP="$ROOT/dist/Librox Companion.app"
 BUNDLE_ID="com.section9labs.Libros.Companion"
 cd "$ROOT"
@@ -45,10 +46,11 @@ info={
 PY
 
 # The existing Companion profile is inspected, not manufactured. Local builds
-# use Development iCloud; production deployment is a separate release action.
-python3 - "$STAGE" "$ROOT/dist/companion.entitlements" <<'PY'
+# may use either permitted iCloud environment. Production reads the live library.
+python3 - "$STAGE" "$ROOT/dist/companion.entitlements" "$CLOUD_ENVIRONMENT" <<'PY'
 import datetime,pathlib,plistlib,subprocess,sys
-bundle=pathlib.Path(sys.argv[1]); profile=None
+bundle=pathlib.Path(sys.argv[1]); profile=None; environment=sys.argv[3]
+if environment not in ('Development','Production'): raise SystemExit('Invalid CloudKit environment')
 roots=[pathlib.Path.home()/'Library/Developer/Xcode/UserData/Provisioning Profiles',
        pathlib.Path.home()/'Library/MobileDevice/Provisioning Profiles']
 for root in roots:
@@ -58,6 +60,7 @@ for root in roots:
   except Exception: continue
   entitlements=data.get('Entitlements',{})
   if (entitlements.get('com.apple.application-identifier')=='995PCLM9KH.com.section9labs.Libros.Companion'
+      and environment in entitlements.get('com.apple.developer.icloud-container-environment',[])
       and data['ExpirationDate']>datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)):
    profile=candidate; break
  if profile: break
@@ -67,7 +70,7 @@ entitlements={'com.apple.application-identifier':'995PCLM9KH.com.section9labs.Li
  'com.apple.developer.team-identifier':'995PCLM9KH',
  'com.apple.developer.icloud-container-identifiers':['iCloud.com.section9labs.Libros'],
  'com.apple.developer.icloud-services':['CloudKit'],
- 'com.apple.developer.icloud-container-environment':'Development'}
+ 'com.apple.developer.icloud-container-environment':environment}
 pathlib.Path(sys.argv[2]).write_bytes(plistlib.dumps(entitlements))
 PY
 IDENTITY="${COMPANION_SIGNING_IDENTITY:-E96C00F14EF8F2937CD600CBD35A806FF8E45AAE}"

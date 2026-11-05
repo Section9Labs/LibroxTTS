@@ -56,7 +56,7 @@ public actor ChatterboxCloudPreparedBookService: ChatterboxPreparedBookService {
     }
     public func catalog(session: ChapterAccountSession) async throws -> ChatterboxStockCatalog {
         try await valid(session)
-        return try await operations.run { [connection] in
+        return try await operations.read { [connection] in
             guard let bytes = try await connection.directory.catalog() else { throw ChatterboxCloudServiceError.notReady }
             let record = try JSONDecoder().decode(ChatterboxCloudStockRecord.self, from: bytes)
             let descriptor = try record.descriptor()
@@ -68,7 +68,7 @@ public actor ChatterboxCloudPreparedBookService: ChatterboxPreparedBookService {
     }
     public func books(session: ChapterAccountSession) async throws -> [ChatterboxCloudBookSummary] {
         try await valid(session)
-        return try await operations.run { [connection] in
+        return try await operations.read { [connection] in
             var result: [ChatterboxCloudBookSummary] = []
             for book in try await connection.directory.books() {
                 let wanted = try await connection.directory.readSets(scopeID: book.scopeID)
@@ -211,7 +211,7 @@ public actor ChatterboxCloudPreparedBookService: ChatterboxPreparedBookService {
     }
     public func resolve(scopeID: String, position: ChapterBookPriority, session: ChapterAccountSession) async throws -> ChatterboxBookResolution {
         try await valid(session)
-        return try await operations.run { try await self.resolveOwned(scopeID, chapter: position.chapterIndex,
+        return try await operations.read { try await self.resolveOwned(scopeID, chapter: position.chapterIndex,
             offset: position.sourceUTF16Offset, afterSegment: nil) }
     }
     private func resolveOwned(_ scope: String, chapter: Int, offset: Int, afterSegment: Int?) async throws -> ChatterboxBookResolution {
@@ -242,7 +242,7 @@ public actor ChatterboxCloudPreparedBookService: ChatterboxPreparedBookService {
     }
     public func successor(of segment: ChatterboxResolvedBookSegment, session: ChapterAccountSession) async throws -> ChatterboxBookResolution {
         try await valid(session)
-        return try await operations.run {
+        return try await operations.read {
             guard try await self.receipt(segment.scopeID).localIntent.wantedRevision == segment.wantedRevision else {
                 throw ChatterboxCloudServiceError.staleIntent
             }
@@ -252,7 +252,7 @@ public actor ChatterboxCloudPreparedBookService: ChatterboxPreparedBookService {
     }
     public func successor(of completion: ChatterboxResolvedBookChapterCompletion, session: ChapterAccountSession) async throws -> ChatterboxBookResolution {
         try await valid(session)
-        return try await operations.run {
+        return try await operations.read {
             guard try await self.receipt(completion.scopeID).localIntent.wantedRevision == completion.wantedRevision else {
                 throw ChatterboxCloudServiceError.staleIntent
             }
@@ -278,7 +278,7 @@ public actor ChatterboxCloudPreparedBookService: ChatterboxPreparedBookService {
     }
     public func download(_ segment: ChatterboxResolvedBookSegment, session: ChapterAccountSession) async throws -> ChatterboxBookSegmentDelivery {
         try await valid(session)
-        return try await operations.run { [connection] in
+        return try await operations.read { [connection] in
             guard let set = try await self.current(segment.scopeID), set.metadata.intent.wantedRevision == segment.wantedRevision else {
                 throw ChatterboxCloudServiceError.staleIntent
             }
@@ -317,7 +317,7 @@ public actor ChatterboxCloudPreparedBookService: ChatterboxPreparedBookService {
                 while !Task.isCancelled {
                     sequence += 1
                     let number = sequence
-                    let update = try await operations.run { try await self.snapshot(scopeID, sequence: number) }
+                    let update = try await operations.read { try await self.snapshot(scopeID, sequence: number) }
                     pair.continuation.yield(update)
                     try await Task.sleep(for: .seconds(5))
                 }
@@ -357,7 +357,7 @@ public actor ChatterboxCloudPreparedBookService: ChatterboxPreparedBookService {
     }
     public func status(scopeID: String, session: ChapterAccountSession) async throws -> ChatterboxBookServiceUpdate {
         try await valid(session)
-        return try await operations.run { try await self.snapshot(scopeID, sequence: 1) }
+        return try await operations.read { try await self.snapshot(scopeID, sequence: 1) }
     }
     public nonisolated func stopRequests() { operations.stop() }
     public func close(session: ChapterAccountSession) async throws {
