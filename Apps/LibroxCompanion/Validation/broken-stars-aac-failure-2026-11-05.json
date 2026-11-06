@@ -1,0 +1,45 @@
+{
+  "book": "Broken Stars",
+  "scopeID": "e06a3b806375c5f961e37e1459d4f0435f2a95ffc1c0f8d40fb1cd17dbb9b677",
+  "reproducedWith": "unchanged NativeAudioExport.swift and NativeFileAudioExport.swift compiled in an isolated temporary harness; no model loaded or running app replaced",
+  "cases": [
+    {
+      "path": "9B98CAC7-390B-49A7-90D2-1D55C433DA2B/segment-0001/chapter.f32",
+      "frames": 103680,
+      "finite": true,
+      "peak": 0.9900000095367432,
+      "outOfRangeSamples": 0,
+      "aacResult": "decodedSampleRange",
+      "aacFirstRejectedSample": 38942,
+      "aacFirstRejectedValue": 1.0001701,
+      "alacResult": "passed",
+      "alacDecodedPeak": 0.99
+    },
+    {
+      "path": "5B952297-175E-4328-894B-70692390F1D4/segment-0003/chapter.f32",
+      "frames": 262080,
+      "finite": true,
+      "peak": 0.9900000095367432,
+      "outOfRangeSamples": 0,
+      "aacResult": "decodedSampleRange",
+      "aacFirstRejectedSample": 166887,
+      "aacFirstRejectedValue": 1.0033699,
+      "alacResult": "passed",
+      "alacDecodedPeak": 0.99
+    },
+    {
+      "path": "F402BF0E-83B7-4EEC-9767-51F38F51B6BF/segment-0000/chapter.f32",
+      "frames": 186240,
+      "finite": true,
+      "peak": 0.9900000095367432,
+      "outOfRangeSamples": 0,
+      "aacResult": "decodedSampleRange",
+      "aacFirstRejectedSample": 138102,
+      "aacFirstRejectedValue": 1.0107424,
+      "alacResult": "passed",
+      "alacDecodedPeak": 0.99
+    }
+  ],
+  "pendingDecision": "User asked whether to create a new explicit ALAC preparation or continue investigating AAC",
+  "wholeBookComplete": false
+}
