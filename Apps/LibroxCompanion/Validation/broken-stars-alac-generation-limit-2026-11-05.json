@@ -1,0 +1,12 @@
+{
+  "book": "Broken Stars",
+  "scopeID": "a7b37739fdee2474d80f88e10de0fb5e3fee1e90280f5b1913494663e64d397f",
+  "delivery": "alac24-1",
+  "observedUI": "Preparing audiobook; Chapter 7 of 63; 19 audio parts sent; ChatterboxMLXRenderer.RendererError error 6",
+  "classification": "generationLimit: decoder exhausted request.maxTokens without the required stop token",
+  "policyMaxTokens": 350,
+  "policyIdentityFile": "Integrations/ChatterboxPlanning/Sources/LibroxChatterboxPlanning/SynthesisIdentity.swift",
+  "inference": "At least one earlier unit failed while later sections continued. This is distinct from the prior AAC readback issue. The failed text/unit has not yet been reproduced in isolation.",
+  "wholeBookComplete": false,
+  "action": "Preserve active generation and published prefixes. Do not truncate, fabricate an EOS/seal, increase tokens under the old identity, or repeatedly retry the identical failing request. Investigate a correctly versioned bounded synthesis repair; do not create another replacement scope without explicit authorization."
+}
