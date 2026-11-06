@@ -82,7 +82,8 @@ public actor CTEngine {
     /// Saved noise is a diagnostic input, never an integer-seed parity promise.
     /// Voice and language are checked even when callers bypass the app facade.
     public func synthesize(_ text: String, language: String, voiceID: String = CTAssets.voiceID,
-                           initialNoise: CTTensor? = nil, captureTrace: Bool = false) throws -> Output {
+                           initialNoise: CTTensor? = nil, captureTrace: Bool = false,
+                           completeSentence: Bool = true) throws -> Output {
         try Task.checkCancellation()
         guard voiceID == CTAssets.voiceID else { throw CTError.unsupportedVoice }
         guard let state else { throw CTError.notLoaded }
@@ -104,7 +105,7 @@ public actor CTEngine {
             try Task.checkCancellation()
             return output
         }
-        let ids = try state.tokenizer.encode(text, language: language)
+        let ids = try state.tokenizer.encode(text, language: language, completeSentence: completeSentence)
         let idsTensor = try CTTensor(ids, shape: [1, ids.count])
         let mask = try CTTensor([Float](repeating: 1, count: ids.count), shape: [1, 1, ids.count])
         record("text_ids", idsTensor); record("text_mask", mask)

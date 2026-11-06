@@ -1,6 +1,7 @@
 // Adapted from Supertone helper, Copyright (c) 2025 Supertone Inc.
 // MIT license: see Resources/helper-LICENSE.
 import Foundation
+import KokoroCatalog
 
 /// Port of the frozen helper's NFKD Unicode indexer. No phoneme frontend is used.
 public struct CTTokenizer: Sendable {
@@ -10,8 +11,8 @@ public struct CTTokenizer: Sendable {
             directory.appendingPathComponent("config/unicode_indexer.json")))
         guard indexer.count == 65_536 else { throw CTError.invalidAssets("unicode_indexer") }
     }
-    public func encode(_ text: String, language: String) throws -> [Int64] {
-        let normalized = try Self.normalize(text, language: language)
+    public func encode(_ text: String, language: String, completeSentence: Bool = true) throws -> [Int64] {
+        let normalized = try Self.normalize(text, language: language, completeSentence: completeSentence)
         guard normalized.unicodeScalars.count <= 512 else { throw CTError.passageTooLong }
         return try normalized.unicodeScalars.map {
             // The pinned Python helper casts to uint16; don't alias unsupported
@@ -20,8 +21,8 @@ public struct CTTokenizer: Sendable {
             return indexer[Int($0.value)]
         }
     }
-    public static func normalize(_ source: String, language: String) throws -> String {
-        guard ["en", "es"].contains(language) else { throw CTError.unsupportedLanguage }
+    public static func normalize(_ source: String, language: String, completeSentence: Bool = true) throws -> String {
+        guard NarrationLanguage.textNativeCodes.contains(language) || language == "na" else { throw CTError.unsupportedLanguage }
         guard source.unicodeScalars.count <= 4096 else { throw CTError.passageTooLong }
         var text = source.decomposedStringWithCompatibilityMapping
         text = String(String.UnicodeScalarView(text.unicodeScalars.filter { scalar in
@@ -51,7 +52,7 @@ public struct CTTokenizer: Sendable {
         guard text.unicodeScalars.contains(where: { CharacterSet.letters.union(.decimalDigits).contains($0) }) else {
             throw CTError.emptyText
         }
-        if let last = text.last, !".!?;:,'\")]}…。」』】〉》›»".contains(last) { text += "." }
+        if completeSentence, let last = text.last, !".!?;:,'\")]}…。」』】〉》›»".contains(last) { text += "." }
         return "<\(language)>" + text + "</\(language)>"
     }
 }

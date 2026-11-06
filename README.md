@@ -1,6 +1,6 @@
 # LibroxTTS
 
-Offline speech synthesis and book narration for iPhone, iPad and Mac. **Librox Plus uses the official Core ML v2 CT F1 runtime**, with English and Spanish narration and GPU acceleration for foreground inference. The existing Kokoro renderer provides 54 voices across eight languages. Neither renderer needs Python, ONNX Runtime, MLX or eSpeak at runtime.
+Offline speech synthesis and book narration for iPhone, iPad and Mac. **Librox Plus uses the official Core ML v2 CT F1 runtime**, with a 31-language native-text adapter and GPU acceleration for foreground inference. The existing Kokoro renderer provides 54 voices across eight languages. Neither renderer needs Python, ONNX Runtime, MLX or eSpeak at runtime.
 
 [![Swift](https://github.com/Section9Labs/LibroxTTS/actions/workflows/swift.yml/badge.svg)](https://github.com/Section9Labs/LibroxTTS/actions/workflows/swift.yml)
 
@@ -18,6 +18,8 @@ Products include `LibroxTTS` (host-facing synthesis/install API), `LibroxCTNativ
 
 See [the narrator integration API](docs/book-planning.md), [casting rules](docs/story-narrator.md), and [enhancement API and validation limits](docs/audio-enhancement.md). The optional, separately imported `QwenANE` product retains the Qwen renderer work; its existence does not establish device eligibility or sustained background performance. No MLX dependency is added to these library products. Rejected model auditions are not app dependencies.
 
+This branch contains the [shared narration pipeline candidate](docs/UNIFIED-NARRATION.md). SDK 0.2.1 remains the released version; the candidate needs app listening acceptance.
+
 ## Speak with Plus
 
 ```swift
@@ -31,9 +33,12 @@ try await NarrationAssets.download(.plus, to: directory)
 
 let renderer = NarrationRenderer(compactDirectory: directory, harmonicSource: nil)
 try await renderer.load(.plus, directory: directory, executionContext: .foreground)
-for passage in try TextNativeNarrationPlanner.plan(
-    "The book was waiting where she had left it.", voiceID: "plus-f1-en-v1") {
-    let samples = try await renderer.render(passage) // mono Float32, 24 kHz
+let plan = try await NarrationPipeline().plan(
+    "The book was waiting where she had left it.", model: .plus,
+    bookID: "example", chapterID: "1", narratorVoiceID: nil,
+    metadataLanguage: "en")
+for passage in plan.units {
+    let samples = try await renderer.render(passage) // mono Float32; model.outputSampleRate
     // Queue samples in your application's player before rendering more.
 }
 await renderer.unload()

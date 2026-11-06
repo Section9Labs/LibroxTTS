@@ -8,7 +8,7 @@ public enum CTError: Error, LocalizedError, Sendable {
         switch self {
         case .invalidAssets(let file): "Plus voice assets failed verification: \(file)."
         case .invalidTensor(let name): "Plus produced an incompatible tensor: \(name)."
-        case .unsupportedLanguage: "Plus currently supports English and Spanish."
+        case .unsupportedLanguage: "This language is not supported by the Plus narrator."
         case .unsupportedVoice: "Choose the Plus F1 narrator. Existing voice selections are not interchangeable."
         case .emptyText: "There is no speakable text in this passage."
         case .passageTooLong: "This passage exceeds the Plus narrator's bounded capacity."

@@ -53,18 +53,25 @@ public struct NarrationProsody: Sendable, Equatable {
 
     public static func analyze(text: String, followingAttribution: String = "",
                                voiceID: String) -> Self {
+        guard let language = Voice.named(voiceID)?.language else { return empty }
+        return analyze(text: text, followingAttribution: followingAttribution, languageCode: language.rawValue)
+    }
+
+    public static func analyze(text: String, followingAttribution: String = "",
+                               languageCode: String) -> Self {
         // Do not classify a truncated sentence as if it were a complete one. Scalar
         // bounds also protect against pathological combining-character clusters.
-        guard text.unicodeScalars.prefix(maximumTextScalars + 1).count <= maximumTextScalars,
-              let language = Voice.named(voiceID)?.language else { return empty }
+        guard text.unicodeScalars.prefix(maximumTextScalars + 1).count <= maximumTextScalars else { return empty }
+        let language = Language(identifier: languageCode)
         let spoken = text.precomposedStringWithCanonicalMapping
             .trimmingCharacters(in: wrappers)
         let ending = terminalSuffix(spoken)
         let body = String(spoken.dropLast(ending.sourceCount))
         let multiple = body.contains { ".!?。！？।॥؟‽⁈⁉".contains($0) }
         let question = ending.kind == .question || ending.kind == .questionExclamation
-        let kind = question ? questionKind(body, language: language, multiple: multiple) : .none
-        let tag = attributionExpression(followingAttribution, language: language)
+        let kind: NarrationQuestionKind = question
+            ? language.map { questionKind(body, language: $0, multiple: multiple) } ?? .unspecified : .none
+        let tag = language.flatMap { attributionExpression(followingAttribution, language: $0) }
         let expression: NarrationExpression
         if let tag { expression = tag }
         else if !multiple, language == .english || language == .spanish {

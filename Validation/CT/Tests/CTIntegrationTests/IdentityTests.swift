@@ -2,6 +2,7 @@ import Foundation
 import Testing
 import KokoroNarration
 import LibroxTTS
+import LibroxCTNative
 
 @Test func previousSelectionsKeepTheirModelAndDelivery() throws {
     let basic = try JSONDecoder().decode(NarrationModel.self, from: Data("\"kokoroDesktop\"".utf8))
@@ -33,7 +34,7 @@ import LibroxTTS
     let plan = try TextNativeNarrationPlanner.plan(long, voiceID: "plus-f1-en-v1")
     #expect(plan.count > 1)
     for unit in plan {
-        #expect(unit.range.length <= 280)
+        #expect(try CTTokenizer.normalize(unit.synthesisText, language: "en", completeSentence: false).unicodeScalars.count <= 500)
         #expect(unit.text == (long as NSString).substring(with: unit.range))
     }
     let symbols = String(repeating: "𝄞", count: 200)

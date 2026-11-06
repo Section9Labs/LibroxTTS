@@ -116,10 +116,7 @@ public actor NarrationRenderer {
             guard let voice = NarrationModel.plus.nativeVoices.first(where: { $0.id == unit.voiceID }) else {
                 throw CTError.unsupportedVoice
             }
-            let native = try await plus.synthesize(unit.text, language: voice.language)
-            try Task.checkCancellation()
-            let pause = unit.boundaryAfter == .continuation ? 0 : (voice.language == "es" ? 0.32 : 0.22)
-            return try CTDelivery.prepare(native.samples, boundaryPause: pause).samples
+            return try await renderNative(unit.synthesisText, language: voice.language, engine: plus)
         }
         guard let kokoro else { throw RenderError.invalidAudio }
         let audio: Audio
@@ -134,9 +131,31 @@ public actor NarrationRenderer {
                 styleRow: profile.styleRow(for: unit), speed: speed, pitchGestures: gestures,
                 voiceBlend: blend.map { NarrationVoiceBlend(secondaryVoiceID: $0.id, weight: $0.weight) })
         } else {
-            audio = try await kokoro.synthesize(unit.text, voiceID: unit.voiceID, speed: speed)
+            audio = try await kokoro.synthesize(unit.synthesisText, voiceID: unit.voiceID, speed: speed)
         }
         return try enhance(audio.samples)
+    }
+
+    private func renderNative(_ text: String, language: String, engine: CTEngine, depth: Int = 0) async throws -> [Float] {
+        try Task.checkCancellation()
+        do {
+            let native = try await engine.synthesize(text, language: language, completeSentence: false)
+            try Task.checkCancellation()
+            return try CTDelivery.prepare(native.samples, sampleRate: NarrationModel.plus.outputSampleRate,
+                                           level: .nativeDynamics).samples
+        } catch CTError.passageTooLong {
+            // Duration is predicted from the actual language and voice, not a
+            // universal character count. Retry bounded fragments only if needed.
+            guard depth < 8, text.count > 8 else { throw CTError.passageTooLong }
+            let midpoint = text.index(text.startIndex, offsetBy: text.count / 2)
+            let prefix = text[..<midpoint]
+            let boundary = prefix.lastIndex(where: { ",;:，、；：".contains($0) })
+                ?? prefix.lastIndex(where: \.isWhitespace) ?? midpoint
+            let split = boundary == text.startIndex ? midpoint : text.index(after: boundary)
+            let first = try await renderNative(String(text[..<split]), language: language, engine: engine, depth: depth + 1)
+            let second = try await renderNative(String(text[split...]), language: language, engine: engine, depth: depth + 1)
+            return first + second
+        }
     }
 
     private func enhance(_ samples: [Float]) throws -> [Float] {

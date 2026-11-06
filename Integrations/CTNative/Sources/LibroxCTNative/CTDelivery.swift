@@ -3,7 +3,17 @@ import Foundation
 
 /// SDK-owned delivery, independent of the host's 24 kHz resonant-voice filter.
 public enum CTDelivery {
-    public static let revision = "ct-delivery-v1:lufs-24:constant-gain:boundary-pauses"
+    public static let revision = "ct-delivery-v2:native-dynamics"
+    /// Frozen CT F1 en-return-relief reference: -16.36134471783063 LUFS.
+    /// Calibrate once to its accepted -24 LUFS audition, not once per passage.
+    /// Shared across languages so a new sentence cannot reset relative dynamics.
+    public static let nativeGainDB = -7.6386552821693705
+    public enum Level: Sendable {
+        /// Compatibility for matched laboratory auditions.
+        case referenceLoudness
+        /// Fixed F1 reference calibration; retain between-passage loudness.
+        case nativeDynamics
+    }
     public struct Output: Sendable {
         public let samples: [Float]
         public let sampleRate: Int
@@ -14,11 +24,11 @@ public enum CTDelivery {
         public let pausePolicy = "native-context-with-passage-boundaries"
     }
     public static func prepare(_ native: [Float], sampleRate: Int = 24_000,
-                               boundaryPause: Double = 0) throws -> Output {
+                               boundaryPause: Double = 0, level: Level = .referenceLoudness) throws -> Output {
         guard [24_000, 44_100].contains(sampleRate), boundaryPause.isFinite, (0...1).contains(boundaryPause),
               !native.isEmpty, native.count <= 44_100 * 31, native.allSatisfy(\.isFinite) else { throw CTError.invalidAudio }
         let loudness = try integratedLoudness(native)
-        let desiredGain = pow(10, (-24 - loudness) / 20)
+        let desiredGain = pow(10, (level == .referenceLoudness ? -24 - loudness : nativeGainDB) / 20)
         let peak = native.reduce(Float(0)) { max($0, abs($1)) }
         guard peak > 0 else { throw CTError.invalidAudio }
         // A single gain preserves waveform shape. No clipping, compressor or limiter.
