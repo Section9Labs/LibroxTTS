@@ -8,5 +8,127 @@
   "policyIdentityFile": "Integrations/ChatterboxPlanning/Sources/LibroxChatterboxPlanning/SynthesisIdentity.swift",
   "inference": "At least one earlier unit failed while later sections continued. This is distinct from the prior AAC readback issue. The failed text/unit has not yet been reproduced in isolation.",
   "wholeBookComplete": false,
-  "action": "Preserve active generation and published prefixes. Do not truncate, fabricate an EOS/seal, increase tokens under the old identity, or repeatedly retry the identical failing request. Investigate a correctly versioned bounded synthesis repair; do not create another replacement scope without explicit authorization."
+  "action": "Preserve active generation and published prefixes. Do not truncate, fabricate an EOS/seal, increase tokens under the old identity, or repeatedly retry the identical failing request. Investigate a correctly versioned bounded synthesis repair; do not create another replacement scope without explicit authorization.",
+  "followup": {
+    "checkedAtUTC": "2026-11-06T02:19:45.485598+00:00",
+    "nativeUI": "Chapter 11 of 63, 1 audio part sent; unchanged RendererError code 6",
+    "localALACSegmentsAtInitialCheck": 99,
+    "latestLocalALACAgeSecondsAtInitialCheck": 39,
+    "earlierLocalPrefixesWithoutSeal": [
+      {
+        "section": 6,
+        "segments": 43
+      },
+      {
+        "section": 7,
+        "segments": 21
+      },
+      {
+        "section": 9,
+        "segments": 6
+      }
+    ],
+    "evidenceBoundary": "Local prefixes and missing local seals identify investigation candidates only. No cloud completion or audio readback verification performed. Section 4 remains a zero-prefix candidate; exact failed unit not established.",
+    "pipelineFinding": "BookSession plans windows of three units. MLX renderBatch decodes the next request before delivering the previous acoustic result. A failed decode may therefore suppress delivery of an already decoded preceding unit; prefix length alone does not identify the failing unit.",
+    "nextDiagnostic": "Resolve exact planner units for each candidate, then perform one bounded isolated reproduction after safely joining the active producer, or with demonstrably separate resources. Evaluate a bounded, explicitly versioned synthesis policy. No migration is authorized yet.",
+    "runtimeChanges": "None; active ALAC preparation left running. No retries, replacement scope, altered token ceiling, or rebuild."
+  },
+  "rangeInspection": {
+    "method": "Read-only isolated Swift inspection using unchanged StoryNarrator plus BookDirector sentence and 300-character splitting logic. No model or app loaded; no inference replay. Candidate ranges are not exact failure attribution.",
+    "candidates": [
+      {
+        "section": 4,
+        "localPrefix": 0,
+        "totalPlannedRanges": 4,
+        "candidateRanges": [
+          {
+            "characters": 299,
+            "index": 0,
+            "sha256": "61aac3b917663eb64331864704e4d16b13f6853f140dcec7ffa0b5b0037b72ef",
+            "sourceLength": 299,
+            "sourceOffset": 0,
+            "wordCount": 47
+          },
+          {
+            "characters": 298,
+            "index": 1,
+            "sha256": "9554e03d59fbdfd034ef003feb8501ee121115ee3e899ee83dc732b644916cc7",
+            "sourceLength": 298,
+            "sourceOffset": 300,
+            "wordCount": 56
+          }
+        ]
+      },
+      {
+        "section": 6,
+        "localPrefix": 43,
+        "totalPlannedRanges": 55,
+        "candidateRanges": [
+          {
+            "characters": 295,
+            "index": 43,
+            "sha256": "3177a15c84bbe0afc066510bd3c7daead397a21769b701e05b43e10933f6c3b4",
+            "sourceLength": 295,
+            "sourceOffset": 4307,
+            "wordCount": 53
+          },
+          {
+            "characters": 47,
+            "index": 44,
+            "sha256": "4855a20af881ffffd24e5ca84afaee2f4809609d85995c99d8efa1c3265872b8",
+            "sourceLength": 47,
+            "sourceOffset": 4603,
+            "wordCount": 7
+          }
+        ]
+      },
+      {
+        "section": 7,
+        "localPrefix": 21,
+        "totalPlannedRanges": 23,
+        "candidateRanges": [
+          {
+            "characters": 282,
+            "index": 21,
+            "sha256": "5f5b583776ee2065c0c0718917f41cd8018385cfb564a59319dc40c5c4716429",
+            "sourceLength": 282,
+            "sourceOffset": 1224,
+            "wordCount": 45
+          },
+          {
+            "characters": 75,
+            "index": 22,
+            "sha256": "2f4a9c60e0762118521651b8f3862f8b1851ec963f4d17d31582b0106689f42d",
+            "sourceLength": 75,
+            "sourceOffset": 1507,
+            "wordCount": 13
+          }
+        ]
+      },
+      {
+        "section": 9,
+        "localPrefix": 6,
+        "totalPlannedRanges": 1045,
+        "candidateRanges": [
+          {
+            "characters": 297,
+            "index": 6,
+            "sha256": "a7afb3ba2a081a30df6a742ebdaa53aa20f13b134f887b9eb73db5a6ff8bc990",
+            "sourceLength": 297,
+            "sourceOffset": 635,
+            "wordCount": 48
+          },
+          {
+            "characters": 235,
+            "index": 7,
+            "sha256": "b46ceeb04be0636aa8e097a0b6daf4afc5b85620305af9cd0d106c6ab89ad0c7",
+            "sourceLength": 235,
+            "sourceOffset": 933,
+            "wordCount": 34
+          }
+        ]
+      }
+    ],
+    "assessment": "Long passages near 300 characters occur among candidate failures, but section 6 also has a 47-character candidate. Shorter splitting alone is not yet a demonstrated repair. Exact decoder attribution and bounded alternative-policy inference remain required before proposing a migration."
+  }
 }
