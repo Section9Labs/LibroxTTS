@@ -170,4 +170,3 @@ public actor CTEngine {
         return Output(samples: samples, predictedDuration: seconds, trace: trace, graphSeconds: times)
     }
 }
-
