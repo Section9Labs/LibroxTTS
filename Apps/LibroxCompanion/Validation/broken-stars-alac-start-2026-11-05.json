@@ -1,0 +1,24 @@
+{
+  "book": "Broken Stars",
+  "delivery": "alac24-1",
+  "environment": "Production",
+  "existingAACSegmentFilesRetained": 147,
+  "firstALACSegment": {
+    "codec": "alac24-1",
+    "decodedFrames": 287040,
+    "durationSeconds": 11.96,
+    "fileBytes": 651010,
+    "sampleRate": 24000,
+    "sha256": "b8390dbd47e5d7ab2ecabf065843c8e64838d6f07c060e5ddbdb00e5998ea28f"
+  },
+  "installedExecutableSHA256": "9f1e4f5cac552a3bd6b9c27a576621a5755a1c7ef0def58bc71192d2143201a3",
+  "leftRunning": true,
+  "monitor": "finish-broken-stars-audiobook follows the new ALAC scope",
+  "observedUI": "Preparing audiobook \u00b7 Broken Stars \u00b7 Chapter 2 of 63 \u00b7 1 audio parts sent",
+  "priorAACDemandCancelledAndConfirmed": true,
+  "priorAACScopeID": "e06a3b806375c5f961e37e1459d4f0435f2a95ffc1c0f8d40fb1cd17dbb9b677",
+  "scopeID": "a7b37739fdee2474d80f88e10de0fb5e3fee1e90280f5b1913494663e64d397f",
+  "sourcePartsUploaded": 63,
+  "wantedRequestConfirmed": true,
+  "wholeBookComplete": false
+}

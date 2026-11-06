@@ -58,11 +58,11 @@ Known identifiers are test evidence, not production hardcoded constants:
 
 - Book: Broken Stars, Ken Liu.
 - Original EPUB SHA-256: `07309c2c9afcb0c6614d6c075b6cd003c2120976d8d730be3a6ec4fe01f6ff65`.
-- Production scope: `e06a3b806375c5f961e37e1459d4f0435f2a95ffc1c0f8d40fb1cd17dbb9b677`.
+- Active Production scope: `a7b37739fdee2474d80f88e10de0fb5e3fee1e90280f5b1913494663e64d397f` (lossless ALAC, explicitly selected by the user).
 - Extraction: `companion-epub-swiftsoup-parts-2`; 62 original EPUB spine entries produce 63 narration parts, including silent entries.
-- Existing delivery is AAC-LC. All 63 source contents and the wanted request were confirmed in Production; actual audio generation and the first segment publication were verified.
+- Active delivery is lossless ALAC. The earlier AAC scope `e06a3b806375c5f961e37e1459d4f0435f2a95ffc1c0f8d40fb1cd17dbb9b677` remains preserved but its preparation demand is cancelled; do not select it as the acceptance target.
 
-Refresh its live status. It is not yet proven complete: the monitor subsequently observed an audio-export failure while later parts continued rendering. Do not hide missing/failed parts or mark the whole book Ready. Do not restart, duplicate, or switch the existing scope to a different codec as an adoption shortcut. Surface failures and coordinate any producer repair with the active companion work.
+Refresh its live status. It is not yet proven complete. The user approved the new ALAC preparation after three AAC segments failed decoded-sample validation and the same PCM passed ALAC without modification. Do not hide missing/failed parts or mark the whole book Ready. Adopt the active ALAC scope exactly; do not restart, duplicate, or switch its codec as an adoption shortcut. Surface failures and coordinate any producer repair with the active companion work.
 
 10. Validate both flows and deliver the implementation.
 
