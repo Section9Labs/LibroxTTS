@@ -3,8 +3,10 @@ import PackageDescription
 
 let package = Package(
     name: "LibroxTTS",
-    platforms: [.macOS(.v13), .iOS(.v17), .macCatalyst(.v17)],
+    platforms: [.macOS(.v15), .iOS(.v18), .macCatalyst(.v18)],
     products: [
+        .library(name: "LibroxCTNative", targets: ["LibroxCTNative"]),
+        .executable(name: "ct-install-probe", targets: ["CTInstallProbe"]),
         .library(name: "QwenANE", targets: ["QwenANE"]),
         .library(name: "LibroxTTS", targets: ["LibroxTTS"]),
         .library(name: "KokoroCatalog", targets: ["KokoroCatalog"]),
@@ -19,6 +21,10 @@ let package = Package(
         .executable(name: "narrator-mood", targets: ["NarratorMoodProbe"]),
     ],
     targets: [
+        .target(name: "LibroxCTNative", path: "Integrations/CTNative/Sources/LibroxCTNative", resources: [.process("Resources")]),
+        .executableTarget(name: "CTInstallProbe", dependencies: ["LibroxTTS", "LibroxCTNative"]),
+        .testTarget(name: "LibroxCTNativeTests", dependencies: ["LibroxCTNative"], path: "Integrations/CTNative/Tests/LibroxCTNativeTests"),
+        .testTarget(name: "CTIntegrationTests", dependencies: ["LibroxTTS", "KokoroNarration", "LibroxCTNative"], path: "Validation/CT/Tests/CTIntegrationTests"),
         .testTarget(name: "QwenANETests", dependencies: ["QwenANE"]),
         .target(name: "QwenANE", exclude: ["PROVENANCE.md"], resources: [.copy("Resources/TinyTrashLabs-LICENSE.txt")]),
         .systemLibrary(name: "CZlib"),
@@ -30,7 +36,7 @@ let package = Package(
         .target(name: "PronunciationEnglish", resources: [.process("Resources")]),
         .target(name: "KokoroPronunciation", dependencies: ["PronunciationEnglish"],
                 resources: [.process("Resources")]),
-        .target(name: "LibroxTTS", dependencies: ["KokoroCatalog", "CZlib", "KokoroPronunciation"],
+        .target(name: "LibroxTTS", dependencies: ["KokoroCatalog", "CZlib", "KokoroPronunciation", "KokoroNarration", "KokoroAudio", "LibroxCTNative"],
                 path: "Sources/KokoroKit", resources: [.process("Resources")]),
         .executableTarget(name: "KokoroProbe", dependencies: ["LibroxTTS"]),
         .executableTarget(name: "PronunciationProbe", dependencies: ["KokoroPronunciation"]),

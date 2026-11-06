@@ -21,3 +21,5 @@ Models/
 .venv-desktop-narration/
 Benchmarks/Narration/results/
 Benchmarks/Narration/Device/Info.plist
+
+Examples/CTDeviceProbe/Info.plist

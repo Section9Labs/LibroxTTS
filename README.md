@@ -1,24 +1,50 @@
 # LibroxTTS
 
-Offline speech synthesis and book narration for iPhone, iPad and Mac. The Kokoro renderer provides **54 voices across eight languages**, with shared pronunciation, narration planning and voice cleanup. Basic and Enhanced use the same pronunciation corrections. The Kokoro path requires no Python, MLX or eSpeak runtime.
+Offline speech synthesis and book narration for iPhone, iPad and Mac. **Librox Plus uses the official Core ML v2 CT F1 runtime**, with English and Spanish narration and GPU acceleration for foreground inference. The existing Kokoro renderer provides 54 voices across eight languages. Neither renderer needs Python, ONNX Runtime, MLX or eSpeak at runtime.
 
 [![Swift](https://github.com/Section9Labs/LibroxTTS/actions/workflows/swift.yml/badge.svg)](https://github.com/Section9Labs/LibroxTTS/actions/workflows/swift.yml)
 
 ## Install
 
-The repository is now `https://github.com/Section9Labs/LibroxTTS`. The module rename and narration improvements are currently unreleased. To test this checkout, add it as a local package in Xcode, or use:
+Add the versioned Swift package:
 
 ```swift
-.package(path: "../LibroxTTS")
+.package(url: "https://github.com/Section9Labs/LibroxTTS.git", exact: "0.2.0")
 ```
 
-Products: `LibroxTTS` (synthesis), `KokoroCatalog` (voices/assets), and `KokoroPronunciation` (text to model phonemes). There are no remote Swift dependencies. Swift 6 is required. Source targets support iOS/Catalyst 17+ and macOS 13+; the supplied Core ML assets require **iOS/Catalyst 18+ and macOS 15+**. Apple system language facilities are required, so Linux is not supported.
+Products include `LibroxTTS` (host-facing synthesis/install API), `LibroxCTNative` (Core ML CT runtime), `KokoroCatalog` (Kokoro voices/assets), and `KokoroPronunciation` (Kokoro text to model phonemes). There are no remote Swift dependencies. Swift 6, **iOS/Catalyst 18+ or macOS 15+** are required. Apple system language facilities are required, so Linux is not supported.
 
-The development branch also provides `KokoroNarration` (book planning and persistent cast metadata) and `KokoroAudio` (bounded voice enhancement). They are opt-in. The historical v0.1.0 tag still uses the old module name and does not include this development API; it must not be used with the examples below. Remote consumers should pin a reviewed commit containing the rename once it is published. Neither module changes the default synthesis engine or silently enables effects.
+`KokoroNarration` provides book planning and persistent cast metadata; `KokoroAudio` provides bounded voice enhancement. The historical v0.1.0 tag uses the old module name and does not include this API. Existing `KokoroEngine` defaults are preserved; applications select Plus explicitly.
 
 See [the narrator integration API](docs/book-planning.md), [casting rules](docs/story-narrator.md), and [enhancement API and validation limits](docs/audio-enhancement.md). The optional, separately imported `QwenANE` product retains the Qwen renderer work; its existence does not establish device eligibility or sustained background performance. No MLX dependency is added to these library products. Rejected model auditions are not app dependencies.
 
-## Speak
+## Speak with Plus
+
+```swift
+import Foundation
+import LibroxTTS
+
+let directory = URL.applicationSupportDirectory.appending(path: "LibroxPlusV2")
+// Explicit one-time public download (~439 MB); validates every SHA-256 and
+// prepares the local compiler cache. Do this before loading a renderer.
+try await NarrationAssets.download(.plus, to: directory)
+
+let renderer = NarrationRenderer(compactDirectory: directory, harmonicSource: nil)
+try await renderer.load(.plus, directory: directory, executionContext: .foreground)
+for passage in try TextNativeNarrationPlanner.plan(
+    "The book was waiting where she had left it.", voiceID: "plus-f1-en-v1") {
+    let samples = try await renderer.render(passage) // mono Float32, 24 kHz
+    // Queue samples in your application's player before rendering more.
+}
+await renderer.unload()
+```
+
+Use `plus-f1-es-v1` for Spanish. The app owns playback and lifecycle policy;
+select `.background` before subsequent inactive/background inference. See the
+[Core ML v2 integration and download contract](docs/COREML-V2.md) for supported
+devices, memory/cold-start measurements, model licensing, and acceptance limits.
+
+## Speak with Kokoro
 
 ```swift
 import Foundation
@@ -95,6 +121,6 @@ Ordinary tests need no model download. Opt-in inference tests use local assets. 
 
 **Original Section9Labs code is dual-licensed under Apache-2.0 OR MIT, at your option.** See [LICENSE](LICENSE), [LICENSE-APACHE](LICENSE-APACHE), and [LICENSE-MIT](LICENSE-MIT).
 
-This choice does not relicense third-party components. The reused English frontend and other Apache components remain Apache-2.0; dictionary data retains its own notices. Model weights and voices are separate Apache-2.0 assets. The French lexicon's upstream provenance limitation is documented in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). This project does not claim ownership of upstream code, dictionaries or models.
+This choice does not relicense third-party components. The reused English frontend and other Apache components remain Apache-2.0; dictionary data retains its own notices. Kokoro model weights and voices are separate Apache-2.0 assets. **Plus CT model/voice assets are a modified Supertonic 3 derivative under BigScience Open RAIL-M, including its use restrictions.** The download and SDK include the full model license, attribution and modification notices. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). This project does not claim ownership of upstream code, dictionaries or models.
 
 Applications can show `KokoroAttribution.text` in their acknowledgements to include the bundled notices and license texts.

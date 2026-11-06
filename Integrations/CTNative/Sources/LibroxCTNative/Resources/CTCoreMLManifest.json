@@ -1,0 +1,122 @@
+{
+  "identity": "librox-plus-ct-f1-coremlgpu-v2",
+  "referenceManifestSHA256": "8bbf2b6c453d386b905a3c99f6a77ab9705d26a3b76e09dcf29addf16cea9b62",
+  "parameterCount": 108425399,
+  "files": [
+    {
+      "path": "config/tts.json",
+      "bytes": 8253,
+      "sha256": "42078d3aef1cd43ab43021f3c54f47d2d75ceb4e75f627f118890128b06a0d09"
+    },
+    {
+      "path": "config/unicode_indexer.json",
+      "bytes": 277676,
+      "sha256": "9bf7346e43883a81f8645c81224f786d43c5b57f3641f6e7671a7d6c493cb24f"
+    },
+    {
+      "path": "coreml/duration_predictor.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 112958,
+      "sha256": "ee4a19f19098789541fd61420a2fe5d22f8f1b9bebab0e60ba44d4dbd1a5bad8"
+    },
+    {
+      "path": "coreml/duration_predictor.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 3463104,
+      "sha256": "848ebbf691c6fed3d23767804701fa7127e695aede6ce5a8803b753d4bff4390"
+    },
+    {
+      "path": "coreml/duration_predictor.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "e38f0f7765c8d35f551217ed1fda9c50e4ac244ae3657addd82e23414683a8c2"
+    },
+    {
+      "path": "coreml/text_encoder.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 184317,
+      "sha256": "f3f8b72ab901c0ddd1ef1352ca383cff98309e013122d98049dec620eb01890c"
+    },
+    {
+      "path": "coreml/text_encoder.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 35531392,
+      "sha256": "bd862cc6feab0116634d5ae963120dc0bf8dabb3bad7561ba97f5fb0bb52ca6a"
+    },
+    {
+      "path": "coreml/text_encoder.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "55f0f7b98b5844408b5af019a5ecc1a0baaa2320270072c273f162c67be58fb4"
+    },
+    {
+      "path": "coreml/text_encoder_early.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 184317,
+      "sha256": "8828f08bc28b0fd1d7018e81291fa70e635306260bda73e8d878d10ccadb483b"
+    },
+    {
+      "path": "coreml/text_encoder_early.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 35531392,
+      "sha256": "d74638e656d03ec28260daa4964eabbd67d10bdcf96528360662da5e18c1f647"
+    },
+    {
+      "path": "coreml/text_encoder_early.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "a51e72df03440b4b9adf4c83251ae9444960d4f94ffa7fe38bf3fbb09f7a2ea8"
+    },
+    {
+      "path": "coreml/vector_estimator.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 6367214,
+      "sha256": "19c4797a88ee12b34e0b9b7c2d1bd16e1b70e8c7d43ceb21da9f55ab6b683622"
+    },
+    {
+      "path": "coreml/vector_estimator.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 255845408,
+      "sha256": "bacbea8d824178a0c8d4b64adc1e05aed533e3b835386c2c933da6e5134b5f0e"
+    },
+    {
+      "path": "coreml/vector_estimator.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "c74bc97c888e52f035d540899919abbefa7f6d9ae6d76139dc9cf18413d96a7b"
+    },
+    {
+      "path": "coreml/vocoder.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 79359,
+      "sha256": "62b35e2a1168046187acc80f1173c989eb562f60d2df1589448de870c5a907c0"
+    },
+    {
+      "path": "coreml/vocoder.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 101339136,
+      "sha256": "f0f325c9e90fe325cf1450e7f5f204ded3a8771b32d5e151435a9fb0fc07ac6d"
+    },
+    {
+      "path": "coreml/vocoder.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "35c48f9c7d39869bbcf7fea0496d48cd0df15bf08744932b055c484553744cfd"
+    },
+    {
+      "path": "licenses/MODIFICATIONS.md",
+      "bytes": 1380,
+      "sha256": "5ecea7ffd6ca3c05318c935d2ea3e76fbed17f7e8fd25c78ebb335c30cf34d87"
+    },
+    {
+      "path": "licenses/helper-LICENSE",
+      "bytes": 1070,
+      "sha256": "0dfe0d0ba84416fe3879d9a34f4909d8d0137c78d1e95834177b0414ac096fa2"
+    },
+    {
+      "path": "licenses/model-LICENSE",
+      "bytes": 15007,
+      "sha256": "0d944a9110fed9a9602d60e0423a272903e7bd21ab060490774efc77c2275e9f"
+    },
+    {
+      "path": "licenses/model-card.md",
+      "bytes": 9189,
+      "sha256": "d414e4b085fb9989ebfd2b64f868ff861694022b4bdb805b09e702386dbdc7d5"
+    },
+    {
+      "path": "provenance.json",
+      "bytes": 1978,
+      "sha256": "bb35534bcc0f503c1f1d1424e9588ee177e4bd81af9e8c8d0ea6b0b9f44d4182"
+    },
+    {
+      "path": "voice_styles/F1.json",
+      "bytes": 292046,
+      "sha256": "bbdec6ee00231c2c742ad05483df5334cab3b52fda3ba38e6a07059c4563dbc2"
+    }
+  ]
+}

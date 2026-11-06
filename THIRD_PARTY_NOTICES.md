@@ -210,3 +210,19 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+## Librox Plus CT F1 / Supertonic 3 (Core ML v2)
+
+Plus model and voice assets are a modified derivative of Supertone Supertonic 3,
+Copyright (c) Supertone Inc., distributed separately under the BigScience Open
+RAIL-M License, dated August 18, 2022, including its use restrictions. They are
+not relicensed under this repository's Apache-2.0 OR MIT option. The full license,
+modification notice and MIT helper license are bundled under
+`Integrations/CTNative/Sources/LibroxCTNative/Resources/` and accompany each model
+download. Apps must pass on the model license and require their users to comply
+with its use restrictions. `KokoroAttribution.text` includes these notices.
+
+The Swift tokenizer adapts the Supertone MIT helper, Copyright (c) 2025 Supertone
+Inc. Other original CT runtime code is Apache-2.0 OR MIT. See
+[the Core ML v2 provenance and integration contract](docs/COREML-V2.md).
