@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.1 — 2026-11-06
+
+- Add the Spanish regional selection API used by the app: explicit Argentina
+  profile, BCP-47 region parsing, and stable language tags. Existing Spain and
+  Latin America defaults are unchanged; this does not import the separate
+  multilingual lexicon experiment.
+- Core ML model bytes, download revision and cache identities are unchanged.
+
 ## 0.2.0 — 2026-11-06
 
 - Promote CT F1 Core ML v2 to the official Plus runtime, with English/Spanish

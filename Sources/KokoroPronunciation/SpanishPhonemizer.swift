@@ -3,9 +3,33 @@
 import Foundation
 
 /// Broad pronunciation profiles, not a claim to cover every regional variety.
-public enum SpanishDialect: String, Sendable, Codable {
+public enum SpanishDialect: String, CaseIterable, Sendable, Codable {
     case spain
     case latinAmerica
+    /// Rioplatense broad profile: seseo and voiceless /ʃ/ for consonantal y/ll.
+    /// Argentina also has voiced /ʒ/ and other regional varieties; this is not
+    /// a claim to model every Argentine accent or the voice's pitch contours.
+    case argentina
+
+    /// Resolve regional book metadata without treating bare `es` as a country.
+    /// A user's explicit pronunciation selection should take precedence.
+    public init?(languageTag: String) {
+        let parts = languageTag.lowercased().replacingOccurrences(of: "_", with: "-").split(separator: "-")
+        guard parts.first == "es", parts.count >= 2 else { return nil }
+        let subtags = parts.dropFirst().prefix { $0.count != 1 }
+        guard let region = subtags.first(where: { $0.count == 2 || $0 == "419" }).map(String.init) else { return nil }
+        if region == "es" { self = .spain }
+        else if region == "ar" { self = .argentina }
+        else if ["419", "mx", "co", "cl", "pe", "uy", "ve", "ec", "bo", "py", "cr", "cu", "do", "gt", "hn", "ni", "pa", "pr", "sv"].contains(region) { self = .latinAmerica }
+        else { return nil }
+    }
+    public var languageTag: String {
+        switch self {
+        case .spain: "es-ES"
+        case .latinAmerica: "es-419"
+        case .argentina: "es-AR"
+        }
+    }
 }
 
 /// Independently authored, deterministic Spanish spelling-to-pronunciation rules.
@@ -319,7 +343,7 @@ public struct SpanishPhonemizer: Sendable {
             case "b", "v": ipa = "b"
             case "ñ": ipa = "ɲ"
             case "l":
-                if next == "l" { ipa = "ʝ"; index += 1 }
+                if next == "l" { ipa = dialect == .argentina ? "ʃ" : "ʝ"; index += 1 }
                 else { ipa = "l" }
             case "r":
                 if next == "r" { ipa = "r"; index += 1 }
@@ -331,7 +355,7 @@ public struct SpanishPhonemizer: Sendable {
                     sounds.append(Sound(ipa: "i", vowel: "i", finalY: letters.count > 1))
                     index += 1; continue
                 }
-                ipa = "ʝ"
+                ipa = dialect == .argentina ? "ʃ" : "ʝ"
             case "x":
                 // Initial x is normally /s/ in adapted Greek-derived vocabulary.
                 if index != 0 && !hasInitialXBase(word, at: index) { sounds.append(Sound(ipa: "k")) }
@@ -433,7 +457,7 @@ public struct SpanishPhonemizer: Sendable {
         if consonantCount == 1 { return start - 1 }
         let pair = sounds[start - 2].ipa + sounds[start - 1].ipa
         let onsets: Set<String> = ["pɾ", "bɾ", "tɾ", "dɾ", "kɾ", "gɾ", "fɾ", "pl", "bl", "kl", "gl", "fl"]
-        if onsets.contains(pair) || (pair == "tl" && dialect == .latinAmerica) { return start - 2 }
+        if onsets.contains(pair) || (pair == "tl" && dialect != .spain) { return start - 2 }
         return start - 1
     }
 }
