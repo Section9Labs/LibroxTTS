@@ -9,8 +9,14 @@ import LibroxCTNative
 /// not label a language perceptually accepted or a sample more expressive.
 @main struct NarrationPipelineProbe {
     static func main() async throws {
+        if CommandLine.arguments.count == 4 {
+            try await comparePassage(assets: URL(fileURLWithPath: CommandLine.arguments[1]),
+                output: URL(fileURLWithPath: CommandLine.arguments[2]),
+                passage: URL(fileURLWithPath: CommandLine.arguments[3]))
+            return
+        }
         guard CommandLine.arguments.count == 3 else {
-            throw CocoaError(.fileNoSuchFile, userInfo: [NSLocalizedDescriptionKey: "Usage: narration-pipeline-probe ASSETS OUTPUT"])
+            throw CocoaError(.fileNoSuchFile, userInfo: [NSLocalizedDescriptionKey: "Usage: narration-pipeline-probe ASSETS OUTPUT [PASSAGE.txt]"])
         }
         let assets = URL(fileURLWithPath: CommandLine.arguments[1])
         let output = URL(fileURLWithPath: CommandLine.arguments[2])
@@ -45,7 +51,7 @@ import LibroxCTNative
         for (language, text) in passages {
             let plan = try await pipeline.plan(text, model: .plus, bookID: "audition", chapterID: language,
                                               narratorVoiceID: nil, language: language)
-            for (label, units, legacy) in [("before", oldPlan(text), true),
+            for (label, units, legacy) in [("before", try oldPlan(text), true),
                                          ("after", plan.units.map(\.synthesisText), false)] {
                 var samples: [Float] = []
                 for unit in units {
@@ -106,24 +112,34 @@ import LibroxCTNative
         }
         return values
     }
-    static func oldPlan(_ text: String) -> [String] {
+    static func oldPlan(_ text: String) throws -> [String] {
         let source = text as NSString
         let tokenizer = NLTokenizer(unit: .sentence); tokenizer.string = text
-        var result: [NSRange] = []
+        var ranges: [NSRange] = []
         tokenizer.enumerateTokens(in: text.startIndex..<text.endIndex) { sentence, _ in
-            var remainder = NSRange(sentence, in: text)
+            ranges.append(NSRange(sentence, in: text)); return true
+        }
+        if ranges.isEmpty, !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            ranges = [NSRange(location: 0, length: source.length)]
+        }
+        var result: [NSRange] = []
+        for range in ranges {
+            var remainder = range
             while remainder.length > 0 {
+                try Task.checkCancellation()
                 var end = min(NSMaxRange(remainder), remainder.location + 280)
                 if end < NSMaxRange(remainder) {
-                    while end > remainder.location, !CharacterSet.whitespacesAndNewlines.contains(UnicodeScalar(source.character(at: end - 1))!) { end -= 1 }
+                    while end > remainder.location,
+                          !(UnicodeScalar(source.character(at: end - 1)).map { CharacterSet.whitespacesAndNewlines.contains($0) } ?? false) { end -= 1 }
+                    guard end > remainder.location else { throw CTError.invalidTensor("Legacy planner cannot split text") }
                 }
                 let part = NSRange(location: remainder.location, length: end - remainder.location)
-                if let prior = result.last, end - prior.location <= 280 {
+                if let prior = result.last, end - prior.location <= 280,
+                   !source.substring(with: NSRange(location: NSMaxRange(prior), length: part.location - NSMaxRange(prior))).contains("\n") {
                     result[result.count - 1] = NSRange(location: prior.location, length: end - prior.location)
                 } else { result.append(part) }
                 remainder = NSRange(location: end, length: NSMaxRange(remainder) - end)
             }
-            return true
         }
         return result.map { source.substring(with: $0) }
     }
