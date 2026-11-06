@@ -1,4 +1,4 @@
-# Librox Plus Core ML v2 — SDK 0.2.0
+# Librox Plus Core ML v2 — SDK 0.2.1
 
 Core ML v2 is the official CT F1 implementation. All five graphs execute through
 Core ML FP32; there is no ONNX Runtime or MLX dependency. The earlier hybrid v1
@@ -7,7 +7,7 @@ Existing Kokoro APIs and default rendering behavior remain available.
 
 ## Download contract
 
-- SDK: `Section9Labs/LibroxTTS`, tag `v0.2.0`.
+- SDK: `Section9Labs/LibroxTTS`, tag `v0.2.1`.
 - Model release: `plus-coreml-v2-2026-11-06` in the same public GitHub repository.
 - Model identity: `librox-plus-ct-f1-coremlgpu-v2`.
 - Model payload: 23 files, 439,248,281 bytes. Compiler caches require additional disk space.

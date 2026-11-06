@@ -7,7 +7,7 @@
 enum SpanishLexicon {
     static func spelling(for word: String, dialect: SpanishDialect) -> String {
         if dialect == .spain, let spelling = peninsularHiatus[word] { return spelling }
-        if dialect == .latinAmerica, let spelling = latinAmericanLoans[word] { return spelling }
+        if dialect != .spain, let spelling = latinAmericanLoans[word] { return spelling }
         return spellings[word] ?? word
     }
 
