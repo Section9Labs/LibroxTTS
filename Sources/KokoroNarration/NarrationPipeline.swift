@@ -21,7 +21,7 @@ public actor NarrationPipeline {
     public func plan(_ text: String, model: NarrationModel, bookID: String, chapterID: String,
                      narratorVoiceID: String?, language: String? = nil, metadataLanguage: String? = nil,
                      cast: BookVoiceCast? = nil, characterVoices: Bool = false,
-                     options: PronunciationOptions = .init(), delivery: NarrationDeliveryOptions = .init(),
+                     options: PronunciationOptions = .init(), delivery: NarrationDeliveryOptions = .init(expressive: true),
                      lexicon: SpokenTextLexicon = .init()) async throws -> Plan {
         try Task.checkCancellation()
         let preferredLanguage = narratorVoiceID.flatMap { id in
