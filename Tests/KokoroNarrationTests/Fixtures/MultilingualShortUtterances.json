@@ -1,0 +1,50 @@
+[
+  {
+    "language": "en",
+    "voice": "af_heart",
+    "text": "Andy closed the book. “Wait!” he said. “Are you sure?” Alice nodded. “Yes. Call Apple first, then Google. We can ask Oracle tomorrow.” The clock struck twelve. “No!” Andy cried. “Not tomorrow!” He took a breath and lowered his voice. “I mean today. Please.”",
+    "source": "Original diagnostic text authored for this test; not a book excerpt."
+  },
+  {
+    "language": "es",
+    "voice": "ef_dora",
+    "text": "La habitación quedó en silencio. —¡Espera! —dijo Ana—. ¿Estás seguro? —Sí —respondió Luis—. Llama primero a Apple y después a Google. Oracle puede esperar hasta mañana. El reloj dio las doce. —¡No! ¡Mañana no! Ana respiró y bajó la voz. —Quiero decir hoy. Por favor.",
+    "source": "Original diagnostic text authored for this test; not a book excerpt."
+  },
+  {
+    "language": "fr",
+    "voice": "ff_siwis",
+    "text": "La pièce devint silencieuse. « Attends ! » dit Anne. « Tu es sûr ? » Louis hocha la tête. « Oui. Appelle Apple, puis Google. Oracle peut attendre demain. » La pendule sonna douze coups. « Non ! Pas demain ! » Anne respira et baissa la voix. « Je veux dire aujourd’hui. S’il te plaît. »",
+    "source": "Original diagnostic text authored for this test; not a book excerpt."
+  },
+  {
+    "language": "it",
+    "voice": "if_sara",
+    "text": "La stanza rimase in silenzio. «Aspetta!» disse Anna. «Sei sicuro?» Luca annuì. «Sì. Chiama prima Apple e poi Google. Oracle può aspettare fino a domani.» L’orologio batté dodici colpi. «No! Non domani!» Anna respirò e abbassò la voce. «Voglio dire oggi. Per favore.»",
+    "source": "Original diagnostic text authored for this test; not a book excerpt."
+  },
+  {
+    "language": "pt",
+    "voice": "pf_dora",
+    "text": "A sala ficou em silêncio. “Espere!”, disse Ana. “Você tem certeza?” Luís concordou. “Sim. Ligue primeiro para a Apple e depois para o Google. A Oracle pode esperar até amanhã.” O relógio bateu doze horas. “Não! Amanhã não!” Ana respirou e baixou a voz. “Quero dizer hoje. Por favor.”",
+    "source": "Original diagnostic text authored for this test; not a book excerpt."
+  },
+  {
+    "language": "hi",
+    "voice": "hf_alpha",
+    "text": "कमरे में सन्नाटा छा गया। “रुको!” आशा ने कहा। “क्या तुम्हें यकीन है?” मोहन ने सिर हिलाया। “हाँ। पहले Apple को और फिर Google को फ़ोन करो। Oracle कल तक इंतज़ार कर सकता है।” घड़ी में बारह बजे। “नहीं! कल नहीं!” आशा ने साँस ली और धीरे से कहा, “मेरा मतलब आज है। कृपया।”",
+    "source": "Original diagnostic text authored for this test; not a book excerpt."
+  },
+  {
+    "language": "ja",
+    "voice": "jf_alpha",
+    "text": "部屋は静かになった。「待って！」と花子が言った。「本当なの？」太郎はうなずいた。「うん。まずAppleに、それからGoogleに電話して。Oracleは明日でもいいよ。」時計が十二時を告げた。「だめ！明日じゃない！」花子は息をついて、声を落とした。「今日って言いたかったの。お願い。」",
+    "source": "Original diagnostic text authored for this test; not a book excerpt."
+  },
+  {
+    "language": "zh",
+    "voice": "zf_xiaobei",
+    "text": "房间里安静下来。“等等！”小林说。“你确定吗？”小明点了点头。“是的。先联系Apple，再联系Google。Oracle可以等到明天。”钟敲了十二下。“不！不能等到明天！”小林深吸一口气，放低了声音。“我的意思是今天。拜托了。”",
+    "source": "Original diagnostic text authored for this test; not a book excerpt."
+  }
+]

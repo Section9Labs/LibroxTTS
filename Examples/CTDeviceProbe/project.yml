@@ -1,0 +1,48 @@
+name: CTDeviceProbe
+packages:
+  LibroxCTNative:
+    path: ../../Integrations/CTNative
+targets:
+  CTDeviceProbe:
+    type: application
+    platform: iOS
+    deploymentTarget: '18.0'
+    sources:
+      - path: Sources
+      - path: ../../Models/CTCoreMLV2GPUAssets
+        type: folder
+        buildPhase: resources
+      - path: ../../Models/Fixtures
+        type: folder
+        buildPhase: resources
+    dependencies:
+      - package: LibroxCTNative
+        product: LibroxCTNative
+    info:
+      path: Info.plist
+      properties:
+        CFBundleDisplayName: CT Core ML 2
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        UILaunchScreen: {}
+        UIBackgroundModes: [audio]
+        UIFileSharingEnabled: true
+        LSSupportsOpeningDocumentsInPlace: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.section9labs.LibroxCTCoreMLV2Test
+        DEVELOPMENT_TEAM: 995PCLM9KH
+        CODE_SIGN_STYLE: Automatic
+        SWIFT_VERSION: '6.0'
+        SWIFT_OPTIMIZATION_LEVEL: '-O'
+        TARGETED_DEVICE_FAMILY: '1,2'
+        CURRENT_PROJECT_VERSION: 7
+        MARKETING_VERSION: '0.1'
+        SUPPORTS_MACCATALYST: NO
+schemes:
+  CTDeviceProbe:
+    build:
+      targets:
+        CTDeviceProbe: all
+    run:
+      config: Release

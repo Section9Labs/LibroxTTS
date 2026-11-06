@@ -133,8 +133,11 @@ public actor KokoroEngine {
     /// Render a bounded unit from BookNarrationPlanner with the configured
     /// audiobook renderer. The caller retains source offsets and voice identity.
     public func synthesizeNarration(_ phonemes: String, voiceID: String,
-                                   styleRow: Int = 158, speed: Float = 1) throws -> Audio {
-        try synthesizePreparedNarration(phonemes, voiceID: voiceID, styleRow: styleRow, speed: speed)
+                                   styleRow: Int = 158, speed: Float = 1,
+                                   pitchGestures: [NarrationPitchGesture] = [],
+                                   voiceBlend: NarrationVoiceBlend? = nil) throws -> Audio {
+        try synthesizePreparedNarration(phonemes, voiceID: voiceID, styleRow: styleRow, speed: speed,
+                                       pitchGestures: pitchGestures, voiceBlend: voiceBlend)
     }
 
     /// Checked prepared input avoids silently changing the listening experiment's
@@ -143,7 +146,9 @@ public actor KokoroEngine {
     public func synthesizePreparedNarration(_ phonemes: String, voiceID: String,
                                             styleRow: Int, speed: Float = 1,
                                             experimentalProsody: ExperimentalProsody = .neutral,
-                                            experimentalNoiseSeed: UInt64? = nil) throws -> Audio {
+                                            experimentalNoiseSeed: UInt64? = nil,
+                                            pitchGestures: [NarrationPitchGesture] = [],
+                                            voiceBlend: NarrationVoiceBlend? = nil) throws -> Audio {
         try Task.checkCancellation()
         guard narrationExperiment, case .fixedSize = rendererPolicy else { throw SynthesisError.invalidDecoderAssets }
         guard Voice.named(voiceID) != nil else { throw SynthesisError.unknownVoice }
@@ -162,10 +167,31 @@ public actor KokoroEngine {
             pack = try VoicePack(data: Data(contentsOf: directory.appendingPathComponent("voices/\(voiceID).bin")))
             voices = [voiceID: pack]
         }
+        let style = try pack.style(phonemeCount: styleRow)
+        if let blend = voiceBlend {
+            guard blend.weight.isFinite, (0...0.5).contains(blend.weight),
+                  let secondary = Voice.named(blend.secondaryVoiceID),
+                  secondary.language == Voice.named(voiceID)?.language else {
+                throw SynthesisError.incompatibleVoiceAndLanguage
+            }
+            if blend.weight > 0, blend.secondaryVoiceID != voiceID {
+                let other: VoicePack
+                if let cached = voices[blend.secondaryVoiceID] { other = cached }
+                else { other = try VoicePack(data: Data(contentsOf: directory.appendingPathComponent("voices/\(blend.secondaryVoiceID).bin"))) }
+                // At most two packs, independent of the number of book characters.
+                voices = [voiceID: pack, blend.secondaryVoiceID: other]
+                let reference = try other.style(phonemeCount: styleRow)
+                for i in 0..<256 {
+                    style[i] = NSNumber(value: style[i].floatValue * (1 - blend.weight)
+                        + reference[i].floatValue * blend.weight)
+                }
+            }
+        }
         let samples = try autoreleasepool {
-            try model.forward(phonemes: phonemes, refS: pack.style(phonemeCount: styleRow), speed: speed,
+            try model.forward(phonemes: phonemes, refS: style, speed: speed,
                               experimentalProsody: experimentalProsody,
-                              experimentalNoiseSeed: experimentalNoiseSeed).audio
+                              experimentalNoiseSeed: experimentalNoiseSeed,
+                              pitchGestures: pitchGestures).audio
         }
         guard !samples.isEmpty, samples.allSatisfy({ $0.isFinite && abs($0) <= 1 }),
               samples.contains(where: { abs($0) > 0.00001 }) else { throw SynthesisError.invalidAudio }

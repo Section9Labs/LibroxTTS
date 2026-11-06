@@ -1,0 +1,56 @@
+{
+  "repository": "Section9Labs/LibroxTTS",
+  "revision": "kokoro-hd-2026-10-19",
+  "files": [
+    {
+      "path": "frontend-fp32.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "size": 319635,
+      "sha256": "cc86a84f28a09548075df4f3d4067da9cc6e80e0425c9e76f03b410b669d14d5",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/kokoro-hd-2026-10-19/frontend-fp32.mlpackage--Data--com.apple.CoreML--model.mlmodel"
+    },
+    {
+      "path": "frontend-fp32.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "size": 111529344,
+      "sha256": "71f3f7dfa1de9d51628c2847ba8fdb373db79ab080a73c0054f388b22cf42f03",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/kokoro-hd-2026-10-19/frontend-fp32.mlpackage--Data--com.apple.CoreML--weights--weight.bin"
+    },
+    {
+      "path": "frontend-fp32.mlpackage/Manifest.json",
+      "size": 617,
+      "sha256": "01088a69689b76d65d01632e7ecdc16f5767ba0b292bf1f1db2137e30e64941f",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/kokoro-hd-2026-10-19/frontend-fp32.mlpackage--Manifest.json"
+    },
+    {
+      "path": "frontend-provenance.json",
+      "size": 289,
+      "sha256": "a7e4c917081d9f65eb8c1761a9d332573300c91e4fe17827b936b23cec39fad5",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/kokoro-hd-2026-10-19/frontend-provenance.json"
+    }
+  ],
+  "installedFiles": [
+    {
+      "path": "frontend-fp32.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "size": 319635,
+      "sha256": "cc86a84f28a09548075df4f3d4067da9cc6e80e0425c9e76f03b410b669d14d5",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/kokoro-hd-2026-10-19/frontend-fp32.mlpackage--Data--com.apple.CoreML--model.mlmodel"
+    },
+    {
+      "path": "frontend-fp32.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "size": 111529344,
+      "sha256": "71f3f7dfa1de9d51628c2847ba8fdb373db79ab080a73c0054f388b22cf42f03",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/kokoro-hd-2026-10-19/frontend-fp32.mlpackage--Data--com.apple.CoreML--weights--weight.bin"
+    },
+    {
+      "path": "frontend-fp32.mlpackage/Manifest.json",
+      "size": 617,
+      "sha256": "01088a69689b76d65d01632e7ecdc16f5767ba0b292bf1f1db2137e30e64941f",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/kokoro-hd-2026-10-19/frontend-fp32.mlpackage--Manifest.json"
+    },
+    {
+      "path": "frontend-provenance.json",
+      "size": 289,
+      "sha256": "a7e4c917081d9f65eb8c1761a9d332573300c91e4fe17827b936b23cec39fad5",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/kokoro-hd-2026-10-19/frontend-provenance.json"
+    }
+  ]
+}

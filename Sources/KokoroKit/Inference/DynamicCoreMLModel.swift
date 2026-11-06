@@ -31,7 +31,8 @@ final class DynamicCoreMLModel {
 
     func forward(phonemes: String, refS: MLMultiArray, speed: Float,
                  experimentalProsody: ExperimentalProsody = .neutral,
-                 experimentalNoiseSeed: UInt64? = nil) throws -> SegmentOutput {
+                 experimentalNoiseSeed: UInt64? = nil,
+                 pitchGestures: [NarrationPitchGesture] = []) throws -> SegmentOutput {
         if experimentalNoiseSeed != nil {
             guard narrationExperiment, harmonicSource != nil else { throw SynthesisError.invalidDecoderAssets }
         }
@@ -75,6 +76,15 @@ final class DynamicCoreMLModel {
                 throw SynthesisError.invalidDecoderAssets
             }
             features["F0_pred"] = try experimentalProsody.adjusted(pitch)
+        }
+        if !pitchGestures.isEmpty {
+            guard narrationExperiment, harmonicSource != nil,
+                  let pitch = features["F0_pred"],
+                  let durations = front.featureValue(for: "pred_dur_clamped")?.multiArrayValue else {
+                throw SynthesisError.invalidDecoderAssets
+            }
+            features["F0_pred"] = try NarrationAcoustics.adjusted(pitch, durations: durations,
+                phonemeCount: ids.count - 2, gestures: pitchGestures)
         }
         if let harmonicSource, let pitch = features["F0_pred"] {
             features["har"] = try autoreleasepool { try harmonicSource.predict(pitch: pitch, seed: experimentalNoiseSeed) }
