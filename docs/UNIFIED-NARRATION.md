@@ -1,6 +1,6 @@
 # Shared narration pipeline candidate
 
-This branch addresses the audible app-versus-audition regression reported on 6 November 2026. It is a candidate for listening review, not a claim of improved perceived quality or a new model-weight release.
+This branch addresses the audible app-versus-audition regression reported on 6 November 2026. Matt accepted an improvement on the reported Electric Dreams excerpt in both the original comparison and native iPhone playback. Broader listening and full-app validation remain open; this is not a new model-weight release.
 
 ## Host contract
 
@@ -34,10 +34,12 @@ Changed text, delivery and planning identities invalidate prepared PCM caches wi
 
 The optional `PASSAGE.txt` argument performs a controlled English paragraph comparison instead. With frozen `reference-report.json`, `reference-noise.bin`, `reference-text-ids.bin` and `reference-raw.bin` in OUTPUT, it requires matching source text, token IDs, noise shape and sample count before reporting conversion error. `LIBROX_PROBE_BACKEND` selects a diagnostic backend, defaulting to `coreMLGPUHeavy`. See [the Moby-Dick comparison](MOBY-DICK-COMPARISON.md) for evidence and its limits.
 
-Required before acceptance: Matt's English/Spanish listening judgment; actual iPhone/iPad download/cache/seek/rate/lock-screen playback and memory checks at 44.1 kHz; native-language pronunciation review beyond English/Spanish; preview/language-menu device UI checks. Do not infer those from passing tests or waveform metrics.
+Remaining validation: broader English/Spanish listening; actual iPhone/iPad download/cache/seek/rate/lock-screen playback and memory checks at 44.1 kHz; native-language pronunciation review beyond English/Spanish; preview/language-menu device UI checks. Passage-level iPhone listening acceptance is recorded below. Do not infer broader acceptance from passing tests or waveform metrics.
 
 The actual EPUB reproduction additionally covers blank/indented paragraph separators, single-quoted dialogue, and long quoted sentences. These previously threw `unbreakableText` in the candidate. Native planning now tokenizes within paragraphs and ignores nonspeaking tokens; source offsets remain exact and leading punctuation can be scanned before the first word. Revision `ct-context-tokens-3` invalidates earlier candidate planning identities. Synthetic regression fixtures cover LF, CRLF and Unicode paragraph separators without publishing private book text.
 
 ## Accepted real-book audition
 
 Matt rated candidate B **“sounds much better”** on the Electric Dreams excerpt reconstructed from exact-key-matched phone cache units. The accepted WAV SHA-256 is `e50ae775efeed54d32505bd4ad9e621e30cba56a1438ccc502ff3b08d8e4e8a6`, rendered using production library commit `55e65f9adba7a37a723c01caf7d4938698ed58d9`. The current app pin `4e99cd5` contains identical library code plus a diagnostic entry-file rename. This is passage-level listening acceptance, not a universal quality or physical-app qualification. Model weights and public download hashes are unchanged. Private source/audio and the exact acceptance record remain local; the initial authored English and Moby-Dick comparisons remain “about the same.”
+
+On 6 November 2026, Matt compared “Play approved reference” with “Play device render” in the separate CT Accepted B 0.2 (7) probe on Tachikoma (iPhone 17 Pro Max), then confirmed **“Yes, it keeps the improvement.”** This accepts native iPhone rendering and playback for the same excerpt using SDK `4e99cd5`. The first device-render WAV SHA-256 is `5751efe06865c90c8d41f03200e83a241a2475171fa02e756ae6ce19c901d61c`. It does not qualify full Librox playback/cache/lifecycle behavior, iPad, or other passages and languages. The app PR records native timing and memory evidence: https://github.com/mrbrutti/Libros/pull/162.
