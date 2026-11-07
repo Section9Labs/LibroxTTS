@@ -1,3 +1,4 @@
+import PocketTTSMLX
 import CoreML
 import CryptoKit
 import Foundation
@@ -9,6 +10,7 @@ import KokoroNarration
 public enum NarrationAssets {
     public static func repositoryID(_ model: NarrationModel) -> String {
         switch model {
+        case .pocket: PocketTTSCatalog.identity
         case .compact: "mrbrutti/librox@kokoro-coreml-2026-10-15"
         case .kokoroDesktop: "narration-kokoroDesktop"
         case .plus: CTApprovedExpression.isDownloadPublished ? CTApprovedExpression.installationIdentity : CTAssets.coreMLIdentity
@@ -39,11 +41,12 @@ public enum NarrationAssets {
             total + (old.contains(contentKey(file)) ? 0 : file.size)
         }
     }
-    public static func manifest(_ model: NarrationModel, repositoryID selected: String? = nil) throws -> AssetManifest {
+    public static func manifest(_ model: NarrationModel, repositoryID selected: String? = nil, language: String? = nil) throws -> AssetManifest {
         guard selected == nil || compatibleRepositoryIDs(model).contains(selected!) else {
             throw CTError.invalidAssets("unsupported installation")
         }
         switch model {
+        case .pocket: return try PocketTTSCatalog.manifest(language: language)
         case .compact: return try .bundled()
         case .kokoroDesktop:
             guard let url = Bundle.module.url(forResource: "NarrationBasic", withExtension: "json") else { throw CTError.invalidAssets("Basic manifest") }
@@ -80,6 +83,7 @@ public enum NarrationAssets {
     }
     public static func isDownloadPublished(_ model: NarrationModel, repositoryID: String? = nil) -> Bool {
         let selected = repositoryID ?? Self.repositoryID(model)
+        if model == .pocket && !PocketTTSCatalog.isDownloadPublished { return false }
         guard model.isEnabled, compatibleRepositoryIDs(model).contains(selected) else { return false }
         if selected == CTApprovedExpression.installationIdentity {
             return CTApprovedExpression.isDownloadPublished
@@ -91,7 +95,7 @@ public enum NarrationAssets {
     public static func preparationIdentity(_ model: NarrationModel, repositoryID: String? = nil) -> String {
         let selected = repositoryID ?? Self.repositoryID(model)
         let expression = selected == CTApprovedExpression.installationIdentity ? ":" + CTApprovedExpression.identity : ""
-        return model == .plus ? selected + ":" + CTEngine.runtimeIdentity + ":gpu-specializations-1" + expression
+        return model == .pocket ? selected + ":" + PocketTTSEngine.runtimeIdentity : model == .plus ? selected + ":" + CTEngine.runtimeIdentity + ":gpu-specializations-1" + expression
             : selected + ":prepared-1"
     }
     /// Known older installations are read-only reuse candidates, not evidence
@@ -153,11 +157,11 @@ public enum NarrationAssets {
     /// manifest(_:), their background URLSession, and prepare(_:model:).
     /// Serialize installation for a destination and keep it separate from any
     /// active renderer until this function succeeds.
-    public static func download(_ model: NarrationModel, to directory: URL,
+    public static func download(_ model: NarrationModel, to directory: URL, language: String? = nil,
                                 progress: (@Sendable (Double) -> Void)? = nil) async throws {
         guard isDownloadPublished(model) else { throw CTError.invalidAssets("unavailable model") }
         if model == .compact { try await ModelAssets.download(to: directory, progress: progress); return }
-        let pinned = try manifest(model)
+        let pinned = try manifest(model, language: language)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         var downloaded: Int64 = 0
         for file in pinned.files {
@@ -181,16 +185,16 @@ public enum NarrationAssets {
             downloaded += file.size
             progress?(Double(downloaded) / Double(pinned.downloadSize))
         }
-        try prepare(directory, model: model)
+        try prepare(directory, model: model, language: language)
         try configureForPlayback(directory)
     }
     /// Fast receipt/UI check. Loading separately verifies every pinned hash.
-    public static func isPrepared(_ directory: URL, model: NarrationModel, repositoryID: String? = nil) -> Bool {
-        guard let manifest = try? manifest(model, repositoryID: repositoryID), manifest.isPresent(in: directory) else { return false }
+    public static func isPrepared(_ directory: URL, model: NarrationModel, repositoryID: String? = nil, language: String? = nil) -> Bool {
+        guard let manifest = try? manifest(model, repositoryID: repositoryID, language: language), manifest.isPresent(in: directory) else { return false }
         return model != .kokoroDesktop || FileManager.default.fileExists(
             atPath: directory.appendingPathComponent("frontend-fp32.mlmodelc").path)
     }
-    public static func prepare(_ directory: URL, model: NarrationModel, repositoryID: String? = nil) throws {
+    public static func prepare(_ directory: URL, model: NarrationModel, repositoryID: String? = nil, language: String? = nil) throws {
         if model == .plus {
             // Pay the common generator functions' hardware specialization cost
             // while the install UI is preparing the voice, before the first Play.
@@ -200,7 +204,7 @@ public enum NarrationAssets {
             return
         }
         if model == .compact { try ModelAssets.prepare(in: directory); return }
-        try validate(directory, manifest: manifest(model))
+        try validate(directory, manifest: manifest(model, repositoryID: repositoryID, language: language))
         if model == .kokoroDesktop {
             let compiled = try MLModel.compileModel(at: directory.appendingPathComponent("frontend-fp32.mlpackage"))
             defer { try? FileManager.default.removeItem(at: compiled) }

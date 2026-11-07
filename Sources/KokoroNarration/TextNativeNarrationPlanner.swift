@@ -1,3 +1,4 @@
+import KokoroCatalog
 import Foundation
 import NaturalLanguage
 import KokoroPronunciation
@@ -9,16 +10,21 @@ public enum TextNativeNarrationPlanner {
     public static let revision = "ct-context-tokens-3:" + SpokenTextLexicon.revision
     public enum PlanningError: Error { case invalidVoice, unbreakableText }
     public static func plan(_ text: String, voiceID: String,
-                            lexicon: SpokenTextLexicon = .init()) throws -> [BookNarrationUnit] {
+                            lexicon: SpokenTextLexicon = .init(), model: NarrationModel = .plus) throws -> [BookNarrationUnit] {
         guard text.unicodeScalars.count <= PronunciationEngine.maximumInputScalars else {
             throw PronunciationError.inputTooLong(limit: PronunciationEngine.maximumInputScalars)
         }
-        guard let voice = NarrationModel.plus.nativeVoices.first(where: { $0.id == voiceID }) else {
+        guard let voice = model.nativeVoices.first(where: { $0.id == voiceID }) else {
             throw PlanningError.invalidVoice
         }
         let source = text as NSString
         func spoken(_ range: NSRange) -> String { lexicon.text(source.substring(with: range), language: voice.language) }
         func fits(_ range: NSRange, allowEmptyPrefix: Bool = false) -> Bool {
+            if model == .pocket {
+                // Bounded source groups; the engine uses its actual language tokenizer
+                // and Kyutai's 25-token continuation splitter inside each group.
+                return spoken(range).unicodeScalars.count <= 1200
+            }
             do {
                 let normalized = try CTTokenizer.normalize(spoken(range), language: voice.language,
                                                             completeSentence: false)

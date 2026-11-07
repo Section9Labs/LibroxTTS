@@ -44,10 +44,10 @@ public actor NarrationPipeline {
             } else { nativeCast = nil }
             if let nativeCast {
                 let plan = try TextNativeCharacterPlanner.plan(text, bookID: bookID, chapterID: chapterID,
-                    language: language, cast: nativeCast, characterVoices: characterVoices, lexicon: lexicon)
+                    language: language, cast: nativeCast, characterVoices: characterVoices, lexicon: lexicon, model: model)
                 units = plan.units; updatedCast = plan.cast; originalPlan = plan
             } else {
-                units = try TextNativeNarrationPlanner.plan(text, voiceID: voiceID, lexicon: lexicon)
+                units = try TextNativeNarrationPlanner.plan(text, voiceID: voiceID, lexicon: lexicon, model: model)
                 updatedCast = nil
             }
         } else {

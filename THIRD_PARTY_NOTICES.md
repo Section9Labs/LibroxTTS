@@ -226,3 +226,12 @@ with its use restrictions. `KokoroAttribution.text` includes these notices.
 The Swift tokenizer adapts the Supertone MIT helper, Copyright (c) 2025 Supertone
 Inc. Other original CT runtime code is Apache-2.0 OR MIT. See
 [the Core ML v2 provenance and integration contract](docs/COREML-V2.md).
+
+## Pocket TTS / native MLX integration
+
+Pocket TTS by Kyutai: MIT implementation, CC BY 4.0 model weights. Native Swift
+components adapted from MLX Audio Swift (MIT, Prince Canuma). See
+[exact revisions, modifications and licenses](Integrations/PocketTTS/PROVENANCE.md).
+Hosted language packs retain Kyutai attribution and per-voice source credits.
+Cosette/Expresso and Jean/EARS are excluded from the commercial preset catalog.
+MLX Swift and its transitive dependencies retain their own licenses.

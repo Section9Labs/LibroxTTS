@@ -4,6 +4,17 @@ Offline speech synthesis and book narration for iPhone, iPad and Mac. **Librox P
 
 [![Swift](https://github.com/Section9Labs/LibroxTTS/actions/workflows/swift.yml/badge.svg)](https://github.com/Section9Labs/LibroxTTS/actions/workflows/swift.yml)
 
+## Pocket TTS (development)
+
+The `codex/pocket-tts` integration adds the latest Kyutai Pocket TTS as a native
+Swift MLX option alongside Basic and Plus: 25 preset voices across English,
+French, German, Portuguese, Italian, Spanish and Dutch, with streaming 24 kHz
+PCM and chunk-continuation narration. Downloads use pinned GitHub release assets
+with SHA-256 verification; each language is optional. See the
+[Pocket TTS integration](Integrations/PocketTTS/README.md) for SDK APIs, provenance,
+reading behavior and validation. GPU generation is currently qualified only as
+an Apple silicon Mac development path; physical iOS qualification is pending.
+
 ## Install
 
 Add the versioned Swift package:
@@ -16,7 +27,7 @@ Products include `LibroxTTS` (host-facing synthesis/install API), `LibroxCTNativ
 
 `KokoroNarration` provides book planning and persistent cast metadata; `KokoroAudio` provides bounded voice enhancement. The historical v0.1.0 tag uses the old module name and does not include this API. Existing `KokoroEngine` defaults are preserved; applications select Plus explicitly.
 
-See [the narrator integration API](docs/book-planning.md), [casting rules](docs/story-narrator.md), and [enhancement API and validation limits](docs/audio-enhancement.md). The optional, separately imported `QwenANE` product retains the Qwen renderer work; its existence does not establish device eligibility or sustained background performance. No MLX dependency is added to these library products. Rejected model auditions are not app dependencies.
+See [the narrator integration API](docs/book-planning.md), [casting rules](docs/story-narrator.md), and [enhancement API and validation limits](docs/audio-enhancement.md). The optional, separately imported `QwenANE` product retains the Qwen renderer work; its existence does not establish device eligibility or sustained background performance. The shared LibroxTTS product now links the Pocket TTS MLX runtime; KokoroCatalog, KokoroPronunciation and KokoroNarration remain independent of MLX. Rejected model auditions are not app dependencies.
 
 Version 0.4.0-beta.1 adds the ten-style DK bank, shared character casting and persisted readings across all 31 Plus languages, opt-in native blending, and retained CT playback during updates. Read the [beta upgrade guide](docs/UPGRADE-0.4.0-beta.1.md). Native expression research remains off; this beta does not claim full acoustic parity or listening certification across every language. Stable 0.3.0 remains available with its original CT F1 bank.
 

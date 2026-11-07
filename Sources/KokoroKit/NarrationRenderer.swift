@@ -1,3 +1,4 @@
+import PocketTTSMLX
 import Foundation
 import Darwin
 import KokoroAudio
@@ -24,6 +25,7 @@ public actor NarrationRenderer {
             }
         }
     }
+    private var pocket: PocketTTSEngine?
     private var plus: CTEngine?
     private var plusBackend: CTEngine.Backend?
     private var leased = false
@@ -64,6 +66,7 @@ public actor NarrationRenderer {
         await unloadHeld()
     }
     private func unloadHeld() async {
+        await pocket?.unload(); pocket = nil
         await plus?.unload(); plus = nil
         plusBackend = nil
         await kokoro?.unload()
@@ -77,6 +80,9 @@ public actor NarrationRenderer {
         try Task.checkCancellation()
         guard selection.isEnabled else {
             throw RenderError.unavailable("Choose Basic, Plus or System voices in Listening settings.")
+        }
+        if selection == .pocket, executionContext == .background {
+            throw RenderError.unavailable("Pocket TTS requires foreground GPU generation. Play prepared audio in the background.")
         }
         let backend: CTEngine.Backend = executionContext == .foreground ? .coreMLGPUHeavy : .coreMLCPU
         let directory = directory.standardizedFileURL
@@ -92,6 +98,11 @@ public actor NarrationRenderer {
             return
         }
         await unloadHeld()
+        if selection == .pocket {
+            pocket = PocketTTSEngine(directory: directory)
+            current = selection; currentDirectory = directory; currentRepositoryID = repositoryID
+            return
+        }
         if selection == .plus {
             let engine = CTEngine(directory: directory, backend: backend, assetIdentity: repositoryID,
                 contextStyleDiagnostic: contextStyleDiagnostic)
@@ -124,6 +135,9 @@ public actor NarrationRenderer {
     public func render(_ unit: BookNarrationUnit, delivery: NarrationDeliveryOptions = .init()) async throws -> [Float] {
         await acquire(); defer { release() }
         try Task.checkCancellation()
+        if let pocket {
+            return try await pocket.synthesize(unit.synthesisText, voiceID: unit.voiceID).samples
+        }
         if let plus {
             guard let voice = NarrationModel.plus.nativeVoices.first(where: { $0.id == unit.voiceID }) else {
                 throw CTError.unsupportedVoice

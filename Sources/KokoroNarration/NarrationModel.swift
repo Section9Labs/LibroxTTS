@@ -5,6 +5,7 @@ import LibroxCTNative
 /// Stable, persisted selection. Eligibility never rewrites a user's choice.
 public enum NarrationModel: String, CaseIterable, Codable, Sendable, Identifiable {
     case compact, enhanced, kokoroDesktop, qwenDesktop
+    case pocket = "pocketTTSV1"
     case plus = "ctPlusV1"
     public var id: String { rawValue }
     public var name: String {
@@ -12,6 +13,7 @@ public enum NarrationModel: String, CaseIterable, Codable, Sendable, Identifiabl
         case .compact: "Previous Basic"
         case .enhanced: "Previous Enhanced"
         case .kokoroDesktop: "Basic"
+        case .pocket: "Pocket TTS"
         case .plus: "Plus"
         case .qwenDesktop: "Previous Studio"
         }
@@ -22,8 +24,8 @@ public enum NarrationModel: String, CaseIterable, Codable, Sendable, Identifiabl
     public var isEnabled: Bool { !isQwen }
     public var deliveryProfile: NarrationProfile { self == .kokoroDesktop ? .enhanced : .basic }
     public var supportedSelection: Self { isEnabled ? self : .compact }
-    public var usesTextNativePlanning: Bool { self == .plus }
-    public var supportsCharacterVoices: Bool { self == .compact || self == .kokoroDesktop || self == .plus }
+    public var usesTextNativePlanning: Bool { self == .plus || self == .pocket }
+    public var supportsCharacterVoices: Bool { self == .compact || self == .kokoroDesktop || self == .plus || self == .pocket }
     public var supportsExpressiveDelivery: Bool { self == .compact || self == .kokoroDesktop }
     public var supportsVoiceBlending: Bool { self == .kokoroDesktop || self == .plus }
     public var supportsPronunciationDialect: Bool { self == .compact || self == .kokoroDesktop }
@@ -33,16 +35,16 @@ public enum NarrationModel: String, CaseIterable, Codable, Sendable, Identifiabl
         .init(expressive: supportsExpressiveDelivery && options.expressive,
               blendedVoice: supportsVoiceBlending && options.blendedVoice)
     }
-    public var requiresPlusAccess: Bool { self == .plus }
-    public var usesPreparedCache: Bool { self == .kokoroDesktop || self == .plus }
+    public var requiresPlusAccess: Bool { self == .plus || self == .pocket }
+    public var usesPreparedCache: Bool { self == .kokoroDesktop || self == .plus || self == .pocket }
     public var dependencies: [Self] { self == .kokoroDesktop ? [.compact] : [] }
     public var outputSampleRate: Int { nativeSampleRate }
     public var nativeSampleRate: Int { self == .plus ? 44_100 : 24_000 }
     public var deliveryIdentity: String {
-        self == .plus ? "dk-delivery-v1:native44100:source-boundaries:native-dynamics" : "profiled-narration-runtime-1"
+        self == .pocket ? "pocket-mlx-28770c06-v1:tf25:warm12:eos6:fp32" : self == .plus ? "dk-delivery-v1:native44100:source-boundaries:native-dynamics" : "profiled-narration-runtime-1"
     }
     public func renderIdentity(for unit: BookNarrationUnit) -> String {
-        self == .plus ? deliveryIdentity + ":context="
+        self == .pocket ? deliveryIdentity : self == .plus ? deliveryIdentity + ":context="
             + (unit.nativeExpression?.cacheIdentity ?? unit.nativeTextContext?.renderCacheKey ?? "none")
             : deliveryProfile.renderIdentity(for: unit)
     }
@@ -51,10 +53,11 @@ public enum NarrationModel: String, CaseIterable, Codable, Sendable, Identifiabl
         public let name: String
         public let language: String
         public let styleID: String
-        public var engineVoiceID: String { "dk-" + styleID.lowercased() + "-v1" }
+        public var engineVoiceID: String { id.hasPrefix("pocket-") ? styleID : "dk-" + styleID.lowercased() + "-v1" }
     }
     public var nativeVoices: [NativeVoice] {
-        self == .plus ? CTAssets.styles.flatMap { style in
+        if self == .pocket { return PocketTTSCatalog.voices.map { NativeVoice(id: $0.id, name: $0.name.replacingOccurrences(of: "_", with: " ").capitalized + " · " + NarrationLanguage.name($0.language), language: $0.language, styleID: $0.name) } }
+        return self == .plus ? CTAssets.styles.flatMap { style in
             supportedLanguageCodes.map { language in
                 NativeVoice(id: "plus-\(style.lowercased())-\(language)-v1",
                     name: style + " · " + NarrationLanguage.name(language), language: language, styleID: style)
@@ -62,10 +65,18 @@ public enum NarrationModel: String, CaseIterable, Codable, Sendable, Identifiabl
         } : []
     }
     public var supportedLanguageCodes: [String] {
-        self == .plus ? NarrationLanguage.textNativeCodes : Language.allCases.map(\.rawValue)
+        self == .pocket ? PocketTTSCatalog.languages : self == .plus ? NarrationLanguage.textNativeCodes : Language.allCases.map(\.rawValue)
     }
     public func resolvedVoiceID(_ preferred: String?, language: String) -> String? {
         guard let language = NarrationLanguage.normalize(language), supportedLanguageCodes.contains(language) else { return nil }
+        if self == .pocket {
+            let name: String?
+            if let preferred {
+                guard let voice = PocketTTSCatalog.voice(id: preferred) else { return nil }
+                name = voice.name
+            } else { name = PocketTTSCatalog.defaultVoices[language] }
+            return nativeVoices.first { $0.language == language && $0.styleID == name }?.id
+        }
         if self == .plus {
             let style = nativeVoices.first { $0.id == preferred }?.styleID ?? "F1"
             return nativeVoices.first { $0.language == language && $0.styleID == style }?.id
@@ -73,12 +84,13 @@ public enum NarrationModel: String, CaseIterable, Codable, Sendable, Identifiabl
         if let preferred, let voice = Voice.named(preferred), voice.language.rawValue == language { return preferred }
         return Language(rawValue: language).map { Voice.preferred(for: $0).id }
     }
-    public var requiresPreparation: Bool { self == .qwenDesktop }
+    public var requiresPreparation: Bool { self == .qwenDesktop || self == .pocket }
     public var detail: String {
         switch self {
         case .compact: "Small download · Listen immediately"
         case .enhanced: "Richer narration · On-device listening"
         case .kokoroDesktop: "On-device listening"
+        case .pocket: "25 voices · 7 languages · Foreground preparation"
         case .plus: "10 voices · 31 languages"
         case .qwenDesktop: "Expressive narration · Prepare chapters before listening"
         }
@@ -105,6 +117,9 @@ public enum NarrationModel: String, CaseIterable, Codable, Sendable, Identifiabl
             return "These earlier voices are temporarily unavailable. Choose Basic, Plus or System voices in Listening settings."
         }
         switch self {
+        case .pocket:
+            guard device.desktop else { return "Pocket TTS uses MLX GPU generation. iPhone and iPad qualification is pending; prepare audio on an Apple silicon Mac." }
+            return nil
         case .compact: return nil
         case .plus:
             let testedPhone = device.identifier == "iPhone18,2" && device.physicalMemory >= 12_000_000_000

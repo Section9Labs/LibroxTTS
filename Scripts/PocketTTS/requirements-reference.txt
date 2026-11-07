@@ -1,0 +1,7 @@
+# Install this in an isolated environment, then pip install -e the pinned Kyutai checkout.
+numpy==2.5.4
+PyYAML==6.0.3
+safetensors==0.8.0
+scipy==1.18.1
+tokenizers==0.23.3
+torch==2.15.0
