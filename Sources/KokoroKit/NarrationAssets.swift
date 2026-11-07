@@ -38,6 +38,54 @@ public enum NarrationAssets {
         switch model { case .kokoroDesktop: "BundledNarrationHD"; case .plus: "CTCoreMLV2GPUAssets"; default: nil }
     }
     public static func isDownloadPublished(_ model: NarrationModel) -> Bool { model.isEnabled && model != .plus }
+    /// Preparation follows actual model/runtime identities, not the host's SDK
+    /// version string. Hosts may persist this after successful preparation.
+    public static func preparationIdentity(_ model: NarrationModel) -> String {
+        model == .plus ? CTAssets.identity + ":" + CTEngine.runtimeIdentity + ":gpu-specializations-1"
+            : repositoryID(model) + ":prepared-1"
+    }
+    /// Known older installations are read-only reuse candidates, not evidence
+    /// that an old model can render every voice in the current catalog.
+    public static func previousRepositoryIDs(_ model: NarrationModel) -> [String] {
+        model == .plus ? ["librox-plus-dk-coreml-v1", "librox-plus-ct-f1-coremlgpu-v2"] : []
+    }
+
+    /// Seed a private staging directory using current manifest hashes. Never
+    /// move/delete a working installation or trust its old receipt as validation.
+    @discardableResult
+    public static func reuseVerifiedFiles(manifest: AssetManifest, from directories: [URL],
+                                         into staging: URL) throws -> Set<String> {
+        let fm = FileManager.default
+        // A caller must provide a different staging root from all source roots.
+        let targetRoot = staging.standardizedFileURL.resolvingSymlinksInPath()
+        guard !directories.contains(where: {
+            let source = $0.standardizedFileURL.resolvingSymlinksInPath().path
+            return source == targetRoot.path || source.hasPrefix(targetRoot.path + "/") || targetRoot.path.hasPrefix(source + "/")
+        }) else {
+            throw CTError.invalidAssets("staging overlaps installed model")
+        }
+        var reused: Set<String> = []
+        for file in manifest.files {
+            try Task.checkCancellation()
+            guard !file.path.isEmpty, !file.path.hasPrefix("/"),
+                  !file.path.split(separator: "/").contains("..") else { throw CTError.invalidAssets(file.path) }
+            let target = staging.appendingPathComponent(file.path)
+            guard target.standardizedFileURL.resolvingSymlinksInPath().path.hasPrefix(targetRoot.path + "/") else {
+                throw CTError.invalidAssets(file.path)
+            }
+            if try matches(target, size: file.size, sha256: file.sha256) { reused.insert(file.path); continue }
+            for directory in directories {
+                let source = directory.appendingPathComponent(file.path)
+                guard try matches(source, size: file.size, sha256: file.sha256) else { continue }
+                try fm.createDirectory(at: target.deletingLastPathComponent(), withIntermediateDirectories: true)
+                if fm.fileExists(atPath: target.path) { try fm.removeItem(at: target) }
+                try fm.copyItem(at: source, to: target)
+                reused.insert(file.path)
+                break
+            }
+        }
+        return reused
+    }
     /// Foreground installer. Hosts needing process-surviving transfers can use
     /// manifest(_:), their background URLSession, and prepare(_:model:).
     /// Serialize installation for a destination and keep it separate from any

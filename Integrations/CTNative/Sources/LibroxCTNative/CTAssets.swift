@@ -9,7 +9,7 @@ public enum CTError: Error, LocalizedError, Sendable {
         case .invalidAssets(let file): "Plus voice assets failed verification: \(file)."
         case .invalidTensor(let name): "Plus produced an incompatible tensor: \(name)."
         case .unsupportedLanguage: "This language is not supported by the Plus narrator."
-        case .unsupportedVoice: "Choose the Plus F1 narrator. Existing voice selections are not interchangeable."
+        case .unsupportedVoice: "Choose a supported Plus voice. Voices from other models are not interchangeable."
         case .emptyText: "There is no speakable text in this passage."
         case .passageTooLong: "This passage exceeds the Plus narrator's bounded capacity."
         case .invalidAudio: "Plus produced invalid audio."
@@ -19,13 +19,14 @@ public enum CTError: Error, LocalizedError, Sendable {
 }
 
 public enum CTAssets {
-    public static let identity = "librox-plus-dk-coreml-v1"
-    public static let releaseTag = "plus-dk-coreml-preview-v1"
+    public static let identity = "librox-plus-dk-coreml-v2"
+    public static let releaseTag = "plus-dk-coreml-preview-v2"
     public static let downloadBaseURL = "https://github.com/Section9Labs/LibroxTTS/releases/download/" + releaseTag + "/"
     public static let coreMLIdentity = identity
     public static let voiceID = "dk-f1-v1"
-    public static let voiceStyles = ["dk-f1-v1": "F1", "dk-m1-v1": "M1"]
-    public static let parameterCount = 108_569_401
+    public static let styles = ["F1", "F2", "F3", "F4", "F5", "M1", "M2", "M3", "M4", "M5"]
+    public static let voiceStyles = Dictionary(uniqueKeysWithValues: styles.map { ("dk-" + $0.lowercased() + "-v1", $0) })
+    public static let parameterCount = 108_672_825
     public struct Manifest: Decodable, Sendable {
         public struct File: Decodable, Sendable {
             public let path: String

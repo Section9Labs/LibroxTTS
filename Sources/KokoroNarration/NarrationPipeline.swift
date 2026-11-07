@@ -24,6 +24,7 @@ public actor NarrationPipeline {
                      options: PronunciationOptions = .init(), delivery: NarrationDeliveryOptions = .init(expressive: true),
                      lexicon: SpokenTextLexicon = .init()) async throws -> Plan {
         try Task.checkCancellation()
+        let delivery = model.resolvedDeliveryOptions(delivery)
         let preferredLanguage = narratorVoiceID.flatMap { id in
             model.nativeVoices.first { $0.id == id }?.language ?? Voice.named(id)?.language.rawValue
         }
@@ -50,8 +51,14 @@ public actor NarrationPipeline {
             }
         } else {
             guard let phoneticLanguage = PronunciationLanguage(rawValue: language) else { throw PlanningError.unsupportedLanguage(language) }
-            let original = try cast ?? BookVoiceCast(bookID: bookID, language: phoneticLanguage,
-                                                    narratorVoiceID: voiceID, voicePool: [])
+            let original: BookVoiceCast
+            if let cast { original = cast }
+            else if characterVoices && model.supportsCharacterVoices {
+                original = try model.makeVoiceCast(bookID: bookID, language: language, narratorVoiceID: voiceID)
+            } else {
+                original = try BookVoiceCast(bookID: bookID, language: phoneticLanguage,
+                                            narratorVoiceID: voiceID, voicePool: [])
+            }
             let plan = try await bookPlanner.plan(text, chapterID: chapterID, cast: original,
                 characterVoices: characterVoices && model.supportsCharacterVoices,
                 options: options, profile: model.deliveryProfile, delivery: delivery)

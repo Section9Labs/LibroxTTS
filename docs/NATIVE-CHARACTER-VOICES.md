@@ -3,7 +3,7 @@
 The DK preview uses the same `BookVoiceCast`, `SpeakerAttributor` and
 `StoryNarrator` as Kokoro, followed by native text preparation. Assigned dialogue
 actually changes `unit.voiceID`, which `NarrationRenderer` passes to the pinned
-F1/M1 styles in `CTEngine`. Switching styles does not reload the synthesis graphs.
+F1–F5/M1–M5 styles in `CTEngine`. Switching styles does not reload the synthesis graphs.
 No model weights, voice tables, generator, vocoder or delivery processing changed.
 
 ## Host integration
@@ -26,6 +26,10 @@ to use `setVoice(_:for:)`, `addAlias(_:to:)` and `replacingNarrator(with:)`.
 Manual nil assignments remain narrator fallback. The saved cast's narrator is
 authoritative until explicitly changed. Foreign model, wrong-book and
 wrong-language casts are rejected, including when character playback is off.
+For an older saved catalog, call `model.expandingVoiceCatalog(in:)` before
+showing the current menus. It adds available voices without recasting characters
+or removing manual narrator fallback. Persist the expanded cast on the next edit
+or successful plan. Hosts with intentionally restricted palettes can keep them.
 
 Model or catalog scope must be part of saved voice assignments. Keep existing
 Kokoro files and manual choices; do not overwrite them with Plus voices or pass
@@ -50,7 +54,8 @@ until the host can persist and reuse the identical plan.
   Query `supportsAutomaticCharacterAttribution` rather than treating synthesis
   language support as speaker-understanding support. The legacy cast schema
   itself accepts only `PronunciationLanguage` languages.
-- F1 and M1 are the two accepted native voice styles. The pool can reuse a
+- F1–F5 and M1–M5 are available; F1/M1 baseline quality has listening acceptance.
+  The pool can reuse a
   compatible style for several characters. This is not a unique voice for every
   character, and source gender is never guessed from a name alone.
 - Named English quotations and Spanish quotations/dash dialogue reuse existing

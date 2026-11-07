@@ -1,5 +1,9 @@
 # DK Core ML preview
 
+This page records the original accepted F1/M1 preview. The current candidate
+adds all ten presets; see [the shared-feature audit](SHARED-MODEL-FEATURE-AUDIT.md)
+for its new asset identity, validation and remaining scope.
+
 This branch integrates the frozen DK early encoder into the native Plus pipeline.
 It is a local listening candidate, not a published SDK or model download. SDK
 0.3.0 and TestFlight 1.9.3 (243) still use the previous CT model.

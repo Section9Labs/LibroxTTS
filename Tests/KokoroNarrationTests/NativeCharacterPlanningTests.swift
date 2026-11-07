@@ -13,10 +13,10 @@ private let characterScenes = [
 func nativeCharacterCatalogAndCastUseOnlyTheirOwnVoices(_ language: String) throws {
     let model = NarrationModel.plus
     let voices = model.characterVoiceCatalog(language: language)
-    #expect(voices.map(\.id) == ["plus-f1-\(language)-v1", "plus-m1-\(language)-v1"])
-    #expect(voices.map(\.gender) == [.female, .male])
+    #expect(voices.map(\.id) == ["f1", "f2", "f3", "f4", "f5", "m1", "m2", "m3", "m4", "m5"].map { "plus-\($0)-\(language)-v1" })
+    #expect(voices.map(\.gender) == Array(repeating: .female, count: 5) + Array(repeating: .male, count: 5))
     let cast = try model.makeVoiceCast(bookID: "book", language: language, narratorVoiceID: voices[0].id)
-    #expect(cast.voicePool == [voices[1].id] && cast.voiceSharing == .reuseCompatible)
+    #expect(cast.voicePool == Array(voices.dropFirst()).map(\.id) && cast.voiceSharing == .reuseCompatible)
     #expect(throws: NarrationPipeline.PlanningError.self) {
         try model.makeVoiceCast(bookID: "book", language: language, narratorVoiceID: "af_heart")
     }
@@ -29,10 +29,10 @@ func nativeCharacterCatalogAndCastUseOnlyTheirOwnVoices(_ language: String) thro
             narratorVoiceID: "plus-f1-\(language)-v1", language: language, characterVoices: true)
         let cast = try #require(plan.cast)
         #expect(cast.characters.count == 2)
-        #expect(cast.characters[0].voiceID == "plus-f1-\(language)-v1")
+        #expect(cast.characters[0].voiceID == "plus-f2-\(language)-v1")
         #expect(cast.characters[1].voiceID == "plus-m1-\(language)-v1")
         let dialogue = plan.units.filter { $0.role == .dialogue }
-        #expect(dialogue.map(\.voiceID) == ["plus-f1-\(language)-v1", "plus-m1-\(language)-v1", "plus-f1-\(language)-v1"])
+        #expect(dialogue.map(\.voiceID) == ["plus-f2-\(language)-v1", "plus-m1-\(language)-v1", "plus-f2-\(language)-v1"])
         #expect(dialogue.map(\.speakerID) == ["c1", "c2", "c1"])
         #expect(plan.units.filter { $0.role == .narration }.allSatisfy { $0.voiceID == plan.narratorVoiceID && $0.speakerID == nil })
         #expect(plan.bookPlan?.characterAttributionSupported == true)
@@ -114,7 +114,7 @@ func nativeCharacterCatalogAndCastUseOnlyTheirOwnVoices(_ language: String) thro
 }
 
 @Test func nativeLanguageSupportDoesNotPretendAttributionExistsEverywhere() async throws {
-    #expect(NarrationModel.plus.characterVoiceCatalog(language: "de-DE").count == 2)
+    #expect(NarrationModel.plus.characterVoiceCatalog(language: "de-DE").count == 10)
     #expect(!NarrationModel.plus.supportsAutomaticCharacterAttribution(language: "de"))
     let plan = try await NarrationPipeline().plan("Die Tür war offen.", model: .plus, bookID: "german", chapterID: "one",
         narratorVoiceID: "plus-m1-de-v1", language: "de", characterVoices: true)

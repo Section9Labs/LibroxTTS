@@ -15,7 +15,7 @@ extension NarrationModel {
               supportedLanguageCodes.contains(language) else { return [] }
         if usesTextNativePlanning {
             return nativeVoices.filter { $0.language == language }.map {
-                CharacterVoice(id: $0.id, name: $0.name, gender: $0.styleID == "F1" ? .female : .male)
+                CharacterVoice(id: $0.id, name: $0.name, gender: $0.styleID.hasPrefix("F") ? .female : .male)
             }
         }
         return Voice.all.filter { $0.language.rawValue == language }.map {
@@ -46,5 +46,16 @@ extension NarrationModel {
             voicePool: voices.map(\.id).filter { $0 != narratorVoiceID },
             voiceGenders: Dictionary(uniqueKeysWithValues: voices.map { ($0.id, $0.gender) }),
             voiceSharing: .reuseCompatible)
+    }
+
+    /// Add newly available voices without changing identities, assignments or
+    /// explicit narrator fallbacks. Reject a cast from a different model catalog.
+    public func expandingVoiceCatalog(in cast: BookVoiceCast) throws -> BookVoiceCast {
+        let voices = characterVoiceCatalog(language: cast.language.rawValue)
+        let available = Set(voices.map(\.id))
+        let existing = Set(cast.voicePool + [cast.narratorVoiceID] + Array(cast.characterVoices.values))
+        guard existing.isSubset(of: available) else { throw NarrationPipeline.PlanningError.invalidVoice }
+        return try cast.addingVoices(voices.map(\.id).filter { $0 != cast.narratorVoiceID },
+            genders: Dictionary(uniqueKeysWithValues: voices.map { ($0.id, $0.gender) }))
     }
 }

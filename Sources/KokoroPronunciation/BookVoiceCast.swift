@@ -72,6 +72,20 @@ public struct BookVoiceCast: Codable, Sendable, Equatable {
         Dictionary(uniqueKeysWithValues: characters.compactMap { c in c.voiceID.map { (c.id, $0) } })
     }
 
+    /// Expand an installed catalog without recasting anyone. Previously manual
+    /// nil choices remain manual, and aliases/character IDs remain byte-stable.
+    public func addingVoices(_ voices: [String], genders: [String: Gender]) throws -> Self {
+        try validate()
+        var pool = voicePool
+        for voice in voices where voice != narratorVoiceID && !pool.contains(voice) { pool.append(voice) }
+        let metadata = voiceGenders.merging(genders) { _, latest in latest }
+        var result = try Self(bookID: bookID, language: language, narratorVoiceID: narratorVoiceID,
+            voicePool: pool, styleRow: styleRow, voiceGenders: metadata, voiceSharing: voiceSharing)
+        result.characters = characters; result.aliases = aliases
+        try result.validate()
+        return result
+    }
+
     public func encoded() throws -> Data {
         try validate()
         let encoder = JSONEncoder(); encoder.outputFormatting = [.sortedKeys]
