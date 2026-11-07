@@ -41,10 +41,11 @@ public enum NarrationModel: String, CaseIterable, Codable, Sendable, Identifiabl
     public var outputSampleRate: Int { nativeSampleRate }
     public var nativeSampleRate: Int { self == .plus ? 44_100 : 24_000 }
     public var deliveryIdentity: String {
-        self == .pocket ? "pocket-mlx-28770c06-v1:tf25:warm12:eos6:fp32" : self == .plus ? "dk-delivery-v1:native44100:source-boundaries:native-dynamics" : "profiled-narration-runtime-1"
+        self == .pocket ? "pocket-mlx-28770c06-v2:adaptive:warm12:eos6:fp32" : self == .plus ? "dk-delivery-v1:native44100:source-boundaries:native-dynamics" : "profiled-narration-runtime-1"
     }
     public func renderIdentity(for unit: BookNarrationUnit) -> String {
-        self == .pocket ? deliveryIdentity : self == .plus ? deliveryIdentity + ":context="
+        self == .pocket ? deliveryIdentity + ":" + (unit.pocketChunking ?? .init()).cacheIdentity
+            + ":role=" + (unit.role == .dialogue ? "dialogue" : "narration") : self == .plus ? deliveryIdentity + ":context="
             + (unit.nativeExpression?.cacheIdentity ?? unit.nativeTextContext?.renderCacheKey ?? "none")
             : deliveryProfile.renderIdentity(for: unit)
     }

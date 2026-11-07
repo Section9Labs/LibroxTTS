@@ -23,7 +23,8 @@ public actor NarrationPipeline {
                      narratorVoiceID: String?, language: String? = nil, metadataLanguage: String? = nil,
                      cast: BookVoiceCast? = nil, characterVoices: Bool = false,
                      options: PronunciationOptions = .init(), delivery: NarrationDeliveryOptions = .init(expressive: true),
-                     lexicon: SpokenTextLexicon = .init(), nativeExpression: Bool = false, repositoryID: String? = nil) async throws -> Plan {
+                     lexicon: SpokenTextLexicon = .init(), nativeExpression: Bool = false, repositoryID: String? = nil,
+                     pocketChunking: PocketTTSChunkingOptions = .init()) async throws -> Plan {
         try Task.checkCancellation()
         let delivery = model.resolvedDeliveryOptions(delivery)
         let preferredLanguage = narratorVoiceID.flatMap { id in
@@ -44,10 +45,10 @@ public actor NarrationPipeline {
             } else { nativeCast = nil }
             if let nativeCast {
                 let plan = try TextNativeCharacterPlanner.plan(text, bookID: bookID, chapterID: chapterID,
-                    language: language, cast: nativeCast, characterVoices: characterVoices, lexicon: lexicon, model: model)
+                    language: language, cast: nativeCast, characterVoices: characterVoices, lexicon: lexicon, model: model, pocketChunking: pocketChunking)
                 units = plan.units; updatedCast = plan.cast; originalPlan = plan
             } else {
-                units = try TextNativeNarrationPlanner.plan(text, voiceID: voiceID, lexicon: lexicon, model: model)
+                units = try TextNativeNarrationPlanner.plan(text, voiceID: voiceID, lexicon: lexicon, model: model, pocketChunking: pocketChunking)
                 updatedCast = nil
             }
         } else {

@@ -37,3 +37,27 @@ Not established: perceptual superiority to Plus, all 175 voice/language pairs,
 long-book/endurance/thermal behavior, physical iPhone/iPad runtime acceptance,
 or a shipped Librox app update. The tiny English models, 24-layer previews and
 arbitrary-reference cloning are outside the hosted preset pack qualification.
+
+## Adaptive phrasing update (runtime v2)
+
+The current runtime replaces the fixed 25-token production splitter with
+configurable sentence-aware grouping. The earlier numerical results validate
+unchanged model operators and the retained upstream reference splitter, not an
+assertion that adaptive chunk plans equal upstream plans.
+
+- Full package suite and generic unsigned iOS build passed again.
+- All 14 Pocket tests passed with installed packs and reference fixtures enabled,
+  including source/cast preservation, shared-voice speaker separation, role
+  targets, protected passages, bounded clause/word fallback, Unicode/decimals,
+  invalid options, cache identities, real-tokenizer previews and native rendering.
+- Seven fresh default-voice renders succeeded. ASR matched six normalized word
+  sequences exactly; Portuguese had an `a`/`ao` discrepancy. The source of that
+  discrepancy (synthesis or recognizer) is not established.
+- A longer English narrative rendered 18.96 seconds in three chunks (24, 53,
+  22 tokens), preserving the short follow-on sentences with their preceding
+  thought and resetting continuation at the paragraph. ASR reported `things`/`thing`
+  and `Then`/`And` differences; word fidelity remains open for listening review.
+  The comparison and complete plans are in `adaptive-chunking.json`.
+
+These are structural/content checks. Choosing pleasant narration targets still
+requires listening; the 48/32 soft targets are starting points, not tuned presets.

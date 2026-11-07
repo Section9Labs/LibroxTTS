@@ -74,8 +74,8 @@ one pack. Switching language unloads the previous model and verifies the new pac
 throwing callback with backpressure. Stage output until success; cancellation or
 EOS-limit failure must discard incomplete units. `synthesize` buffers a bounded
 unit (maximum five minutes), never a whole book. Source input is capped at 16,384
-Unicode scalars; normal pipeline groups are at most 1,200 scalars, then the
-model's tokenizer splits them into smaller chunks.
+Unicode scalars; normal pipeline groups default to at most 2,400 scalars (configurable), then the
+model's real language tokenizer chooses sentence-aware generation chunks.
 
 The shared renderer rejects `.background` for Pocket GPU generation. Eligibility
 currently admits Apple silicon Macs; iPhone/iPad generation remains unqualified.
@@ -85,11 +85,58 @@ short-sample success does not establish locked-screen GPU permission on a phone.
 ## Reading behavior
 
 Current Kyutai defaults are temperature **0.3** and one LSD sampler step. The port
-uses 25-token target chunks, feeding each prior chunk's text and generated latents
-into the next chunk and warming Mimi with its last 12 latent frames. This retains
-local delivery continuity while keeping state bounded. Continuation resets at a
-Librox unit/voice/paragraph boundary, making independent rendering and retries
-safe; no hidden context from a previously played chapter enters the cache key.
+now uses configurable **adaptive phrasing**, replacing its initial fixed 25-token
+target. This is structural grouping, not an emotion classifier:
+
+- A whole sentence stays together when it fits the hard cap, even above the target.
+- Short setup/follow-on sentences and a small set of language-specific connective
+  words can keep adjacent sentences together above the target.
+- Narration and dialogue have separate soft targets: initially 48 and 32 tokens.
+  These are engineering starting points, not listening-qualified voice presets.
+- The hard cap defaults to 96 tokens, configurable up to 100. An oversized sentence
+  splits at a clause, then at a whole-word boundary if needed. An indivisible word
+  above the cap fails explicitly; it is never truncated or omitted.
+- Paragraphs, speaker turns and narration/dialogue attribution spans are firm
+  boundaries. They remain separate even when their assigned voices match. The
+  model does not infer speakers itself; the existing attribution layer supplies
+  those boundaries when character planning is enabled and supported.
+- A short dialogue turn is allowed to remain short; it is never padded with another
+  speaker's words to meet a target.
+
+```swift
+let chunking = PocketTTSChunkingOptions(
+    narrationTargetTokens: 56, dialogueTargetTokens: 28,
+    maximumTokens: 96, shortSentenceTokens: 12,
+    maximumUnitScalars: 2400
+)
+// Pass pocketChunking: chunking to NarrationPipeline.plan(...).
+// Units carry the selected policy through NarrationRenderer.
+
+// A host/editor can protect an individual bounded speaker passage:
+var protectedUnit = plan.units[0]
+protectedUnit.pocketChunking = .init(grouping: .keepTogether)
+// Throws if a protected passage exceeds the cap; never joins paragraphs/speakers.
+
+// Inspect the exact text, token counts, boundary reasons and context resets:
+let chunks = try await engine.previewChunks(
+    protectedUnit.synthesisText, voiceID: protectedUnit.voiceID,
+    chunking: protectedUnit.pocketChunking ?? .init(),
+    role: protectedUnit.role == .dialogue ? .dialogue : .narration
+)
+```
+
+The policy is Codable for book settings. Include `NarrationModel.pocket.renderIdentity(for: unit)`
+in prepared-audio cache keys alongside the usual text/voice/model identities. It
+includes the policy and resolved role; the runtime revision also changed so old
+25-token audio is not reused. Direct synthesis and `renderFrames` accept the same
+`chunking` and `role` arguments. Direct engine callers must supply separate speaker
+turns; `role: .dialogue` alone does not perform speaker attribution.
+
+Within a passage, previous text and generated latents condition the next chunk;
+Mimi warms with the prior 12 latent frames. Continuation resets at a paragraph or
+independently rendered unit. No hidden context from another character or previously
+played chapter enters a render. Resetting is distinct from adding a timed pause;
+this policy does not insert synthetic silence or emotion tags.
 
 The latest punctuation preparation prevents unfinished clause endings, keeps
 abbreviations/decimals together, preserves closing quotes with their sentence,
@@ -120,6 +167,8 @@ Use a separate Python environment with the pinned Kyutai checkout installed.
 swift build -c release --product pocket-tts-probe
 swift test --filter Pocket
 swift run -c release pocket-tts-probe --download /path/to/packs en
+swift run -c release pocket-tts-probe --plan /path/to/packs \
+  pocket-alba-en-v1 'She waited. Nobody came.'
 swift run -c release pocket-tts-probe /path/to/packs \
   pocket-alba-en-v1 /tmp/pocket.wav 'The library was quiet.'
 ```

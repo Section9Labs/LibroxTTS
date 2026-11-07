@@ -15,6 +15,9 @@ public struct BookNarrationUnit: Sendable {
     public let boundaryAfter: NarrationBoundary
     /// Prepared spoken words; source text/ranges remain untouched for highlighting.
     public var spokenText: String? = nil
+    /// Pocket-specific phrasing budgets. Hosts may override a unit before rendering;
+    /// use NarrationModel.renderIdentity(for:) in the resulting audio cache key.
+    public var pocketChunking: PocketTTSChunkingOptions? = nil
     public var synthesisText: String { spokenText ?? text }
     public var expression: NarrationExpression = .neutral
     /// Present for the opt-in source-context plan. Does not select a render rate.

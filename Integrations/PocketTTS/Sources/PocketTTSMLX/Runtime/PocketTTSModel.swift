@@ -1,3 +1,4 @@
+import KokoroCatalog
 import Foundation
 @preconcurrency import MLX
 import MLXNN
@@ -182,19 +183,29 @@ public final class PocketTTSModel: Module {
         return 0
     }
 
+    public func chunkPlan(text: String, language: String, role: PocketTTSPassageRole,
+                          options: PocketTTSChunkingOptions) throws -> [PocketTTSTextChunk] {
+        try PocketTTSPassageChunker.plan(text, language: language, role: role, options: options,
+            prepare: { try PocketTTSTextUtils.prepareTextPrompt($0, config: self.config).0 },
+            tokenCount: { self.flow_lm.conditioner.tokenizer.encode($0).count })
+    }
+
     /// Synchronous callback supplies natural 80 ms codec frames and backpressure.
     /// Keep this object inside one actor; a model contains mutable decoder state.
     public func render(text: String, voice: String, continuation: Bool = true,
+                       chunking: PocketTTSChunkingOptions = .init(),
+                       role: PocketTTSPassageRole = .narration, language: String = "en",
                        onChunk: ([Float]) throws -> Void) throws {
         try validateSampling()
         var state = try loadVoiceState(voice)
         let promptFrames = getFlowCacheNumFrames(state)
-        let chunks = try PocketTTSTextUtils.splitIntoBestSentences(flow_lm.conditioner.tokenizer, text,
-            maxTokens: continuation ? 25 : 50, config: config)
+        let chunks = try chunkPlan(text: text, language: language, role: role, options: chunking)
         var previousText: String?
         var previousLatents: [MLXArray] = []
-        for chunk in chunks {
+        for decision in chunks {
             try Task.checkCancellation()
+            let chunk = decision.text
+            if decision.startsNewPassage { previousText = nil; previousLatents = [] }
             sliceFlowCache(&state, to: promptFrames)
             let forced = continuation && !previousLatents.isEmpty ? concatenated(previousLatents, axis: 1) : nil
             let joined = forced == nil ? chunk : (previousText! + " " + chunk)

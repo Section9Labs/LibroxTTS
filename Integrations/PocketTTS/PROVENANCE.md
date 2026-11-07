@@ -51,3 +51,11 @@ This port's hosted presets do not enable arbitrary reference-audio cloning.
 Kyutai's separate cloning-enabled distribution has an access/consent gate; it is
 not fetched or mirrored by this integration. The 24-layer previews, tiny English
 variants and alternative sampler families are not advertised as qualified packs.
+
+## Librox phrasing policy (runtime v2)
+
+The upstream fixed-target splitter remains available for reference parity checks.
+Production narration uses our adaptive sentence/paragraph chunker, configurable
+through `PocketTTSChunkingOptions`. This is an intentional scheduling change, not
+a weight change or claim of superior listening quality. The checkpoint, operator
+math, voice states and hosted asset hashes remain unchanged.

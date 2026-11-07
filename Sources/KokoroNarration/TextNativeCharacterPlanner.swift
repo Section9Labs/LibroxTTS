@@ -1,4 +1,5 @@
 import Foundation
+import KokoroCatalog
 import KokoroPronunciation
 
 /// Shared speaker attribution and book identities, followed by the native text
@@ -13,7 +14,8 @@ enum TextNativeCharacterPlanner {
     }
     static func plan(_ text: String, bookID: String, chapterID: String, language: String,
                      cast original: BookVoiceCast, characterVoices: Bool,
-                     lexicon: SpokenTextLexicon, model: NarrationModel = .plus) throws -> BookNarrationPlan {
+                     lexicon: SpokenTextLexicon, model: NarrationModel = .plus,
+                     pocketChunking: PocketTTSChunkingOptions = .init()) throws -> BookNarrationPlan {
         _ = try original.encoded()
         guard original.bookID == bookID else { throw BookVoiceCast.CastError.wrongBook }
         guard original.language.rawValue == language else { throw BookNarrationPlanner.PlanningError.languageMismatch }
@@ -23,7 +25,7 @@ enum TextNativeCharacterPlanner {
         let supported = model.supportsAutomaticCharacterAttribution(language: language)
         guard characterVoices && supported else {
             return BookNarrationPlan(units: try TextNativeNarrationPlanner.plan(text,
-                voiceID: original.narratorVoiceID, lexicon: lexicon, model: model), cast: original,
+                voiceID: original.narratorVoiceID, lexicon: lexicon, model: model, pocketChunking: pocketChunking), cast: original,
                 attribution: nil, characterAttributionSupported: supported)
         }
 
@@ -56,7 +58,7 @@ enum TextNativeCharacterPlanner {
         var fragments: [(BookNarrationUnit, Span)] = []
         for span in spans {
             try Task.checkCancellation()
-            for unit in try TextNativeNarrationPlanner.plan(span.text, voiceID: span.voiceID, lexicon: lexicon, model: model) {
+            for unit in try TextNativeNarrationPlanner.plan(span.text, voiceID: span.voiceID, lexicon: lexicon, model: model, pocketChunking: pocketChunking) {
                 fragments.append((unit, span))
             }
         }
@@ -72,6 +74,7 @@ enum TextNativeCharacterPlanner {
                 boundaryAfter: boundary, role: span.role,
                 speakerID: span.speakerID)
             unit.spokenText = local.spokenText
+            unit.pocketChunking = local.pocketChunking
             unit.prosody = local.prosody
             return unit
         }

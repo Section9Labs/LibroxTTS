@@ -20,7 +20,7 @@ public enum PocketTTSError: LocalizedError {
 /// Serialized native Swift MLX owner. MLX arrays and caches never cross this actor.
 /// GPU generation is foreground/preparation-only until physical-device qualification.
 public actor PocketTTSEngine {
-    public static let runtimeIdentity = "pocket-mlx-28770c06-v1:tf25:warm12:eos6:fp32"
+    public static let runtimeIdentity = "pocket-mlx-28770c06-v2:adaptive:warm12:eos6:fp32"
     public struct Output: Sendable { public let samples: [Float]; public let sampleRate: Int }
     private let directory: URL
     private var model: PocketTTSModel?
@@ -28,19 +28,16 @@ public actor PocketTTSEngine {
     public init(directory: URL) { self.directory = directory }
     public func unload() { model = nil; language = nil }
     public func synthesize(_ text: String, voiceID: String, temperature: Float = 0.3,
-                           continueChunks: Bool = true) throws -> Output {
+                           continueChunks: Bool = true, chunking: PocketTTSChunkingOptions = .init(),
+                           role: PocketTTSPassageRole = .narration) throws -> Output {
+        try chunking.validate()
         guard let voice = PocketTTSCatalog.voice(id: voiceID) else { throw PocketTTSError.invalidVoice }
         guard text.unicodeScalars.count <= 16_384 else { throw PocketTTSError.textTooLong }
-        if language != voice.language {
-            model = nil; language = nil
-            try PocketTTSCatalog.validate(in: directory, language: voice.language)
-            model = try PocketTTSModel.fromModelDirectory(directory.appendingPathComponent(voice.language))
-            language = voice.language
-        }
-        guard let model else { throw PocketTTSError.invalidAssets }
+        let model = try loadedModel(language: voice.language)
         model.temp = temperature
         var samples: [Float] = []
-        try model.render(text: text, voice: voice.name, continuation: continueChunks) { chunk in
+        try model.render(text: text, voice: voice.name, continuation: continueChunks, chunking: chunking,
+                         role: role, language: voice.language) { chunk in
             guard samples.count + chunk.count <= 24_000 * 300 else { throw PocketTTSError.textTooLong }
             samples += chunk
         }
@@ -50,16 +47,34 @@ public actor PocketTTSEngine {
     /// Frame callbacks are synchronous and apply backpressure. The consumer must
     /// discard staged output on errors/cancellation; only success completes a unit.
     public func renderFrames(_ text: String, voiceID: String,
+                             chunking: PocketTTSChunkingOptions = .init(),
+                             role: PocketTTSPassageRole = .narration,
                              receive: @Sendable ([Float]) throws -> Void) throws {
+        try chunking.validate()
         guard let voice = PocketTTSCatalog.voice(id: voiceID) else { throw PocketTTSError.invalidVoice }
-        if language != voice.language {
+        let model = try loadedModel(language: voice.language)
+        model.temp = 0.3
+        try model.render(text: text, voice: voice.name, chunking: chunking, role: role,
+                         language: voice.language, onChunk: receive)
+    }
+    /// Inspect the same token-aware decisions used by synthesis before generating audio.
+    public func previewChunks(_ text: String, voiceID: String,
+                              chunking: PocketTTSChunkingOptions = .init(),
+                              role: PocketTTSPassageRole = .narration) throws -> [PocketTTSTextChunk] {
+        try chunking.validate()
+        guard let voice = PocketTTSCatalog.voice(id: voiceID) else { throw PocketTTSError.invalidVoice }
+        return try loadedModel(language: voice.language).chunkPlan(text: text, language: voice.language,
+                                                                  role: role, options: chunking)
+    }
+
+    private func loadedModel(language requested: String) throws -> PocketTTSModel {
+        if language != requested {
             model = nil; language = nil
-            try PocketTTSCatalog.validate(in: directory, language: voice.language)
-            model = try PocketTTSModel.fromModelDirectory(directory.appendingPathComponent(voice.language))
-            language = voice.language
+            try PocketTTSCatalog.validate(in: directory, language: requested)
+            model = try PocketTTSModel.fromModelDirectory(directory.appendingPathComponent(requested))
+            language = requested
         }
         guard let model else { throw PocketTTSError.invalidAssets }
-        model.temp = 0.3
-        try model.render(text: text, voice: voice.name, onChunk: receive)
+        return model
     }
 }

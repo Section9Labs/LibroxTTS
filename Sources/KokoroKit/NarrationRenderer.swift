@@ -136,7 +136,8 @@ public actor NarrationRenderer {
         await acquire(); defer { release() }
         try Task.checkCancellation()
         if let pocket {
-            return try await pocket.synthesize(unit.synthesisText, voiceID: unit.voiceID).samples
+            return try await pocket.synthesize(unit.synthesisText, voiceID: unit.voiceID,
+                chunking: unit.pocketChunking ?? .init(), role: unit.role == .dialogue ? .dialogue : .narration).samples
         }
         if let plus {
             guard let voice = NarrationModel.plus.nativeVoices.first(where: { $0.id == unit.voiceID }) else {
