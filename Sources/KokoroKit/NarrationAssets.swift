@@ -16,19 +16,43 @@ public enum NarrationAssets {
         case .qwenDesktop: "narration-qwenDesktop"
         }
     }
-    public static func manifest(_ model: NarrationModel) throws -> AssetManifest {
+    public static func compatibleRepositoryIDs(_ model: NarrationModel) -> [String] {
+        model == .plus ? [repositoryID(model), CTAssets.releasedIdentity] : [repositoryID(model)]
+    }
+    /// Older playback is explicit and restricted to that installation's voices.
+    /// A retained CT F1 installation is never relabelled as the ten-style DK bank.
+    public static func supportedNativeStyles(repositoryID: String) -> [String] {
+        repositoryID == CTAssets.identity ? CTAssets.styles : repositoryID == CTAssets.releasedIdentity ? ["F1"] : []
+    }
+    /// Manifest-derived estimate only; corrupt/missing installed files download
+    /// again. Reuse always verifies actual bytes before accepting them.
+    public static func estimatedDownloadSize(_ model: NarrationModel, reusing repositoryID: String?) throws -> Int64 {
+        let current = try manifest(model)
+        guard let repositoryID, let previous = try? manifest(model, repositoryID: repositoryID) else { return current.downloadSize }
+        let old = Dictionary(uniqueKeysWithValues: previous.installedFiles.map { ($0.path, $0) })
+        return current.files.reduce(0) { total, file in
+            total + (old[file.path]?.sha256 == file.sha256 && old[file.path]?.size == file.size ? 0 : file.size)
+        }
+    }
+    public static func manifest(_ model: NarrationModel, repositoryID selected: String? = nil) throws -> AssetManifest {
+        guard selected == nil || compatibleRepositoryIDs(model).contains(selected!) else {
+            throw CTError.invalidAssets("unsupported installation")
+        }
         switch model {
         case .compact: return try .bundled()
         case .kokoroDesktop:
             guard let url = Bundle.module.url(forResource: "NarrationBasic", withExtension: "json") else { throw CTError.invalidAssets("Basic manifest") }
             return try JSONDecoder().decode(AssetManifest.self, from: Data(contentsOf: url))
         case .plus:
-            let pinned = try CTAssets.manifest()
+            let identity = selected ?? CTAssets.identity
+            let pinned = try CTAssets.manifest(identity: identity)
+            let tag = identity == CTAssets.identity ? CTAssets.releaseTag : CTAssets.releasedTag
+            let baseURL = "https://github.com/Section9Labs/LibroxTTS/releases/download/" + tag + "/"
             let files = pinned.files.map {
                 ["path": $0.path, "size": $0.bytes, "sha256": $0.sha256,
-                 "sourceURL": CTAssets.downloadBaseURL + $0.path.replacingOccurrences(of: "/", with: "--")] as [String: Any]
+                 "sourceURL": baseURL + $0.path.replacingOccurrences(of: "/", with: "--")] as [String: Any]
             }
-            let json: [String: Any] = ["repository": "Section9Labs/LibroxTTS", "revision": CTAssets.releaseTag,
+            let json: [String: Any] = ["repository": "Section9Labs/LibroxTTS", "revision": tag,
                                       "files": files, "installedFiles": files]
             return try JSONDecoder().decode(AssetManifest.self, from: JSONSerialization.data(withJSONObject: json))
         default: throw CTError.invalidAssets("Legacy model unavailable")
@@ -40,9 +64,9 @@ public enum NarrationAssets {
     public static func isDownloadPublished(_ model: NarrationModel) -> Bool { model.isEnabled && model != .plus }
     /// Preparation follows actual model/runtime identities, not the host's SDK
     /// version string. Hosts may persist this after successful preparation.
-    public static func preparationIdentity(_ model: NarrationModel) -> String {
-        model == .plus ? CTAssets.identity + ":" + CTEngine.runtimeIdentity + ":gpu-specializations-1"
-            : repositoryID(model) + ":prepared-1"
+    public static func preparationIdentity(_ model: NarrationModel, repositoryID: String? = nil) -> String {
+        model == .plus ? (repositoryID ?? CTAssets.identity) + ":" + CTEngine.runtimeIdentity + ":gpu-specializations-1"
+            : Self.repositoryID(model) + ":prepared-1"
     }
     /// Known older installations are read-only reuse candidates, not evidence
     /// that an old model can render every voice in the current catalog.
@@ -122,17 +146,17 @@ public enum NarrationAssets {
         try configureForPlayback(directory)
     }
     /// Fast receipt/UI check. Loading separately verifies every pinned hash.
-    public static func isPrepared(_ directory: URL, model: NarrationModel) -> Bool {
-        guard let manifest = try? manifest(model), manifest.isPresent(in: directory) else { return false }
+    public static func isPrepared(_ directory: URL, model: NarrationModel, repositoryID: String? = nil) -> Bool {
+        guard let manifest = try? manifest(model, repositoryID: repositoryID), manifest.isPresent(in: directory) else { return false }
         return model != .kokoroDesktop || FileManager.default.fileExists(
             atPath: directory.appendingPathComponent("frontend-fp32.mlmodelc").path)
     }
-    public static func prepare(_ directory: URL, model: NarrationModel) throws {
+    public static func prepare(_ directory: URL, model: NarrationModel, repositoryID: String? = nil) throws {
         if model == .plus {
             // Pay the common generator functions' hardware specialization cost
             // while the install UI is preparing the voice, before the first Play.
             // Each model is released before the next; weights and audio stay unchanged.
-            try CTAssets.prepare(directory, specializeFor: .coreMLGPUHeavy)
+            try CTAssets.prepare(directory, specializeFor: .coreMLGPUHeavy, identity: repositoryID ?? CTAssets.identity)
             try configureForPlayback(directory)
             return
         }

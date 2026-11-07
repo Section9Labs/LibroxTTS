@@ -30,6 +30,8 @@ public actor NarrationRenderer {
     private var waiters: [CheckedContinuation<Void, Never>] = []
     private var kokoro: KokoroEngine?
     private var current: NarrationModel?
+    private var currentDirectory: URL?
+    private var currentRepositoryID: String?
     private let compactDirectory: URL
     private let harmonicSource: URL?
     private let logger = Logger(subsystem: "com.section9labs.Libros", category: "NarrationRenderer")
@@ -62,18 +64,23 @@ public actor NarrationRenderer {
         plusBackend = nil
         await kokoro?.unload()
         kokoro = nil
-        current = nil
+        current = nil; currentDirectory = nil; currentRepositoryID = nil
     }
 
     public func load(_ selection: NarrationModel, directory: URL,
-                     executionContext: ExecutionContext = .background) async throws {
+                     executionContext: ExecutionContext = .background, repositoryID: String? = nil) async throws {
         await acquire(); defer { release() }
         try Task.checkCancellation()
         guard selection.isEnabled else {
             throw RenderError.unavailable("Choose Basic, Plus or System voices in Listening settings.")
         }
         let backend: CTEngine.Backend = executionContext == .foreground ? .coreMLGPUHeavy : .coreMLCPU
-        if current == selection {
+        let directory = directory.standardizedFileURL
+        let repositoryID = repositoryID ?? NarrationAssets.repositoryID(selection)
+        guard NarrationAssets.compatibleRepositoryIDs(selection).contains(repositoryID) else {
+            throw RenderError.unavailable("This installed voice version is not supported by the current library.")
+        }
+        if current == selection, currentDirectory == directory, currentRepositoryID == repositoryID {
             if selection == .plus, plusBackend != backend, let plus {
                 do { try await plus.setBackend(backend); plusBackend = backend }
                 catch { await unloadHeld(); throw error }
@@ -82,10 +89,10 @@ public actor NarrationRenderer {
         }
         await unloadHeld()
         if selection == .plus {
-            let engine = CTEngine(directory: directory, backend: backend)
+            let engine = CTEngine(directory: directory, backend: backend, assetIdentity: repositoryID)
             try await engine.load()
             do { try Task.checkCancellation() } catch { await engine.unload(); throw error }
-            plus = engine; plusBackend = backend; current = selection
+            plus = engine; plusBackend = backend; current = selection; currentDirectory = directory; currentRepositoryID = repositoryID
             return
         }
         let started = Date()
@@ -105,7 +112,7 @@ public actor NarrationRenderer {
         do { try Task.checkCancellation() }
         catch { await engine.unload(); throw error }
         kokoro = engine
-        current = selection
+        current = selection; currentDirectory = directory; currentRepositoryID = repositoryID
         logger.notice("Narration model load completed in \(Date().timeIntervalSince(started), privacy: .public) seconds")
     }
 

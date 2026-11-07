@@ -13,6 +13,7 @@ public actor CTEngine {
         public var identity: String { "ct-fp32-general-" + rawValue + "-v2" }
     }
     private let directory: URL
+    private let assetIdentity: String
     /// Whole-passage decoding is retained for deterministic equivalence checks.
     public enum VocoderMode: Sendable { case bounded, wholePassage }
     private let vocoderMode: VocoderMode
@@ -46,8 +47,10 @@ public actor CTEngine {
     public enum TextContextDisposition: String, Sendable {
         case absent, identity, applied, rejected
     }
-    public init(directory: URL, backend: Backend = .coreMLCPU, vocoderMode: VocoderMode = .bounded) {
+    public init(directory: URL, backend: Backend = .coreMLCPU, vocoderMode: VocoderMode = .bounded,
+                assetIdentity: String = CTAssets.identity) {
         self.directory = directory; self.backend = backend; self.vocoderMode = vocoderMode
+        self.assetIdentity = assetIdentity
     }
     public func unload() { state = nil; activeBlend = nil }
     /// Foreground GPU and background CPU share the text models and styles.
@@ -70,7 +73,7 @@ public actor CTEngine {
         guard state == nil else { return }
         activeBlend = nil
         try Task.checkCancellation()
-        try CTAssets.validate(directory)
+        try CTAssets.validate(directory, identity: assetIdentity)
         var coreML: [String: CTCoreMLGraph] = [:]
         for name in ["duration_predictor", "text_encoder_early", "text_encoder", "vocoder"] {
             try Task.checkCancellation()
@@ -94,7 +97,8 @@ public actor CTEngine {
     /// Select pinned styles without reloading graphs. A blend is a deterministic
     /// interpolation of both conditioning tables, never a mix of rendered audio.
     public func setVoice(_ selected: String, blend: CTVoiceBlend? = nil) throws {
-        guard CTAssets.voiceStyles[selected] != nil else { throw CTError.unsupportedVoice }
+        guard CTAssets.voiceStyles[selected] != nil,
+              assetIdentity == CTAssets.identity || (selected == CTAssets.voiceID && blend == nil) else { throw CTError.unsupportedVoice }
         guard state != nil else { throw CTError.notLoaded }
         let blend = try blend?.validated(primaryVoiceID: selected)
         guard selected != voiceID || blend != activeBlend else { return }
@@ -163,7 +167,7 @@ public actor CTEngine {
         let early: MLFeatureValue
         var contextDisposition: TextContextDisposition = textContext == nil ? .absent : .rejected
         var preparedContext: (CTTextContext.Binding, [Int64])?
-        if let textContext, !completeSentence, activeBlend == nil,
+        if let textContext, !completeSentence, activeBlend == nil, assetIdentity == CTAssets.identity,
            let style = CTAssets.voiceStyles[self.voiceID],
            CTTextContext.validates(textContext, spokenText: text, language: language,
                modelFingerprint: try CTTextContext.modelFingerprint(), styleID: style),

@@ -22,6 +22,8 @@ public enum CTAssets {
     public static let identity = "librox-plus-dk-coreml-v2"
     public static let releaseTag = "plus-dk-coreml-preview-v2"
     public static let downloadBaseURL = "https://github.com/Section9Labs/LibroxTTS/releases/download/" + releaseTag + "/"
+    public static let releasedIdentity = "librox-plus-ct-f1-coremlgpu-v2"
+    public static let releasedTag = "plus-coreml-v2-2026-11-06"
     public static let coreMLIdentity = identity
     public static let voiceID = "dk-f1-v1"
     public static let styles = ["F1", "F2", "F3", "F4", "F5", "M1", "M2", "M3", "M4", "M5"]
@@ -38,15 +40,17 @@ public enum CTAssets {
         public let parameterCount: Int
         public let files: [File]
     }
-    public static func manifest() throws -> Manifest {
-        guard let url = Bundle.module.url(forResource: "CTCoreMLManifest", withExtension: "json") else {
+    public static func manifest(identity selected: String = identity) throws -> Manifest {
+        guard [identity, releasedIdentity].contains(selected) else { throw CTError.invalidAssets("unsupported asset identity") }
+        let resource = selected == identity ? "CTCoreMLManifest" : "CTReleasedManifest"
+        guard let url = Bundle.module.url(forResource: resource, withExtension: "json") else {
             throw CTError.invalidAssets("SDK manifest")
         }
         return try JSONDecoder().decode(Manifest.self, from: Data(contentsOf: url))
     }
     /// Trust the SDK's pinned hashes, never a manifest supplied beside downloaded models.
-    public static func validate(_ directory: URL) throws {
-        for file in try manifest().files {
+    public static func validate(_ directory: URL, identity: String = identity) throws {
+        for file in try manifest(identity: identity).files {
             try Task.checkCancellation()
             let url = directory.appendingPathComponent(file.path)
             guard try url.resourceValues(forKeys: [.fileSizeKey]).fileSize == file.bytes else {
@@ -66,8 +70,8 @@ public enum CTAssets {
     }
     /// Installation can pay the compiler cost before Play without retaining
     /// inference models. Later loads reuse this OS/source-specific disk cache.
-    public static func prepare(_ directory: URL, specializeFor backend: CTEngine.Backend? = nil) throws {
-        try validate(directory)
+    public static func prepare(_ directory: URL, specializeFor backend: CTEngine.Backend? = nil, identity: String = identity) throws {
+        try validate(directory, identity: identity)
         for name in ["duration_predictor", "text_encoder_early", "text_encoder", "vector_estimator", "vocoder"] {
             try Task.checkCancellation()
             _ = try CTCompiledModelCache.modelURL(for: directory.appendingPathComponent("coreml/\(name).mlpackage"))

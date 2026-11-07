@@ -38,3 +38,24 @@ app validation and release availability are recorded separately. Chinese remains
 Basic-only; Plus must report unsupported language rather than silently switching
 engines. Native regional dialects, IPA/stress equivalence and meaningful expression
 improvement still need a model-appropriate implementation and qualification.
+
+## Retained installation playback
+
+`NarrationAssets.compatibleRepositoryIDs` lists current DK then released CT F1.
+`manifest(_:repositoryID:)` pins each version independently. The old manifest is
+embedded from immutable SDK0.3.0; downloaded metadata cannot authorize a version.
+`NarrationRenderer.load(... repositoryID:)` validates and loads the requested
+installation. It compares directory and repository identity before its fast path,
+so a completed update can replace the old renderer on the next playback session.
+
+Snapshot the selected installation when planning a playback generation and pass
+that same identity to every load and prepared PCM key. Do not consult a newly
+activated default on every sentence. Keep an ongoing session on its original
+version; update activation takes effect when a new session is configured.
+
+The retained CT bank supports F1 only, without blending or new character presets.
+Do not silently replace a requested M/F voice with F1. `supportedNativeStyles`
+provides this boundary; saved preferences can stay saved while the UI explains
+that the additional voices require an update. `estimatedDownloadSize` is based
+on matching manifest hashes; actual reuse rehashes bytes. Keep the older receipt
+and files until a verified/prepared new version is atomically installed.
