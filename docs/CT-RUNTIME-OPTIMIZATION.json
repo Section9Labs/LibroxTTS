@@ -1,0 +1,109 @@
+{
+  "date": "2026-11-06",
+  "scope": "Separate optimized physical-device probe using unchanged assets. Full-app validation is separate. RSS and sampled footprint are different metrics. Prepared runs include a full-vocoder parity check: their peak memory is not a bounded-mode metric.",
+  "devices": {
+    "iphone": {
+      "baseline": {
+        "loadSeconds": 1.3108370304107666,
+        "peakPhysicalFootprintBytes": 1558695432,
+        "peakResidentBytes": 2174468096,
+        "postUnloadFootprintBytes": 386369880
+      },
+      "bounded": {
+        "loadSeconds": 1.0013569593429565,
+        "peakPhysicalFootprintBytes": 669698800,
+        "peakResidentBytes": 1448935424,
+        "postUnloadFootprintBytes": 331696568
+      },
+      "baselineRenderSeconds": [
+        17.952270984649658,
+        2.1281189918518066
+      ],
+      "boundedRenderSeconds": [
+        12.582563042640686,
+        2.1534459590911865
+      ],
+      "preparationSeconds": 21.868960976600647,
+      "preparedLoadSeconds": 0.9566490650177002,
+      "preparedRenderSeconds": [
+        2.0496020317077637,
+        1.8933959007263184
+      ],
+      "nativeEquivalence": [
+        {
+          "exact": true,
+          "maxError": 0,
+          "samples": 236544,
+          "snrDB": 999,
+          "unit": 0
+        },
+        {
+          "exact": true,
+          "maxError": 0,
+          "samples": 814080,
+          "snrDB": 999,
+          "unit": 1
+        }
+      ]
+    },
+    "ipad": {
+      "baseline": {
+        "loadSeconds": 1.5851389169692993,
+        "peakPhysicalFootprintBytes": 1567443416,
+        "peakResidentBytes": 1961148416,
+        "postUnloadFootprintBytes": 383386992
+      },
+      "bounded": {
+        "loadSeconds": 1.0526750087738037,
+        "peakPhysicalFootprintBytes": 772327152,
+        "peakResidentBytes": 1429471232,
+        "postUnloadFootprintBytes": 503301512
+      },
+      "baselineRenderSeconds": [
+        15.284376978874207,
+        1.665215015411377
+      ],
+      "boundedRenderSeconds": [
+        10.082105994224548,
+        1.501950979232788
+      ],
+      "preparationSeconds": 17.432713985443115,
+      "preparedLoadSeconds": 1.0647399425506592,
+      "preparedRenderSeconds": [
+        1.7346980571746826,
+        1.4823830127716064
+      ],
+      "nativeEquivalence": [
+        {
+          "exact": true,
+          "maxError": 0,
+          "samples": 236544,
+          "snrDB": 999,
+          "unit": 0
+        },
+        {
+          "exact": true,
+          "maxError": 0,
+          "samples": 814080,
+          "snrDB": 999,
+          "unit": 1
+        }
+      ]
+    }
+  },
+  "desktopCoreMLEquivalence": {
+    "backends": [
+      "CPU",
+      "GPUHeavy"
+    ],
+    "latentLengths": [
+      77,
+      113,
+      129,
+      265,
+      431
+    ],
+    "maximumAbsoluteError": 0.0
+  },
+  "modelWeightsChanged": false
+}

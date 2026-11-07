@@ -10,8 +10,11 @@ public struct BookNarrationUnit: Sendable {
     public let text: String
     public let range: NSRange
     public let voiceID: String
-    public let phonemes: String
+    public var phonemes: String
     public let boundaryAfter: NarrationBoundary
+    /// Prepared spoken words; source text/ranges remain untouched for highlighting.
+    public var spokenText: String? = nil
+    public var synthesisText: String { spokenText ?? text }
     public var expression: NarrationExpression = .neutral
     /// Present for the opt-in source-context plan. Does not select a render rate.
     public var prosody: NarrationProsody? = nil
@@ -213,7 +216,7 @@ public actor BookNarrationPlanner {
             }
         }
         var prepared = profile?.prepare(units) ?? units
-        if profile == .enhanced, delivery.expressive {
+        if delivery.expressive {
             for i in prepared.indices where !prepared[i].phonemes.isEmpty {
                 prepared[i].expressiveFocus = try NarrationExpressiveDelivery.focus(
                     text: prepared[i].text, sourceRange: prepared[i].range, phonemes: prepared[i].phonemes,

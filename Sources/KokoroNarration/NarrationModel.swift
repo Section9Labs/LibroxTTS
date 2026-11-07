@@ -1,4 +1,5 @@
 import Foundation
+import KokoroCatalog
 
 /// Stable, persisted selection. Eligibility never rewrites a user's choice.
 public enum NarrationModel: String, CaseIterable, Codable, Sendable, Identifiable {
@@ -25,10 +26,10 @@ public enum NarrationModel: String, CaseIterable, Codable, Sendable, Identifiabl
     public var requiresPlusAccess: Bool { self == .plus }
     public var usesPreparedCache: Bool { self == .kokoroDesktop || self == .plus }
     public var dependencies: [Self] { self == .kokoroDesktop ? [.compact] : [] }
-    public var outputSampleRate: Int { 24_000 }
+    public var outputSampleRate: Int { nativeSampleRate }
     public var nativeSampleRate: Int { self == .plus ? 44_100 : 24_000 }
     public var deliveryIdentity: String {
-        self == .plus ? "ct-f1-v2:full-coremlfp32:gain24:boundary-pauses:resample24-v1" : "profiled-narration-runtime-1"
+        self == .plus ? "ct-f1-delivery-v3:native44100:source-boundaries:native-dynamics" : "profiled-narration-runtime-1"
     }
     public func renderIdentity(for unit: BookNarrationUnit) -> String {
         self == .plus ? deliveryIdentity : deliveryProfile.renderIdentity(for: unit)
@@ -39,8 +40,18 @@ public enum NarrationModel: String, CaseIterable, Codable, Sendable, Identifiabl
         public let language: String
     }
     public var nativeVoices: [NativeVoice] {
-        self == .plus ? [.init(id: "plus-f1-en-v1", name: "F1 · English", language: "en"),
-                        .init(id: "plus-f1-es-v1", name: "F1 · Español", language: "es")] : []
+        self == .plus ? supportedLanguageCodes.map {
+            .init(id: "plus-f1-\($0)-v1", name: "F1 · " + NarrationLanguage.name($0), language: $0)
+        } : []
+    }
+    public var supportedLanguageCodes: [String] {
+        self == .plus ? NarrationLanguage.textNativeCodes : Language.allCases.map(\.rawValue)
+    }
+    public func resolvedVoiceID(_ preferred: String?, language: String) -> String? {
+        guard let language = NarrationLanguage.normalize(language), supportedLanguageCodes.contains(language) else { return nil }
+        if self == .plus { return nativeVoices.first { $0.language == language }?.id }
+        if let preferred, let voice = Voice.named(preferred), voice.language.rawValue == language { return preferred }
+        return Language(rawValue: language).map { Voice.preferred(for: $0).id }
     }
     public var requiresPreparation: Bool { self == .qwenDesktop }
     public var detail: String {
@@ -48,7 +59,7 @@ public enum NarrationModel: String, CaseIterable, Codable, Sendable, Identifiabl
         case .compact: "Small download · Listen immediately"
         case .enhanced: "Richer narration · On-device listening"
         case .kokoroDesktop: "On-device listening"
-        case .plus: "F1 narrator · English and Spanish"
+        case .plus: "F1 narrator · 31 languages"
         case .qwenDesktop: "Expressive narration · Prepare chapters before listening"
         }
     }

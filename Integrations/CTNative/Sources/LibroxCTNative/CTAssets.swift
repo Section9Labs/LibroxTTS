@@ -8,7 +8,7 @@ public enum CTError: Error, LocalizedError, Sendable {
         switch self {
         case .invalidAssets(let file): "Plus voice assets failed verification: \(file)."
         case .invalidTensor(let name): "Plus produced an incompatible tensor: \(name)."
-        case .unsupportedLanguage: "Plus currently supports English and Spanish."
+        case .unsupportedLanguage: "This language is not supported by the Plus narrator."
         case .unsupportedVoice: "Choose the Plus F1 narrator. Existing voice selections are not interchangeable."
         case .emptyText: "There is no speakable text in this passage."
         case .passageTooLong: "This passage exceeds the Plus narrator's bounded capacity."
@@ -64,11 +64,23 @@ public enum CTAssets {
     }
     /// Installation can pay the compiler cost before Play without retaining
     /// inference models. Later loads reuse this OS/source-specific disk cache.
-    public static func prepare(_ directory: URL) throws {
+    public static func prepare(_ directory: URL, specializeFor backend: CTEngine.Backend? = nil) throws {
         try validate(directory)
         for name in ["duration_predictor", "text_encoder_early", "text_encoder", "vector_estimator", "vocoder"] {
             try Task.checkCancellation()
             _ = try CTCompiledModelCache.modelURL(for: directory.appendingPathComponent("coreml/\(name).mlpackage"))
+        }
+        if let backend {
+            // Loading pays Core ML's persistent hardware-specialization cost.
+            // Retire each function before loading the next; no prediction or
+            // audio session is started and no model stays resident afterward.
+            for length in [64, 192, 320, 400] {
+                try Task.checkCancellation()
+                try autoreleasepool {
+                    _ = try CTCoreMLGraph(package: directory.appendingPathComponent("coreml/vector_estimator.mlpackage"),
+                        backend: backend, functionName: CTGenerator.functionName(for: length))
+                }
+            }
         }
     }
     /// An atomic, version-specific installation. An existing corrupt install is reported,

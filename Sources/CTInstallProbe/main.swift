@@ -26,7 +26,9 @@ import LibroxCTNative
         var rows: [[String: Any]] = []
         for (text, voice) in [("The book was waiting where she had left it.", "plus-f1-en-v1"),
                               ("El libro estaba donde lo había dejado.", "plus-f1-es-v1")] {
-            for unit in try TextNativeNarrationPlanner.plan(text, voiceID: voice) {
+            let plan = try await NarrationPipeline().plan(text, model: .plus, bookID: "install-probe",
+                chapterID: "0", narratorVoiceID: voice)
+            for unit in plan.units {
                 let start = Date()
                 let audio = try await renderer.render(unit)
                 guard !audio.isEmpty && audio.allSatisfy({ $0.isFinite && abs($0) <= 1 }) else { throw CTError.invalidAudio }

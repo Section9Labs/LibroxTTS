@@ -1,6 +1,6 @@
 # LibroxTTS
 
-Offline speech synthesis and book narration for iPhone, iPad and Mac. **Librox Plus uses the official Core ML v2 CT F1 runtime**, with English and Spanish narration and GPU acceleration for foreground inference. The existing Kokoro renderer provides 54 voices across eight languages. Neither renderer needs Python, ONNX Runtime, MLX or eSpeak at runtime.
+Offline speech synthesis and book narration for iPhone, iPad and Mac. **Librox Plus uses the official Core ML v2 CT F1 runtime**, with a 31-language native-text adapter and GPU acceleration for foreground inference. The existing Kokoro renderer provides 54 voices across eight languages. Neither renderer needs Python, ONNX Runtime, MLX or eSpeak at runtime.
 
 [![Swift](https://github.com/Section9Labs/LibroxTTS/actions/workflows/swift.yml/badge.svg)](https://github.com/Section9Labs/LibroxTTS/actions/workflows/swift.yml)
 
@@ -9,7 +9,7 @@ Offline speech synthesis and book narration for iPhone, iPad and Mac. **Librox P
 Add the versioned Swift package:
 
 ```swift
-.package(url: "https://github.com/Section9Labs/LibroxTTS.git", exact: "0.2.1")
+.package(url: "https://github.com/Section9Labs/LibroxTTS.git", exact: "0.3.0")
 ```
 
 Products include `LibroxTTS` (host-facing synthesis/install API), `LibroxCTNative` (Core ML CT runtime), `KokoroCatalog` (Kokoro voices/assets), and `KokoroPronunciation` (Kokoro text to model phonemes). There are no remote Swift dependencies. Swift 6, **iOS/Catalyst 18+ or macOS 15+** are required. Apple system language facilities are required, so Linux is not supported.
@@ -17,6 +17,8 @@ Products include `LibroxTTS` (host-facing synthesis/install API), `LibroxCTNativ
 `KokoroNarration` provides book planning and persistent cast metadata; `KokoroAudio` provides bounded voice enhancement. The historical v0.1.0 tag uses the old module name and does not include this API. Existing `KokoroEngine` defaults are preserved; applications select Plus explicitly.
 
 See [the narrator integration API](docs/book-planning.md), [casting rules](docs/story-narrator.md), and [enhancement API and validation limits](docs/audio-enhancement.md). The optional, separately imported `QwenANE` product retains the Qwen renderer work; its existence does not establish device eligibility or sustained background performance. No MLX dependency is added to these library products. Rejected model auditions are not app dependencies.
+
+Version 0.3.0 ships the [shared narration pipeline](docs/UNIFIED-NARRATION.md), accepted CT passage delivery and bounded-vocoder runtime. Read the [0.3.0 app upgrade guide](docs/UPGRADE-0.3.0.md) for sample-rate, cache and model-download migration. Existing verified Core ML v2 weights are reused.
 
 ## Speak with Plus
 
@@ -31,9 +33,12 @@ try await NarrationAssets.download(.plus, to: directory)
 
 let renderer = NarrationRenderer(compactDirectory: directory, harmonicSource: nil)
 try await renderer.load(.plus, directory: directory, executionContext: .foreground)
-for passage in try TextNativeNarrationPlanner.plan(
-    "The book was waiting where she had left it.", voiceID: "plus-f1-en-v1") {
-    let samples = try await renderer.render(passage) // mono Float32, 24 kHz
+let plan = try await NarrationPipeline().plan(
+    "The book was waiting where she had left it.", model: .plus,
+    bookID: "example", chapterID: "1", narratorVoiceID: nil,
+    metadataLanguage: "en")
+for passage in plan.units {
+    let samples = try await renderer.render(passage) // mono Float32; model.outputSampleRate
     // Queue samples in your application's player before rendering more.
 }
 await renderer.unload()

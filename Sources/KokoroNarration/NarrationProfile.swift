@@ -24,7 +24,8 @@ public enum NarrationProfile: String, Codable, Sendable, CaseIterable {
         self == .enhanced ? NarrationStylePolicy.length.row(phonemeCount: unit.phonemes.unicodeScalars.count) : 158
     }
     public func focus(for unit: BookNarrationUnit) -> [NarrationFocus] {
-        self == .enhanced ? Array((EnhancedNarrationDelivery.focus(for: unit) + unit.expressiveFocus).prefix(16)) : []
+        let native = self == .enhanced ? EnhancedNarrationDelivery.focus(for: unit) : []
+        return Array((native + unit.expressiveFocus).prefix(16))
     }
     public func speed(for unit: BookNarrationUnit) -> Float {
         self == .enhanced ? 1 : unit.expression.speedMultiplier
