@@ -152,6 +152,37 @@ struct AllLanguageNarrationTests {
         }
     }
 
+    @Test(arguments: cases)
+    func decoratedAndDecomposedTagsKeepOriginalRanges(_ fixture: (String, String, String, String, String)) async throws {
+        let (language, name, prefix, open, close) = fixture
+        let sample = try #require(NarrationLanguage.sampleText(language))
+        let plain = prefix + open + "XYZ 42. " + sample + close + " " + sample
+        let sources = [plain.decomposedStringWithCanonicalMapping, "🌙 " + plain,
+                       ("🌙 " + plain).decomposedStringWithCanonicalMapping]
+        for source in sources {
+            let narrator = "plus-f1-\(language)-v1"
+            let plan = try await NarrationPipeline().plan(source, model: .plus, bookID: "unicode", chapterID: "one",
+                narratorVoiceID: narrator, language: language, characterVoices: true)
+            #expect(plan.cast?.characters.first?.name == name, "Missing speaker for \(language): \(source)")
+            #expect(plan.units.contains { $0.role == .dialogue && $0.voiceID != narrator })
+            for unit in plan.units {
+                #expect(unit.text == (source as NSString).substring(with: unit.range))
+            }
+        }
+    }
+
+    @Test(arguments: cases.filter { !["en", "es"].contains($0.0) })
+    func decorationsDoNotSkipPrecedingWords(_ fixture: (String, String, String, String, String)) async throws {
+        let (language, _, prefix, open, close) = fixture
+        let sample = try #require(NarrationLanguage.sampleText(language))
+        let source = "🌙 uncertain " + prefix + open + sample + close
+        let narrator = "plus-f1-\(language)-v1"
+        let plan = try await NarrationPipeline().plan(source, model: .plus, bookID: "abstention", chapterID: "one",
+            narratorVoiceID: narrator, language: language, characterVoices: true)
+        #expect(plan.cast?.characters.isEmpty == true)
+        #expect(plan.units.allSatisfy { $0.voiceID == narrator })
+    }
+
     @Test func oldCastLanguageEncodingRemainsAString() throws {
         let cast = try BookVoiceCast(bookID: "old", language: .english, narratorVoiceID: "af_heart", voicePool: [])
         let json = try #require(JSONSerialization.jsonObject(with: cast.encoded()) as? [String: Any])

@@ -55,10 +55,13 @@ enum MultilingualSpeakerAttribution {
             let name = #"(?<name>"# + word + (uncased ? "" : "(?:[ \\t]+" + word + "){0,2}") + ")"
             let verb = "(?i:" + profile.reportingVerbs.sorted { $0.count > $1.count }
                 .map(NSRegularExpression.escapedPattern(for:)).joined(separator: "|") + ")"
-            let boundary = #"(?:^|[.!?。！？؛][ \t]*)"#
+            // Decorative symbols may precede a tag at the start of a line.
+            // Never skip words: doing so could discard negation or ambiguity.
+            let lineStart = #"^[\p{S}\p{M}\x{200D} \t]*"#
+            let boundary = "(?:" + lineStart + #"|[.!?。！？؛][ \t]*)"#
             let colon = #"[ \t]*[:：,，][ \t]*$"#
             let ending = #"(?=$|[ \t.,;:!?。！？،؛])"#
-            var prefix = [#"^[ \t]*"# + name + #"[ \t]*[:：][ \t]*$"#]
+            var prefix = [lineStart + name + #"[ \t]*[:：][ \t]*$"#]
             var suffix: [String] = []
             switch language {
             case "ja":
@@ -86,6 +89,9 @@ enum MultilingualSpeakerAttribution {
             suffixes = try suffix.map { try NSRegularExpression(pattern: $0) }
         }
         private func tag(_ patterns: [NSRegularExpression], _ text: String, suffix: Bool) -> Tag? {
+            // Match canonical text locally; quote offsets and spoken source stay
+            // in the original passage, so decomposed accents cannot shift ranges.
+            let text = text.precomposedStringWithCanonicalMapping
             let ns = text as NSString
             for pattern in patterns {
                 guard let match = pattern.firstMatch(in: text, range: NSRange(location: 0, length: ns.length)) else { continue }
