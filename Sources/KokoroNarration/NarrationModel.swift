@@ -1,5 +1,6 @@
 import Foundation
 import KokoroCatalog
+import LibroxCTNative
 
 /// Stable, persisted selection. Eligibility never rewrites a user's choice.
 public enum NarrationModel: String, CaseIterable, Codable, Sendable, Identifiable {
@@ -23,6 +24,15 @@ public enum NarrationModel: String, CaseIterable, Codable, Sendable, Identifiabl
     public var supportedSelection: Self { isEnabled ? self : .compact }
     public var usesTextNativePlanning: Bool { self == .plus }
     public var supportsCharacterVoices: Bool { self == .compact || self == .kokoroDesktop || self == .plus }
+    public var supportsExpressiveDelivery: Bool { self == .compact || self == .kokoroDesktop }
+    public var supportsVoiceBlending: Bool { self == .kokoroDesktop }
+    public var supportsPronunciationDialect: Bool { self == .compact || self == .kokoroDesktop }
+    /// Unsupported saved controls remain saved by the host, but must not create
+    /// a different preparation/cache request for identical native audio.
+    public func resolvedDeliveryOptions(_ options: NarrationDeliveryOptions) -> NarrationDeliveryOptions {
+        .init(expressive: supportsExpressiveDelivery && options.expressive,
+              blendedVoice: supportsVoiceBlending && options.blendedVoice)
+    }
     public var requiresPlusAccess: Bool { self == .plus }
     public var usesPreparedCache: Bool { self == .kokoroDesktop || self == .plus }
     public var dependencies: [Self] { self == .kokoroDesktop ? [.compact] : [] }
@@ -42,7 +52,7 @@ public enum NarrationModel: String, CaseIterable, Codable, Sendable, Identifiabl
         public var engineVoiceID: String { "dk-" + styleID.lowercased() + "-v1" }
     }
     public var nativeVoices: [NativeVoice] {
-        self == .plus ? ["F1", "M1"].flatMap { style in
+        self == .plus ? CTAssets.styles.flatMap { style in
             supportedLanguageCodes.map { language in
                 NativeVoice(id: "plus-\(style.lowercased())-\(language)-v1",
                     name: style + " · " + NarrationLanguage.name(language), language: language, styleID: style)
@@ -67,7 +77,7 @@ public enum NarrationModel: String, CaseIterable, Codable, Sendable, Identifiabl
         case .compact: "Small download · Listen immediately"
         case .enhanced: "Richer narration · On-device listening"
         case .kokoroDesktop: "On-device listening"
-        case .plus: "F1 and M1 · 31 languages"
+        case .plus: "10 voices · 31 languages"
         case .qwenDesktop: "Expressive narration · Prepare chapters before listening"
         }
     }

@@ -10,7 +10,7 @@ import LibroxCTNative
     // DK is a local listening candidate. Do not advertise its reserved URLs
     // as downloadable until the assets are published and release-qualified.
     #expect(!NarrationAssets.isDownloadPublished(.plus))
-    #expect(native.identity == "librox-plus-dk-coreml-v1")
+    #expect(native.identity == "librox-plus-dk-coreml-v2")
     #expect(manifest.revision == CTAssets.releaseTag)
     #expect(manifest.downloadSize > 400_000_000 && manifest.downloadSize < 500_000_000)
     #expect(manifest.files.count == native.files.count)
@@ -27,6 +27,10 @@ import LibroxCTNative
     #expect(manifest.files.contains { $0.path == "licenses/MODIFICATIONS.md" })
     #expect(manifest.files.contains { $0.path == "voice_styles/F1.json" })
     #expect(manifest.files.contains { $0.path == "voice_styles/M1.json" })
+    for style in CTAssets.styles {
+        #expect(manifest.files.contains { $0.path == "voice_styles/\(style).json" })
+    }
+    #expect(native.parameterCount == CTAssets.parameterCount)
     #expect(CTAttribution.modelLicense.contains("Attachment A"))
     #expect(CTAttribution.modifications.contains("modified derivative"))
     #expect(KokoroAttribution.text.contains(CTAttribution.modelLicense))
