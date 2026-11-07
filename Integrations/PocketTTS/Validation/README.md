@@ -1,5 +1,10 @@
 # Native migration validation — 2026-11-07
 
+The initial measurements below used the 25-voice development pack. The SDK beta
+release supersedes it with a 23-voice v2 pack after withholding Juergen/Rafael
+whose source-recording rights were undocumented. Retained tensors are identical;
+see `sdk-beta3-release.json` for the final catalog, pack and release validation.
+
 Host: Mac15,14, Apple M3 Ultra, 256 GiB RAM. Swift 6.4/Xcode 27 toolchain.
 This is developer-machine evidence, not phone or minimum-Mac qualification.
 

@@ -9,7 +9,7 @@ TEXTS={
 'it':'La biblioteca era silenziosa. Oltre la finestra, la pioggia cadeva dolcemente. Chiuse il libro e si mise ad ascoltare.',
 'pt':'A biblioteca estava silenciosa. Do outro lado da janela, a chuva caía suavemente. Ela fechou o livro e ficou a ouvir.',
 'nl':'Het was stil in de bibliotheek. Buiten het raam viel de regen zachtjes. Ze sloot het boek en luisterde.'}
-VOICES=dict(en='alba',es='lola',fr='estelle',de='juergen',it='giovanni',pt='rafael',nl='daan')
+VOICES=dict(en='alba',es='lola',fr='estelle',de='alba',it='giovanni',pt='alba',nl='daan')
 def main():
     p=argparse.ArgumentParser();p.add_argument('--probe',required=True);p.add_argument('--assets',required=True);p.add_argument('--output',type=pathlib.Path,required=True);a=p.parse_args();a.output.mkdir(parents=True,exist_ok=True)
     report=[]

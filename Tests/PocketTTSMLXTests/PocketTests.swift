@@ -3,8 +3,26 @@ import KokoroCatalog
 @testable import PocketTTSMLX
 @Test func catalogSeparatesLanguages() {
     #expect(PocketTTSCatalog.languages.count == 7)
-    #expect(Set(PocketTTSCatalog.voices.map(\.id)).count == 175)
+    #expect(Set(PocketTTSCatalog.voices.map(\.id)).count == 161)
     #expect(PocketTTSCatalog.voice(id: "pocket-lola-es-v1")?.language == "es")
+}
+
+@Test func pocketDistributionOnlyIncludesReviewedRecordingSources() throws {
+    let excluded = ["cosette", "jean", "juergen", "rafael"]
+    for language in PocketTTSCatalog.languages {
+        let manifest = try PocketTTSCatalog.manifest(language: language)
+        let names = Set(manifest.files.filter { $0.path.contains("/embeddings/") }
+            .map { URL(fileURLWithPath: $0.path).deletingPathExtension().lastPathComponent })
+        #expect(names == Set(PocketTTSCatalog.voiceNames))
+        #expect(manifest.revision == PocketTTSCatalog.identity)
+        #expect(names.contains(try #require(PocketTTSCatalog.defaultVoices[language])))
+        for name in excluded {
+            #expect(PocketTTSCatalog.voice(id: "pocket-\(name)-\(language)-v1") == nil)
+            #expect(NarrationModel.pocket.resolvedVoiceID("pocket-\(name)-\(language)-v1", language: language) == nil)
+        }
+    }
+    #expect(PocketTTSCatalog.voice(id: "pocket-alba-en-v1")?.sourceRecordingLicense == "CC-BY-4.0")
+    #expect(PocketTTSCatalog.voice(id: "pocket-lola-es-v1")?.sourceRecordingLicense == "CC0-1.0")
 }
 
 import Foundation
@@ -92,10 +110,10 @@ func referenceLatents() throws {
     let env = ProcessInfo.processInfo.environment
     if let path = env["POCKET_METALLIB"] { GPU.metallib = URL(fileURLWithPath: path) }
     let code = env["POCKET_LANGUAGE"] ?? "en"
-    let voice = PocketTTSCatalog.defaultVoices[code]!
     let assets = URL(fileURLWithPath: env["POCKET_ASSETS"]!)
     let ref = URL(fileURLWithPath: env["POCKET_REFERENCE"]!)
     let report = try JSONSerialization.jsonObject(with: Data(contentsOf: ref.appendingPathComponent("reference.json"))) as! [String: Any]
+    let voice = env["POCKET_VOICE"] ?? (report["voice"] as? String) ?? PocketTTSCatalog.defaultVoices[code]!
     let model = try PocketTTSModel.fromModelDirectory(assets.appendingPathComponent(code))
     model.temp = 0
     let tokenizer = model.flow_lm.conditioner.tokenizer

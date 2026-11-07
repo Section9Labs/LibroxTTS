@@ -11,7 +11,7 @@ Original Section9Labs contributions: **Apache-2.0 OR MIT**. Upstream components 
 | `Sources/KokoroKit/Resources/vocab.json`, `Scripts/ModelExport/backend.py` | Apache-2.0, Kokoro |
 | `Benchmarks/Narration/vendor/**`, `Benchmarks/Narration/frontend.py` | Apache-2.0, Jud/kokoro-coreml and hexgrad/kokoro benchmark adapters; see vendor README |
 | `Licenses/**`, notices and quoted license text | Original upstream terms and ownership |
-| Downloaded weights and voice embeddings | Separate Apache-2.0 model distribution; not covered by our MIT option |
+| Downloaded weights and voice embeddings | Model-specific terms: Kokoro Apache-2.0, Plus Open RAIL-M, Pocket CC BY 4.0 plus recording-source terms; not covered by our MIT option |
 | Other original code, tests and documentation | Apache-2.0 OR MIT |
 
 # Third-party notices
@@ -235,3 +235,5 @@ components adapted from MLX Audio Swift (MIT, Prince Canuma). See
 Hosted language packs retain Kyutai attribution and per-voice source credits.
 Cosette/Expresso and Jean/EARS are excluded from the commercial preset catalog.
 MLX Swift and its transitive dependencies retain their own licenses.
+
+Pocket source recordings are inventoried in [VOICE-LICENSES.md](Integrations/PocketTTS/VOICE-LICENSES.md). The SDK release retains 23 presets with CC BY 4.0 or CC0 source declarations; Cosette/Jean (noncommercial) and Juergen/Rafael (source rights undocumented) are excluded. Model weights and distributed voice states retain Kyutai attribution regardless of the recording license.

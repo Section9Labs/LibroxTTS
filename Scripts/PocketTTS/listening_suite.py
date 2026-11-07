@@ -103,7 +103,7 @@ def main():
                     rows.append(row)
                     print(f'{len(rows):3}: {clip_id}  {row["duration"]:.2f}s / {len(row["chunks"])} chunks', flush=True)
     manifest = dict(title='PocketTTS quality-first narrator auditions', version=2, baselineSamplerSteps=4,
-                    assetRelease='pocket-tts-mlx-2026-11-07', probeSHA256=binary_hash,
+                    assetRelease='pocket-tts-mlx-2026-11-07-v2', probeSHA256=binary_hash,
                     baseCommit=subprocess.check_output(['git','rev-parse','HEAD'], text=True).strip(),
                     sourceDiffSHA256=hashlib.sha256(subprocess.check_output(['git','diff','HEAD'])).hexdigest(),
                     generated=time.strftime('%Y-%m-%dT%H:%M:%S%z'), samples=rows,

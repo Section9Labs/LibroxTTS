@@ -39,5 +39,5 @@ hook=model.flow_lm.register_forward_hook(record)
 t=time.monotonic();audio=model.generate_audio(voice,a.text,teacher_force_previous_chunk=True)
 scipy.io.wavfile.write(a.output/'reference.wav',model.sample_rate,audio.numpy())
 save_file(trace,a.output/'trace.safetensors')
-report={'text':a.text,'tokens':model.flow_lm.conditioner.tokenizer.encode(a.text),'chunks':split_into_best_sentences(model.flow_lm.conditioner.tokenizer,a.text,25,False,cfg.get('remove_semicolons',False),replace_characters=cfg.get('replace_characters')),'sample_count':audio.numel(),'seconds':time.monotonic()-t}
+report={'voice':a.voice,'text':a.text,'tokens':model.flow_lm.conditioner.tokenizer.encode(a.text),'chunks':split_into_best_sentences(model.flow_lm.conditioner.tokenizer,a.text,25,False,cfg.get('remove_semicolons',False),replace_characters=cfg.get('replace_characters')),'sample_count':audio.numel(),'seconds':time.monotonic()-t}
 (a.output/'reference.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n');print(report)

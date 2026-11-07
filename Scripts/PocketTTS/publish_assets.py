@@ -8,7 +8,7 @@ def gh(*args):
  return subprocess.check_output(['gh',*args],text=True)
 def main():
  p=argparse.ArgumentParser();p.add_argument('--assets',type=pathlib.Path,required=True);p.add_argument('--manifests',type=pathlib.Path,required=True);p.add_argument('--commit',required=True);p.add_argument('--notes',type=pathlib.Path,required=True);p.add_argument('--publish',action='store_true');a=p.parse_args()
- repo='Section9Labs/LibroxTTS';tag='pocket-tts-mlx-2026-11-07'
+ repo='Section9Labs/LibroxTTS';tag='pocket-tts-mlx-2026-11-07-v2'
  files=[f for path in sorted(a.manifests.glob('*.json')) for f in json.loads(path.read_text())['files']]
  if len(files)!=len({f['path'] for f in files}):raise ValueError('Duplicate asset paths')
  for f in files:

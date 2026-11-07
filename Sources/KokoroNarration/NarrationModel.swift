@@ -92,7 +92,7 @@ public enum NarrationModel: String, CaseIterable, Codable, Sendable, Identifiabl
         case .compact: "Small download · Listen immediately"
         case .enhanced: "Richer narration · On-device listening"
         case .kokoroDesktop: "On-device listening"
-        case .pocket: "25 voices · 7 languages · Foreground preparation"
+        case .pocket: "23 voices · 7 languages · Foreground preparation"
         case .plus: "10 voices · 31 languages"
         case .qwenDesktop: "Expressive narration · Prepare chapters before listening"
         }

@@ -11,7 +11,7 @@ rendering and prepared-audio identities. It does not change Librox app defaults 
 ship an app update. MLX is now a pinned package dependency; existing Basic/Plus
 inference still uses their own renderers.
 
-[Hosted language packs](https://github.com/Section9Labs/LibroxTTS/releases/tag/pocket-tts-mlx-2026-11-07)
+[Hosted language packs](https://github.com/Section9Labs/LibroxTTS/releases/tag/pocket-tts-mlx-2026-11-07-v2)
 are published as an asset prerelease. The SDK integration remains on the
 `codex/pocket-tts` branch; the asset tag is not an SDK version tag.
 
@@ -21,13 +21,13 @@ are published as an asset prerelease. The SDK integration remains on the
 | --- | --- | --- |
 | English | `en` | Alba |
 | French | `fr` | Estelle |
-| German | `de` | Juergen |
-| Portuguese | `pt` | Rafael |
+| German | `de` | Alba (cross-language; audition first) |
+| Portuguese | `pt` | Alba (cross-language; audition first) |
 | Italian | `it` | Giovanni |
 | Spanish | `es` | Lola |
 | Dutch | `nl` | Daan |
 
-Each pack exposes 25 names (175 stable language/voice IDs). A language selects a
+Each pack exposes 23 names (161 stable language/voice IDs). A language selects a
 separate checkpoint/tokenizer; changing a voice does not turn an English model
 into a multilingual model. IDs look like `pocket-alba-en-v1` and
 `pocket-lola-es-v1`. Cross-language voice identity is available through the supplied
@@ -36,7 +36,8 @@ attribution remains limited to the languages supported by Librox's attribution
 layer. Pocket voice genders are unspecified rather than guessed from names.
 
 The unfiltered upstream catalog has 27 voices. We omit Cosette and Jean because
-of their noncommercial recording licenses. Model weights are CC BY 4.0; code is
+of their noncommercial recording licenses. Juergen and Rafael are also withheld because
+their source-recording licenses are not documented. See the [per-voice license inventory](VOICE-LICENSES.md). Model weights are CC BY 4.0; code is
 MIT. See [provenance and credits](PROVENANCE.md).
 
 ## Integration
@@ -44,8 +45,8 @@ MIT. See [provenance and credits](PROVENANCE.md).
 ```swift
 import LibroxTTS
 
-// Explicit optional foreground download. One language is about 372 MB;
-// omitting language installs all seven (about 2.60 GB).
+// Explicit optional foreground download. One language is about 360 MB;
+// omitting language installs all seven (about 2.52 GB).
 try await NarrationAssets.download(.pocket, to: modelDirectory, language: "es")
 
 let plan = try await NarrationPipeline().plan(

@@ -45,7 +45,12 @@ voice contributors, link to the upstream model and CC BY 4.0 license, and state
 that execution was ported to Swift MLX. Voice source licenses are independent of
 the model license; consult [Kyutai's voice credits](https://huggingface.co/kyutai/tts-voices).
 **Cosette (Expresso) and Jean (EARS) are excluded** because their source recordings
-are CC BY-NC 4.0. Their IDs are rejected rather than substituted silently.
+are CC BY-NC 4.0. Juergen and Rafael are also withheld because Kyutai does not document the
+licenses of their source recordings. These four IDs are rejected rather than
+substituted silently. German and Portuguese default to Alba for new selections.
+The release has 23 voices (161 language/voice IDs). See [the license inventory](VOICE-LICENSES.md).
+The initial 25-voice development pack and its validation evidence remain historical;
+the SDK release uses the superseding `pocket-tts-mlx-2026-11-07-v2` pack.
 
 This port's hosted presets do not enable arbitrary reference-audio cloning.
 Kyutai's separate cloning-enabled distribution has an access/consent gate; it is

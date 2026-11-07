@@ -1,9 +1,15 @@
 Pocket TTS model packs for the LibroxTTS native Swift MLX integration.
 
 Seven optional packs: English (current October 2026 default), French, German,
-Portuguese, Italian, Spanish and Dutch. Each contains 25 preset voice states,
+Portuguese, Italian, Spanish and Dutch. Each contains 23 preset voice states,
 a tokenizer, current configuration, weights and attribution. Cosette and Jean
-are excluded because their source recordings are noncommercial.
+are excluded because their source recordings are noncommercial. Juergen and Rafael
+are withheld because their recording licenses are not documented. German and
+Portuguese default to Alba; all retained presets have states for all seven languages.
+
+This v2 pack supersedes the initial development pack. Voice credits now include
+source recording licenses, attribution and evidence URLs. Existing weights and
+retained voice states are byte-identical.
 
 These assets require the Pocket TTS SDK integration; they do not replace Plus
 assets or change any user's selected model. GPU inference is a Mac development

@@ -16,7 +16,7 @@ jobs:
       - name: Release tests
         run: swift test -c release
       - name: Compile benchmark Python scripts
-        run: python3 -m compileall -q Benchmarks/Narration
+        run: python3 -m compileall -q Benchmarks/Narration Scripts/PocketTTS
       - name: Install XcodeGen
         run: brew install xcodegen
       - name: Generate iOS example
