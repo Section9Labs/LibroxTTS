@@ -1,6 +1,6 @@
 {
-  "sdkDependency": "e7cfed982ce94e75d2ad4c665e9f801cc3afa06e",
-  "mergedRuntimeCommit": "c76cf0405b63981b3923507d1dde07aba2dc1bb9",
+  "sdkDependency": "6a9d3e27259213a5931a62de3f3d50aa6e39f1b7",
+  "mergedRuntimeCommit": "f551ae4a65438a15a73aa72c20e967174820cf10",
   "languages": [
     "en",
     "es",
@@ -35,20 +35,16 @@
     "ko"
   ],
   "matrixTests": 4,
-  "matrixCases": 124,
-  "narrationRegressionTests": 167,
+  "matrixCases": 186,
+  "narrationRegressionTests": 169,
   "status": "passed",
   "testSource": "Tests/KokoroNarrationTests/NarrationTextContextLanguageTests.swift",
-  "testSourceSHA256": "3a754428b0cb2280066b6a1fe069749501be0449dd9333ca2564d541471a22e2",
+  "testSourceSHA256": "9728a7686caa6667c067d053eb35ace20e9e72551b42be48e5631647bd4877f1",
   "tokenizerTableSHA256": "9bf7346e43883a81f8645c81224f786d43c5b57f3641f6e7671a7d6c493cb24f",
   "logs": [
     {
-      "path": "/tmp/librox-context-all-languages-tests.log",
-      "sha256": "a7f01bf2284b125e08f4ffa03ac4201a6bd64b9ea3b3b8729b37659268fa7af8"
-    },
-    {
-      "path": "/tmp/librox-context-all-languages-regression.log",
-      "sha256": "4e3cc20c2aee3d13afa30064728540ec49beaee8ede5c338446c24737ecd5481"
+      "path": "/tmp/librox-context-prefix-fix-regression.log",
+      "sha256": "7c2757e0e972830794606c3d06fc13fadfdcbd02c8afb9ad1bf28820399d6247"
     }
   ],
   "scope": "Prepared-text alignment and actual pinned tokenizer IDs only; no model inference or new language listening acceptance.",
@@ -59,7 +55,24 @@
   "upstreamBoundary": {
     "scope": "Combined decorated and decomposed reporting-prefix stress case",
     "recipe": "('🌙 ' + prefix + open + 'XYZ 42. ' + sample + close + ' ' + sample).decomposedStringWithCanonicalMapping using AllLanguageNarrationTests.cases and sampleText(language)",
-    "observation": "No dialogue units in29 of31 cases before binder invocation; EN/ES succeeded.",
-    "action": "Reported to SDK owner; no parser modifications in this worktree. Standard supported reporting tags retained for the binder matrix; Unicode stress remains inside dialogue."
+    "observation": "The exact combined stress reproducer now reaches dialogue binding and preserves exact normalized tokens and production token IDs in all 31 languages.",
+    "action": "Merged SDK fix; matrix retains the prior speech-only stress cases and adds the exact decorated/decomposed reporting-prefix variant.",
+    "status": "resolved",
+    "fixCommit": "6a9d3e27259213a5931a62de3f3d50aa6e39f1b7"
+  },
+  "previousValidation": {
+    "sourceCommit": "c0ff23ef185da3698709692dd4a14b839c0cbe50",
+    "matrixCases": 124,
+    "narrationRegressionTests": 167,
+    "logs": [
+      {
+        "path": "/tmp/librox-context-all-languages-tests.log",
+        "sha256": "a7f01bf2284b125e08f4ffa03ac4201a6bd64b9ea3b3b8729b37659268fa7af8"
+      },
+      {
+        "path": "/tmp/librox-context-all-languages-regression.log",
+        "sha256": "4e3cc20c2aee3d13afa30064728540ec49beaee8ede5c338446c24737ecd5481"
+      }
+    ]
   }
 }

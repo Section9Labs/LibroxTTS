@@ -9,13 +9,17 @@ import LibroxCTNative
 struct NarrationTextContextLanguageTests {
     typealias Fixture = (String, String, String, String, String)
 
-    private func prepared(_ fixture: Fixture) async throws -> (String, NarrationPipeline.Plan) {
+    private func prepared(_ fixture: Fixture, stressPrefix: Bool) async throws -> (String, NarrationPipeline.Plan) {
         let (language, name, prefix, open, close) = fixture
         let sample = try #require(NarrationLanguage.sampleText(language))
         // Keep the literal supported reporting tag while exercising decomposed
         // speech, filtered emoji, numbers and a spoken override inside the unit.
         let speech = ("🌙 XYZ 42. " + sample).decomposedStringWithCanonicalMapping
-        let source = prefix + open + speech + close + " " + sample.decomposedStringWithCanonicalMapping
+        // The second variant is the exact reporting-prefix reproduction that
+        // previously prevented dialogue discovery in 29 languages.
+        let source = stressPrefix
+            ? ("🌙 " + prefix + open + "XYZ 42. " + sample + close + " " + sample).decomposedStringWithCanonicalMapping
+            : prefix + open + speech + close + " " + sample.decomposedStringWithCanonicalMapping
         let lexicon = SpokenTextLexicon(entries: [.init(written: "XYZ", spoken: name, language: language)])
         let plan = try await NarrationPipeline().plan(source, model: .plus, bookID: "context-languages",
             chapterID: language, narratorVoiceID: "plus-f1-\(language)-v1", language: language,
@@ -30,10 +34,10 @@ struct NarrationTextContextLanguageTests {
             language: language, modelFingerprint: CTTextContext.modelFingerprint(), styleID: voice.styleID)
     }
 
-    @Test(arguments: AllLanguageNarrationTests.cases)
-    func preparedDialogueKeepsExactNormalizedTokens(_ fixture: Fixture) async throws {
+    @Test(arguments: AllLanguageNarrationTests.cases, [false, true])
+    func preparedDialogueKeepsExactNormalizedTokens(_ fixture: Fixture, _ stressPrefix: Bool) async throws {
         let language = fixture.0
-        let (source, plan) = try await prepared(fixture)
+        let (source, plan) = try await prepared(fixture, stressPrefix: stressPrefix)
         let index = try #require(plan.units.firstIndex { $0.role == .dialogue && $0.text.contains("XYZ") })
         let unit = plan.units[index]
         #expect((source as NSString).substring(with: unit.range) == unit.text)
@@ -56,15 +60,15 @@ struct NarrationTextContextLanguageTests {
     // Read only the pinned production tokenizer table. No model is loaded and
     // this does not imply native audio or pronunciation acceptance in a language.
     @Test(.enabled(if: ProcessInfo.processInfo.environment["CT_CONTEXT_TOKENIZER_ASSETS"] != nil),
-          arguments: AllLanguageNarrationTests.cases)
-    func gatheredProductionTokenIDsMatchIsolatedSpeech(_ fixture: Fixture) async throws {
+          arguments: AllLanguageNarrationTests.cases, [false, true])
+    func gatheredProductionTokenIDsMatchIsolatedSpeech(_ fixture: Fixture, _ stressPrefix: Bool) async throws {
         let path = try #require(ProcessInfo.processInfo.environment["CT_CONTEXT_TOKENIZER_ASSETS"])
         let directory = URL(fileURLWithPath: path)
         let pinned = try #require(CTAssets.manifest().files.first { $0.path == "config/unicode_indexer.json" })
         let data = try Data(contentsOf: directory.appendingPathComponent(pinned.path))
         #expect(SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined() == pinned.sha256)
         let tokenizer = try CTTokenizer(directory: directory)
-        let (source, plan) = try await prepared(fixture)
+        let (source, plan) = try await prepared(fixture, stressPrefix: stressPrefix)
         let indices = plan.units.indices.filter { plan.units[$0].role == .dialogue }
         #expect(!indices.isEmpty)
         for index in indices {

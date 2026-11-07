@@ -80,6 +80,14 @@ Merged SDK `e7cfed982ce94e75d2ad4c665e9f801cc3afa06e` at `c76cf0405b63981b392350
 
 Four parameterized tests (124 cases) pass: exact normalized spoken-token gathering after numeric/dictionary expansion, decomposition and emoji filtering; exact gathered IDs from the pinned production tokenizer; stage-context paragraph isolation; and distinct gather/render identity for repeated quotations. The broader release narration suite passes all 167 tests. The tokenizer test is opt-in with `CT_CONTEXT_TOKENIZER_ASSETS`; it was explicitly enabled for both recorded runs against the v2 assets. It reads the verified indexer table and loads no model. Reproduction and hashes are recorded in `docs/validation/native-context-all-languages.json`.
 
-A separate stress fixture with an emoji before a canonically decomposed reporting prefix yielded no dialogue units in 29 languages before any binder call. EN/ES succeeded. This combined prefix condition has been reported to the SDK owner; its individual causes are not isolated here. The passing binding matrix retains supported reporting tags and exercises decomposed text/emoji inside the spoken unit. No casting/catalog/app files were modified beyond merging the owned SDK dependency.
+The initial stress fixture with an emoji before a canonically decomposed reporting prefix yielded no dialogue units in 29 languages before any binder call. That reported gap is now resolved by SDK `6a9d3e2` and verified by the combined matrix below. No casting/catalog/app files were modified beyond merging the owned SDK dependencies.
 
 All four previously approved listening-file hashes remain identical. These structural checks do not establish narration quality, automatic emotion understanding or phone performance in the other languages. The prior user verdict is preserved exactly, without inferring comparative superiority. Context-specific PCM cache identity and deliberate production attachment remain outstanding integration work.
+
+## Decorated and decomposed reporting-prefix fix
+
+Merged SDK `6a9d3e27259213a5931a62de3f3d50aa6e39f1b7` at `f551ae4a65438a15a73aa72c20e967174820cf10`. The matcher uses a local NFC copy and allows leading symbols at line start while preserving original source ranges. No context engine or model changes accompany this dependency.
+
+The context matrix now exercises both the original speech-only Unicode stress and the exact previously failing combined prefix reproduction. All 186 parameterized cases pass, including exact normalized and production-token gathering for both variants in all 31 languages. The full release narration suite passes 169 tests, including the SDK's independent decomposition-only, emoji-only, combined-prefix and preceding-word rejection checks. The recorded parser gap is closed. Current evidence and log hashes replace the active validation record, with prior evidence retained under `previousValidation`.
+
+The four positively reviewed audio files remain byte-identical. No model inference, additional listening acceptance, phone qualification or context default enablement occurred during this reconciliation.
