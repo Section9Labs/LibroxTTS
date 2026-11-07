@@ -1,5 +1,6 @@
 import Darwin
 import Foundation
+import LibroxTTS
 import PocketTTSMLX
 import KokoroCatalog
 import AVFoundation
@@ -13,6 +14,13 @@ import AVFoundation
     }
     static func run() async throws {
         let a = CommandLine.arguments
+        if a.count == 4, a[1] == "--download" {
+            let directory = URL(fileURLWithPath: a[2])
+            try await NarrationAssets.download(.pocket, to: directory, language: a[3])
+            let manifest = try NarrationAssets.manifest(.pocket, language: a[3])
+            print("Installed \(a[3]): \(manifest.installedFiles.count) verified files, \(manifest.downloadSize) bytes")
+            return
+        }
         guard a.count == 5 || a.count == 6 else { print("pocket-tts-probe ASSET_ROOT VOICE_ID OUTPUT.wav TEXT [TEMPERATURE]"); return }
         let started = Date()
         let engine = PocketTTSEngine(directory: URL(fileURLWithPath: a[1]))

@@ -13,7 +13,7 @@ public enum PocketTTSCatalog {
     VOICE-CREDITS.json; source licenses: https://huggingface.co/kyutai/tts-voices
     """
     public static let identity = "pocket-tts-mlx-2026-11-07"
-    public static let isDownloadPublished = false
+    public static let isDownloadPublished = true
     public static let languages = ["en", "fr", "de", "pt", "it", "es", "nl"]
     public static let voiceNames = ["alba", "anna", "azelma", "bill_boerst", "caro_davy", "charles", "daan", "eponine", "estelle", "eve", "fantine", "george", "giovanni", "jane", "javert", "juergen", "lola", "marius", "mary", "michael", "paul", "peter_yearsley", "rafael", "stuart_bell", "vera"]
     public static let defaultVoices = ["en": "alba", "fr": "estelle", "de": "juergen", "pt": "rafael", "it": "giovanni", "es": "lola", "nl": "daan"]

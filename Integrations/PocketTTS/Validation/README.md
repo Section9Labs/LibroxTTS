@@ -4,6 +4,10 @@ Host: Mac15,14, Apple M3 Ultra, 256 GiB RAM. Swift 6.4/Xcode 27 toolchain.
 This is developer-machine evidence, not phone or minimum-Mac qualification.
 
 - Debug and release native executable builds passed.
+- Published all 217 hosted files after verifying GitHub SHA-256 digests and
+  sizes against the pinned manifests. A clean English installation through
+  `NarrationAssets.download` verified 31 files (371,942,978 bytes) and rendered
+  4.8 seconds of audio successfully; see `hosted-install.json`.
 - Full `swift test` passed (496 Swift Testing cases reported across targets, plus
   the package’s XCTest tests). Opt-in asset tests were also run separately.
 - Generic iOS `LibroxTTS` build passed with code signing disabled. This proves

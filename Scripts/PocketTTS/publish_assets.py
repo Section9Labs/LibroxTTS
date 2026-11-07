@@ -22,7 +22,8 @@ def main():
   gh('release','create',tag,'--repo',repo,'--target',a.commit,'--draft','--prerelease','--latest=false','--title','Pocket TTS native MLX — seven language packs','--notes-file',str(a.notes))
   try:
    gh('release','upload',tag,*links,'--repo',repo)
-   release=json.loads(gh('api',f'repos/{repo}/releases/tags/{tag}'))
+   api_url=json.loads(gh('release','view',tag,'--repo',repo,'--json','apiUrl'))['apiUrl']
+   release=json.loads(gh('api',api_url))
    remote={f['name']:f for f in release['assets']}
    for f in files:
     asset=remote[f['path'].replace('/','--')]

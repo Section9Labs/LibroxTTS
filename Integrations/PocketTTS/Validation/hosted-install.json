@@ -1,0 +1,23 @@
+{
+  "releaseID": 437897363,
+  "tag": "pocket-tts-mlx-2026-11-07",
+  "verifiedFiles": 217,
+  "bytes": 2603609374,
+  "digest": "SHA-256",
+  "releaseURL": "https://github.com/Section9Labs/LibroxTTS/releases/tag/pocket-tts-mlx-2026-11-07",
+  "published": true,
+  "cleanInstall": {
+    "language": "en",
+    "files": 31,
+    "bytes": 371942978,
+    "path": "NarrationAssets.download(.pocket, to: directory, language: \"en\")",
+    "sha256Verified": true
+  },
+  "renderFromCleanInstall": {
+    "voice": "pocket-alba-en-v1",
+    "samples": 115200,
+    "sampleRate": 24000,
+    "elapsedSeconds": 0.5738070011138916,
+    "peak": 0.5743963
+  }
+}

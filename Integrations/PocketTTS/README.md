@@ -11,6 +11,10 @@ rendering and prepared-audio identities. It does not change Librox app defaults 
 ship an app update. MLX is now a pinned package dependency; existing Basic/Plus
 inference still uses their own renderers.
 
+[Hosted language packs](https://github.com/Section9Labs/LibroxTTS/releases/tag/pocket-tts-mlx-2026-11-07)
+are published as an asset prerelease. The SDK integration remains on the
+`codex/pocket-tts` branch; the asset tag is not an SDK version tag.
+
 ## Voices and languages
 
 | Language | Pack | Suggested starting voice |
@@ -115,6 +119,7 @@ Use a separate Python environment with the pinned Kyutai checkout installed.
 ```sh
 swift build -c release --product pocket-tts-probe
 swift test --filter Pocket
+swift run -c release pocket-tts-probe --download /path/to/packs en
 swift run -c release pocket-tts-probe /path/to/packs \
   pocket-alba-en-v1 /tmp/pocket.wav 'The library was quiet.'
 ```
