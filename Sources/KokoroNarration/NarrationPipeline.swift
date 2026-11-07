@@ -5,7 +5,7 @@ import KokoroPronunciation
 /// The common entry point for book playback, preparation, exports and auditions.
 /// Hosts persist the optional cast; model adapters own their input representation.
 public actor NarrationPipeline {
-    public static let revision = "narration-pipeline-1:" + TextNativeNarrationPlanner.revision
+    public static let revision = "narration-pipeline-2:native-characters-1:" + TextNativeNarrationPlanner.revision
     public struct Plan: Sendable {
         public let units: [BookNarrationUnit]
         public let narratorVoiceID: String
@@ -35,8 +35,19 @@ public actor NarrationPipeline {
         let updatedCast: BookVoiceCast?
         var originalPlan: BookNarrationPlan?
         if model.usesTextNativePlanning {
-            units = try TextNativeNarrationPlanner.plan(text, voiceID: voiceID, lexicon: lexicon)
-            updatedCast = nil
+            let nativeCast: BookVoiceCast?
+            if let cast { nativeCast = cast }
+            else if characterVoices && model.supportsAutomaticCharacterAttribution(language: language) {
+                nativeCast = try model.makeVoiceCast(bookID: bookID, language: language, narratorVoiceID: voiceID)
+            } else { nativeCast = nil }
+            if let nativeCast {
+                let plan = try TextNativeCharacterPlanner.plan(text, bookID: bookID, chapterID: chapterID,
+                    language: language, cast: nativeCast, characterVoices: characterVoices, lexicon: lexicon)
+                units = plan.units; updatedCast = plan.cast; originalPlan = plan
+            } else {
+                units = try TextNativeNarrationPlanner.plan(text, voiceID: voiceID, lexicon: lexicon)
+                updatedCast = nil
+            }
         } else {
             guard let phoneticLanguage = PronunciationLanguage(rawValue: language) else { throw PlanningError.unsupportedLanguage(language) }
             let original = try cast ?? BookVoiceCast(bookID: bookID, language: phoneticLanguage,

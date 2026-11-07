@@ -59,7 +59,20 @@ Local evidence lives at `/Users/matt/Code/swift/librox-dk-native-assets-v1`:
 The four continuity examples each have one planned paragraph unit: English
 16.230748 seconds and Spanish 17.275646 seconds. Their receipts bind the source
 snapshot used before this documentation and preview-distribution test update.
-No claim of improved perceptual quality is made until listening acceptance.
+Matt accepted these four recordings as meeting the basic voice-quality bar,
+as relayed by the research chat on November 6, 2026:
+"These new male and female voices sound good and meet the bar continue improving them using coreML sdk."
+This accepts F1/M1 English/Spanish basic voice quality, not human-level emotion,
+DL pacing, or device qualification. The accepted runtime source is commit
+`fc1a614d4d702e2416f8e94c8742f0c02f39cf42`; the original receipts retain their
+pre-commit implementation snapshot and must not be rewritten.
+
+| Accepted recording | WAV SHA256 |
+| --- | --- |
+| en-continuity-F1 | `19af74f8fdac17361660fc1697ed964faecfa4757fee02cd5892211d0c548b72` |
+| en-continuity-M1 | `bcb0d338a16518bd877842ac731a3b9cc10c3ada2c722cd4e8c08966204592ab` |
+| es-continuity-F1 | `6d211e6c85a1cec8943dcde57752ed66c328239f2ce90d6d3bdabb289a888ccb` |
+| es-continuity-M1 | `b144dd08f5aec88cb16ad91533ff9f7ddaa5accc8ee0b8999a98cafacf6edee0` |
 
 ## Remaining release scope
 
@@ -70,8 +83,9 @@ pacing and must not be described as DK+DL parity.
 
 Context-aware emotion control is also unfinished. Story metadata attached to
 fields the renderer does not consume cannot establish acoustic expression.
-M1 is a pretrained style choice, not a new emotion-control system; its inherited
-delivery gain has not been separately listening-qualified.
+M1 is a pretrained style choice, not a new emotion-control system. The accepted
+examples use its inherited delivery gain; broad loudness calibration remains
+outside those four listening examples.
 
 Native DK has not yet been qualified on iPhone/iPad, for memory/cold start or
 background handoff. Previous CT device results do not qualify the changed model.

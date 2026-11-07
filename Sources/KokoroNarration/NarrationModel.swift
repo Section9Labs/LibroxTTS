@@ -22,7 +22,7 @@ public enum NarrationModel: String, CaseIterable, Codable, Sendable, Identifiabl
     public var deliveryProfile: NarrationProfile { self == .kokoroDesktop ? .enhanced : .basic }
     public var supportedSelection: Self { isEnabled ? self : .compact }
     public var usesTextNativePlanning: Bool { self == .plus }
-    public var supportsCharacterVoices: Bool { self == .compact || self == .kokoroDesktop }
+    public var supportsCharacterVoices: Bool { self == .compact || self == .kokoroDesktop || self == .plus }
     public var requiresPlusAccess: Bool { self == .plus }
     public var usesPreparedCache: Bool { self == .kokoroDesktop || self == .plus }
     public var dependencies: [Self] { self == .kokoroDesktop ? [.compact] : [] }

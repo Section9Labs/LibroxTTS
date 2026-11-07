@@ -1,0 +1,50 @@
+import KokoroCatalog
+import KokoroPronunciation
+
+extension NarrationModel {
+    /// The model owns its voice IDs. Hosts must not build a Plus cast from the
+    /// Kokoro catalog or infer native voice metadata from Kokoro ID prefixes.
+    public struct CharacterVoice: Identifiable, Sendable {
+        public let id: String
+        public let name: String
+        public let gender: BookVoiceCast.Gender
+    }
+
+    public func characterVoiceCatalog(language: String) -> [CharacterVoice] {
+        guard supportsCharacterVoices, let language = NarrationLanguage.normalize(language),
+              supportedLanguageCodes.contains(language) else { return [] }
+        if usesTextNativePlanning {
+            return nativeVoices.filter { $0.language == language }.map {
+                CharacterVoice(id: $0.id, name: $0.name, gender: $0.styleID == "F1" ? .female : .male)
+            }
+        }
+        return Voice.all.filter { $0.language.rawValue == language }.map {
+            CharacterVoice(id: $0.id, name: $0.name, gender: $0.id.dropFirst().first == "f" ? .female : .male)
+        }
+    }
+
+    /// Synthesis language support and automatic speaker attribution are separate.
+    /// Unresolved dialogue uses the narrator; no alternating-speaker guesses.
+    public func supportsAutomaticCharacterAttribution(language: String) -> Bool {
+        guard supportsCharacterVoices, let language = NarrationLanguage.normalize(language) else { return false }
+        return supportedLanguageCodes.contains(language) && ["en", "es"].contains(language)
+    }
+
+    /// Persist the returned cast before playback and retain it between chapters.
+    /// Existing BookVoiceCast language storage covers the pronunciation languages;
+    /// automatic attribution is currently English/Spanish for every model.
+    public func makeVoiceCast(bookID: String, language: String, narratorVoiceID: String) throws -> BookVoiceCast {
+        guard let code = NarrationLanguage.normalize(language),
+              let castLanguage = PronunciationLanguage(rawValue: code) else {
+            throw NarrationPipeline.PlanningError.unsupportedLanguage(language)
+        }
+        let voices = characterVoiceCatalog(language: code)
+        guard voices.contains(where: { $0.id == narratorVoiceID }) else {
+            throw NarrationPipeline.PlanningError.invalidVoice
+        }
+        return try BookVoiceCast(bookID: bookID, language: castLanguage, narratorVoiceID: narratorVoiceID,
+            voicePool: voices.map(\.id).filter { $0 != narratorVoiceID },
+            voiceGenders: Dictionary(uniqueKeysWithValues: voices.map { ($0.id, $0.gender) }),
+            voiceSharing: .reuseCompatible)
+    }
+}
