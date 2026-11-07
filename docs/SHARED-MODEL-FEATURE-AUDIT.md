@@ -22,8 +22,8 @@ tested fixes and remaining work.
 | --- | --- | --- |
 | Playback, preparation and previews | `NarrationPipeline` and `NarrationRenderer` remain the shared entry points. | Adapters prepare phonemes for Kokoro and normalized text for Plus. |
 | Voice selection and Automatic language | App now uses SDK `resolvedVoiceID`; F1–F5/M1–M5 survive all 31 language resolutions. Voice picker lists ten styles for the effective language and preserves Automatic when selecting a style. | Kokoro retains its own language-specific catalog. |
-| Character casting and saved assignments | Same `BookVoiceCast`, attributor and source ranges; old native pools expand without changing characters, aliases, manual assignments or manual narrator fallback. Direct Kokoro pipeline calls now create a usable cast too. | Automatic attribution is English/Spanish for both, not all synthesis languages. |
-| Spanish play structure | Basic and Plus now share `StageDialogueStructure.parseBook`. With character mode on, known printed labels resolve saved voices, directions/labels use the narrator, and unknown labels do not allocate guessed voices. | Plus single-narrator mode retains its accepted grouping. Parser bounds and unsupported languages fall back to the existing plan. |
+| Character casting and saved assignments | Same `BookVoiceCast`, attributor and source ranges; old native pools expand without changing characters, aliases, manual assignments or manual narrator fallback. Direct Kokoro pipeline calls now create a usable cast too. | Localized explicit speech tags/labels now cover every supported model language. Existing EN/ES coreference/gender heuristics remain richer; see ALL-LANGUAGE-NARRATION.md. |
+| Multilingual play structure | Basic and Plus now share `StageDialogueStructure.parseBook`. With character mode on, known printed labels resolve saved voices, directions/labels use the narrator, and unknown labels do not allocate guessed voices. | Plus single-narrator mode retains its accepted grouping. Parser bounds and unsupported languages fall back to the existing plan. |
 | Dictionary readings and normalization | `SpokenTextLexicon` shares reviewed spoken readings and source offsets across both adapters. Native uses common text normalization and English number expansion. | The large Kokoro phoneme dictionary cannot be fed verbatim into a grapheme-input model. Native pronunciation is not certified identical to Kokoro's G2P. |
 | Expressive controls and blending | SDK exposes actual capabilities and resolves supported delivery options. Unsupported retained preferences no longer create different native cache requests for identical audio. | Kokoro's phone-level gestures/blends are not native emotion controls. Native context response is a separate, default-off candidate. |
 | Pronunciation dialect | Capability belongs to SDK; app only offers it where consumed. | Native does not consume Kokoro regional phone substitutions. |
@@ -89,6 +89,10 @@ asset reuse. App tests cover native style preservation under Automatic/explicit
 language, older saved casts selecting new presets and retained inactive settings.
 
 This audit does not claim full feature parity: native DL pacing, context/emotion
-qualification, wider-language automatic attribution, complete model-update UX,
+qualification, broader linguistic/listening qualification, complete model-update UX,
 publication and new iPhone/iPad/TestFlight qualification remain open. Do not
 expose unsupported controls or equate metadata with an acoustic capability.
+
+## Full language rollout
+
+The subsequent [all-language implementation](ALL-LANGUAGE-NARRATION.md) removes the cast-storage/frontend-enum coupling and EN/ES attribution gate. All 31 Plus languages now share persistent character choices, localized explicit reporting/label rules, stage direction routing, spoken overrides and numeric preparation. This supersedes earlier EN/ES-only capability statements; it does not imply equal linguistic quality in every language. No model bytes change.

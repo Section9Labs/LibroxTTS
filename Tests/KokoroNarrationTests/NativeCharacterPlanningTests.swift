@@ -115,10 +115,10 @@ func nativeCharacterCatalogAndCastUseOnlyTheirOwnVoices(_ language: String) thro
 
 @Test func nativeLanguageSupportDoesNotPretendAttributionExistsEverywhere() async throws {
     #expect(NarrationModel.plus.characterVoiceCatalog(language: "de-DE").count == 10)
-    #expect(!NarrationModel.plus.supportsAutomaticCharacterAttribution(language: "de"))
+    #expect(NarrationModel.plus.supportsAutomaticCharacterAttribution(language: "de"))
     let plan = try await NarrationPipeline().plan("Die Tür war offen.", model: .plus, bookID: "german", chapterID: "one",
         narratorVoiceID: "plus-m1-de-v1", language: "de", characterVoices: true)
-    #expect(plan.cast == nil && plan.units.allSatisfy { $0.voiceID == "plus-m1-de-v1" })
+    #expect(plan.cast?.language.rawValue == "de" && plan.units.allSatisfy { $0.voiceID == "plus-m1-de-v1" })
 }
 
 @Test func nativeSpanishDashDialogueKeepsReportingClausesWithNarrator() async throws {

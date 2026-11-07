@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 import Foundation
+import KokoroPronunciation
 
 /// A source-grounded dialogue interval supplied by the book's existing attribution
 /// pass. UTF-16 offsets refer to the unchanged chapter, never normalized speech.
@@ -35,11 +36,11 @@ public struct StageDialogueResult: Sendable, Equatable {
     public var accepted: Bool { status == .parsed }
 }
 
-/// Conservative Spanish theatrical structure. No speaker alternation, sentiment,
-/// voice assignment or audio controls. The caller opts in; ordinary English paths
-/// stay outside this parser. Every result covers the original text exactly once.
+/// Bounded theatrical structure with localized direction cues. No speaker
+/// alternation, sentiment, voice assignment or audio controls. Every result
+/// covers the original text exactly once; uncertain parentheticals stay spoken.
 public enum StageDialogueStructure {
-    public static let revision = "stage-dialogue-1"
+    public static let revision = "stage-dialogue-2"
     public static let maximumUTF16Length = 16_384
     public static let maximumRanges = 2_048
     public static let maximumSpans = 8_192
@@ -53,7 +54,8 @@ public enum StageDialogueStructure {
             .init(spans: source.isEmpty ? [] : [.init(range: NSRange(location: 0, length: ns.length),
                 text: source, role: .narration, speakerID: nil, associatedSpeakerID: nil)], status: status)
         }
-        guard languageCode.lowercased().split(whereSeparator: { $0 == "-" || $0 == "_" }).first == "es" else {
+        let language = String(languageCode.lowercased().split(whereSeparator: { $0 == "-" || $0 == "_" }).first ?? "")
+        guard NarrationLanguageRules.profiles[language] != nil else {
             return fallback(.unsupportedLanguage)
         }
         guard ns.length <= maximumUTF16Length, establishedDialogue.count <= maximumRanges,
@@ -117,7 +119,7 @@ public enum StageDialogueStructure {
         var split: [StageDialogueSpan] = []
         for span in spans {
             guard span.role == .dialogue else { split.append(span); continue }
-            let directions = stageDirections(in: span.text)
+            let directions = stageDirections(in: span.text, language: language)
             var cursor = 0
             for direction in directions {
                 if cursor < direction.location { split.append(subspan(span, local: NSRange(location: cursor, length: direction.location - cursor), role: .dialogue)) }
@@ -199,7 +201,7 @@ public enum StageDialogueStructure {
             let label = (head as NSString).substring(with: match.range(at: 1))
             let key = canonical(label)
             guard label.utf16.count <= 96, !reservedLabels.contains(key),
-                  label.first?.isUppercase == true else { continue }
+                  (label.first?.isUppercase == true || known[key] != nil) else { continue }
             let marker = (head as NSString).substring(with: match.range(at: 2))
             guard marker.contains(".") || known[key] != nil else { continue }
             // Label scope is a typographic paragraph. It never carries a speaker
@@ -227,21 +229,21 @@ public enum StageDialogueStructure {
         "resumen", "índice", "indice", "ejemplo", "introducción", "prólogo", "epílogo", "fin"
     ]
 
-    private static func stageDirections(in text: String) -> [NSRange] {
+    private static func stageDirections(in text: String, language: String) -> [NSRange] {
         let ns = text as NSString
         var ranges: [NSRange] = [], opening: Int?, depth = 0, invalid = false
         for i in 0..<ns.length {
             let c = ns.character(at: i)
-            if c == 40 { // (
+            if c == 40 || c == 0xFF08 { // ( or full-width （
                 if depth == 0 { opening = i; invalid = false }
                 depth += 1
                 if depth > 8 { invalid = true }
-            } else if c == 41, depth > 0 {
+            } else if c == 41 || c == 0xFF09, depth > 0 {
                 depth -= 1
                 if depth == 0, let start = opening {
                     let range = NSRange(location: start, length: i - start + 1)
                     if !invalid, range.length <= maximumDirectionUTF16Length,
-                       isDirectionCue(ns.substring(with: range)) { ranges.append(range) }
+                       isDirectionCue(ns.substring(with: range), language: language) { ranges.append(range) }
                     opening = nil
                 }
             }
@@ -249,9 +251,17 @@ public enum StageDialogueStructure {
         return ranges
     }
 
-    private static func isDirectionCue(_ text: String) -> Bool {
+    private static func isDirectionCue(_ text: String, language: String) -> Bool {
         let body = text.dropFirst().dropLast().trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !body.contains("\n"), !body.contains("\r"), let initial = body.first, initial.isUppercase else { return false }
+        guard !body.contains("\n"), !body.contains("\r") else { return false }
+        if language != "es" {
+            let value = body.precomposedStringWithCanonicalMapping.lowercased()
+            return NarrationLanguageRules.profiles[language]?.directionCues.contains { cue in
+                value == cue || value.hasPrefix(cue + " ") || value.hasPrefix(cue + ".")
+                    || value.hasPrefix(cue + ",") || value.hasPrefix(cue + "。") || value.hasPrefix(cue + "।")
+            } == true
+        }
+        guard body.first?.isUppercase == true else { return false }
         let value = body.precomposedStringWithCanonicalMapping.lowercased()
         let first = value.split(whereSeparator: { !$0.isLetter }).first.map(String.init) ?? ""
         let action = ["observa", "mira", "ríe", "llora", "grita", "susurra", "señala", "entra", "sale", "pausa", "silencio"]

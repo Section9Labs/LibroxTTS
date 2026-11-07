@@ -80,7 +80,7 @@ import KokoroPronunciation
                     // This bounded diagnostic preserves every source character.
                     let fragment = source.substring(with: NSRange(location: start, length: end - start))
                     let remaining = source.substring(from: end)
-                    let phones = try pronunciation.phonemize(fragment, language: cast.language,
+                    let phones = try pronunciation.phonemize(fragment, language: cast.language.pronunciationLanguage!,
                         options: .init(spanishAdverbDoubleStress: true)).phonemes
                     guard phones.unicodeScalars.count >= 40,
                           remaining.contains(where: { $0.isLetter || $0.isNumber }) else { continue }
@@ -91,7 +91,7 @@ import KokoroPronunciation
             }
             let remaining = source.substring(from: start)
             let phones = start == 0 ? unit.phonemes : try pronunciation.phonemize(remaining,
-                language: cast.language, options: .init(spanishAdverbDoubleStress: true)).phonemes
+                language: cast.language.pronunciationLanguage!, options: .init(spanishAdverbDoubleStress: true)).phonemes
             renderUnits.append(.init(text: remaining, phonemes: phones, boundaryAfter: unit.boundaryAfter,
                 expression: unit.expression, speed: NarrationDelivery.speed(for: unit, pacing: .audiobook)))
         }

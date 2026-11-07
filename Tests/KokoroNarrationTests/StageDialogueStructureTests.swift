@@ -108,7 +108,7 @@ struct StageDialogueStructureTests {
 
     @Test func refusesOversizedInputAndLeavesEnglishUntouched() {
         let text = "ELENA.—(Con alegría.) Hola."
-        let en = StageDialogueStructure.parse(text, languageCode: "en", establishedDialogue: [whole(text)])
+        let en = StageDialogueStructure.parse(text, languageCode: "xx", establishedDialogue: [whole(text)])
         #expect(en.status == .unsupportedLanguage)
         coverage(text, en)
         let huge = String(repeating: "a", count: StageDialogueStructure.maximumUTF16Length + 1)
