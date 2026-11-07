@@ -245,34 +245,12 @@ public actor BookNarrationPlanner {
     /// not permission to allocate or replace a saved character voice.
     private func structuredSpans(_ spans: [RenderingSpan], source: String,
                                  cast: BookVoiceCast, characterVoices: Bool) -> [RenderingSpan] {
-        var seeds = spans.filter(\.isDialogue).map {
+        let seeds = spans.filter(\.isDialogue).map {
             StageDialogueRange(range: NSRange(location: $0.offset, length: $0.text.utf16.count),
                                speakerID: $0.speakerID)
         }
-        // An embedded quote must not hide the enclosing em-dash dialogue turn.
-        // Retain precise seeds when they identify distinct embedded speakers.
-        if let turns = try? NSRegularExpression(pattern: #"(?m)^[ \t]*—[^\r\n]+"#) {
-            for match in turns.matches(in: source, range: NSRange(location: 0, length: source.utf16.count)) {
-                let overlapping = seeds.filter { NSIntersectionRange($0.range, match.range).length > 0 }
-                let identities = Set(overlapping.compactMap(\.speakerID))
-                guard identities.count <= 1,
-                      overlapping.allSatisfy({ $0.range.location >= match.range.location && NSMaxRange($0.range) <= NSMaxRange(match.range) }) else { continue }
-                seeds.removeAll { NSIntersectionRange($0.range, match.range).length > 0 }
-                seeds.append(.init(range: match.range, speakerID: identities.first))
-            }
-        }
-        let structure = StageDialogueStructure.parse(source, languageCode: cast.language.rawValue,
-            establishedDialogue: seeds, knownSpeakerLabels: cast.aliases)
-        guard structure.accepted, structure.spans.map(\.text).joined() == source else { return spans }
-        let original = source as NSString
-        var expectedOffset = 0
-        for span in structure.spans {
-            guard span.range.location == expectedOffset, span.range.length >= 0,
-                  span.range.length <= original.length - expectedOffset,
-                  original.substring(with: span.range) == span.text else { return spans }
-            expectedOffset += span.range.length
-        }
-        guard expectedOffset == original.length else { return spans }
+        guard let structure = StageDialogueStructure.parseBook(source, languageCode: cast.language.rawValue,
+            establishedDialogue: seeds, knownSpeakerLabels: cast.aliases) else { return spans }
         return structure.spans.map { span in
             let dialogue = span.role == .dialogue
             let voice = dialogue && characterVoices

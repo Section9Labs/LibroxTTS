@@ -12,7 +12,7 @@ Plus now exposes the pinned Supertonic 3 helper's 31 languages. Every language h
 
 ## Pronunciation and expression
 
-`SpokenTextLexicon` supplies shared, reviewed written-to-spoken readings (names, abbreviations) without rewriting book text or reading offsets. Text-native rendering also uses the existing language-specific number/date/time/currency normalizer where available, plus the English cardinal reader. Kokoro retains its full existing pronunciation dictionaries, stress and phoneme adapters.
+`SpokenTextLexicon` supplies shared, reviewed written-to-spoken readings (names, abbreviations) without rewriting book text or reading offsets. Text-native rendering also uses the existing language-specific number/date/time/currency normalizer where available, plus shared English number words for bounded cardinals, ordinals and signed/grouped decimals. Kokoro retains its full existing pronunciation dictionaries, stress and phoneme adapters. Context-dependent year/address readings and phoneme dictionaries do not yet have full native parity.
 
 The large Kokoro dictionaries contain phonemes, not interchangeable CT input. We do not transliterate IPA back to invented spellings or claim that CT consumes that dictionary. Model-independent spoken readings apply to both adapters; direct phoneme enforcement remains a Kokoro capability. The current shared dictionary extension API does not add an app editing UI or convert the existing IPA dictionaries into reliable native-text readings.
 

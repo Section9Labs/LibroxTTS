@@ -1,5 +1,4 @@
 import Foundation
-import PronunciationEnglish
 
 /// The orthographic side of pronunciation preparation. Phoneme dictionaries stay
 /// in PronunciationEngine; text-native models receive words, never Kokoro phones.
@@ -13,7 +12,7 @@ public struct SpokenTextLexicon: Sendable {
             self.written = written; self.spoken = spoken; self.language = language
         }
     }
-    public static let revision = "spoken-text-1"
+    public static let revision = "spoken-text-2"
     private let entries: [Entry]
     public init(entries: [Entry] = []) { self.entries = entries }
 
@@ -41,14 +40,10 @@ public struct SpokenTextLexicon: Sendable {
         if let language = PronunciationLanguage(rawValue: language) {
             text = TextNormalizer.normalize(text, language: language)
         }
-        // English's shared normalizer leaves numbers to its G2P. Supply that
-        // module's exact cardinal readings to native-text renderers too.
+        // English's shared normalizer leaves general numbers to its G2P.
+        // Native text gets the same number words without passing phonemes.
         if language == "en" {
-            text = TextReplacement.replace(text, #"(?<![\p{L}\d.,:/-])\d{1,15}(?![\p{L}\d.,:/-])"#) {
-                let number = $0[0]
-                guard number.count == 1 || number.first != "0" else { return number }
-                return NumberToWords.cardinal(number) ?? number
-            }
+            text = EnglishSpokenNumbers.expand(text)
         }
         return text
     }
