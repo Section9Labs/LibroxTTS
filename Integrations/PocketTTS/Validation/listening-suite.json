@@ -1,0 +1,410 @@
+{
+  "clips": 106,
+  "totalSeconds": 1860.24,
+  "host": "Mac15,14 Apple M3 Ultra, 256 GiB",
+  "probeSHA256": "cbe691dae13ee7252374327aad30d1904c2b97ebcbd8d58008f2e32c8e9c695e",
+  "assetRelease": "pocket-tts-mlx-2026-11-07",
+  "sourceBaseCommit": "bb4221df0ded7c54e7a974f9e41c3f130f0044f7",
+  "sourceDiffSHA256": "dfb0c99db5213d26885f39d5d7f6b2e023961ee1d240b20de157d54ad34df82c",
+  "manifestSHA256": "3f26264ad9c3dbedb46060c323a13d518116a3d3f3d6ba2726e2dfdc8b0faeb6",
+  "repeatability": {
+    "exactWAVMatch": true,
+    "originalSHA256": "0b4dcf072d787cee6f1dd7db787a2747e9c8b10f5b7024fa478a37a04ffa3cdb",
+    "repeatSHA256": "0b4dcf072d787cee6f1dd7db787a2747e9c8b10f5b7024fa478a37a04ffa3cdb",
+    "request": "en-alba-reflective-balanced-t0.3-s1-seed42"
+  },
+  "screening": {
+    "method": "Whisper large-v3-turbo, case/punctuation-normalized word sequences",
+    "exactMatches": 37,
+    "total": 106,
+    "qualification": "ASR mismatches are review flags, not confirmed synthesis errors; exact matches are not narration-quality approval."
+  },
+  "configurations": [
+    {
+      "language": "en",
+      "voice": "alba",
+      "temperature": 0.3,
+      "phrasing": "balanced",
+      "samplerSteps": 1,
+      "seed": 42,
+      "exactWordMatches": 1,
+      "passages": 3
+    },
+    {
+      "language": "en",
+      "voice": "alba",
+      "temperature": 0.15,
+      "phrasing": "balanced",
+      "samplerSteps": 1,
+      "seed": 42,
+      "exactWordMatches": 1,
+      "passages": 3
+    },
+    {
+      "language": "en",
+      "voice": "alba",
+      "temperature": 0.45,
+      "phrasing": "balanced",
+      "samplerSteps": 1,
+      "seed": 42,
+      "exactWordMatches": 1,
+      "passages": 3
+    },
+    {
+      "language": "en",
+      "voice": "alba",
+      "temperature": 0.3,
+      "phrasing": "short",
+      "samplerSteps": 1,
+      "seed": 42,
+      "exactWordMatches": 2,
+      "passages": 3
+    },
+    {
+      "language": "en",
+      "voice": "alba",
+      "temperature": 0.3,
+      "phrasing": "flow",
+      "samplerSteps": 1,
+      "seed": 42,
+      "exactWordMatches": 0,
+      "passages": 3
+    },
+    {
+      "language": "en",
+      "voice": "alba",
+      "temperature": 0.3,
+      "phrasing": "balanced",
+      "samplerSteps": 2,
+      "seed": 42,
+      "exactWordMatches": 1,
+      "passages": 3
+    },
+    {
+      "language": "en",
+      "voice": "alba",
+      "temperature": 0.3,
+      "phrasing": "balanced",
+      "samplerSteps": 4,
+      "seed": 42,
+      "exactWordMatches": 0,
+      "passages": 3
+    },
+    {
+      "language": "en",
+      "voice": "alba",
+      "temperature": 0.3,
+      "phrasing": "balanced",
+      "samplerSteps": 1,
+      "seed": 77,
+      "exactWordMatches": 1,
+      "passages": 1
+    },
+    {
+      "language": "en",
+      "voice": "jane",
+      "temperature": 0.3,
+      "phrasing": "balanced",
+      "samplerSteps": 1,
+      "seed": 42,
+      "exactWordMatches": 2,
+      "passages": 3
+    },
+    {
+      "language": "en",
+      "voice": "vera",
+      "temperature": 0.3,
+      "phrasing": "balanced",
+      "samplerSteps": 1,
+      "seed": 42,
+      "exactWordMatches": 2,
+      "passages": 3
+    },
+    {
+      "language": "en",
+      "voice": "george",
+      "temperature": 0.3,
+      "phrasing": "balanced",
+      "samplerSteps": 1,
+      "seed": 42,
+      "exactWordMatches": 0,
+      "passages": 3
+    },
+    {
+      "language": "en",
+      "voice": "george",
+      "temperature": 0.15,
+      "phrasing": "balanced",
+      "samplerSteps": 1,
+      "seed": 42,
+      "exactWordMatches": 1,
+      "passages": 3
+    },
+    {
+      "language": "en",
+      "voice": "george",
+      "temperature": 0.45,
+      "phrasing": "balanced",
+      "samplerSteps": 1,
+      "seed": 42,
+      "exactWordMatches": 0,
+      "passages": 3
+    },
+    {
+      "language": "en",
+      "voice": "george",
+      "temperature": 0.3,
+      "phrasing": "short",
+      "samplerSteps": 1,
+      "seed": 42,
+      "exactWordMatches": 1,
+      "passages": 3
+    },
+    {
+      "language": "en",
+      "voice": "george",
+      "temperature": 0.3,
+      "phrasing": "flow",
+      "samplerSteps": 1,
+      "seed": 42,
+      "exactWordMatches": 0,
+      "passages": 3
+    },
+    {
+      "language": "en",
+      "voice": "george",
+      "temperature": 0.3,
+      "phrasing": "balanced",
+      "samplerSteps": 2,
+      "seed": 42,
+      "exactWordMatches": 0,
+      "passages": 3
+    },
+    {
+      "language": "en",
+      "voice": "george",
+      "temperature": 0.3,
+      "phrasing": "balanced",
+      "samplerSteps": 4,
+      "seed": 42,
+      "exactWordMatches": 0,
+      "passages": 3
+    },
+    {
+      "language": "en",
+      "voice": "george",
+      "temperature": 0.3,
+      "phrasing": "balanced",
+      "samplerSteps": 1,
+      "seed": 77,
+      "exactWordMatches": 0,
+      "passages": 1
+    },
+    {
+      "language": "en",
+      "voice": "peter_yearsley",
+      "temperature": 0.3,
+      "phrasing": "balanced",
+      "samplerSteps": 1,
+      "seed": 42,
+      "exactWordMatches": 3,
+      "passages": 3
+    },
+    {
+      "language": "en",
+      "voice": "stuart_bell",
+      "temperature": 0.3,
+      "phrasing": "balanced",
+      "samplerSteps": 1,
+      "seed": 42,
+      "exactWordMatches": 2,
+      "passages": 3
+    },
+    {
+      "language": "es",
+      "voice": "lola",
+      "temperature": 0.3,
+      "phrasing": "balanced",
+      "samplerSteps": 1,
+      "seed": 42,
+      "exactWordMatches": 1,
+      "passages": 3
+    },
+    {
+      "language": "es",
+      "voice": "lola",
+      "temperature": 0.15,
+      "phrasing": "balanced",
+      "samplerSteps": 1,
+      "seed": 42,
+      "exactWordMatches": 1,
+      "passages": 3
+    },
+    {
+      "language": "es",
+      "voice": "lola",
+      "temperature": 0.45,
+      "phrasing": "balanced",
+      "samplerSteps": 1,
+      "seed": 42,
+      "exactWordMatches": 1,
+      "passages": 3
+    },
+    {
+      "language": "es",
+      "voice": "lola",
+      "temperature": 0.3,
+      "phrasing": "short",
+      "samplerSteps": 1,
+      "seed": 42,
+      "exactWordMatches": 3,
+      "passages": 3
+    },
+    {
+      "language": "es",
+      "voice": "lola",
+      "temperature": 0.3,
+      "phrasing": "flow",
+      "samplerSteps": 1,
+      "seed": 42,
+      "exactWordMatches": 0,
+      "passages": 3
+    },
+    {
+      "language": "es",
+      "voice": "lola",
+      "temperature": 0.3,
+      "phrasing": "balanced",
+      "samplerSteps": 2,
+      "seed": 42,
+      "exactWordMatches": 1,
+      "passages": 3
+    },
+    {
+      "language": "es",
+      "voice": "lola",
+      "temperature": 0.3,
+      "phrasing": "balanced",
+      "samplerSteps": 4,
+      "seed": 42,
+      "exactWordMatches": 1,
+      "passages": 3
+    },
+    {
+      "language": "es",
+      "voice": "lola",
+      "temperature": 0.3,
+      "phrasing": "balanced",
+      "samplerSteps": 1,
+      "seed": 77,
+      "exactWordMatches": 1,
+      "passages": 1
+    },
+    {
+      "language": "es",
+      "voice": "alba",
+      "temperature": 0.3,
+      "phrasing": "balanced",
+      "samplerSteps": 1,
+      "seed": 42,
+      "exactWordMatches": 1,
+      "passages": 3
+    },
+    {
+      "language": "es",
+      "voice": "alba",
+      "temperature": 0.15,
+      "phrasing": "balanced",
+      "samplerSteps": 1,
+      "seed": 42,
+      "exactWordMatches": 1,
+      "passages": 3
+    },
+    {
+      "language": "es",
+      "voice": "alba",
+      "temperature": 0.45,
+      "phrasing": "balanced",
+      "samplerSteps": 1,
+      "seed": 42,
+      "exactWordMatches": 1,
+      "passages": 3
+    },
+    {
+      "language": "es",
+      "voice": "alba",
+      "temperature": 0.3,
+      "phrasing": "short",
+      "samplerSteps": 1,
+      "seed": 42,
+      "exactWordMatches": 3,
+      "passages": 3
+    },
+    {
+      "language": "es",
+      "voice": "alba",
+      "temperature": 0.3,
+      "phrasing": "flow",
+      "samplerSteps": 1,
+      "seed": 42,
+      "exactWordMatches": 0,
+      "passages": 3
+    },
+    {
+      "language": "es",
+      "voice": "alba",
+      "temperature": 0.3,
+      "phrasing": "balanced",
+      "samplerSteps": 2,
+      "seed": 42,
+      "exactWordMatches": 1,
+      "passages": 3
+    },
+    {
+      "language": "es",
+      "voice": "alba",
+      "temperature": 0.3,
+      "phrasing": "balanced",
+      "samplerSteps": 4,
+      "seed": 42,
+      "exactWordMatches": 1,
+      "passages": 3
+    },
+    {
+      "language": "es",
+      "voice": "alba",
+      "temperature": 0.3,
+      "phrasing": "balanced",
+      "samplerSteps": 1,
+      "seed": 77,
+      "exactWordMatches": 0,
+      "passages": 1
+    },
+    {
+      "language": "es",
+      "voice": "jane",
+      "temperature": 0.3,
+      "phrasing": "balanced",
+      "samplerSteps": 1,
+      "seed": 42,
+      "exactWordMatches": 0,
+      "passages": 3
+    },
+    {
+      "language": "es",
+      "voice": "george",
+      "temperature": 0.3,
+      "phrasing": "balanced",
+      "samplerSteps": 1,
+      "seed": 42,
+      "exactWordMatches": 2,
+      "passages": 3
+    }
+  ],
+  "validation": [
+    "All 106 WAV files match their recorded SHA-256 hashes; all chunk token counts are within the requested cap.",
+    "Browser playback, language filters, ratings, shortlisting and JSON export verified; test ratings were cleared.",
+    "15 Pocket tests reported passing; four opt-in asset/reference tests skipped in this run. The generated suite directly exercises native synthesis.",
+    "No listening winner, model-weight change, production profile promotion or app release."
+  ]
+}

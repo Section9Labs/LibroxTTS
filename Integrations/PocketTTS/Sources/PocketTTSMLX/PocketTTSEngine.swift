@@ -4,7 +4,7 @@ import KokoroCatalog
 import MLX
 
 public enum PocketTTSError: LocalizedError {
-    case emptyText, textTooLong, invalidVoice, unsupportedLanguage, invalidAssets, invalidAudio
+    case emptyText, textTooLong, invalidVoice, unsupportedLanguage, invalidAssets, invalidAudio, invalidSamplerSteps
     public var errorDescription: String? {
         switch self {
         case .emptyText: "There is no text to speak."
@@ -13,6 +13,7 @@ public enum PocketTTSError: LocalizedError {
         case .unsupportedLanguage: "Pocket TTS does not support this language."
         case .invalidAssets: "The Pocket TTS language pack is missing or invalid. Download it again."
         case .invalidAudio: "Pocket TTS did not produce valid audio."
+        case .invalidSamplerSteps: "Pocket TTS sampler steps must be between 1 and 8."
         }
     }
 }
@@ -29,12 +30,14 @@ public actor PocketTTSEngine {
     public func unload() { model = nil; language = nil }
     public func synthesize(_ text: String, voiceID: String, temperature: Float = 0.3,
                            continueChunks: Bool = true, chunking: PocketTTSChunkingOptions = .init(),
-                           role: PocketTTSPassageRole = .narration) throws -> Output {
+                           role: PocketTTSPassageRole = .narration, samplerSteps: Int = 1) throws -> Output {
         try chunking.validate()
+        guard (1...8).contains(samplerSteps) else { throw PocketTTSError.invalidSamplerSteps }
         guard let voice = PocketTTSCatalog.voice(id: voiceID) else { throw PocketTTSError.invalidVoice }
         guard text.unicodeScalars.count <= 16_384 else { throw PocketTTSError.textTooLong }
         let model = try loadedModel(language: voice.language)
         model.temp = temperature
+        model.lsd_decode_steps = samplerSteps
         var samples: [Float] = []
         try model.render(text: text, voice: voice.name, continuation: continueChunks, chunking: chunking,
                          role: role, language: voice.language) { chunk in
@@ -49,11 +52,14 @@ public actor PocketTTSEngine {
     public func renderFrames(_ text: String, voiceID: String,
                              chunking: PocketTTSChunkingOptions = .init(),
                              role: PocketTTSPassageRole = .narration,
+                             samplerSteps: Int = 1,
                              receive: @Sendable ([Float]) throws -> Void) throws {
         try chunking.validate()
+        guard (1...8).contains(samplerSteps) else { throw PocketTTSError.invalidSamplerSteps }
         guard let voice = PocketTTSCatalog.voice(id: voiceID) else { throw PocketTTSError.invalidVoice }
         let model = try loadedModel(language: voice.language)
         model.temp = 0.3
+        model.lsd_decode_steps = samplerSteps
         try model.render(text: text, voice: voice.name, chunking: chunking, role: role,
                          language: voice.language, onChunk: receive)
     }

@@ -183,3 +183,16 @@ from independent sampling and accumulated autoregressive floating-point drift.
 Validation reports are in [Validation](Validation/). They cover real native
 M3 Ultra renders, seven-language CPU/MLX parity and an ASR content screen. These
 are not perceptual acceptance, all-voice qualification, or device endurance tests.
+
+## Listening comparisons
+
+See [the listening suite](../../Scripts/PocketTTS/LISTENING.md) to generate the
+English/Spanish narrator auditions and a local review page. It compares voice,
+temperature, adaptive phrasing and sampler steps in separate rounds, then checks
+repeat takes. The page supports ratings, shortlists, notes and configuration
+exports. These are auditions; no winner or new app default is selected.
+
+Direct `synthesize` and `renderFrames` calls accept `samplerSteps` (1–8, default 1).
+The shared narrator renderer continues to use one step. Promote selected temperature
+and sampler settings into the production profile/cache contract before using a
+nondefault audition configuration in the app.

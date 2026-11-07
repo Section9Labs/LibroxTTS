@@ -61,3 +61,26 @@ assertion that adaptive chunk plans equal upstream plans.
 
 These are structural/content checks. Choosing pleasant narration targets still
 requires listening; the 48/32 soft targets are starting points, not tuned presets.
+
+## Controlled listening suite
+
+Generated 106 English/Spanish WAV clips (1,860.24 seconds) across ten language/voice
+combinations, three original passages, temperatures 0.15/0.30/0.45, three phrasing
+policies, sampler steps 1/2/4 and repeat takes. A same-seed rerun matched the original
+WAV byte-for-byte. All clip hashes and token caps were verified.
+
+ASR matched normalized words exactly for 37 clips; 69 have review flags. Those are
+not 69 confirmed synthesis failures, and the 37 matches are not listening approval.
+Peter Yearsley/English/balanced and Lola or Alba/Spanish/short matched all three
+passages at temperature 0.3, one step, seed 42. They are candidates for listening,
+not selected winners. See `listening-suite.json` for per-configuration evidence.
+
+The local HTML page supports playback, language/passage/round filters, ratings,
+shortlists, chunk inspection and JSON export. Browser checks verified playback,
+filters, rating/shortlist state and exported settings; temporary test ratings were
+cleared. All 15 Pocket tests reported passing (four opt-in asset tests skipped);
+the generated suite itself exercises native synthesis with installed weights.
+
+See `Scripts/PocketTTS/LISTENING.md` for reproduction. Audio and the complete
+manifest live in ignored `Benchmarks/Narration/results/pocket-tts-2026-11-07/listening-suite/`.
+No production preset or app default has been changed.
