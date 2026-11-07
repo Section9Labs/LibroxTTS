@@ -11,14 +11,16 @@ public enum NarrationAssets {
         switch model {
         case .compact: "mrbrutti/librox@kokoro-coreml-2026-10-15"
         case .kokoroDesktop: "narration-kokoroDesktop"
-        case .plus: CTAssets.coreMLIdentity
+        case .plus: CTApprovedExpression.isDownloadPublished ? CTApprovedExpression.installationIdentity : CTAssets.coreMLIdentity
         case .enhanced: "narration-enhanced-ane-v1"
         case .qwenDesktop: "narration-qwenDesktop"
         }
     }
     public static func compatibleRepositoryIDs(_ model: NarrationModel) -> [String] {
-        model == .plus ? [repositoryID(model), CTApprovedExpression.installationIdentity, CTAssets.releasedIdentity]
-            : [repositoryID(model)]
+        guard model == .plus else { return [repositoryID(model)] }
+        var seen = Set<String>()
+        return [repositoryID(model), CTApprovedExpression.installationIdentity, CTAssets.identity, CTAssets.releasedIdentity]
+            .filter { seen.insert($0).inserted }
     }
     /// Older playback is explicit and restricted to that installation's voices.
     /// A retained CT F1 installation is never relabelled as the ten-style DK bank.
@@ -47,7 +49,7 @@ public enum NarrationAssets {
             guard let url = Bundle.module.url(forResource: "NarrationBasic", withExtension: "json") else { throw CTError.invalidAssets("Basic manifest") }
             return try JSONDecoder().decode(AssetManifest.self, from: Data(contentsOf: url))
         case .plus:
-            let identity = selected ?? CTAssets.identity
+            let identity = selected ?? repositoryID(model)
             let pinned = try CTAssets.manifest(identity: identity)
             let tag = identity == CTApprovedExpression.installationIdentity ? CTApprovedExpression.releaseTag
                 : identity == CTAssets.identity ? CTAssets.releaseTag : CTAssets.releasedTag
@@ -70,7 +72,11 @@ public enum NarrationAssets {
         }
     }
     public static func bundledResourceName(_ model: NarrationModel) -> String? {
-        switch model { case .kokoroDesktop: "BundledNarrationHD"; case .plus: "CTCoreMLV2GPUAssets"; default: nil }
+        switch model {
+        case .kokoroDesktop: "BundledNarrationHD"
+        case .plus: CTApprovedExpression.isDownloadPublished ? "CTApprovedExpressionAssets" : "CTCoreMLV2GPUAssets"
+        default: nil
+        }
     }
     public static func isDownloadPublished(_ model: NarrationModel, repositoryID: String? = nil) -> Bool {
         let selected = repositoryID ?? Self.repositoryID(model)
@@ -91,7 +97,7 @@ public enum NarrationAssets {
     /// Known older installations are read-only reuse candidates, not evidence
     /// that an old model can render every voice in the current catalog.
     public static func previousRepositoryIDs(_ model: NarrationModel) -> [String] {
-        model == .plus ? ["librox-plus-dk-coreml-v1", "librox-plus-ct-f1-coremlgpu-v2"] : []
+        model == .plus ? [CTAssets.identity, "librox-plus-dk-coreml-v1", CTAssets.releasedIdentity] : []
     }
 
     /// Seed a private staging directory using current manifest hashes. Never
@@ -189,7 +195,7 @@ public enum NarrationAssets {
             // Pay the common generator functions' hardware specialization cost
             // while the install UI is preparing the voice, before the first Play.
             // Each model is released before the next; weights and audio stay unchanged.
-            try CTAssets.prepare(directory, specializeFor: .coreMLGPUHeavy, identity: repositoryID ?? CTAssets.identity)
+            try CTAssets.prepare(directory, specializeFor: .coreMLGPUHeavy, identity: repositoryID ?? Self.repositoryID(model))
             try configureForPlayback(directory)
             return
         }

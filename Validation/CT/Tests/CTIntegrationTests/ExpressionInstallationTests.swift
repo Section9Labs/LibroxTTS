@@ -11,11 +11,13 @@ import LibroxCTNative
     #expect(combined.identity == id)
     #expect(combined.files.count == base.files.count + 8)
     #expect(manifest.files.count == combined.files.count)
-    #expect(NarrationAssets.repositoryID(.plus) == CTAssets.identity) // Candidate not activated publicly yet.
+    #expect(NarrationAssets.repositoryID(.plus) == (CTApprovedExpression.isDownloadPublished ? id : CTAssets.identity))
+    #expect(NarrationAssets.compatibleRepositoryIDs(.plus).contains(CTAssets.identity))
+    #expect(NarrationAssets.previousRepositoryIDs(.plus).contains(CTAssets.identity))
     #expect(NarrationAssets.compatibleRepositoryIDs(.plus).contains(id))
     #expect(NarrationAssets.compatibleRepositoryIDs(.plus).contains(CTAssets.releasedIdentity))
     #expect(NarrationAssets.supportedNativeStyles(repositoryID: id) == CTAssets.styles)
-    #expect(!NarrationAssets.isDownloadPublished(.plus, repositoryID: id))
+    #expect(NarrationAssets.isDownloadPublished(.plus, repositoryID: id) == CTApprovedExpression.isDownloadPublished)
     #expect(!NarrationAssets.isDownloadPublished(.plus, repositoryID: "unknown-installation"))
     let old = Set(base.files.map { $0.sha256 + ":" + String($0.bytes) })
     let missing = manifest.files.filter { !old.contains($0.sha256 + ":" + String($0.size)) }
