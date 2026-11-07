@@ -8,17 +8,24 @@ import Foundation
 /// atomic publication prevent partial compiler output from becoming visible.
 enum CTCompiledModelCache {
     static func modelURL(for package: URL) throws -> URL {
-        let fm = FileManager.default
         let name = package.lastPathComponent
         let files = try CTAssets.manifest().files.filter { $0.path.hasPrefix("coreml/" + name + "/") }
         guard !files.isEmpty else { throw CTError.invalidAssets(name) }
+        return try modelURL(for: package,
+            verifiedIdentity: files.sorted { $0.path < $1.path }.map { $0.path + ":" + $0.sha256 })
+    }
+
+    /// Internal only: callers must verify all source bytes against SDK-pinned hashes first.
+    static func modelURL(for package: URL, verifiedIdentity: [String]) throws -> URL {
+        guard !verifiedIdentity.isEmpty else { throw CTError.invalidAssets("compiler source identity") }
+        let fm = FileManager.default
         #if arch(arm64)
         let architecture = "arm64"
         #else
         let architecture = "x86_64"
         #endif
         let identity = (["ct-compiler-cache-v1", architecture, ProcessInfo.processInfo.operatingSystemVersionString]
-            + files.sorted { $0.path < $1.path }.map { $0.path + ":" + $0.sha256 }).joined(separator: "\n")
+            + verifiedIdentity).joined(separator: "\n")
         let key = SHA256.hash(data: Data(identity.utf8)).map { String(format: "%02x", $0) }.joined()
         let root: URL
         if let override = ProcessInfo.processInfo.environment["CT_COMPILE_CACHE_ROOT"] {

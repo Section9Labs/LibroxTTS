@@ -42,7 +42,8 @@ public enum NarrationModel: String, CaseIterable, Codable, Sendable, Identifiabl
         self == .plus ? "dk-delivery-v1:native44100:source-boundaries:native-dynamics" : "profiled-narration-runtime-1"
     }
     public func renderIdentity(for unit: BookNarrationUnit) -> String {
-        self == .plus ? deliveryIdentity + ":context=" + (unit.nativeTextContext?.renderCacheKey ?? "none")
+        self == .plus ? deliveryIdentity + ":context="
+            + (unit.nativeExpression?.cacheIdentity ?? unit.nativeTextContext?.renderCacheKey ?? "none")
             : deliveryProfile.renderIdentity(for: unit)
     }
     public struct NativeVoice: Identifiable, Sendable {

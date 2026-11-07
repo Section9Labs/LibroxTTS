@@ -17,6 +17,7 @@ public actor CTEngine {
     /// Whole-passage decoding is retained for deterministic equivalence checks.
     public enum VocoderMode: Sendable { case bounded, wholePassage }
     private let vocoderMode: VocoderMode
+    private let contextStyleDiagnostic: CTContextStyleDiagnostic.Configuration?
     private var voiceID = CTAssets.voiceID
     private var activeBlend: CTVoiceBlend?
     private var backend: Backend
@@ -31,6 +32,7 @@ public actor CTEngine {
         var dpFeature: MLFeatureValue
         let totalStep: MLFeatureValue
         let steps: [MLFeatureValue]
+        let contextStyleEncoder: CTContextStyleDiagnostic.Encoder?
     }
     private struct Style: Decodable {
         struct Table: Decodable { let data: [[[Float]]]; let dims: [Int] }
@@ -48,9 +50,11 @@ public actor CTEngine {
         case absent, identity, applied, rejected
     }
     public init(directory: URL, backend: Backend = .coreMLCPU, vocoderMode: VocoderMode = .bounded,
-                assetIdentity: String = CTAssets.identity) {
+                assetIdentity: String = CTAssets.identity,
+                contextStyleDiagnostic: CTContextStyleDiagnostic.Configuration? = nil) {
         self.directory = directory; self.backend = backend; self.vocoderMode = vocoderMode
         self.assetIdentity = assetIdentity
+        self.contextStyleDiagnostic = contextStyleDiagnostic
     }
     public func unload() { state = nil; activeBlend = nil }
     /// Foreground GPU and background CPU share the text models and styles.
@@ -92,7 +96,8 @@ public actor CTEngine {
             ttl: ttl, dp: dp,
             ttlFeature: CTCoreMLGraph.feature(ttl), dpFeature: CTCoreMLGraph.feature(dp),
             totalStep: CTCoreMLGraph.feature(CTTensor([Float(10)], shape: [1])),
-            steps: (0..<10).map { try CTCoreMLGraph.feature(CTTensor([Float($0)], shape: [1])) })
+            steps: (0..<10).map { try CTCoreMLGraph.feature(CTTensor([Float($0)], shape: [1])) },
+            contextStyleEncoder: contextStyleDiagnostic.map { try CTContextStyleDiagnostic.Encoder(configuration: $0) })
     }
     /// Select pinned styles without reloading graphs. A blend is a deterministic
     /// interpolation of both conditioning tables, never a mix of rendered audio.
@@ -127,7 +132,8 @@ public actor CTEngine {
     /// Voice and language are checked even when callers bypass the app facade.
     public func synthesize(_ text: String, language: String, voiceID: String? = nil,
                            initialNoise: CTTensor? = nil, captureTrace: Bool = false,
-                           completeSentence: Bool = true, textContext: CTTextContext.Binding? = nil) throws -> Output {
+                           completeSentence: Bool = true, textContext: CTTextContext.Binding? = nil,
+                           expression: CTExpressionInput? = nil) throws -> Output {
         try Task.checkCancellation()
         guard voiceID == nil || voiceID == self.voiceID else { throw CTError.unsupportedVoice }
         guard let state else { throw CTError.notLoaded }
@@ -137,7 +143,7 @@ public actor CTEngine {
         func recordFeature(_ name: String, _ feature: MLFeatureValue) throws {
             if captureTrace { trace[name] = try CTCoreMLGraph.tensor(feature) }
         }
-        func run(_ name: String, _ inputs: [String: MLFeatureValue]) throws -> MLFeatureValue {
+        func run(_ name: String, _ inputs: [String: MLFeatureValue], timingKey: String? = nil) throws -> MLFeatureValue {
             try Task.checkCancellation()
             let start = Date()
             let output = try autoreleasepool {
@@ -145,9 +151,16 @@ public actor CTEngine {
                 guard let graph = state.coreML[name] else { throw CTError.notLoaded }
                 return try graph.predict(inputs)
             }
-            times[name, default: 0] += Date().timeIntervalSince(start)
+            times[timingKey ?? name, default: 0] += Date().timeIntervalSince(start)
             try Task.checkCancellation()
             return output
+        }
+        // Production expression evidence cannot fall through to the older gather algorithm.
+        if let expression {
+            guard contextStyleDiagnostic?.manifestSHA256 == CTApprovedExpression.manifestSHA256,
+                  contextStyleDiagnostic?.carryMode == .linearTwoStep,
+                  expression.binding == textContext, activeBlend == nil,
+                  assetIdentity == CTAssets.identity else { throw CTError.invalidTensor("expression configuration mismatch") }
         }
         let ids = try state.tokenizer.encode(text, language: language, completeSentence: completeSentence)
         let idsTensor = try CTTensor(ids, shape: [1, ids.count])
@@ -181,16 +194,24 @@ public actor CTEngine {
         if let (textContext, contextIDs) = preparedContext {
             let contextIDTensor = try CTTensor(contextIDs, shape: [1, contextIDs.count])
             let contextMask = try CTTensor([Float](repeating: 1, count: contextIDs.count), shape: [1, 1, contextIDs.count])
-            let encoded = try CTCoreMLGraph.tensor(run("text_encoder_early", [
+            let contextFeed = [
                 "text_ids": try CTCoreMLGraph.feature(contextIDTensor),
-                "text_mask": try CTCoreMLGraph.feature(contextMask), "style_ttl": state.ttlFeature]))
-            guard encoded.shape == [1, 256, contextIDs.count] else { throw CTError.invalidTensor("context encoder shape") }
-            let values = try encoded.floats()
-            var selected: [Float] = []; selected.reserveCapacity(256 * ids.count)
-            for channel in 0..<256 {
-                selected += textContext.gatherIndices.map { values[channel * contextIDs.count + $0] }
+                "text_mask": try CTCoreMLGraph.feature(contextMask), "style_ttl": state.ttlFeature]
+            if let encoder = state.contextStyleEncoder {
+                let encoded = try encoder.encode(context: contextFeed, unit: feed, binding: textContext, expression: expression)
+                early = encoded.features
+                for (name, seconds) in encoded.seconds { times[name, default: 0] += seconds }
+                for (name, value) in encoded.diagnosticFeatures { try recordFeature(name, value) }
+            } else {
+                let encoded = try CTCoreMLGraph.tensor(run("text_encoder_early", contextFeed))
+                guard encoded.shape == [1, 256, contextIDs.count] else { throw CTError.invalidTensor("context encoder shape") }
+                let values = try encoded.floats()
+                var selected: [Float] = []; selected.reserveCapacity(256 * ids.count)
+                for channel in 0..<256 {
+                    selected += textContext.gatherIndices.map { values[channel * contextIDs.count + $0] }
+                }
+                early = try CTCoreMLGraph.feature(CTTensor(selected, shape: [1, 256, ids.count]))
             }
-            early = try CTCoreMLGraph.feature(CTTensor(selected, shape: [1, 256, ids.count]))
             contextDisposition = .applied
             record("context_text_ids", contextIDTensor)
             record("context_gather_indices", try CTTensor(textContext.gatherIndices.map(Int64.init), shape: [ids.count]))
@@ -233,11 +254,43 @@ public actor CTEngine {
         let generatorMask = try CTCoreMLGraph.paddedText(maskFeature)
         let generatorEarly = try CTCoreMLGraph.paddedText(early)
         let generatorLate = try CTCoreMLGraph.paddedText(late)
+        var carrySteps: [Int: MLFeatureValue] = [:]
+        let carryMode = contextStyleDiagnostic?.carryMode ?? .disabled
+        if contextDisposition == .applied, carryMode != .disabled {
+            carrySteps = try autoreleasepool {
+                let reference = try run("text_encoder_early", feed, timingKey: "context_carry_reference_encoder")
+                try recordFeature("context_carry_reference", reference)
+                let started = Date()
+                let contextualTensor = try CTCoreMLGraph.tensor(early)
+                let referenceTensor = try CTCoreMLGraph.tensor(reference)
+                let lateTensor = try CTCoreMLGraph.tensor(late)
+                let prepared = try CTContextCarry.prepare(contextual: contextualTensor, reference: referenceTensor,
+                    late: lateTensor, mode: carryMode)
+                record("context_carry_residual", prepared.residual)
+                record("context_carry_step3_unpadded", prepared.step3)
+                record("context_carry_step4_unpadded", prepared.step4)
+                let step3 = try CTCoreMLGraph.paddedText(CTCoreMLGraph.feature(prepared.step3))
+                let step4 = try CTCoreMLGraph.paddedText(CTCoreMLGraph.feature(prepared.step4))
+                let retainedBytes = [step3, step4].reduce(0) { $0 + ($1.multiArrayValue?.count ?? 0) * 4 }
+                // Accounting categories are separate, not an inferred peak sum.
+                record("context_carry_payload_bytes", try CTTensor([
+                    Float(contextualTensor.data.count + referenceTensor.data.count + lateTensor.data.count),
+                    Float(prepared.floatArrayPayloadBytes), Float(prepared.newTensorPayloadBytes), Float(retainedBytes),
+                    Float(referenceTensor.data.count)
+                ], shape: [5]))
+                times["context_carry_prepare", default: 0] += Date().timeIntervalSince(started)
+                return [3: step3, 4: step4]
+            }
+        }
         for step in 0..<10 {
-            latent = try run("vector_estimator", ["noisy_latent": latent, "text_emb": step < 3 ? generatorEarly : generatorLate,
+            let conditioning = carrySteps[step] ?? (step < 3 ? generatorEarly : generatorLate)
+            if step == 3 || step == 4 { try recordFeature("generator_conditioning_step_\(step)", conditioning) }
+            latent = try run("vector_estimator", ["noisy_latent": latent, "text_emb": conditioning,
                 "style_ttl": state.ttlFeature, "text_mask": generatorMask, "latent_mask": latentMaskFeature,
                 "current_step": state.steps[step], "total_step": state.totalStep, "text_ids": generatorIDs])
             try recordFeature("latent_after_step_\(step)", latent)
+            // The two carry buffers are dead immediately after their respective step.
+            carrySteps.removeValue(forKey: step)
         }
         let samples: [Float]
         switch vocoderMode {

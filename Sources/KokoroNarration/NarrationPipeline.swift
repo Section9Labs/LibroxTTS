@@ -22,7 +22,7 @@ public actor NarrationPipeline {
                      narratorVoiceID: String?, language: String? = nil, metadataLanguage: String? = nil,
                      cast: BookVoiceCast? = nil, characterVoices: Bool = false,
                      options: PronunciationOptions = .init(), delivery: NarrationDeliveryOptions = .init(expressive: true),
-                     lexicon: SpokenTextLexicon = .init()) async throws -> Plan {
+                     lexicon: SpokenTextLexicon = .init(), nativeExpression: Bool = false) async throws -> Plan {
         try Task.checkCancellation()
         let delivery = model.resolvedDeliveryOptions(delivery)
         let preferredLanguage = narratorVoiceID.flatMap { id in
@@ -78,6 +78,10 @@ public actor NarrationPipeline {
         }
         for index in units.indices where units[index].prosody == nil {
             units[index].prosody = NarrationProsody.analyze(text: units[index].text, languageCode: language)
+        }
+        if model == .plus, nativeExpression, !delivery.blendedVoice {
+            units = try NarrationNativeExpression.prepare(units: units, source: text,
+                decisions: originalPlan?.attribution?.decisions ?? [])
         }
         return Plan(units: units, narratorVoiceID: updatedCast?.narratorVoiceID ?? voiceID,
                     language: language, cast: updatedCast,

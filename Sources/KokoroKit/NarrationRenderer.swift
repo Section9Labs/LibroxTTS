@@ -34,18 +34,22 @@ public actor NarrationRenderer {
     private var currentRepositoryID: String?
     private let compactDirectory: URL
     private let harmonicSource: URL?
+    private let contextStyleDiagnostic: CTContextStyleDiagnostic.Configuration?
     private let logger = Logger(subsystem: "com.section9labs.Libros", category: "NarrationRenderer")
 
     /// Host-facing initializer: storage and bundled resources, with no model graph knowledge.
-    public init(storageRoot: URL, resources: Bundle) {
+    public init(storageRoot: URL, resources: Bundle, expressionDirectory: URL? = nil) {
         compactDirectory = storageRoot.appendingPathComponent(
             NarrationAssets.repositoryID(.compact).replacingOccurrences(of: "/", with: "_"), isDirectory: true)
         harmonicSource = resources.url(forResource: "NarrationSource", withExtension: "mlmodelc")
+        contextStyleDiagnostic = expressionDirectory.map(CTApprovedExpression.configuration)
     }
 
-    public init(compactDirectory: URL, harmonicSource: URL?) {
+    public init(compactDirectory: URL, harmonicSource: URL?,
+                contextStyleDiagnostic: CTContextStyleDiagnostic.Configuration? = nil) {
         self.compactDirectory = compactDirectory
         self.harmonicSource = harmonicSource
+        self.contextStyleDiagnostic = contextStyleDiagnostic
     }
 
     private func acquire() async {
@@ -89,7 +93,8 @@ public actor NarrationRenderer {
         }
         await unloadHeld()
         if selection == .plus {
-            let engine = CTEngine(directory: directory, backend: backend, assetIdentity: repositoryID)
+            let engine = CTEngine(directory: directory, backend: backend, assetIdentity: repositoryID,
+                contextStyleDiagnostic: contextStyleDiagnostic)
             try await engine.load()
             do { try Task.checkCancellation() } catch { await engine.unload(); throw error }
             plus = engine; plusBackend = backend; current = selection; currentDirectory = directory; currentRepositoryID = repositoryID
@@ -125,7 +130,8 @@ public actor NarrationRenderer {
             }
             try await plus.setVoice(voice.engineVoiceID, blend: delivery.nativeBlend(for: unit.voiceID))
             return try await renderNative(unit.synthesisText, language: voice.language, engine: plus,
-                                          textContext: delivery.nativeBlend(for: unit.voiceID) == nil ? unit.nativeTextContext : nil)
+                                          textContext: delivery.nativeBlend(for: unit.voiceID) == nil ? unit.nativeTextContext : nil,
+                                          expression: delivery.nativeBlend(for: unit.voiceID) == nil ? unit.nativeExpression : nil)
         }
         guard let kokoro else { throw RenderError.invalidAudio }
         let audio: Audio
@@ -146,10 +152,11 @@ public actor NarrationRenderer {
     }
 
     private func renderNative(_ text: String, language: String, engine: CTEngine, depth: Int = 0,
-                              textContext: CTTextContext.Binding? = nil) async throws -> [Float] {
+                              textContext: CTTextContext.Binding? = nil,
+                              expression: CTExpressionInput? = nil) async throws -> [Float] {
         try Task.checkCancellation()
         do {
-            let native = try await engine.synthesize(text, language: language, completeSentence: false, textContext: textContext)
+            let native = try await engine.synthesize(text, language: language, completeSentence: false, textContext: textContext, expression: expression)
             try Task.checkCancellation()
             return try CTDelivery.prepare(native.samples, sampleRate: NarrationModel.plus.outputSampleRate,
                                            level: .nativeDynamics).samples
@@ -176,7 +183,7 @@ public actor NarrationRenderer {
     /// Native-only review of one bounded unit with supplied noise. Uses the same
     /// model, voice and delivery as render(); does not silently split a comparison.
     public func renderNativeDiagnostic(_ unit: BookNarrationUnit, initialNoise: CTTensor? = nil,
-                                       delivery: NarrationDeliveryOptions = .init()) async throws -> NativeDiagnostic {
+                                       delivery: NarrationDeliveryOptions = .init(), captureTrace: Bool = true) async throws -> NativeDiagnostic {
         await acquire(); defer { release() }
         try Task.checkCancellation()
         guard let plus, let voice = NarrationModel.plus.nativeVoices.first(where: { $0.id == unit.voiceID }) else {
@@ -185,8 +192,9 @@ public actor NarrationRenderer {
         let blend = delivery.nativeBlend(for: unit.voiceID)
         try await plus.setVoice(voice.engineVoiceID, blend: blend)
         let native = try await plus.synthesize(unit.synthesisText, language: voice.language,
-            initialNoise: initialNoise, captureTrace: true, completeSentence: false,
-            textContext: blend == nil ? unit.nativeTextContext : nil)
+            initialNoise: initialNoise, captureTrace: captureTrace, completeSentence: false,
+            textContext: blend == nil ? unit.nativeTextContext : nil,
+            expression: blend == nil ? unit.nativeExpression : nil)
         let prepared = try CTDelivery.prepare(native.samples, sampleRate: NarrationModel.plus.outputSampleRate,
                                              level: .nativeDynamics)
         return NativeDiagnostic(samples: prepared.samples, native: native)

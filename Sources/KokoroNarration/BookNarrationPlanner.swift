@@ -30,6 +30,7 @@ public struct BookNarrationUnit: Sendable {
     /// Experimental, validated native input context. Nil preserves accepted DK.
     /// No production planner populates it until native listening qualification.
     public var nativeTextContext: CTTextContext.Binding? = nil
+    public var nativeExpression: CTExpressionInput? = nil
     public var requiresRendererSplit: Bool { phonemes.unicodeScalars.count > 510 }
 }
 
