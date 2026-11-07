@@ -27,6 +27,12 @@ ambiguous or untagged turns never imply alternating speakers. Existing EN/ES
 local pronoun/action continuations and gender evidence remain more extensive:
 this change does not claim equal coreference accuracy or infer gender from names.
 
+Reporting-tag matching normalizes a local copy to NFC, so decomposed accents and
+Hangul match the same literal rules. Leading decorative symbols are accepted at
+line start without skipping words or arbitrary preceding clauses. Quotation and
+playback ranges continue to reference the untouched source, including emoji and
+decomposed combining marks.
+
 Basic and Plus share the bounded stage parser. Registered speaker labels retain
 assigned voices; explicit localized parenthetical directions use the narrator.
 Ordinary parentheticals remain dialogue. Native single-narrator mode retains its
@@ -54,7 +60,12 @@ Arabic, Devanagari, Japanese and Korean scripts. The app's
 `testAllNativeLanguagesPersistAndRestoreManualCharacterVoices` exercises its
 actual store for all 31 languages.
 
-Both cache revisions advance: `native-characters-3` and `spoken-text-3`. Existing
+The Unicode regression repeats the 31 reporting fixtures with decomposed text,
+leading emoji, and both together (93 cases), preserving original source ranges.
+Another 29 cases ensure that symbol handling does not skip preceding words in
+the shared multilingual matcher; existing EN/ES abstention tests remain intact.
+
+Both cache revisions advance: `native-characters-4` and `spoken-text-3`. Existing
 app PCM keys include the combined pipeline revision; model assets do not change.
 Full SDK release tests pass, with the existing opt-in real-model skips retained.
 Native render receipts and app/build checks are recorded separately in the release
