@@ -96,3 +96,22 @@ expose unsupported controls or equate metadata with an acoustic capability.
 ## Full language rollout
 
 The subsequent [all-language implementation](ALL-LANGUAGE-NARRATION.md) removes the cast-storage/frontend-enum coupling and EN/ES attribution gate. All 31 Plus languages now share persistent character choices, localized explicit reporting/label rules, stage direction routing, spoken overrides and numeric preparation. This supersedes earlier EN/ES-only capability statements; it does not imply equal linguistic quality in every language. No model bytes change.
+
+## Beta successor (supersedes the earlier implementation gaps above)
+
+SDK0.4.0-beta.1 implements native style blending for all ten styles/all31 languages,
+persistable Unicode-aware spoken corrections, common multilingual reporting seam
+rules and an opt-in native semantic timing adapter. Shared native context PCM keys
+are integrated, but context is not attached by default: the newest comparative
+listening feedback did not establish a meaningful improvement.
+
+The released CT F1 manifest/runtime is retained independently for playback while
+DK stages and prepares. The app snapshots installation identity per playback
+generation, keeps model-specific PCM keys, offers an explicit Update action and
+keeps verified old files/receipts. No silent voice or engine substitution is used.
+
+Model-level gaps remain: Chinese synthesis in Plus, native regional pronunciation,
+phonemic/stress-dictionary equivalence, meaningful expression improvement and DL
+timing qualification. Ten-style blending and semantic cadence are implemented
+choices with technical tests, not automatic claims of preferred sound. See
+[shared delivery integration](SHARED-DELIVERY-UPGRADE.md) and the beta upgrade guide.

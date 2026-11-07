@@ -4,12 +4,11 @@ import KokoroNarration
 import LibroxTTS
 import LibroxCTNative
 
-@Test func plusPreviewPinsFilesAndRetainsModelLicense() throws {
+@Test func plusBetaPinsPublishedFilesAndRetainsModelLicense() throws {
     let manifest = try NarrationAssets.manifest(.plus)
     let native = try CTAssets.manifest()
-    // DK is a local listening candidate. Do not advertise its reserved URLs
-    // as downloadable until the assets are published and release-qualified.
-    #expect(!NarrationAssets.isDownloadPublished(.plus))
+    // The beta assets are public; every URL remains pinned to its immutable release.
+    #expect(NarrationAssets.isDownloadPublished(.plus))
     #expect(native.identity == "librox-plus-dk-coreml-v2")
     #expect(manifest.revision == CTAssets.releaseTag)
     #expect(manifest.downloadSize > 400_000_000 && manifest.downloadSize < 500_000_000)

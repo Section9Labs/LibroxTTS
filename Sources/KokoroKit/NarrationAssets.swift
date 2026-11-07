@@ -61,7 +61,7 @@ public enum NarrationAssets {
     public static func bundledResourceName(_ model: NarrationModel) -> String? {
         switch model { case .kokoroDesktop: "BundledNarrationHD"; case .plus: "CTCoreMLV2GPUAssets"; default: nil }
     }
-    public static func isDownloadPublished(_ model: NarrationModel) -> Bool { model.isEnabled && model != .plus }
+    public static func isDownloadPublished(_ model: NarrationModel) -> Bool { model.isEnabled }
     /// Preparation follows actual model/runtime identities, not the host's SDK
     /// version string. Hosts may persist this after successful preparation.
     public static func preparationIdentity(_ model: NarrationModel, repositoryID: String? = nil) -> String {

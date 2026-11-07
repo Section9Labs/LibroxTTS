@@ -1,6 +1,6 @@
 # LibroxTTS
 
-Offline speech synthesis and book narration for iPhone, iPad and Mac. **Librox Plus uses the official Core ML v2 CT F1 runtime**, with a 31-language native-text adapter and GPU acceleration for foreground inference. The existing Kokoro renderer provides 54 voices across eight languages. Neither renderer needs Python, ONNX Runtime, MLX or eSpeak at runtime.
+Offline speech synthesis and book narration for iPhone, iPad and Mac. **Librox Plus uses the Core ML DK runtime with ten native styles**, with a 31-language native-text adapter and GPU acceleration for foreground inference. The existing Kokoro renderer provides 54 voices across eight languages. Neither renderer needs Python, ONNX Runtime, MLX or eSpeak at runtime.
 
 [![Swift](https://github.com/Section9Labs/LibroxTTS/actions/workflows/swift.yml/badge.svg)](https://github.com/Section9Labs/LibroxTTS/actions/workflows/swift.yml)
 
@@ -9,7 +9,7 @@ Offline speech synthesis and book narration for iPhone, iPad and Mac. **Librox P
 Add the versioned Swift package:
 
 ```swift
-.package(url: "https://github.com/Section9Labs/LibroxTTS.git", exact: "0.3.0")
+.package(url: "https://github.com/Section9Labs/LibroxTTS.git", exact: "0.4.0-beta.1")
 ```
 
 Products include `LibroxTTS` (host-facing synthesis/install API), `LibroxCTNative` (Core ML CT runtime), `KokoroCatalog` (Kokoro voices/assets), and `KokoroPronunciation` (Kokoro text to model phonemes). There are no remote Swift dependencies. Swift 6, **iOS/Catalyst 18+ or macOS 15+** are required. Apple system language facilities are required, so Linux is not supported.
@@ -18,7 +18,7 @@ Products include `LibroxTTS` (host-facing synthesis/install API), `LibroxCTNativ
 
 See [the narrator integration API](docs/book-planning.md), [casting rules](docs/story-narrator.md), and [enhancement API and validation limits](docs/audio-enhancement.md). The optional, separately imported `QwenANE` product retains the Qwen renderer work; its existence does not establish device eligibility or sustained background performance. No MLX dependency is added to these library products. Rejected model auditions are not app dependencies.
 
-Version 0.3.0 ships the [shared narration pipeline](docs/UNIFIED-NARRATION.md), accepted CT passage delivery and bounded-vocoder runtime. Read the [0.3.0 app upgrade guide](docs/UPGRADE-0.3.0.md) for sample-rate, cache and model-download migration. Existing verified Core ML v2 weights are reused.
+Version 0.4.0-beta.1 adds the ten-style DK bank, shared character casting and persisted readings across all 31 Plus languages, opt-in native blending, and retained CT playback during updates. Read the [beta upgrade guide](docs/UPGRADE-0.4.0-beta.1.md). Native expression research remains off; this beta does not claim full acoustic parity or listening certification across every language. Stable 0.3.0 remains available with its original CT F1 bank.
 
 ## Speak with Plus
 

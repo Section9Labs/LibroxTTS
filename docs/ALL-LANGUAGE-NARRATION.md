@@ -65,7 +65,7 @@ leading emoji, and both together (93 cases), preserving original source ranges.
 Another 29 cases ensure that symbol handling does not skip preceding words in
 the shared multilingual matcher; existing EN/ES abstention tests remain intact.
 
-Both cache revisions advance: `native-characters-4` and `spoken-text-3`. Existing
+Both cache revisions advance: `native-characters-4` and `spoken-text-4`. Existing
 app PCM keys include the combined pipeline revision; model assets do not change.
 Full SDK release tests pass, with the existing opt-in real-model skips retained.
 Native render receipts and app/build checks are recorded separately in the release

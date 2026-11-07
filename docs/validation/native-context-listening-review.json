@@ -1,7 +1,7 @@
 {
-  "status": "listening-approved-for-presented-samples",
+  "status": "acceptable-sample-quality-not-a-meaningful-expression-improvement",
   "userQuote": "Just listened and they sound good",
-  "scope": "Positive sample-quality feedback on the four presented baseline-then-context comparisons; no comparative preference stated.",
+  "scope": "Earlier positive sample-quality feedback is preserved. Newer explicit comparative feedback, relayed by the listening session, did not establish a meaningful expression gain. Default remains off.",
   "cases": [
     {
       "case": "en-female-relief",
@@ -30,8 +30,9 @@
   "defaultEnabled": false,
   "phoneQualified": false,
   "remainingIntegration": [
-    "Include renderCacheKey in PCM identity",
-    "Coordinate automatic context attachment inside LibroxTTS",
-    "Measure native iPhone latency, memory and thermal behavior"
-  ]
+    "Meaningful listening improvement before enabling a production default",
+    "Native phone qualification; remaining dedicated hardware checks deferred to TestFlight"
+  ],
+  "newerComparativeFeedbackReported": "not a meaningful improvement but one in the right directionm.",
+  "cacheIdentityImplemented": "NarrationModel.renderIdentity(for:) now includes renderCacheKey"
 }
