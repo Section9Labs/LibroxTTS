@@ -16,7 +16,7 @@ final class CTCoreMLGraph {
         }
         configuration.allowLowPrecisionAccumulationOnGPU = false
         let compiledURL = try CTCompiledModelCache.modelURL(for: package)
-        model = try MLModel(contentsOf: compiledURL, configuration: configuration)
+        model = try autoreleasepool { try MLModel(contentsOf: compiledURL, configuration: configuration) }
     }
 
     /// Pad the masked text axis once per passage. Latent audio is never padded.

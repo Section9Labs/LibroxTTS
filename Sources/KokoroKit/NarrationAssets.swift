@@ -80,7 +80,14 @@ public enum NarrationAssets {
             atPath: directory.appendingPathComponent("frontend-fp32.mlmodelc").path)
     }
     public static func prepare(_ directory: URL, model: NarrationModel) throws {
-        if model == .plus { try CTAssets.prepare(directory); try configureForPlayback(directory); return }
+        if model == .plus {
+            // Pay the common generator functions' hardware specialization cost
+            // while the install UI is preparing the voice, before the first Play.
+            // Each model is released before the next; weights and audio stay unchanged.
+            try CTAssets.prepare(directory, specializeFor: .coreMLGPUHeavy)
+            try configureForPlayback(directory)
+            return
+        }
         if model == .compact { try ModelAssets.prepare(in: directory); return }
         try validate(directory, manifest: manifest(model))
         if model == .kokoroDesktop {

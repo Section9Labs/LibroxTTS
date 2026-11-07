@@ -13,6 +13,9 @@ public actor CTEngine {
         public var identity: String { "ct-fp32-general-" + rawValue + "-v2" }
     }
     private let directory: URL
+    /// Whole-passage decoding is retained for deterministic equivalence checks.
+    public enum VocoderMode: Sendable { case bounded, wholePassage }
+    private let vocoderMode: VocoderMode
     private var backend: Backend
     private var state: State?
     private struct State {
@@ -37,7 +40,9 @@ public actor CTEngine {
         public let trace: [String: CTTensor]
         public let graphSeconds: [String: Double]
     }
-    public init(directory: URL, backend: Backend = .coreMLCPU) { self.directory = directory; self.backend = backend }
+    public init(directory: URL, backend: Backend = .coreMLCPU, vocoderMode: VocoderMode = .bounded) {
+        self.directory = directory; self.backend = backend; self.vocoderMode = vocoderMode
+    }
     public func unload() { state = nil }
     /// Foreground GPU and background CPU share the text models and styles.
     /// Retire heavy allocations before replacement; never hold both backends.
@@ -162,8 +167,13 @@ public actor CTEngine {
                 "current_step": state.steps[step], "total_step": state.totalStep, "text_ids": generatorIDs])
             try recordFeature("latent_after_step_\(step)", latent)
         }
-        let wave = try run("vocoder", ["latent": latent])
-        let samples = try CTCoreMLGraph.tensor(wave).floats()
+        let samples: [Float]
+        switch vocoderMode {
+        case .bounded:
+            samples = try CTVocoderWindows.render(latent) { try run("vocoder", ["latent": $0]) }
+        case .wholePassage:
+            samples = try CTCoreMLGraph.tensor(run("vocoder", ["latent": latent])).floats()
+        }
         guard samples.count == latentLength * 3072, samples.allSatisfy(\.isFinite), samples.contains(where: { $0 != 0 }) else {
             throw CTError.invalidAudio
         }
