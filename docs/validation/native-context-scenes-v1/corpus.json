@@ -1,0 +1,83 @@
+{
+  "cases": [
+    {
+      "id": "en-female-relief",
+      "language": "en",
+      "file": "/Users/matt/Code/swift/librox-tts-story-context/docs/validation/native-context-scenes-v1/en-female-relief.txt",
+      "narratorVoiceID": "plus-f1-en-v1",
+      "speaker": "Clara",
+      "scene": "relief"
+    },
+    {
+      "id": "en-female-danger",
+      "language": "en",
+      "file": "/Users/matt/Code/swift/librox-tts-story-context/docs/validation/native-context-scenes-v1/en-female-danger.txt",
+      "narratorVoiceID": "plus-f1-en-v1",
+      "speaker": "Clara",
+      "scene": "danger"
+    },
+    {
+      "id": "en-male-relief",
+      "language": "en",
+      "file": "/Users/matt/Code/swift/librox-tts-story-context/docs/validation/native-context-scenes-v1/en-male-relief.txt",
+      "narratorVoiceID": "plus-f1-en-v1",
+      "speaker": "James",
+      "scene": "relief"
+    },
+    {
+      "id": "en-male-danger",
+      "language": "en",
+      "file": "/Users/matt/Code/swift/librox-tts-story-context/docs/validation/native-context-scenes-v1/en-male-danger.txt",
+      "narratorVoiceID": "plus-f1-en-v1",
+      "speaker": "James",
+      "scene": "danger"
+    },
+    {
+      "id": "es-female-relief",
+      "language": "es",
+      "file": "/Users/matt/Code/swift/librox-tts-story-context/docs/validation/native-context-scenes-v1/es-female-relief.txt",
+      "narratorVoiceID": "plus-f1-es-v1",
+      "speaker": "Clara",
+      "scene": "relief"
+    },
+    {
+      "id": "es-female-danger",
+      "language": "es",
+      "file": "/Users/matt/Code/swift/librox-tts-story-context/docs/validation/native-context-scenes-v1/es-female-danger.txt",
+      "narratorVoiceID": "plus-f1-es-v1",
+      "speaker": "Clara",
+      "scene": "danger"
+    },
+    {
+      "id": "es-male-relief",
+      "language": "es",
+      "file": "/Users/matt/Code/swift/librox-tts-story-context/docs/validation/native-context-scenes-v1/es-male-relief.txt",
+      "narratorVoiceID": "plus-f1-es-v1",
+      "speaker": "Diego",
+      "scene": "relief"
+    },
+    {
+      "id": "es-male-danger",
+      "language": "es",
+      "file": "/Users/matt/Code/swift/librox-tts-story-context/docs/validation/native-context-scenes-v1/es-male-danger.txt",
+      "narratorVoiceID": "plus-f1-es-v1",
+      "speaker": "Diego",
+      "scene": "danger"
+    },
+    {
+      "id": "en-narration-control",
+      "language": "en",
+      "file": "/Users/matt/Code/swift/librox-tts-story-context/docs/validation/native-context-scenes-v1/en-narration-control.txt",
+      "narratorVoiceID": "plus-f1-en-v1",
+      "scene": "narration-only control"
+    },
+    {
+      "id": "es-narration-control",
+      "language": "es",
+      "file": "/Users/matt/Code/swift/librox-tts-story-context/docs/validation/native-context-scenes-v1/es-narration-control.txt",
+      "narratorVoiceID": "plus-f1-es-v1",
+      "scene": "narration-only control"
+    }
+  ],
+  "scope": "Raw text only enters SDK. Gender/scene names are evaluation metadata, not acoustic control inputs."
+}

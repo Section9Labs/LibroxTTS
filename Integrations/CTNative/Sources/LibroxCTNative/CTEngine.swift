@@ -40,6 +40,10 @@ public actor CTEngine {
         public let predictedDuration: Float
         public let trace: [String: CTTensor]
         public let graphSeconds: [String: Double]
+        public let textContextDisposition: TextContextDisposition
+    }
+    public enum TextContextDisposition: String, Sendable {
+        case absent, identity, applied, rejected
     }
     public init(directory: URL, backend: Backend = .coreMLCPU, vocoderMode: VocoderMode = .bounded) {
         self.directory = directory; self.backend = backend; self.vocoderMode = vocoderMode
@@ -104,7 +108,7 @@ public actor CTEngine {
     /// Voice and language are checked even when callers bypass the app facade.
     public func synthesize(_ text: String, language: String, voiceID: String? = nil,
                            initialNoise: CTTensor? = nil, captureTrace: Bool = false,
-                           completeSentence: Bool = true) throws -> Output {
+                           completeSentence: Bool = true, textContext: CTTextContext.Binding? = nil) throws -> Output {
         try Task.checkCancellation()
         guard voiceID == nil || voiceID == self.voiceID else { throw CTError.unsupportedVoice }
         guard let state else { throw CTError.notLoaded }
@@ -141,7 +145,40 @@ public actor CTEngine {
             throw CTError.passageTooLong
         }
         let feed = ["text_ids": idsFeature, "text_mask": maskFeature, "style_ttl": state.ttlFeature]
-        let early = try run("text_encoder_early", feed)
+        let early: MLFeatureValue
+        var contextDisposition: TextContextDisposition = textContext == nil ? .absent : .rejected
+        var preparedContext: (CTTextContext.Binding, [Int64])?
+        if let textContext, !completeSentence,
+           let style = CTAssets.voiceStyles[self.voiceID],
+           CTTextContext.validates(textContext, spokenText: text, language: language,
+               modelFingerprint: try CTTextContext.modelFingerprint(), styleID: style),
+           let contextIDs = try? state.tokenizer.encode(textContext.contextText, language: language, completeSentence: false),
+           textContext.gatherIndices.count == ids.count,
+           textContext.gatherIndices.allSatisfy({ contextIDs.indices.contains($0) }),
+           textContext.gatherIndices.map({ contextIDs[$0] }) == ids {
+            if textContext.isIdentity { contextDisposition = .identity }
+            else { preparedContext = (textContext, contextIDs) }
+        }
+        if let (textContext, contextIDs) = preparedContext {
+            let contextIDTensor = try CTTensor(contextIDs, shape: [1, contextIDs.count])
+            let contextMask = try CTTensor([Float](repeating: 1, count: contextIDs.count), shape: [1, 1, contextIDs.count])
+            let encoded = try CTCoreMLGraph.tensor(run("text_encoder_early", [
+                "text_ids": try CTCoreMLGraph.feature(contextIDTensor),
+                "text_mask": try CTCoreMLGraph.feature(contextMask), "style_ttl": state.ttlFeature]))
+            guard encoded.shape == [1, 256, contextIDs.count] else { throw CTError.invalidTensor("context encoder shape") }
+            let values = try encoded.floats()
+            var selected: [Float] = []; selected.reserveCapacity(256 * ids.count)
+            for channel in 0..<256 {
+                selected += textContext.gatherIndices.map { values[channel * contextIDs.count + $0] }
+            }
+            early = try CTCoreMLGraph.feature(CTTensor(selected, shape: [1, 256, ids.count]))
+            contextDisposition = .applied
+            record("context_text_ids", contextIDTensor)
+            record("context_gather_indices", try CTTensor(textContext.gatherIndices.map(Int64.init), shape: [ids.count]))
+        } else {
+            early = try run("text_encoder_early", feed)
+
+        }
         let late = try run("text_encoder", feed)
         try recordFeature("text_emb_early", early); try recordFeature("text_emb_late", late)
         // Preserve numpy float32 duration arithmetic, including its rounding.
@@ -194,6 +231,7 @@ public actor CTEngine {
             throw CTError.invalidAudio
         }
         record("waveform", try CTTensor(samples, shape: [samples.count]))
-        return Output(samples: samples, predictedDuration: seconds, trace: trace, graphSeconds: times)
+        return Output(samples: samples, predictedDuration: seconds, trace: trace, graphSeconds: times,
+                      textContextDisposition: contextDisposition)
     }
 }

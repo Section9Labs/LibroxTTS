@@ -3,6 +3,7 @@ import Foundation
 import NaturalLanguage
 import KokoroCatalog
 import KokoroPronunciation
+import LibroxCTNative
 
 /// One bounded synthesis unit. Offsets and text refer to the original source;
 /// pronunciation is separate so a host never has to rewrite the displayed book.
@@ -26,6 +27,9 @@ public struct BookNarrationUnit: Sendable {
     /// treating successful token generation as pronunciation acceptance.
     /// Diagnostic offsets, where present, are local to this unit's text.
     public var pronunciationDiagnostics: [PronunciationDiagnostic] = []
+    /// Experimental, validated native input context. Nil preserves accepted DK.
+    /// No production planner populates it until native listening qualification.
+    public var nativeTextContext: CTTextContext.Binding? = nil
     public var requiresRendererSplit: Bool { phonemes.unicodeScalars.count > 510 }
 }
 

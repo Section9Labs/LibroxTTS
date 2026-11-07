@@ -117,7 +117,8 @@ public actor NarrationRenderer {
                 throw CTError.unsupportedVoice
             }
             try await plus.setVoice(voice.engineVoiceID)
-            return try await renderNative(unit.synthesisText, language: voice.language, engine: plus)
+            return try await renderNative(unit.synthesisText, language: voice.language, engine: plus,
+                                          textContext: unit.nativeTextContext)
         }
         guard let kokoro else { throw RenderError.invalidAudio }
         let audio: Audio
@@ -137,10 +138,11 @@ public actor NarrationRenderer {
         return try enhance(audio.samples)
     }
 
-    private func renderNative(_ text: String, language: String, engine: CTEngine, depth: Int = 0) async throws -> [Float] {
+    private func renderNative(_ text: String, language: String, engine: CTEngine, depth: Int = 0,
+                              textContext: CTTextContext.Binding? = nil) async throws -> [Float] {
         try Task.checkCancellation()
         do {
-            let native = try await engine.synthesize(text, language: language, completeSentence: false)
+            let native = try await engine.synthesize(text, language: language, completeSentence: false, textContext: textContext)
             try Task.checkCancellation()
             return try CTDelivery.prepare(native.samples, sampleRate: NarrationModel.plus.outputSampleRate,
                                            level: .nativeDynamics).samples
@@ -157,6 +159,27 @@ public actor NarrationRenderer {
             let second = try await renderNative(String(text[split...]), language: language, engine: engine, depth: depth + 1)
             return first + second
         }
+    }
+
+    public struct NativeDiagnostic: Sendable {
+        public let samples: [Float]
+        public let native: CTEngine.Output
+    }
+
+    /// Native-only review of one bounded unit with supplied noise. Uses the same
+    /// model, voice and delivery as render(); does not silently split a comparison.
+    public func renderNativeDiagnostic(_ unit: BookNarrationUnit, initialNoise: CTTensor? = nil) async throws -> NativeDiagnostic {
+        await acquire(); defer { release() }
+        try Task.checkCancellation()
+        guard let plus, let voice = NarrationModel.plus.nativeVoices.first(where: { $0.id == unit.voiceID }) else {
+            throw RenderError.invalidAudio
+        }
+        try await plus.setVoice(voice.engineVoiceID)
+        let native = try await plus.synthesize(unit.synthesisText, language: voice.language,
+            initialNoise: initialNoise, captureTrace: true, completeSentence: false, textContext: unit.nativeTextContext)
+        let prepared = try CTDelivery.prepare(native.samples, sampleRate: NarrationModel.plus.outputSampleRate,
+                                             level: .nativeDynamics)
+        return NativeDiagnostic(samples: prepared.samples, native: native)
     }
 
     private func enhance(_ samples: [Float]) throws -> [Float] {

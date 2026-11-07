@@ -1,0 +1,55 @@
+# Native context gathering: implementation and listening evidence
+
+Status: diagnostic candidate, default off, awaiting human listening. Accepted DK F1/M1 voices remain the baseline. No model weights, voice tables or assets change.
+
+## Mechanism
+
+The production SDK plans and casts raw book text. For each dialogue unit, `NarrationTextContext.surrounding` constructs a window from the actual prepared synthesis readings and original inter-unit separators: at most two neighboring units on either side, within one paragraph and 512 normalized tokens. Dictionary and number expansions therefore remain aligned to the spoken text.
+
+`CTTextContext` binds the selected span to the normalized whole context, including the language wrappers. Temporary private-use markers establish exact positions through normalization; they never enter the model. The unmarked result must equal ordinary normalization, and gathered tokens must exactly equal the isolated unit. Ambiguous or noncompositional mappings fail closed.
+
+The existing DK early Core ML encoder runs on the bounded context in the selected speaker's style. Its features are gathered at the exact spoken-token positions and used at acoustic steps 0–2. Duration, late encoder at steps 3–9, generator inputs, noise, vocoder and delivery stay unchanged. This exposes surrounding prose to existing learned features; it does not implement an emotion classifier or establish semantic understanding.
+
+The feature binding includes source range, text, normalized tokens, language, actual manifest fingerprint, style and revision. The engine rebuilds and validates it, then also compares actual gathered token IDs. A nil, identity or invalid binding takes the original isolated encoder path. Renderer duration splitting drops context instead of reusing invalid offsets. No production planner attaches context by default.
+
+There is no feature cache in this prototype. Future feature reuse must use `featureCacheKey`; waveform reuse must also distinguish `renderCacheKey` and the full synthesis configuration. Shared context with repeated identical quotes has different gather positions and render keys. This implementation adds no learned parameters or additional generation steps, but encoding longer context can increase runtime. It is not iPhone-qualified.
+
+## Native evidence
+
+SDK base: `1170112e51d5a3ef277ff6191026ae827aa73ad3`.
+Asset identity: `librox-plus-dk-coreml-v1` (accepted two-voice bundle).
+Runner binary SHA-256: `29f3ccb0928607c253ad9f43b41fb4340822d97b7133fe941a027fee52bdf417`.
+
+Evidence directory: `/Users/matt/Code/swift/librox-dk-native-context-v1`.
+`implementation.json` freezes every runtime Swift source hash, the binary and tracked diff. `manifest.json` inventories all ten cases and listening files. Per-case receipts retain exact source, actual cast, model hashes, token-binding files, supplied noise, graph/wall times and WAV hashes. The corpus is in `docs/validation/native-context-scenes-v1`.
+
+Ten complete-paragraph comparisons were generated through `NarrationRenderer` and Core ML: eight dialogue scenes spanning English/Spanish, F1/M1 and relief/danger, plus two narration-only controls. Evaluation scene labels never enter model inputs. The same quoted line appears under opposing surrounding contexts.
+
+Verified in every case:
+
+- Identity and wrong-style rejected context produce byte-exact native and delivered PCM at matched noise.
+- Text IDs/masks, both style tables, predicted duration, late encoder features, initial latent and latent mask match exactly between arms.
+- Sample counts match; samples are finite and in range.
+- Narration units reuse baseline audio explicitly. Both narration-only complete WAV files are byte-identical.
+
+The first eight cases each apply context to one actual dialogue unit. Changed early features or waveforms are not quality evidence. Word fidelity and appropriate expression still require listening.
+
+Each `baseline-then-context.wav` contains accepted baseline followed by candidate with a presentation-only 0.8-second gap. No ASR, added pauses inside narration, waveform pitch or tempo edits, or candidate-specific gain were used. The diagnostic does not implement historical DL pacing.
+
+Validation: release probe build and full `swift test -c release` completed successfully. Six new binder tests cover normalization/Unicode, repeated dialogue positions, dictionary substitutions, paragraph/token bounds and cache separation. Existing opt-in real-model, benchmark and integration tests remain skipped by their normal configuration; the separate ten-case native run supplies the audio evidence described above. Logs: `/tmp/librox-native-context-build.log`, `/tmp/librox-native-context-binding-tests.log`, `/tmp/librox-context-sdk-tests.log`.
+
+## Reproduction
+
+Build `narration-pipeline-probe` in release mode, then run:
+
+```sh
+.build/release/narration-pipeline-probe --native-context ASSET_DIRECTORY NEW_OUTPUT_DIRECTORY en plus-f1-en-v1 docs/validation/native-context-scenes-v1/en-female-relief.txt
+```
+
+Use `es` and `plus-f1-es-v1` for Spanish. Actual M1 character selection comes from SDK casting, not overriding F1 style data. The output directory must be new. Initial noise is shared within each pair and saved; a fresh invocation creates new noise.
+
+## Ownership and release boundary
+
+This isolated patch owns the binder, optional engine input, nil unit storage, renderer forwarding and diagnostic runner/tests. It does not change production assets, catalog, `NarrationPipeline`, casting, app wiring or defaults. The SDK chat owns all-voice asset registration, casting and iPhone integration. New assets must invalidate old context bindings through their actual manifest fingerprints.
+
+Human listening is pending. Phone latency/memory/thermal qualification, DL timing parity, general emotion understanding and human-narrator quality are not claimed. Keep this path disabled pending listening and native integration review. The older local-query proposal is deferred and is not this implementation.
