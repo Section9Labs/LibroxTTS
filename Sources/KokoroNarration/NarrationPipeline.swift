@@ -1,5 +1,6 @@
 import Foundation
 import KokoroCatalog
+import LibroxCTNative
 import KokoroPronunciation
 
 /// The common entry point for book playback, preparation, exports and auditions.
@@ -22,7 +23,7 @@ public actor NarrationPipeline {
                      narratorVoiceID: String?, language: String? = nil, metadataLanguage: String? = nil,
                      cast: BookVoiceCast? = nil, characterVoices: Bool = false,
                      options: PronunciationOptions = .init(), delivery: NarrationDeliveryOptions = .init(expressive: true),
-                     lexicon: SpokenTextLexicon = .init(), nativeExpression: Bool = false) async throws -> Plan {
+                     lexicon: SpokenTextLexicon = .init(), nativeExpression: Bool = false, repositoryID: String? = nil) async throws -> Plan {
         try Task.checkCancellation()
         let delivery = model.resolvedDeliveryOptions(delivery)
         let preferredLanguage = narratorVoiceID.flatMap { id in
@@ -79,7 +80,8 @@ public actor NarrationPipeline {
         for index in units.indices where units[index].prosody == nil {
             units[index].prosody = NarrationProsody.analyze(text: units[index].text, languageCode: language)
         }
-        if model == .plus, nativeExpression, !delivery.blendedVoice {
+        if model == .plus, nativeExpression || repositoryID == CTApprovedExpression.installationIdentity,
+           !delivery.blendedVoice {
             units = try NarrationNativeExpression.prepare(units: units, source: text,
                 decisions: originalPlan?.attribution?.decisions ?? [])
         }

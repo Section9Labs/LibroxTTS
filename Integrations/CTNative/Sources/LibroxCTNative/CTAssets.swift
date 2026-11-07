@@ -41,12 +41,20 @@ public enum CTAssets {
         public let files: [File]
     }
     public static func manifest(identity selected: String = identity) throws -> Manifest {
+        if selected == CTApprovedExpression.installationIdentity {
+            let base = try manifest(identity: identity)
+            return Manifest(identity: selected, referenceManifestSHA256: CTApprovedExpression.manifestSHA256,
+                parameterCount: base.parameterCount, files: base.files + (try CTApprovedExpression.files()))
+        }
         guard [identity, releasedIdentity].contains(selected) else { throw CTError.invalidAssets("unsupported asset identity") }
         let resource = selected == identity ? "CTCoreMLManifest" : "CTReleasedManifest"
         guard let url = Bundle.module.url(forResource: resource, withExtension: "json") else {
             throw CTError.invalidAssets("SDK manifest")
         }
         return try JSONDecoder().decode(Manifest.self, from: Data(contentsOf: url))
+    }
+    static func isDKIdentity(_ value: String) -> Bool {
+        value == identity || value == CTApprovedExpression.installationIdentity
     }
     /// Trust the SDK's pinned hashes, never a manifest supplied beside downloaded models.
     public static func validate(_ directory: URL, identity: String = identity) throws {
@@ -75,6 +83,9 @@ public enum CTAssets {
         for name in ["duration_predictor", "text_encoder_early", "text_encoder", "vector_estimator", "vocoder"] {
             try Task.checkCancellation()
             _ = try CTCompiledModelCache.modelURL(for: directory.appendingPathComponent("coreml/\(name).mlpackage"))
+        }
+        if identity == CTApprovedExpression.installationIdentity {
+            try CTApprovedExpression.prepare(installation: directory)
         }
         if let backend {
             // Loading pays Core ML's persistent hardware-specialization cost.

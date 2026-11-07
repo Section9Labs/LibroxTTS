@@ -29,7 +29,10 @@ isolated rendering path pending expression/blend listening qualification.
 `CTApprovedExpression.configuration(directory:)` pins the approved graph manifest
 and complete carry contract. `NarrationRenderer(storageRoot:resources:expressionDirectory:)`
 loads it; the compact-directory initializer also accepts the pinned configuration
-for independent qualification. A prepared expression unit is rejected if its
+for independent qualification. The new installation identity
+`librox-plus-dk-expression-round07-v1` also configures the renderer automatically:
+pass the same `repositoryID` to `NarrationPipeline.plan` and `NarrationRenderer.load`.
+Old DK/CT installations keep their own validation, preparation and playback identities. A prepared expression unit is rejected if its
 engine lacks the matching expression configuration, rather than silently using
 the earlier gather algorithm. The default application path remains unchanged.
 
@@ -72,7 +75,11 @@ The approved expression packages contain 72,492,357 bytes; 72,113,792 bytes are
 identical to already installed DK weights. A real-asset test verifies reuse of all
 32 DK files plus both expression weight files, leaving 378,565 bytes of new graph
 package files, plus the expression manifest metadata, for an existing DK install.
-The full expression update manifest/download activation remains release work.
+The SDK now registers the complete 40-file installation, including the pinned
+graph manifest and supplemental modifications notice. `stage_approved_expression_release.py`
+produces verified model files and seven prospective public release attachments.
+The exact new download is 382,281 bytes for a valid DK installation. Public
+selection/download activation remains off until publication and app integration.
 
 ## Next release integration
 
@@ -80,8 +87,8 @@ Before enabling this in Librox, complete physical qualification and make a new
 immutable versioned asset installation carrying both base DK and approved expression
 identity. Reuse existing verified DK bytes and preserve the working DK/CT installation
 until replacement verification/preparation succeeds. Do not change published
-`plus-dk-coreml-preview-v2` assets or its hashes. Current qualification uses an
-additive private graph directory, not a production download/update implementation.
+`plus-dk-coreml-preview-v2` assets or its hashes. Qualification supports both the original additive graph directory and the complete
+versioned installation. The actual app update/activation remains separate release work.
 
 Playback, preparation, opening/resume cache and voice preview must select the same
 installed expression version and planning option. Every generation and prepared-PCM
@@ -90,3 +97,15 @@ blending and Natural pauses settings; do not enable an unsupported blended expre
 path. The app's existing expression capability flag remains off until that integration
 is ready. Ship via a new SDK version and exact resolved graphs, with a combined app
 SHA, archive and verified TestFlight receipt owned by Release Manager.
+
+## Initial iPhone qualification
+
+Runtime commit `320d63c` completed 115 untraced SDK renders on Tachikoma (iPhone
+17 Pro Max): 55 archived units plus 20 warm GPU, 20 CPU, and 20 return-to-GPU
+renders. Forty repeated GPU units were independently verified raw/delivered
+byte-exact against their first device renders; all frame counts and planned
+source evidence passed. Thermal state remained nominal. Initial measured load
+was 1.898 seconds, reload 0.588 seconds, and peak resident memory 1,735,753,728
+bytes. This was not a controlled cold-OS comparison. Phone output was not
+bit-identical to Mac output; cross-device identity and perceptual equivalence
+are not claimed. iPad and actual Librox playback/background/listening remain open.

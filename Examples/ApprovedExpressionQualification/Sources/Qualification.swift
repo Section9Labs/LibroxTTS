@@ -32,16 +32,17 @@ enum ApprovedExpressionQualification {
         try JSONSerialization.data(withJSONObject: value, options: [.prettyPrinted, .sortedKeys]).write(to: url, options: .atomic)
     }
 
-    static func run(assets: URL, graphs: URL, fixtures: URL, output: URL) async throws {
+    static func run(assets: URL, graphs: URL, fixtures: URL, output: URL,
+                    repositoryID: String = CTAssets.identity) async throws {
         try FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
         let decoder = JSONDecoder()
         let cases = try decoder.decode([Fixture].self, from: Data(contentsOf: fixtures.appendingPathComponent("cases.json")))
         let renderer = NarrationRenderer(compactDirectory: assets, harmonicSource: nil,
-            contextStyleDiagnostic: CTApprovedExpression.configuration(directory: graphs))
+            contextStyleDiagnostic: repositoryID == CTAssets.identity ? CTApprovedExpression.configuration(directory: graphs) : nil)
         var events: [[String: Any]] = []
         var hashes: [String: String] = [:]
         let initial = footprint(), started = Date()
-        try await renderer.load(.plus, directory: assets, executionContext: .foreground)
+        try await renderer.load(.plus, directory: assets, executionContext: .foreground, repositoryID: repositoryID)
         let loadSeconds = Date().timeIntervalSince(started), loaded = footprint()
         for (phase, context, selectedCases) in [
             ("gpu-first", NarrationRenderer.ExecutionContext.foreground, cases),
@@ -50,14 +51,14 @@ enum ApprovedExpressionQualification {
             ("gpu-return", .foreground, Array(cases.prefix(4)))
         ] {
             let transition = Date()
-            try await renderer.load(.plus, directory: assets, executionContext: context)
+            try await renderer.load(.plus, directory: assets, executionContext: context, repositoryID: repositoryID)
             events.append(["phase": phase, "transitionSeconds": Date().timeIntervalSince(transition), "footprint": footprint()])
             for fixture in selectedCases {
                 let directory = fixtures.appendingPathComponent(fixture.id)
                 let cast = try BookVoiceCast.restore(Data(contentsOf: directory.appendingPathComponent("cast.json")), bookID: "context-comparison")
                 let plan = try await NarrationPipeline().plan(fixture.text, model: .plus,
                     bookID: "context-comparison", chapterID: "1", narratorVoiceID: fixture.narratorVoice,
-                    language: fixture.language, cast: cast, characterVoices: true, nativeExpression: true)
+                    language: fixture.language, cast: cast, characterVoices: true, nativeExpression: repositoryID == CTAssets.identity, repositoryID: repositoryID)
                 let expectedRoles = try decoder.decode([String: CTRolePoolEvidence].self,
                     from: Data(contentsOf: directory.appendingPathComponent("role-evidence.json")))
                 let expectedReporting = try decoder.decode([String: CTReportingPoolEvidence].self,
@@ -108,10 +109,10 @@ enum ApprovedExpressionQualification {
         await renderer.unload()
         try await Task.sleep(for: .milliseconds(500))
         let unloaded = footprint(), reloadStart = Date()
-        try await renderer.load(.plus, directory: assets, executionContext: .foreground)
+        try await renderer.load(.plus, directory: assets, executionContext: .foreground, repositoryID: repositoryID)
         let reloadSeconds = Date().timeIntervalSince(reloadStart)
         await renderer.unload()
-        try write(["expressionIdentity": CTApprovedExpression.identity, "loadSeconds": loadSeconds,
+        try write(["repositoryID": repositoryID, "expressionIdentity": CTApprovedExpression.identity, "loadSeconds": loadSeconds,
             "reloadSeconds": reloadSeconds, "initialFootprint": initial, "loadedFootprint": loaded,
             "settledUnloadedFootprint": unloaded, "finalFootprint": footprint(), "peakResidentBytes": peakRSS(),
             "events": events, "sameDeviceGPUReplayExact": true,

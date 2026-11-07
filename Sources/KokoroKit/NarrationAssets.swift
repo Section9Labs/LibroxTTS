@@ -17,17 +17,20 @@ public enum NarrationAssets {
         }
     }
     public static func compatibleRepositoryIDs(_ model: NarrationModel) -> [String] {
-        model == .plus ? [repositoryID(model), CTAssets.releasedIdentity] : [repositoryID(model)]
+        model == .plus ? [repositoryID(model), CTApprovedExpression.installationIdentity, CTAssets.releasedIdentity]
+            : [repositoryID(model)]
     }
     /// Older playback is explicit and restricted to that installation's voices.
     /// A retained CT F1 installation is never relabelled as the ten-style DK bank.
     public static func supportedNativeStyles(repositoryID: String) -> [String] {
-        repositoryID == CTAssets.identity ? CTAssets.styles : repositoryID == CTAssets.releasedIdentity ? ["F1"] : []
+        [CTAssets.identity, CTApprovedExpression.installationIdentity].contains(repositoryID)
+            ? CTAssets.styles : repositoryID == CTAssets.releasedIdentity ? ["F1"] : []
     }
     /// Manifest-derived estimate only; corrupt/missing installed files download
     /// again. Reuse always verifies actual bytes before accepting them.
-    public static func estimatedDownloadSize(_ model: NarrationModel, reusing repositoryID: String?) throws -> Int64 {
-        let current = try manifest(model)
+    public static func estimatedDownloadSize(_ model: NarrationModel, reusing repositoryID: String?,
+                                             targetRepositoryID: String? = nil) throws -> Int64 {
+        let current = try manifest(model, repositoryID: targetRepositoryID)
         guard let repositoryID, let previous = try? manifest(model, repositoryID: repositoryID) else { return current.downloadSize }
         let old = Set(previous.installedFiles.map { contentKey($0) })
         return current.files.reduce(0) { total, file in
@@ -46,11 +49,19 @@ public enum NarrationAssets {
         case .plus:
             let identity = selected ?? CTAssets.identity
             let pinned = try CTAssets.manifest(identity: identity)
-            let tag = identity == CTAssets.identity ? CTAssets.releaseTag : CTAssets.releasedTag
-            let baseURL = "https://github.com/Section9Labs/LibroxTTS/releases/download/" + tag + "/"
-            let files = pinned.files.map {
-                ["path": $0.path, "size": $0.bytes, "sha256": $0.sha256,
-                 "sourceURL": baseURL + $0.path.replacingOccurrences(of: "/", with: "--")] as [String: Any]
+            let tag = identity == CTApprovedExpression.installationIdentity ? CTApprovedExpression.releaseTag
+                : identity == CTAssets.identity ? CTAssets.releaseTag : CTAssets.releasedTag
+            let prior = try CTAssets.manifest().files
+            let files = pinned.files.map { file -> [String: Any] in
+                // Identical weights can use immutable existing release assets.
+                // New graph structure/metadata belongs to the new release only.
+                let reusable = identity == CTApprovedExpression.installationIdentity
+                    ? prior.first { $0.bytes == file.bytes && $0.sha256 == file.sha256 } : nil
+                let sourceTag = reusable == nil ? tag : CTAssets.releaseTag
+                let path = reusable?.path ?? file.path
+                let url = "https://github.com/Section9Labs/LibroxTTS/releases/download/" + sourceTag + "/"
+                    + path.replacingOccurrences(of: "/", with: "--")
+                return ["path": file.path, "size": file.bytes, "sha256": file.sha256, "sourceURL": url]
             }
             let json: [String: Any] = ["repository": "Section9Labs/LibroxTTS", "revision": tag,
                                       "files": files, "installedFiles": files]
@@ -61,12 +72,21 @@ public enum NarrationAssets {
     public static func bundledResourceName(_ model: NarrationModel) -> String? {
         switch model { case .kokoroDesktop: "BundledNarrationHD"; case .plus: "CTCoreMLV2GPUAssets"; default: nil }
     }
-    public static func isDownloadPublished(_ model: NarrationModel) -> Bool { model.isEnabled }
+    public static func isDownloadPublished(_ model: NarrationModel, repositoryID: String? = nil) -> Bool {
+        let selected = repositoryID ?? Self.repositoryID(model)
+        guard model.isEnabled, compatibleRepositoryIDs(model).contains(selected) else { return false }
+        if selected == CTApprovedExpression.installationIdentity {
+            return CTApprovedExpression.isDownloadPublished
+        }
+        return true
+    }
     /// Preparation follows actual model/runtime identities, not the host's SDK
     /// version string. Hosts may persist this after successful preparation.
     public static func preparationIdentity(_ model: NarrationModel, repositoryID: String? = nil) -> String {
-        model == .plus ? (repositoryID ?? CTAssets.identity) + ":" + CTEngine.runtimeIdentity + ":gpu-specializations-1"
-            : Self.repositoryID(model) + ":prepared-1"
+        let selected = repositoryID ?? Self.repositoryID(model)
+        let expression = selected == CTApprovedExpression.installationIdentity ? ":" + CTApprovedExpression.identity : ""
+        return model == .plus ? selected + ":" + CTEngine.runtimeIdentity + ":gpu-specializations-1" + expression
+            : selected + ":prepared-1"
     }
     /// Known older installations are read-only reuse candidates, not evidence
     /// that an old model can render every voice in the current catalog.

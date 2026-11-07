@@ -1,0 +1,67 @@
+{
+  "identity": "librox-dk-context-style-diagnostic-v1",
+  "sourceModelIdentity": "librox-plus-dk-coreml-v2",
+  "sourceManifestSHA256": "3ffd8b0500fc11c9cef366e5e37dfd787a6902112b813c4f23c179a6675b02f9",
+  "sourceWeightSHA256": "1679af50dd3f2c14ebaaecb5aa0185d6d5239c9ed587f7b955c3524c08c5fe25",
+  "localContextQueryRevision": "centered-context-difference-query-1",
+  "quotePoolRevision": "quote-excluded-context-pool-1",
+  "quotePoolMode": "exclude-spoken",
+  "terminalBoundaryRevision": "second-style-terminal-selector-v1",
+  "terminalBoundaryMode": "protect-terminal",
+  "requiredCarryMode": "linear-two-step",
+  "requiredCarryRevision": "late-context-residual-linear2-v1",
+  "inputType": "float32 [1,N,1], compared >0.5 inside MIL",
+  "changedWeightBytes": 0,
+  "addedLearnedParameters": 0,
+  "additionalEncoderCallsOverAccepted04": 0,
+  "acceptedManifestSHA256": "b6032e9c813f183b45e0cb6988ce0cd098a1192af4af73ad7b7c69b0fd5b859d",
+  "rolePoolRevision": "narrator-owned-second-pool-v1",
+  "rolePoolMode": "narrator-owned",
+  "changedOperations": [
+    "input_tensor_87",
+    "x_29"
+  ],
+  "addedOperations": [
+    "reduce_sum",
+    "maximum"
+  ],
+  "additionalEncoderCallsOverAccepted05": 0,
+  "spokenPackageExact": true,
+  "files": [
+    {
+      "path": "context_queries.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 187386,
+      "sha256": "e73763f54ac815fe5acbe393651963b4c94bf271816f5f06bed187e3e982bea7"
+    },
+    {
+      "path": "context_queries.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 36056896,
+      "sha256": "1679af50dd3f2c14ebaaecb5aa0185d6d5239c9ed587f7b955c3524c08c5fe25"
+    },
+    {
+      "path": "context_queries.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "ec5e0f70a17c64a1a8813ac19d89728f3c033860f455dd1d056b086d302d92ae"
+    },
+    {
+      "path": "spoken_context.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 189945,
+      "sha256": "acd844b922f8772cd9093fb7f8e42803d03f1234f193bedf44f65c4cf4f34d7a"
+    },
+    {
+      "path": "spoken_context.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 36056896,
+      "sha256": "1679af50dd3f2c14ebaaecb5aa0185d6d5239c9ed587f7b955c3524c08c5fe25"
+    },
+    {
+      "path": "spoken_context.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "def3c1c4139047c27a813e781c19329cec7eb18bda911fae693ff6dcefc2b3d6"
+    }
+  ],
+  "reportingPoolRevision": "attached-reporting-second-pool-v1",
+  "reportingPoolMode": "attached-reporting",
+  "additionalModelCallsOver06": 0,
+  "additionalLearnedParameters": 0,
+  "graphPackagesExact06": true
+}

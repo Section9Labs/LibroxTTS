@@ -55,6 +55,8 @@ public actor CTEngine {
         self.directory = directory; self.backend = backend; self.vocoderMode = vocoderMode
         self.assetIdentity = assetIdentity
         self.contextStyleDiagnostic = contextStyleDiagnostic
+            ?? (assetIdentity == CTApprovedExpression.installationIdentity
+                ? CTApprovedExpression.configuration(directory: directory.appendingPathComponent("expression")) : nil)
     }
     public func unload() { state = nil; activeBlend = nil }
     /// Foreground GPU and background CPU share the text models and styles.
@@ -103,7 +105,7 @@ public actor CTEngine {
     /// interpolation of both conditioning tables, never a mix of rendered audio.
     public func setVoice(_ selected: String, blend: CTVoiceBlend? = nil) throws {
         guard CTAssets.voiceStyles[selected] != nil,
-              assetIdentity == CTAssets.identity || (selected == CTAssets.voiceID && blend == nil) else { throw CTError.unsupportedVoice }
+              CTAssets.isDKIdentity(assetIdentity) || (selected == CTAssets.voiceID && blend == nil) else { throw CTError.unsupportedVoice }
         guard state != nil else { throw CTError.notLoaded }
         let blend = try blend?.validated(primaryVoiceID: selected)
         guard selected != voiceID || blend != activeBlend else { return }
@@ -160,7 +162,7 @@ public actor CTEngine {
             guard contextStyleDiagnostic?.manifestSHA256 == CTApprovedExpression.manifestSHA256,
                   contextStyleDiagnostic?.carryMode == .linearTwoStep,
                   expression.binding == textContext, activeBlend == nil,
-                  assetIdentity == CTAssets.identity else { throw CTError.invalidTensor("expression configuration mismatch") }
+                  CTAssets.isDKIdentity(assetIdentity) else { throw CTError.invalidTensor("expression configuration mismatch") }
         }
         let ids = try state.tokenizer.encode(text, language: language, completeSentence: completeSentence)
         let idsTensor = try CTTensor(ids, shape: [1, ids.count])
@@ -180,7 +182,7 @@ public actor CTEngine {
         let early: MLFeatureValue
         var contextDisposition: TextContextDisposition = textContext == nil ? .absent : .rejected
         var preparedContext: (CTTextContext.Binding, [Int64])?
-        if let textContext, !completeSentence, activeBlend == nil, assetIdentity == CTAssets.identity,
+        if let textContext, !completeSentence, activeBlend == nil, CTAssets.isDKIdentity(assetIdentity),
            let style = CTAssets.voiceStyles[self.voiceID],
            CTTextContext.validates(textContext, spokenText: text, language: language,
                modelFingerprint: try CTTextContext.modelFingerprint(), styleID: style),
