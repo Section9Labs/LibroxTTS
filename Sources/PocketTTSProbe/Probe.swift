@@ -4,7 +4,7 @@ import LibroxTTS
 import PocketTTSMLX
 import KokoroCatalog
 import AVFoundation
-import MLXRandom
+import MLX
 @main struct Probe {
     struct Trial: Decodable {
         let assets: String

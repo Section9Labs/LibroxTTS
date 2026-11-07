@@ -58,13 +58,13 @@ def main():
     rows = []
     for language, voices in VOICES.items():
         for voice in voices:
-            variants = [('balanced', 0.3, 1, 42, ['voices'])]
+            variants = [('balanced', 0.3, 4, 42, ['voices'])]
             if voice in ANCHORS[language]:
                 variants[0][-1].extend(['temperature', 'phrasing', 'steps', 'repeat'])
-                variants += [('balanced', temp, 1, 42, ['temperature']) for temp in [0.15, 0.45]]
-                variants += [(policy, 0.3, 1, 42, ['phrasing']) for policy in ['short', 'flow']]
-                variants += [('balanced', 0.3, steps, 42, ['steps']) for steps in [2, 4]]
-                variants += [('balanced', 0.3, 1, 77, ['repeat'])]
+                variants += [('balanced', temp, 4, 42, ['temperature']) for temp in [0.15, 0.45]]
+                variants += [(policy, 0.3, 4, 42, ['phrasing']) for policy in ['short', 'flow']]
+                variants += [('balanced', 0.3, steps, 42, ['steps']) for steps in [8, 2, 1]]
+                variants += [('balanced', 0.3, 4, 77, ['repeat'])]
             for policy, temperature, steps, seed, rounds in variants:
                 for passage, text in TEXTS[language].items():
                     if seed == 77 and passage != 'reflective':
@@ -99,16 +99,18 @@ def main():
                         metrics_path.write_text(json.dumps(metrics, indent=2, ensure_ascii=False)+'\n')
                     row.update(metrics)
                     row['duration'] = metrics['samples']/metrics['sampleRate']
+                    row['realTimeFactor'] = metrics['renderSeconds']/row['duration']
                     rows.append(row)
                     print(f'{len(rows):3}: {clip_id}  {row["duration"]:.2f}s / {len(row["chunks"])} chunks', flush=True)
-    manifest = dict(title='PocketTTS narrator auditions', version=1,
+    manifest = dict(title='PocketTTS quality-first narrator auditions', version=2, baselineSamplerSteps=4,
                     assetRelease='pocket-tts-mlx-2026-11-07', probeSHA256=binary_hash,
                     baseCommit=subprocess.check_output(['git','rev-parse','HEAD'], text=True).strip(),
                     sourceDiffSHA256=hashlib.sha256(subprocess.check_output(['git','diff','HEAD'])).hexdigest(),
                     generated=time.strftime('%Y-%m-%dT%H:%M:%S%z'), samples=rows,
+                    benchmarkHost='Mac15,14 Apple M3 Ultra, 256 GiB; short process-isolated samples, not target-device qualification',
                     notes=['Single-narrator readings, including quoted dialogue; this suite does not test multi-character casting.',
                            'All comparison takes use seed 42; repeat takes use seed 77. Seed equality does not guarantee identical noise alignment after chunk boundaries change.',
-                           'Sampler steps affect direct engine auditions; the shared renderer still defaults to one step.',
+                           'Four sampler steps are the default for voices, temperatures, phrasing, repeat takes and shared SDK narration. Eight steps are an additional quality audition; two and one are device-performance fallback comparisons.',
                            'No pitch, compression, loudness normalization, speed change or weight edits.',
                            'ASR is a screening aid; listen to verify words and narration quality. No winning configuration is automatically selected.'])
     (output/'manifest.json').write_text(json.dumps(manifest, indent=2, ensure_ascii=False)+'\n')

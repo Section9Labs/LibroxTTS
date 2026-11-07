@@ -18,6 +18,9 @@ public struct BookNarrationUnit: Sendable {
     /// Pocket-specific phrasing budgets. Hosts may override a unit before rendering;
     /// use NarrationModel.renderIdentity(for:) in the resulting audio cache key.
     public var pocketChunking: PocketTTSChunkingOptions? = nil
+    /// Nil uses the quality-first default of four sampler steps. Persist explicit
+    /// device fallbacks with the book/profile and include them in render identity.
+    public var pocketSampling: PocketTTSSamplingOptions? = nil
     public var synthesisText: String { spokenText ?? text }
     public var expression: NarrationExpression = .neutral
     /// Present for the opt-in source-context plan. Does not select a render rate.

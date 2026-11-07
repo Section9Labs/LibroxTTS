@@ -24,8 +24,10 @@ public actor NarrationPipeline {
                      cast: BookVoiceCast? = nil, characterVoices: Bool = false,
                      options: PronunciationOptions = .init(), delivery: NarrationDeliveryOptions = .init(expressive: true),
                      lexicon: SpokenTextLexicon = .init(), nativeExpression: Bool = false, repositoryID: String? = nil,
-                     pocketChunking: PocketTTSChunkingOptions = .init()) async throws -> Plan {
+                     pocketChunking: PocketTTSChunkingOptions = .init(),
+                     pocketSampling: PocketTTSSamplingOptions = .init()) async throws -> Plan {
         try Task.checkCancellation()
+        if model == .pocket { try pocketSampling.validate() }
         let delivery = model.resolvedDeliveryOptions(delivery)
         let preferredLanguage = narratorVoiceID.flatMap { id in
             model.nativeVoices.first { $0.id == id }?.language ?? Voice.named(id)?.language.rawValue
@@ -85,6 +87,9 @@ public actor NarrationPipeline {
            !delivery.blendedVoice {
             units = try NarrationNativeExpression.prepare(units: units, source: text,
                 decisions: originalPlan?.attribution?.decisions ?? [])
+        }
+        if model == .pocket {
+            for index in units.indices { units[index].pocketSampling = pocketSampling }
         }
         return Plan(units: units, narratorVoiceID: updatedCast?.narratorVoiceID ?? voiceID,
                     language: language, cast: updatedCast,

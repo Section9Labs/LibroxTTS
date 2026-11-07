@@ -21,7 +21,7 @@ public enum PocketTTSError: LocalizedError {
 /// Serialized native Swift MLX owner. MLX arrays and caches never cross this actor.
 /// GPU generation is foreground/preparation-only until physical-device qualification.
 public actor PocketTTSEngine {
-    public static let runtimeIdentity = "pocket-mlx-28770c06-v2:adaptive:warm12:eos6:fp32"
+    public static let runtimeIdentity = "pocket-mlx-28770c06-v3:quality4:adaptive:warm12:eos6:fp32"
     public struct Output: Sendable { public let samples: [Float]; public let sampleRate: Int }
     private let directory: URL
     private var model: PocketTTSModel?
@@ -30,7 +30,8 @@ public actor PocketTTSEngine {
     public func unload() { model = nil; language = nil }
     public func synthesize(_ text: String, voiceID: String, temperature: Float = 0.3,
                            continueChunks: Bool = true, chunking: PocketTTSChunkingOptions = .init(),
-                           role: PocketTTSPassageRole = .narration, samplerSteps: Int = 1) throws -> Output {
+                           role: PocketTTSPassageRole = .narration,
+                           samplerSteps: Int = PocketTTSSamplingOptions.defaultSamplerSteps) throws -> Output {
         try chunking.validate()
         guard (1...8).contains(samplerSteps) else { throw PocketTTSError.invalidSamplerSteps }
         guard let voice = PocketTTSCatalog.voice(id: voiceID) else { throw PocketTTSError.invalidVoice }
@@ -52,7 +53,7 @@ public actor PocketTTSEngine {
     public func renderFrames(_ text: String, voiceID: String,
                              chunking: PocketTTSChunkingOptions = .init(),
                              role: PocketTTSPassageRole = .narration,
-                             samplerSteps: Int = 1,
+                             samplerSteps: Int = PocketTTSSamplingOptions.defaultSamplerSteps,
                              receive: @Sendable ([Float]) throws -> Void) throws {
         try chunking.validate()
         guard (1...8).contains(samplerSteps) else { throw PocketTTSError.invalidSamplerSteps }

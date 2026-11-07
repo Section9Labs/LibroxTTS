@@ -84,3 +84,33 @@ the generated suite itself exercises native synthesis with installed weights.
 See `Scripts/PocketTTS/LISTENING.md` for reproduction. Audio and the complete
 manifest live in ignored `Benchmarks/Narration/results/pocket-tts-2026-11-07/listening-suite/`.
 No production preset or app default has been changed.
+
+## Quality-first sampling (runtime v3)
+
+SDK/direct-engine and shared-renderer defaults now use four sampler steps.
+Codable sampling options travel through plans/units/rendering and cache identities;
+explicit two/one-step fallbacks are never inferred from device names or errors.
+The original one-step audition set is preserved unchanged.
+
+A new 118-clip suite (2,108.24 seconds) uses four steps throughout voice, temperature,
+phrasing and repeat rounds, adds eight-step auditions, and hides lower-step
+comparisons behind an explicit fallback toggle. All WAV hashes/token caps passed.
+ASR matched 38 normalized word sequences exactly; 80 clips carry review flags,
+not confirmed synthesis failures. There is no accepted listening winner.
+
+The full package suite passed, including all 17 Pocket tests with assets/reference
+fixtures enabled. Native renderer checks compare four- and one-step PCM with the
+direct engine and verify that default generation restores four steps after an
+explicit fallback. Sampling changes enter cache identities. Generic iOS compilation
+also passed; no physical-device qualification is implied.
+
+After other agent GPU work completed, three process-isolated timing trials per
+8/4/2/1-step configuration were run in English/Spanish on the M3 Ultra. Four-step
+median throughput was 12.56×/12.60× real time; eight-step was 9.98×/10.11×. Model
+loading is outside this generation timer. All 24 trial WAV hashes matched the
+corresponding generated auditions. These short trials do not establish sustained
+thermal or memory behavior on target devices. See `quality-first-sampling.json`.
+
+The current local listening artifact is
+`Benchmarks/Narration/results/pocket-tts-2026-11-07/listening-suite-quality/`.
+The SDK remains on the development branch; no app update was shipped.

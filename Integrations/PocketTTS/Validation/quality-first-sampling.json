@@ -1,0 +1,357 @@
+{
+  "runtime": "pocket-mlx-28770c06-v3:quality4:adaptive:warm12:eos6:fp32",
+  "defaultSamplerSteps": 4,
+  "qualityAuditionSteps": 8,
+  "explicitFallbackSteps": [
+    2,
+    1
+  ],
+  "automaticFallback": false,
+  "clips": 118,
+  "audioSeconds": 2108.24,
+  "screening": {
+    "method": "Whisper large-v3-turbo, case/punctuation-normalized word sequences",
+    "exactMatches": 38,
+    "total": 118,
+    "qualification": "ASR mismatches are review flags, not confirmed synthesis errors; exact matches are not narration-quality approval."
+  },
+  "probeSHA256": "d588638626d6442ce0e94306400e89631a845b2af464fb78b5cf09bdc65ac2b1",
+  "manifestSHA256": "3d443517ab3bfeaaa6e3f8d9db816ee8ab78a840bd53c255233998d1646046e2",
+  "originalSuitePreserved": true,
+  "benchmarkMatchesGeneratedTakes": true,
+  "benchmark": {
+    "host": "Mac15,14 Apple M3 Ultra, 256 GiB; short process-isolated samples, not target-device qualification",
+    "probeSHA256": "d588638626d6442ce0e94306400e89631a845b2af464fb78b5cf09bdc65ac2b1",
+    "notes": [
+      "Three process-isolated trials per configuration, model load excluded from generation timing.",
+      "Run after synthesis, ASR, builds and tests complete; do not overlap agent GPU workloads.",
+      "Short-sample throughput is not target-device, long-book, thermal or memory qualification.",
+      "No automatic fallback or quality winner is selected from these measurements."
+    ],
+    "summary": [
+      {
+        "language": "en",
+        "samplerSteps": 8,
+        "trials": 3,
+        "medianRenderSeconds": 1.3788141012191772,
+        "medianRealTimeFactor": 0.10020451316999834,
+        "medianTimesRealTime": 9.979590423272514,
+        "identicalRepeatedAudio": true
+      },
+      {
+        "language": "en",
+        "samplerSteps": 4,
+        "trials": 3,
+        "medianRenderSeconds": 1.1341179609298706,
+        "medianRealTimeFactor": 0.07964311523383923,
+        "medianTimesRealTime": 12.556013122589587,
+        "identicalRepeatedAudio": true
+      },
+      {
+        "language": "en",
+        "samplerSteps": 2,
+        "trials": 3,
+        "medianRenderSeconds": 0.9575309753417969,
+        "medianRealTimeFactor": 0.06958800692890965,
+        "medianTimesRealTime": 14.370292297947103,
+        "identicalRepeatedAudio": true
+      },
+      {
+        "language": "en",
+        "samplerSteps": 1,
+        "trials": 3,
+        "medianRenderSeconds": 0.8446979522705078,
+        "medianRealTimeFactor": 0.06174692633556344,
+        "medianTimesRealTime": 16.195138112065752,
+        "identicalRepeatedAudio": true
+      },
+      {
+        "language": "es",
+        "samplerSteps": 8,
+        "trials": 3,
+        "medianRenderSeconds": 1.700456976890564,
+        "medianRealTimeFactor": 0.09886377772619559,
+        "medianTimesRealTime": 10.114928065661339,
+        "identicalRepeatedAudio": true
+      },
+      {
+        "language": "es",
+        "samplerSteps": 4,
+        "trials": 3,
+        "medianRenderSeconds": 1.3582199811935425,
+        "medianRealTimeFactor": 0.07933527927532374,
+        "medianTimesRealTime": 12.604732839341471,
+        "identicalRepeatedAudio": true
+      },
+      {
+        "language": "es",
+        "samplerSteps": 2,
+        "trials": 3,
+        "medianRenderSeconds": 1.2023249864578247,
+        "medianRealTimeFactor": 0.07022926322767667,
+        "medianTimesRealTime": 14.239078612544944,
+        "identicalRepeatedAudio": true
+      },
+      {
+        "language": "es",
+        "samplerSteps": 1,
+        "trials": 3,
+        "medianRenderSeconds": 1.0198460817337036,
+        "medianRealTimeFactor": 0.06342326378940943,
+        "medianTimesRealTime": 15.767085139616897,
+        "identicalRepeatedAudio": true
+      }
+    ],
+    "measurements": [
+      {
+        "language": "en",
+        "voice": "alba",
+        "samplerSteps": 8,
+        "repeat": 0,
+        "renderSeconds": 1.3495320081710815,
+        "audioSeconds": 13.76,
+        "realTimeFactor": 0.0980764540822007,
+        "audioSHA256": "c63211967eccff4425381532973462fa515423c0b345dd51e1ab3c95c79ffaea"
+      },
+      {
+        "language": "en",
+        "voice": "alba",
+        "samplerSteps": 4,
+        "repeat": 0,
+        "renderSeconds": 1.1341179609298706,
+        "audioSeconds": 14.24,
+        "realTimeFactor": 0.07964311523383923,
+        "audioSHA256": "f167499c00d0b9085816f8aff9c6df7c850aa6813142022c6a02b544ab44a38c"
+      },
+      {
+        "language": "en",
+        "voice": "alba",
+        "samplerSteps": 2,
+        "repeat": 0,
+        "renderSeconds": 0.9074059724807739,
+        "audioSeconds": 13.76,
+        "realTimeFactor": 0.06594520148842833,
+        "audioSHA256": "2c2d917eb28e8f53e1771430a88a4f90b82b6c9c94fd3b788c11f203cfb98e56"
+      },
+      {
+        "language": "en",
+        "voice": "alba",
+        "samplerSteps": 1,
+        "repeat": 0,
+        "renderSeconds": 1.032623052597046,
+        "audioSeconds": 13.68,
+        "realTimeFactor": 0.07548414127171388,
+        "audioSHA256": "0b4dcf072d787cee6f1dd7db787a2747e9c8b10f5b7024fa478a37a04ffa3cdb"
+      },
+      {
+        "language": "es",
+        "voice": "lola",
+        "samplerSteps": 8,
+        "repeat": 0,
+        "renderSeconds": 1.7448699474334717,
+        "audioSeconds": 17.2,
+        "realTimeFactor": 0.10144592717636464,
+        "audioSHA256": "30d476b433a9264841811ce76da7c7f301330abf321d024933a7b54fee962127"
+      },
+      {
+        "language": "es",
+        "voice": "lola",
+        "samplerSteps": 4,
+        "repeat": 0,
+        "renderSeconds": 1.3582199811935425,
+        "audioSeconds": 17.12,
+        "realTimeFactor": 0.07933527927532374,
+        "audioSHA256": "2ab885f95caf5a6a1aac6b58d5e2d4163d1346779030da7ff9333d984f46e208"
+      },
+      {
+        "language": "es",
+        "voice": "lola",
+        "samplerSteps": 2,
+        "repeat": 0,
+        "renderSeconds": 1.257665991783142,
+        "audioSeconds": 17.12,
+        "realTimeFactor": 0.07346179858546391,
+        "audioSHA256": "1cd4b5f4eaf42345a8e1087a9004a22cf0dfe42bc6eb5a135d2c1f45f763af1b"
+      },
+      {
+        "language": "es",
+        "voice": "lola",
+        "samplerSteps": 1,
+        "repeat": 0,
+        "renderSeconds": 1.0198460817337036,
+        "audioSeconds": 16.08,
+        "realTimeFactor": 0.06342326378940943,
+        "audioSHA256": "ac29aad6ba94ceddeccdf17a9eddb021aa5650b57a8b289f9c2131ee7ca002b9"
+      },
+      {
+        "language": "en",
+        "voice": "alba",
+        "samplerSteps": 1,
+        "repeat": 1,
+        "renderSeconds": 0.8410540819168091,
+        "audioSeconds": 13.68,
+        "realTimeFactor": 0.0614805615436264,
+        "audioSHA256": "0b4dcf072d787cee6f1dd7db787a2747e9c8b10f5b7024fa478a37a04ffa3cdb"
+      },
+      {
+        "language": "en",
+        "voice": "alba",
+        "samplerSteps": 2,
+        "repeat": 1,
+        "renderSeconds": 0.977895975112915,
+        "audioSeconds": 13.76,
+        "realTimeFactor": 0.07106802144715953,
+        "audioSHA256": "2c2d917eb28e8f53e1771430a88a4f90b82b6c9c94fd3b788c11f203cfb98e56"
+      },
+      {
+        "language": "en",
+        "voice": "alba",
+        "samplerSteps": 4,
+        "repeat": 1,
+        "renderSeconds": 1.3138959407806396,
+        "audioSeconds": 14.24,
+        "realTimeFactor": 0.09226797336942694,
+        "audioSHA256": "f167499c00d0b9085816f8aff9c6df7c850aa6813142022c6a02b544ab44a38c"
+      },
+      {
+        "language": "en",
+        "voice": "alba",
+        "samplerSteps": 8,
+        "repeat": 1,
+        "renderSeconds": 1.3805439472198486,
+        "audioSeconds": 13.76,
+        "realTimeFactor": 0.10033022872237272,
+        "audioSHA256": "c63211967eccff4425381532973462fa515423c0b345dd51e1ab3c95c79ffaea"
+      },
+      {
+        "language": "es",
+        "voice": "lola",
+        "samplerSteps": 1,
+        "repeat": 1,
+        "renderSeconds": 0.9799480438232422,
+        "audioSeconds": 16.08,
+        "realTimeFactor": 0.06094204252632104,
+        "audioSHA256": "ac29aad6ba94ceddeccdf17a9eddb021aa5650b57a8b289f9c2131ee7ca002b9"
+      },
+      {
+        "language": "es",
+        "voice": "lola",
+        "samplerSteps": 2,
+        "repeat": 1,
+        "renderSeconds": 1.2023249864578247,
+        "audioSeconds": 17.12,
+        "realTimeFactor": 0.07022926322767667,
+        "audioSHA256": "1cd4b5f4eaf42345a8e1087a9004a22cf0dfe42bc6eb5a135d2c1f45f763af1b"
+      },
+      {
+        "language": "es",
+        "voice": "lola",
+        "samplerSteps": 4,
+        "repeat": 1,
+        "renderSeconds": 1.3108940124511719,
+        "audioSeconds": 17.12,
+        "realTimeFactor": 0.07657091194224135,
+        "audioSHA256": "2ab885f95caf5a6a1aac6b58d5e2d4163d1346779030da7ff9333d984f46e208"
+      },
+      {
+        "language": "es",
+        "voice": "lola",
+        "samplerSteps": 8,
+        "repeat": 1,
+        "renderSeconds": 1.6993560791015625,
+        "audioSeconds": 17.2,
+        "realTimeFactor": 0.09879977204078852,
+        "audioSHA256": "30d476b433a9264841811ce76da7c7f301330abf321d024933a7b54fee962127"
+      },
+      {
+        "language": "en",
+        "voice": "alba",
+        "samplerSteps": 8,
+        "repeat": 2,
+        "renderSeconds": 1.3788141012191772,
+        "audioSeconds": 13.76,
+        "realTimeFactor": 0.10020451316999834,
+        "audioSHA256": "c63211967eccff4425381532973462fa515423c0b345dd51e1ab3c95c79ffaea"
+      },
+      {
+        "language": "en",
+        "voice": "alba",
+        "samplerSteps": 4,
+        "repeat": 2,
+        "renderSeconds": 1.1221671104431152,
+        "audioSeconds": 14.24,
+        "realTimeFactor": 0.07880387011538731,
+        "audioSHA256": "f167499c00d0b9085816f8aff9c6df7c850aa6813142022c6a02b544ab44a38c"
+      },
+      {
+        "language": "en",
+        "voice": "alba",
+        "samplerSteps": 2,
+        "repeat": 2,
+        "renderSeconds": 0.9575309753417969,
+        "audioSeconds": 13.76,
+        "realTimeFactor": 0.06958800692890965,
+        "audioSHA256": "2c2d917eb28e8f53e1771430a88a4f90b82b6c9c94fd3b788c11f203cfb98e56"
+      },
+      {
+        "language": "en",
+        "voice": "alba",
+        "samplerSteps": 1,
+        "repeat": 2,
+        "renderSeconds": 0.8446979522705078,
+        "audioSeconds": 13.68,
+        "realTimeFactor": 0.06174692633556344,
+        "audioSHA256": "0b4dcf072d787cee6f1dd7db787a2747e9c8b10f5b7024fa478a37a04ffa3cdb"
+      },
+      {
+        "language": "es",
+        "voice": "lola",
+        "samplerSteps": 8,
+        "repeat": 2,
+        "renderSeconds": 1.700456976890564,
+        "audioSeconds": 17.2,
+        "realTimeFactor": 0.09886377772619559,
+        "audioSHA256": "30d476b433a9264841811ce76da7c7f301330abf321d024933a7b54fee962127"
+      },
+      {
+        "language": "es",
+        "voice": "lola",
+        "samplerSteps": 4,
+        "repeat": 2,
+        "renderSeconds": 1.3855549097061157,
+        "audioSeconds": 17.12,
+        "realTimeFactor": 0.08093194566040394,
+        "audioSHA256": "2ab885f95caf5a6a1aac6b58d5e2d4163d1346779030da7ff9333d984f46e208"
+      },
+      {
+        "language": "es",
+        "voice": "lola",
+        "samplerSteps": 2,
+        "repeat": 2,
+        "renderSeconds": 1.1983469724655151,
+        "audioSeconds": 17.12,
+        "realTimeFactor": 0.06999690259728476,
+        "audioSHA256": "1cd4b5f4eaf42345a8e1087a9004a22cf0dfe42bc6eb5a135d2c1f45f763af1b"
+      },
+      {
+        "language": "es",
+        "voice": "lola",
+        "samplerSteps": 1,
+        "repeat": 2,
+        "renderSeconds": 1.028128981590271,
+        "audioSeconds": 16.08,
+        "realTimeFactor": 0.06393836950188253,
+        "audioSHA256": "ac29aad6ba94ceddeccdf17a9eddb021aa5650b57a8b289f9c2131ee7ca002b9"
+      }
+    ]
+  },
+  "validation": [
+    "Full Swift package suite passed, including all 17 Pocket tests with installed assets/reference fixtures enabled.",
+    "Native renderer matched explicit direct-engine four-step and one-step outputs at zero temperature; default synthesis restored four steps after explicit fallback.",
+    "Generic iOS LibroxTTS build passed with signing disabled.",
+    "All 118 WAV hashes and chunk caps verified; primary audition rounds all use four steps.",
+    "Browser shows four/eight-step comparisons first, with lower-compute fallback toggle off.",
+    "Short M3 Ultra measurements do not establish minimum-Mac/phone, long-book, thermal or memory behavior.",
+    "No narration-quality winner or app release."
+  ]
+}

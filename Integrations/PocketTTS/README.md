@@ -84,8 +84,9 @@ short-sample success does not establish locked-screen GPU permission on a phone.
 
 ## Reading behavior
 
-Current Kyutai defaults are temperature **0.3** and one LSD sampler step. The port
-now uses configurable **adaptive phrasing**, replacing its initial fixed 25-token
+Kyutai's reference defaults to temperature **0.3** and one LSD sampler step.
+Librox now defaults to **four sampler steps** for quality-first narration and
+uses configurable **adaptive phrasing**, replacing its initial fixed 25-token
 target. This is structural grouping, not an emotion classifier:
 
 - A whole sentence stays together when it fits the hard cap, even above the target.
@@ -192,7 +193,26 @@ temperature, adaptive phrasing and sampler steps in separate rounds, then checks
 repeat takes. The page supports ratings, shortlists, notes and configuration
 exports. These are auditions; no winner or new app default is selected.
 
-Direct `synthesize` and `renderFrames` calls accept `samplerSteps` (1–8, default 1).
-The shared narrator renderer continues to use one step. Promote selected temperature
-and sampler settings into the production profile/cache contract before using a
-nondefault audition configuration in the app.
+Direct `synthesize`, `renderFrames` and the shared renderer default to **four steps**.
+`PocketTTSSamplingOptions` carries temperature and sampler count through planning,
+rendering and cache identities. It is Codable for host book/profile persistence:
+
+```swift
+// Default quality-first policy:
+let sampling = PocketTTSSamplingOptions() // temperature 0.3, samplerSteps 4
+// Pass pocketSampling: sampling to NarrationPipeline.plan(...).
+// After measuring the actual target device, a host may explicitly select:
+let deviceFallback = PocketTTSSamplingOptions(samplerSteps: 2)
+```
+
+Eight steps are available for a higher-compute listening comparison. Two and one
+are explicit performance fallbacks, not automatic device-name guesses. A render
+error never retries at lower quality. Hosts should measure sustained generation
+throughput, startup latency, memory and thermal behavior on the target device
+before reducing the selected setting. Preparation can tolerate slower generation
+than live playback; do not downgrade merely because a one-off timing is slower.
+
+Include `NarrationModel.pocket.renderIdentity(for: unit)` in the prepared-audio
+key: it includes resolved sampling options and the new quality-first runtime
+revision. Stored one-step audio cannot masquerade as the new default. This is an
+SDK policy on the development branch, not a shipped Librox app change.
