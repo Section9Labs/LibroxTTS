@@ -61,3 +61,9 @@ Merged SDK `f3b723910e4b099d9bcec7870b5e4ea126de22bd` at `319b1d40d271eff53fafe8
 Full release tests and the release probe build pass against `librox-plus-dk-coreml-v2`. Two new native integration comparisons exercise M1 English dialogue and newly available F2 Spanish dialogue with F1 narration. Identity/rejected-context PCM, token/style/late-feature/noise invariants and duration checks pass. Final-build receipts and hashes are at `/Users/matt/Code/swift/librox-dk-native-context-v2-reconciliation/final/manifest.json`. The earlier parent-directory runs used the Swift test-built executable; the `final` directory is the separate final-product-build check.
 
 The v1 F1/M1 listening comparisons remain unchanged and tied to their original binary/assets. The v2 checks establish integration only, not new listening acceptance. Current bindings fingerprint the v2 manifest and actual selected style, so they cannot reuse a v1 binding. No app default, asset publication or iPhone qualification is part of this patch.
+
+## Shared pronunciation and stage-structure dependency
+
+Merged SDK `54a2bb0095fe52c9137722f5c0f7cd425adfabc3` at `e23fb0a2470c362c39f1c9eea8e09f3aaf00f956`. This brings shared English numeric readings and Spanish stage/printed-speaker structure into the context branch without changing the optional context implementation. The release check filtered to `KokoroNarrationTests|NativeNumberReadingsTests` passes, including existing context-binding tests; log `/tmp/librox-context-parity-reconcile-tests.log`.
+
+All ten original listening-pair hashes were reverified unchanged. They remain evidence for their recorded earlier code/assets, not the new frontend revision. No audio was regenerated and no context default was enabled. Production context attachment remains gated on listening and incorporating `renderCacheKey` into PCM identity; the frontend revision alone does not supply that context cache separation.
