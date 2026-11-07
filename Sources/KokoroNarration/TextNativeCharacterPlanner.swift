@@ -4,6 +4,13 @@ import KokoroPronunciation
 /// Shared speaker attribution and book identities, followed by the native text
 /// planner. No phonemization, acting tags, voice blending or audio processing.
 enum TextNativeCharacterPlanner {
+    private struct Span {
+        let text: String
+        let offset: Int
+        let voiceID: String
+        let role: DialogueTimingRole
+        let speakerID: String?
+    }
     static func plan(_ text: String, bookID: String, chapterID: String, language: String,
                      cast original: BookVoiceCast, characterVoices: Bool,
                      lexicon: SpokenTextLexicon) throws -> BookNarrationPlan {
@@ -22,9 +29,31 @@ enum TextNativeCharacterPlanner {
 
         var cast = original
         let attribution = try SpeakerAttributor().analyze(text, bookID: bookID, chapterID: chapterID, cast: &cast)
-        let spans = try StoryNarrator().plan(text, narratorVoiceID: cast.narratorVoiceID,
+        let originalSpans = try StoryNarrator().plan(text, narratorVoiceID: cast.narratorVoiceID,
             characterVoices: cast.characterVoices, dialogue: attribution.annotations, mode: .characterVoices)
-        var fragments: [(BookNarrationUnit, StoryReadingSpan)] = []
+        var spans = originalSpans.map {
+            Span(text: $0.text, offset: $0.offset, voiceID: $0.voiceID,
+                 role: $0.role == .dialogue ? .dialogue : .narration, speakerID: $0.speakerID)
+        }
+        if language == "es", let structure = StageDialogueStructure.parseBook(text, languageCode: language,
+            establishedDialogue: spans.filter { $0.role == .dialogue }.map {
+                .init(range: NSRange(location: $0.offset, length: $0.text.utf16.count), speakerID: $0.speakerID)
+            }, knownSpeakerLabels: cast.aliases),
+           structure.spans.contains(where: { $0.role == .stageDirection || $0.role == .speakerLabel }) {
+            spans = structure.spans.map { span in
+                let dialogue = span.role == .dialogue
+                let voice = dialogue ? span.speakerID.flatMap { cast.characterVoices[$0] } ?? cast.narratorVoiceID
+                    : cast.narratorVoiceID
+                let role: DialogueTimingRole = switch span.role {
+                case .dialogue: .dialogue
+                case .stageDirection, .speakerLabel: .attribution
+                case .narration: .narration
+                }
+                return Span(text: span.text, offset: span.range.location, voiceID: voice,
+                            role: role, speakerID: dialogue ? span.speakerID : nil)
+            }
+        }
+        var fragments: [(BookNarrationUnit, Span)] = []
         for span in spans {
             try Task.checkCancellation()
             for unit in try TextNativeNarrationPlanner.plan(span.text, voiceID: span.voiceID, lexicon: lexicon) {
@@ -40,7 +69,7 @@ enum TextNativeCharacterPlanner {
             let gap = source.substring(with: NSRange(location: NSMaxRange(range), length: next - NSMaxRange(range)))
             let boundary: NarrationBoundary = gap.contains(where: \.isNewline) ? .paragraph : local.boundaryAfter
             var unit = BookNarrationUnit(sourceText: local.text, sourceRange: range, narratorID: span.voiceID,
-                boundaryAfter: boundary, role: span.role == .dialogue ? .dialogue : .narration,
+                boundaryAfter: boundary, role: span.role,
                 speakerID: span.speakerID)
             unit.spokenText = local.spokenText
             unit.prosody = local.prosody

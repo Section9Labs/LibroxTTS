@@ -131,6 +131,40 @@ public enum StageDialogueStructure {
         return .init(spans: split, status: .parsed)
     }
 
+    /// Shared book-level structure preparation. Keep established embedded
+    /// speakers, source coverage and narrator-owned directions identical across
+    /// phoneme and native-text adapters.
+    static func parseBook(_ source: String, languageCode: String,
+                          establishedDialogue: [StageDialogueRange],
+                          knownSpeakerLabels: [String: String]) -> StageDialogueResult? {
+        var seeds = establishedDialogue
+        // An embedded quote must not hide the enclosing em-dash dialogue turn.
+        // Retain precise seeds when they identify distinct embedded speakers.
+        if let turns = try? NSRegularExpression(pattern: #"(?m)^[ \t]*—[^\r\n]+"#) {
+            for match in turns.matches(in: source, range: NSRange(location: 0, length: source.utf16.count)) {
+                let overlapping = seeds.filter { NSIntersectionRange($0.range, match.range).length > 0 }
+                let identities = Set(overlapping.compactMap(\.speakerID))
+                guard identities.count <= 1,
+                      overlapping.allSatisfy({ $0.range.location >= match.range.location && NSMaxRange($0.range) <= NSMaxRange(match.range) }) else { continue }
+                seeds.removeAll { NSIntersectionRange($0.range, match.range).length > 0 }
+                seeds.append(.init(range: match.range, speakerID: identities.first))
+            }
+        }
+        let structure = parse(source, languageCode: languageCode,
+            establishedDialogue: seeds, knownSpeakerLabels: knownSpeakerLabels)
+        guard structure.accepted, structure.spans.map(\.text).joined() == source else { return nil }
+        let original = source as NSString
+        var expectedOffset = 0
+        for span in structure.spans {
+            guard span.range.location == expectedOffset, span.range.length >= 0,
+                  span.range.length <= original.length - expectedOffset,
+                  original.substring(with: span.range) == span.text else { return nil }
+            expectedOffset += span.range.length
+        }
+        guard expectedOffset == original.length else { return nil }
+        return structure
+    }
+
     private struct Label {
         let range: NSRange
         var scopeEnd: Int

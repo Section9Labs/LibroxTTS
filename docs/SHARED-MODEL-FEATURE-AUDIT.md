@@ -12,11 +12,18 @@ finite values and matches the frozen source manifest's SHA256.
 
 ## Audit and implementation
 
+Requirement: Basic's user features are the minimum target for Plus. A different
+input representation explains an implementation difference; it does not close a
+parity gap. Capability flags prevent ineffective controls, but are not evidence
+that an equivalent feature exists. The register below separates shared source,
+tested fixes and remaining work.
+
 | Feature | Shared implementation / result | Model-specific boundary |
 | --- | --- | --- |
 | Playback, preparation and previews | `NarrationPipeline` and `NarrationRenderer` remain the shared entry points. | Adapters prepare phonemes for Kokoro and normalized text for Plus. |
 | Voice selection and Automatic language | App now uses SDK `resolvedVoiceID`; F1–F5/M1–M5 survive all 31 language resolutions. Voice picker lists ten styles for the effective language and preserves Automatic when selecting a style. | Kokoro retains its own language-specific catalog. |
 | Character casting and saved assignments | Same `BookVoiceCast`, attributor and source ranges; old native pools expand without changing characters, aliases, manual assignments or manual narrator fallback. Direct Kokoro pipeline calls now create a usable cast too. | Automatic attribution is English/Spanish for both, not all synthesis languages. |
+| Spanish play structure | Basic and Plus now share `StageDialogueStructure.parseBook`. With character mode on, known printed labels resolve saved voices, directions/labels use the narrator, and unknown labels do not allocate guessed voices. | Plus single-narrator mode retains its accepted grouping. Parser bounds and unsupported languages fall back to the existing plan. |
 | Dictionary readings and normalization | `SpokenTextLexicon` shares reviewed spoken readings and source offsets across both adapters. Native uses common text normalization and English number expansion. | The large Kokoro phoneme dictionary cannot be fed verbatim into a grapheme-input model. Native pronunciation is not certified identical to Kokoro's G2P. |
 | Expressive controls and blending | SDK exposes actual capabilities and resolves supported delivery options. Unsupported retained preferences no longer create different native cache requests for identical audio. | Kokoro's phone-level gestures/blends are not native emotion controls. Native context response is a separate, default-off candidate. |
 | Pronunciation dialect | Capability belongs to SDK; app only offers it where consumed. | Native does not consume Kokoro regional phone substitutions. |
@@ -26,6 +33,34 @@ finite values and matches the frozen source manifest's SHA256.
 | Backend/lifetime | One native renderer switches style tensors without reloading synthesis graphs. Existing cancellation, bounded vocoder and foreground-GPU/background-CPU handoff remain. | These changes do not newly qualify device memory, thermals or background behavior. |
 | Model preparation | SDK `preparationIdentity` replaces the app's hard-coded SDK-version receipt. | Preparation identity is distinct from voice selection and PCM identity. |
 | Downloads and updates | SDK owns known prior asset IDs and verified-file reuse. App copies only files matching the new manifest into private staging, preserving old installations; existing verified preparation/finalization remains. | Complete model-update UX and retaining an older runtime as a fallback during a changed-model download are not implemented here. |
+
+## Basic-to-Plus parity register
+
+Audited the current SDK and the app candidate `c43f513b`, including
+`ListeningSettingsView`, `ListeningVoicePreview`, `ListeningCenter`,
+`NeuralSpeechReader`, `NarrationBookStore`, the planners and both render adapters.
+Source sharing does not replace testing the new native model in TestFlight.
+
+| Basic feature | Plus status and evidence | Remaining action |
+| --- | --- | --- |
+| Voice audition, selection and persistent settings | Shared voice cards/list, preview owner and renderer; native ten-style catalog and Automatic selection covered by existing tests. | New native voices still need listening review. |
+| Narrator/character selection, manual narrator fallback and aliases | Shared cast schema/attributor; app persists separate catalogs. Regression tests exercise source spans, reopen and assignments. | No new device-interaction acceptance claimed. |
+| Spanish theatrical directions and printed speakers | Gap fixed in this pass through the same bounded structural parser; differential Basic/Plus planning tests use the same play and saved character. | Native transitions still require listening. |
+| Numbers, dates, money, times, Roman chapter numerals | Shared normalizer already covered structured forms; this pass fixes native English signed/grouped decimals, longer ordinals and numbers next to sentence punctuation, using Basic's `NumberToWords`. IDs/malformed syntax stay intact. | Context-dependent English year/address readings and arbitrary abbreviation/name pronunciation are not identical to the phoneme frontend. |
+| Pronunciation dictionaries and corrections | Reviewed written-to-spoken overrides share the SDK pipeline. Native receives normalized words. | Basic's IPA/stress/G2P dictionaries are not yet equivalent native pronunciation guidance; do not call this full dictionary parity. |
+| Supported book languages | Native has 31, Basic has 8; **Chinese (`zh`) is Basic-only**. Hindi is supported by both. | The current native model cannot gain Chinese by adding a picker entry. Model-level support and listening qualification are required. Never silently switch engines. |
+| Regional pronunciation | Basic consumes Spanish phone substitutions; Plus does not. | Native equivalent remains required; hidden control is not parity. |
+| Expressive delivery | Basic uses explicit attribution evidence and scoped phone gestures. Native baseline is accepted; optional surrounding-context research is separate/default-off. | Native equivalent needs listening evidence; do not forward unsupported phone controls. |
+| Voice blending | Basic has reviewed specific voice pairs; Plus exposes ten distinct styles. | Native style interpolation is not implemented or accepted; ten presets are not blending parity. |
+| Conversation/chapter seam pacing | Basic applies `NarrationPlaybackCadence`; Plus currently bypasses it to preserve accepted native delivery. | Native timing equivalent remains open. Do not claim the earlier DL result or add unreviewed fixed pauses. |
+| Speed, pause/resume, seek, chapter advance, source highlighting | Shared `NeuralSpeechReader`, player and timeline; sample rate comes from selected model. Native unit source offsets survive substitutions/splitting. | Existing tests/source evidence; repeat usage in TestFlight for the changed native model. |
+| Sleep timer/end-of-chapter, mini-player, Now Playing, route/call interruption and CarPlay presentation | `ListeningCenter` owns these independent of Basic/Plus; both use the same neural driver. | No new hardware checks declared passed. Matt deferred dedicated checks to TestFlight. |
+| Offline cache, prewarming, cancellation and memory lifetime | Shared cache/driver; model, pipeline, spoken text, delivery and actual voice identities separate audio. Plus additionally reserves opening/resume audio. | Character prewarm guard is shared; complete update UI/runtime fallback remains open for new assets. |
+| Download verification and preparation | Both use SDK manifests, checksums and staged installation; Plus reuses verified prior files. | Publish immutable SDK/assets and update all app graphs before release. |
+
+The numeric fix changes `spoken-text-2`; stage casting changes
+`native-characters-2`. Both flow into `NarrationPipeline.revision`, which the app
+includes in prepared PCM keys. No model graph/style bytes change in this pass.
 
 ## Download reuse
 
