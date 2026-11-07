@@ -116,6 +116,7 @@ public actor NarrationRenderer {
             guard let voice = NarrationModel.plus.nativeVoices.first(where: { $0.id == unit.voiceID }) else {
                 throw CTError.unsupportedVoice
             }
+            try await plus.setVoice(voice.engineVoiceID)
             return try await renderNative(unit.synthesisText, language: voice.language, engine: plus)
         }
         guard let kokoro else { throw RenderError.invalidAudio }

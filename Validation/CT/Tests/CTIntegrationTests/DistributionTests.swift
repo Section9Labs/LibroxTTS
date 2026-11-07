@@ -4,10 +4,13 @@ import KokoroNarration
 import LibroxTTS
 import LibroxCTNative
 
-@Test func plusDistributionPinsPublicFilesAndRetainsModelLicense() throws {
+@Test func plusPreviewPinsFilesAndRetainsModelLicense() throws {
     let manifest = try NarrationAssets.manifest(.plus)
     let native = try CTAssets.manifest()
-    #expect(NarrationAssets.isDownloadPublished(.plus))
+    // DK is a local listening candidate. Do not advertise its reserved URLs
+    // as downloadable until the assets are published and release-qualified.
+    #expect(!NarrationAssets.isDownloadPublished(.plus))
+    #expect(native.identity == "librox-plus-dk-coreml-v1")
     #expect(manifest.revision == CTAssets.releaseTag)
     #expect(manifest.downloadSize > 400_000_000 && manifest.downloadSize < 500_000_000)
     #expect(manifest.files.count == native.files.count)
@@ -22,6 +25,8 @@ import LibroxCTNative
     }
     #expect(manifest.files.contains { $0.path == "licenses/model-LICENSE" })
     #expect(manifest.files.contains { $0.path == "licenses/MODIFICATIONS.md" })
+    #expect(manifest.files.contains { $0.path == "voice_styles/F1.json" })
+    #expect(manifest.files.contains { $0.path == "voice_styles/M1.json" })
     #expect(CTAttribution.modelLicense.contains("Attachment A"))
     #expect(CTAttribution.modifications.contains("modified derivative"))
     #expect(KokoroAttribution.text.contains(CTAttribution.modelLicense))

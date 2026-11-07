@@ -9,6 +9,10 @@ import LibroxCTNative
 /// not label a language perceptually accepted or a sample more expressive.
 @main struct NarrationPipelineProbe {
     static func main() async throws {
+        if CommandLine.arguments.dropFirst().first == "--native" {
+            try await nativePassage(arguments: Array(CommandLine.arguments.dropFirst(2)))
+            return
+        }
         if CommandLine.arguments.count == 4 {
             try await comparePassage(assets: URL(fileURLWithPath: CommandLine.arguments[1]),
                 output: URL(fileURLWithPath: CommandLine.arguments[2]),

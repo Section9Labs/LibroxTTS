@@ -37,7 +37,7 @@ public enum NarrationAssets {
     public static func bundledResourceName(_ model: NarrationModel) -> String? {
         switch model { case .kokoroDesktop: "BundledNarrationHD"; case .plus: "CTCoreMLV2GPUAssets"; default: nil }
     }
-    public static func isDownloadPublished(_ model: NarrationModel) -> Bool { model.isEnabled }
+    public static func isDownloadPublished(_ model: NarrationModel) -> Bool { model.isEnabled && model != .plus }
     /// Foreground installer. Hosts needing process-surviving transfers can use
     /// manifest(_:), their background URLSession, and prepare(_:model:).
     /// Serialize installation for a destination and keep it separate from any

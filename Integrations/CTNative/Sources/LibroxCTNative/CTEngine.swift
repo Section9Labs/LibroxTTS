@@ -16,16 +16,17 @@ public actor CTEngine {
     /// Whole-passage decoding is retained for deterministic equivalence checks.
     public enum VocoderMode: Sendable { case bounded, wholePassage }
     private let vocoderMode: VocoderMode
+    private var voiceID = CTAssets.voiceID
     private var backend: Backend
     private var state: State?
     private struct State {
         let tokenizer: CTTokenizer
         var coreML: [String: CTCoreMLGraph]
         let generator: CTGenerator
-        let ttl: CTTensor
-        let dp: CTTensor
-        let ttlFeature: MLFeatureValue
-        let dpFeature: MLFeatureValue
+        var ttl: CTTensor
+        var dp: CTTensor
+        var ttlFeature: MLFeatureValue
+        var dpFeature: MLFeatureValue
         let totalStep: MLFeatureValue
         let steps: [MLFeatureValue]
     }
@@ -72,7 +73,7 @@ public actor CTEngine {
             coreML[name] = try CTCoreMLGraph(package: directory.appendingPathComponent("coreml/\(name).mlpackage"),
                 backend: selected)
         }
-        let style = try JSONDecoder().decode(Style.self, from: Data(contentsOf: directory.appendingPathComponent("voice_styles/F1.json")))
+        let style = try JSONDecoder().decode(Style.self, from: Data(contentsOf: directory.appendingPathComponent("voice_styles/\(CTAssets.voiceStyles[voiceID]!).json")))
         let ttl = try CTTensor(style.style_ttl.data.flatMap { $0.flatMap { $0 } }, shape: style.style_ttl.dims)
         let dp = try CTTensor(style.style_dp.data.flatMap { $0.flatMap { $0 } }, shape: style.style_dp.dims)
         guard ttl.shape == [1, 50, 256], dp.shape == [1, 8, 16] else { throw CTError.invalidAssets("F1") }
@@ -84,13 +85,28 @@ public actor CTEngine {
             totalStep: CTCoreMLGraph.feature(CTTensor([Float(10)], shape: [1])),
             steps: (0..<10).map { try CTCoreMLGraph.feature(CTTensor([Float($0)], shape: [1])) })
     }
+    /// Select an explicitly pinned style without reloading the synthesis graphs.
+    public func setVoice(_ selected: String) throws {
+        guard let name = CTAssets.voiceStyles[selected] else { throw CTError.unsupportedVoice }
+        guard selected != voiceID else { return }
+        guard state != nil else { throw CTError.notLoaded }
+        let style = try JSONDecoder().decode(Style.self, from: Data(contentsOf: directory.appendingPathComponent("voice_styles/\(name).json")))
+        let ttl = try CTTensor(style.style_ttl.data.flatMap { $0.flatMap { $0 } }, shape: style.style_ttl.dims)
+        let dp = try CTTensor(style.style_dp.data.flatMap { $0.flatMap { $0 } }, shape: style.style_dp.dims)
+        guard ttl.shape == [1, 50, 256], dp.shape == [1, 8, 16],
+              try ttl.floats().allSatisfy(\.isFinite), try dp.floats().allSatisfy(\.isFinite) else { throw CTError.invalidAssets(name) }
+        let ttlFeature = try CTCoreMLGraph.feature(ttl), dpFeature = try CTCoreMLGraph.feature(dp)
+        state?.ttl = ttl; state?.dp = dp
+        state?.ttlFeature = ttlFeature; state?.dpFeature = dpFeature
+        voiceID = selected
+    }
     /// Saved noise is a diagnostic input, never an integer-seed parity promise.
     /// Voice and language are checked even when callers bypass the app facade.
-    public func synthesize(_ text: String, language: String, voiceID: String = CTAssets.voiceID,
+    public func synthesize(_ text: String, language: String, voiceID: String? = nil,
                            initialNoise: CTTensor? = nil, captureTrace: Bool = false,
                            completeSentence: Bool = true) throws -> Output {
         try Task.checkCancellation()
-        guard voiceID == CTAssets.voiceID else { throw CTError.unsupportedVoice }
+        guard voiceID == nil || voiceID == self.voiceID else { throw CTError.unsupportedVoice }
         guard let state else { throw CTError.notLoaded }
         var trace: [String: CTTensor] = [:]
         var times: [String: Double] = [:]

@@ -19,12 +19,13 @@ public enum CTError: Error, LocalizedError, Sendable {
 }
 
 public enum CTAssets {
-    public static let identity = "librox-plus-ct-f1-coremlgpu-v2"
-    public static let releaseTag = "plus-coreml-v2-2026-11-06"
+    public static let identity = "librox-plus-dk-coreml-v1"
+    public static let releaseTag = "plus-dk-coreml-preview-v1"
     public static let downloadBaseURL = "https://github.com/Section9Labs/LibroxTTS/releases/download/" + releaseTag + "/"
     public static let coreMLIdentity = identity
-    public static let voiceID = "ct-f1-v1"
-    public static let parameterCount = 108_425_399
+    public static let voiceID = "dk-f1-v1"
+    public static let voiceStyles = ["dk-f1-v1": "F1", "dk-m1-v1": "M1"]
+    public static let parameterCount = 108_569_401
     public struct Manifest: Decodable, Sendable {
         public struct File: Decodable, Sendable {
             public let path: String

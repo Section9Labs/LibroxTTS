@@ -1,7 +1,7 @@
 {
-  "identity": "librox-plus-ct-f1-coremlgpu-v2",
-  "referenceManifestSHA256": "8bbf2b6c453d386b905a3c99f6a77ab9705d26a3b76e09dcf29addf16cea9b62",
-  "parameterCount": 108425399,
+  "identity": "librox-plus-dk-coreml-v1",
+  "referenceManifestSHA256": "a7c2685ef1ac72dda6a06839c03639fabffac4fa2cc94c79dc8b7d3413679098",
+  "parameterCount": 108569401,
   "files": [
     {
       "path": "config/tts.json",
@@ -45,18 +45,18 @@
     },
     {
       "path": "coreml/text_encoder_early.mlpackage/Data/com.apple.CoreML/model.mlmodel",
-      "bytes": 184317,
-      "sha256": "8828f08bc28b0fd1d7018e81291fa70e635306260bda73e8d878d10ccadb483b"
+      "bytes": 186609,
+      "sha256": "bf0447f2512a4cdec0452a12d1edeb3f35fd392736b6dbf8063b5c24a5bbc355"
     },
     {
       "path": "coreml/text_encoder_early.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
-      "bytes": 35531392,
-      "sha256": "d74638e656d03ec28260daa4964eabbd67d10bdcf96528360662da5e18c1f647"
+      "bytes": 36056896,
+      "sha256": "1679af50dd3f2c14ebaaecb5aa0185d6d5239c9ed587f7b955c3524c08c5fe25"
     },
     {
       "path": "coreml/text_encoder_early.mlpackage/Manifest.json",
       "bytes": 617,
-      "sha256": "a51e72df03440b4b9adf4c83251ae9444960d4f94ffa7fe38bf3fbb09f7a2ea8"
+      "sha256": "8a13e2efffa24baaee725927cabebb3b2e3438c1fa9033e52133b9a66d6fd1b0"
     },
     {
       "path": "coreml/vector_estimator.mlpackage/Data/com.apple.CoreML/model.mlmodel",
@@ -90,8 +90,8 @@
     },
     {
       "path": "licenses/MODIFICATIONS.md",
-      "bytes": 1380,
-      "sha256": "5ecea7ffd6ca3c05318c935d2ea3e76fbed17f7e8fd25c78ebb335c30cf34d87"
+      "bytes": 1635,
+      "sha256": "625a98b75dc39487c71cf41261cc1d8d34adc620b2a09561fe5b400b8fe8759b"
     },
     {
       "path": "licenses/helper-LICENSE",
@@ -110,13 +110,18 @@
     },
     {
       "path": "provenance.json",
-      "bytes": 1978,
-      "sha256": "bb35534bcc0f503c1f1d1424e9588ee177e4bd81af9e8c8d0ea6b0b9f44d4182"
+      "bytes": 483,
+      "sha256": "37d93d577db4191622d567fe30fcc07e7d243a32fd5230cfb1d9a4c65aabd433"
     },
     {
       "path": "voice_styles/F1.json",
       "bytes": 292046,
       "sha256": "bbdec6ee00231c2c742ad05483df5334cab3b52fda3ba38e6a07059c4563dbc2"
+    },
+    {
+      "path": "voice_styles/M1.json",
+      "bytes": 291748,
+      "sha256": "e35604687f5d23694b8e91593a93eec0e4eca6c0b02bb8ed69139ab2ea6b0a5b"
     }
   ]
 }

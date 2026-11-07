@@ -29,7 +29,7 @@ public enum NarrationModel: String, CaseIterable, Codable, Sendable, Identifiabl
     public var outputSampleRate: Int { nativeSampleRate }
     public var nativeSampleRate: Int { self == .plus ? 44_100 : 24_000 }
     public var deliveryIdentity: String {
-        self == .plus ? "ct-f1-delivery-v3:native44100:source-boundaries:native-dynamics" : "profiled-narration-runtime-1"
+        self == .plus ? "dk-delivery-v1:native44100:source-boundaries:native-dynamics" : "profiled-narration-runtime-1"
     }
     public func renderIdentity(for unit: BookNarrationUnit) -> String {
         self == .plus ? deliveryIdentity : deliveryProfile.renderIdentity(for: unit)
@@ -38,10 +38,15 @@ public enum NarrationModel: String, CaseIterable, Codable, Sendable, Identifiabl
         public let id: String
         public let name: String
         public let language: String
+        public let styleID: String
+        public var engineVoiceID: String { "dk-" + styleID.lowercased() + "-v1" }
     }
     public var nativeVoices: [NativeVoice] {
-        self == .plus ? supportedLanguageCodes.map {
-            .init(id: "plus-f1-\($0)-v1", name: "F1 · " + NarrationLanguage.name($0), language: $0)
+        self == .plus ? ["F1", "M1"].flatMap { style in
+            supportedLanguageCodes.map { language in
+                NativeVoice(id: "plus-\(style.lowercased())-\(language)-v1",
+                    name: style + " · " + NarrationLanguage.name(language), language: language, styleID: style)
+            }
         } : []
     }
     public var supportedLanguageCodes: [String] {
@@ -49,7 +54,10 @@ public enum NarrationModel: String, CaseIterable, Codable, Sendable, Identifiabl
     }
     public func resolvedVoiceID(_ preferred: String?, language: String) -> String? {
         guard let language = NarrationLanguage.normalize(language), supportedLanguageCodes.contains(language) else { return nil }
-        if self == .plus { return nativeVoices.first { $0.language == language }?.id }
+        if self == .plus {
+            let style = nativeVoices.first { $0.id == preferred }?.styleID ?? "F1"
+            return nativeVoices.first { $0.language == language && $0.styleID == style }?.id
+        }
         if let preferred, let voice = Voice.named(preferred), voice.language.rawValue == language { return preferred }
         return Language(rawValue: language).map { Voice.preferred(for: $0).id }
     }
@@ -59,7 +67,7 @@ public enum NarrationModel: String, CaseIterable, Codable, Sendable, Identifiabl
         case .compact: "Small download · Listen immediately"
         case .enhanced: "Richer narration · On-device listening"
         case .kokoroDesktop: "On-device listening"
-        case .plus: "F1 narrator · 31 languages"
+        case .plus: "F1 and M1 · 31 languages"
         case .qwenDesktop: "Expressive narration · Prepare chapters before listening"
         }
     }
