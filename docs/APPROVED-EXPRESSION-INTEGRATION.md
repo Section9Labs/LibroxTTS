@@ -63,6 +63,17 @@ predicate is conservatively English/Spanish only; other languages retain the
 approved role-pool fallback rather than unreviewed predicate expansion. Phoneme/
 stress-dictionary equivalence, regional pronunciation and Plus Chinese remain open.
 
+## Verified download reuse
+
+The SDK now discovers identical source files at other manifest-listed paths using
+SHA-256 plus byte count, then verifies actual source bytes before making private
+staging copies. This does not fuse models or substitute intermediate tensors.
+The approved expression packages contain 72,492,357 bytes; 72,113,792 bytes are
+identical to already installed DK weights. A real-asset test verifies reuse of all
+32 DK files plus both expression weight files, leaving 378,565 bytes of new graph
+package files, plus the expression manifest metadata, for an existing DK install.
+The full expression update manifest/download activation remains release work.
+
 ## Next release integration
 
 Before enabling this in Librox, complete physical qualification and make a new

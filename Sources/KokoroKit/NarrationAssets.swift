@@ -29,9 +29,9 @@ public enum NarrationAssets {
     public static func estimatedDownloadSize(_ model: NarrationModel, reusing repositoryID: String?) throws -> Int64 {
         let current = try manifest(model)
         guard let repositoryID, let previous = try? manifest(model, repositoryID: repositoryID) else { return current.downloadSize }
-        let old = Dictionary(uniqueKeysWithValues: previous.installedFiles.map { ($0.path, $0) })
+        let old = Set(previous.installedFiles.map { contentKey($0) })
         return current.files.reduce(0) { total, file in
-            total + (old[file.path]?.sha256 == file.sha256 && old[file.path]?.size == file.size ? 0 : file.size)
+            total + (old.contains(contentKey(file)) ? 0 : file.size)
         }
     }
     public static func manifest(_ model: NarrationModel, repositoryID selected: String? = nil) throws -> AssetManifest {
@@ -88,28 +88,41 @@ public enum NarrationAssets {
         }) else {
             throw CTError.invalidAssets("staging overlaps installed model")
         }
+        // New graphs can share identical weights with an installed graph under
+        // another path. Only manifest-pinned content hashes establish reuse;
+        // matching graph/tensor names never do. Validate aliases before reading.
+        for file in manifest.files {
+            guard !file.path.isEmpty, !file.path.hasPrefix("/"),
+                  !file.path.split(separator: "/").contains("..") else { throw CTError.invalidAssets(file.path) }
+        }
+        let aliases = Dictionary(grouping: manifest.files, by: contentKey)
         var reused: Set<String> = []
         for file in manifest.files {
             try Task.checkCancellation()
-            guard !file.path.isEmpty, !file.path.hasPrefix("/"),
-                  !file.path.split(separator: "/").contains("..") else { throw CTError.invalidAssets(file.path) }
             let target = staging.appendingPathComponent(file.path)
             guard target.standardizedFileURL.resolvingSymlinksInPath().path.hasPrefix(targetRoot.path + "/") else {
                 throw CTError.invalidAssets(file.path)
             }
             if try matches(target, size: file.size, sha256: file.sha256) { reused.insert(file.path); continue }
-            for directory in directories {
-                let source = directory.appendingPathComponent(file.path)
-                guard try matches(source, size: file.size, sha256: file.sha256) else { continue }
-                try fm.createDirectory(at: target.deletingLastPathComponent(), withIntermediateDirectories: true)
-                if fm.fileExists(atPath: target.path) { try fm.removeItem(at: target) }
-                try fm.copyItem(at: source, to: target)
-                reused.insert(file.path)
-                break
+            let paths = [file.path] + (aliases[contentKey(file)] ?? []).map(\.path).filter { $0 != file.path }
+            search: for directory in directories {
+                for path in paths {
+                    let source = directory.appendingPathComponent(path)
+                    guard try matches(source, size: file.size, sha256: file.sha256) else { continue }
+                    try fm.createDirectory(at: target.deletingLastPathComponent(), withIntermediateDirectories: true)
+                    if fm.fileExists(atPath: target.path) { try fm.removeItem(at: target) }
+                    try fm.copyItem(at: source, to: target)
+                    reused.insert(file.path)
+                    break search
+                }
             }
         }
         return reused
     }
+    private static func contentKey(_ file: AssetManifest.File) -> String {
+        file.sha256 + ":" + String(file.size)
+    }
+
     /// Foreground installer. Hosts needing process-surviving transfers can use
     /// manifest(_:), their background URLSession, and prepare(_:model:).
     /// Serialize installation for a destination and keep it separate from any
