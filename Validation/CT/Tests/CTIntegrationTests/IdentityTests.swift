@@ -38,9 +38,8 @@ import LibroxCTNative
         #expect(unit.text == (long as NSString).substring(with: unit.range))
     }
     let symbols = String(repeating: "𝄞", count: 200)
-    #expect(throws: TextNativeNarrationPlanner.PlanningError.self) {
-        try TextNativeNarrationPlanner.plan(symbols, voiceID: "plus-f1-en-v1")
-    }
+    // Ornamental paragraphs contain no narration, just like blank EPUB lines.
+    #expect(try TextNativeNarrationPlanner.plan(symbols, voiceID: "plus-f1-en-v1").isEmpty)
 }
 @Test func failedLoadAndUnloadDoNotLeaveUsableRenderer() async throws {
     let missing = URL.temporaryDirectory.appendingPathComponent(UUID().uuidString)

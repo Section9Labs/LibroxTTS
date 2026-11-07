@@ -76,3 +76,38 @@ func everyDeclaredLanguageHasARealPreviewAndTokenBudget(_ language: String) thro
     #expect(abs(a.gainDB - CTDelivery.nativeGainDB) < 1e-10 && abs(a.gainDB - b.gainDB) < 1e-10)
     #expect(abs((try CTDelivery.integratedLoudness(a.samples) - CTDelivery.integratedLoudness(b.samples)) - 12.0412) < 0.001)
 }
+
+@Test(arguments: ["\n \n", "\r\n \r\n", "\u{2029}\u{2029}"])
+func nativeDialogueParagraphsSkipBlankTokensAndKeepSourceRanges(_ separator: String) throws {
+    let first = "  ‘Morning,’ she said, standing beside the gate.   "
+    let second = "  ‘Morning,’ he replied.   ‘Have you brought the letter?’   "
+    let text = first + separator + second
+    let units = try TextNativeNarrationPlanner.plan(text, voiceID: "plus-f1-en-v1")
+    #expect(units.count == 2)
+    #expect(units.first?.boundaryAfter == .paragraph)
+    for (unit, expected) in zip(units, [first, second]) {
+        #expect(unit.text.trimmingCharacters(in: .whitespacesAndNewlines)
+                == expected.trimmingCharacters(in: .whitespacesAndNewlines))
+        #expect(unit.text == (text as NSString).substring(with: unit.range))
+        #expect(!unit.text.contains { $0.isNewline })
+        _ = try CTTokenizer.normalize(unit.synthesisText, language: "en", completeSentence: false)
+    }
+}
+
+@Test func nativeLongQuotedSentenceCanGrowPastItsNonspeakingPrefix() throws {
+    let text = "  ‘" + String(repeating: "The window was open and the room was quiet, ", count: 24) + "she remembered.’"
+    let units = try TextNativeNarrationPlanner.plan(text, voiceID: "plus-f1-en-v1")
+    #expect(units.count > 1)
+    #expect(units.map(\.text).joined().trimmingCharacters(in: .whitespacesAndNewlines)
+            == text.trimmingCharacters(in: .whitespacesAndNewlines))
+    for unit in units {
+        #expect(unit.text == (text as NSString).substring(with: unit.range))
+        #expect(try CTTokenizer.normalize(unit.synthesisText, language: "en", completeSentence: false).unicodeScalars.count <= 500)
+    }
+}
+
+@Test func nativeEmptyAndOrnamentalParagraphsProduceNoAudioUnits() throws {
+    for text in [" \n \n ", "⁂\n* * *\n—", "“”\n‘’"] {
+        #expect(try TextNativeNarrationPlanner.plan(text, voiceID: "plus-f1-en-v1").isEmpty)
+    }
+}
