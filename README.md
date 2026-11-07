@@ -9,7 +9,7 @@ Offline speech synthesis and book narration for iPhone, iPad and Mac. **Librox P
 Add the versioned Swift package:
 
 ```swift
-.package(url: "https://github.com/Section9Labs/LibroxTTS.git", exact: "0.2.1")
+.package(url: "https://github.com/Section9Labs/LibroxTTS.git", exact: "0.3.0")
 ```
 
 Products include `LibroxTTS` (host-facing synthesis/install API), `LibroxCTNative` (Core ML CT runtime), `KokoroCatalog` (Kokoro voices/assets), and `KokoroPronunciation` (Kokoro text to model phonemes). There are no remote Swift dependencies. Swift 6, **iOS/Catalyst 18+ or macOS 15+** are required. Apple system language facilities are required, so Linux is not supported.
@@ -18,7 +18,7 @@ Products include `LibroxTTS` (host-facing synthesis/install API), `LibroxCTNativ
 
 See [the narrator integration API](docs/book-planning.md), [casting rules](docs/story-narrator.md), and [enhancement API and validation limits](docs/audio-enhancement.md). The optional, separately imported `QwenANE` product retains the Qwen renderer work; its existence does not establish device eligibility or sustained background performance. No MLX dependency is added to these library products. Rejected model auditions are not app dependencies.
 
-This branch contains the [shared narration pipeline candidate](docs/UNIFIED-NARRATION.md). SDK 0.2.1 remains the released version; the candidate needs app listening acceptance.
+Version 0.3.0 ships the [shared narration pipeline](docs/UNIFIED-NARRATION.md), accepted CT passage delivery and bounded-vocoder runtime. Read the [0.3.0 app upgrade guide](docs/UPGRADE-0.3.0.md) for sample-rate, cache and model-download migration. Existing verified Core ML v2 weights are reused.
 
 ## Speak with Plus
 
