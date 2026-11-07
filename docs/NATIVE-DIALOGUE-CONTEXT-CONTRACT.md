@@ -53,3 +53,11 @@ Use `es` and `plus-f1-es-v1` for Spanish. Actual M1 character selection comes fr
 This isolated patch owns the binder, optional engine input, nil unit storage, renderer forwarding and diagnostic runner/tests. It does not change production assets, catalog, `NarrationPipeline`, casting, app wiring or defaults. The SDK chat owns all-voice asset registration, casting and iPhone integration. New assets must invalidate old context bindings through their actual manifest fingerprints.
 
 Human listening is pending. Phone latency/memory/thermal qualification, DL timing parity, general emotion understanding and human-narrator quality are not claimed. Keep this path disabled pending listening and native integration review. The older local-query proposal is deferred and is not this implementation.
+
+## Reconciliation with the ten-voice SDK
+
+Merged SDK `f3b723910e4b099d9bcec7870b5e4ea126de22bd` at `319b1d40d271eff53fafe8fa8b5ddb4ba4256203`. The only merge conflict was probe command dispatch; both `--native-context` and `--native-voices` remain available. The optional context implementation is unchanged and defaults remain off.
+
+Full release tests and the release probe build pass against `librox-plus-dk-coreml-v2`. Two new native integration comparisons exercise M1 English dialogue and newly available F2 Spanish dialogue with F1 narration. Identity/rejected-context PCM, token/style/late-feature/noise invariants and duration checks pass. Final-build receipts and hashes are at `/Users/matt/Code/swift/librox-dk-native-context-v2-reconciliation/final/manifest.json`. The earlier parent-directory runs used the Swift test-built executable; the `final` directory is the separate final-product-build check.
+
+The v1 F1/M1 listening comparisons remain unchanged and tied to their original binary/assets. The v2 checks establish integration only, not new listening acceptance. Current bindings fingerprint the v2 manifest and actual selected style, so they cannot reuse a v1 binding. No app default, asset publication or iPhone qualification is part of this patch.
