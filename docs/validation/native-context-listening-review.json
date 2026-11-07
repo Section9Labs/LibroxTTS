@@ -1,0 +1,37 @@
+{
+  "status": "listening-approved-for-presented-samples",
+  "userQuote": "Just listened and they sound good",
+  "scope": "Positive sample-quality feedback on the four presented baseline-then-context comparisons; no comparative preference stated.",
+  "cases": [
+    {
+      "case": "en-female-relief",
+      "pairFile": "/Users/matt/Code/swift/librox-dk-native-context-v1/en-female-relief/baseline-then-context.wav",
+      "pairSHA256": "452e02a8443b9af2b6b1a451b4d808ca114cb9c30ac150c40bf69c3c3bd812c3"
+    },
+    {
+      "case": "en-male-danger",
+      "pairFile": "/Users/matt/Code/swift/librox-dk-native-context-v1/en-male-danger/baseline-then-context.wav",
+      "pairSHA256": "0fb909764cc7100afb7c187fef4f4d98e12d1e373f305f34e673bc0055d4120a"
+    },
+    {
+      "case": "es-female-danger",
+      "pairFile": "/Users/matt/Code/swift/librox-dk-native-context-v1/es-female-danger/baseline-then-context.wav",
+      "pairSHA256": "f55323c3e91f3b49f6bcf4a46eee8a13f14696944e87b6caa8c18d77975638cf"
+    },
+    {
+      "case": "es-male-relief",
+      "pairFile": "/Users/matt/Code/swift/librox-dk-native-context-v1/es-male-relief/baseline-then-context.wav",
+      "pairSHA256": "8332af0b04fddc2af7f8ce2603ac0f4c0f42dd15a6a0048c08f380420315d7bb"
+    }
+  ],
+  "artifactManifestSHA256": "b1848121ce73ddb5cba2809e8aadb37e2cc33385574d6ed8a3d6dbb3a1d49406",
+  "sourceCommit": "90e0e27f918f7942037d48b7f702c197db1a1d27",
+  "sdkBase": "1170112e51d5a3ef277ff6191026ae827aa73ad3",
+  "defaultEnabled": false,
+  "phoneQualified": false,
+  "remainingIntegration": [
+    "Include renderCacheKey in PCM identity",
+    "Coordinate automatic context attachment inside LibroxTTS",
+    "Measure native iPhone latency, memory and thermal behavior"
+  ]
+}

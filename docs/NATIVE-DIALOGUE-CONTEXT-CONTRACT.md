@@ -1,6 +1,6 @@
 # Native context gathering: implementation and listening evidence
 
-Status: diagnostic candidate, default off, awaiting human listening. Accepted DK F1/M1 voices remain the baseline. No model weights, voice tables or assets change.
+Status: presented samples listening-approved; production context remains default off pending integration checks. Accepted DK F1/M1 voices remain the baseline. No model weights, voice tables or assets change.
 
 ## Mechanism
 
@@ -32,7 +32,7 @@ Verified in every case:
 - Sample counts match; samples are finite and in range.
 - Narration units reuse baseline audio explicitly. Both narration-only complete WAV files are byte-identical.
 
-The first eight cases each apply context to one actual dialogue unit. Changed early features or waveforms are not quality evidence. Word fidelity and appropriate expression still require listening.
+The first eight cases each apply context to one actual dialogue unit. Changed early features or waveforms are not quality evidence. The user subsequently approved the four presented samples as sounding good; see the listening review below.
 
 Each `baseline-then-context.wav` contains accepted baseline followed by candidate with a presentation-only 0.8-second gap. No ASR, added pauses inside narration, waveform pitch or tempo edits, or candidate-specific gain were used. The diagnostic does not implement historical DL pacing.
 
@@ -52,7 +52,7 @@ Use `es` and `plus-f1-es-v1` for Spanish. Actual M1 character selection comes fr
 
 This isolated patch owns the binder, optional engine input, nil unit storage, renderer forwarding and diagnostic runner/tests. It does not change production assets, catalog, `NarrationPipeline`, casting, app wiring or defaults. The SDK chat owns all-voice asset registration, casting and iPhone integration. New assets must invalidate old context bindings through their actual manifest fingerprints.
 
-Human listening is pending. Phone latency/memory/thermal qualification, DL timing parity, general emotion understanding and human-narrator quality are not claimed. Keep this path disabled pending listening and native integration review. The older local-query proposal is deferred and is not this implementation.
+The presented samples received positive listening feedback. Phone latency/memory/thermal qualification, DL timing parity, general emotion understanding and human-narrator quality are not claimed. Keep production context disabled pending native integration and cache-identity checks. The older local-query proposal is deferred and is not this implementation.
 
 ## Reconciliation with the ten-voice SDK
 
@@ -67,3 +67,9 @@ The v1 F1/M1 listening comparisons remain unchanged and tied to their original b
 Merged SDK `54a2bb0095fe52c9137722f5c0f7cd425adfabc3` at `e23fb0a2470c362c39f1c9eea8e09f3aaf00f956`. This brings shared English numeric readings and Spanish stage/printed-speaker structure into the context branch without changing the optional context implementation. The release check filtered to `KokoroNarrationTests|NativeNumberReadingsTests` passes, including existing context-binding tests; log `/tmp/librox-context-parity-reconcile-tests.log`.
 
 All ten original listening-pair hashes were reverified unchanged. They remain evidence for their recorded earlier code/assets, not the new frontend revision. No audio was regenerated and no context default was enabled. Production context attachment remains gated on listening and incorporating `renderCacheKey` into PCM identity; the frontend revision alone does not supply that context cache separation.
+
+## Listener verdict
+
+Matt's direct response to the four presented Core ML comparisons: “Just listened and they sound good.” Record this as positive listening acceptance for those samples, without inferring an unstated A/B preference or extending acceptance to the unpresented voices/scenes. Exact files and hashes are in `docs/validation/native-context-listening-review.json` and the evidence directory's `listening-review.json`. The original manifests and audio remain immutable.
+
+The SDK chat received the verdict. The next integration work is context-specific PCM cache identity, SDK-owned context attachment and iPhone validation. The original sample-quality gate is satisfied; release/device qualification remains separate. No weights, defaults or audio changed when recording this review.
