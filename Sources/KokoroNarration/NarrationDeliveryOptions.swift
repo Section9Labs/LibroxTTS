@@ -2,6 +2,7 @@
 import Foundation
 import KokoroCatalog
 import KokoroPronunciation
+import LibroxCTNative
 
 /// Optional, deterministic delivery refinements. Neither changes playback speed
 /// nor loads a second model. Hosts persist these alongside the selected voice.
@@ -11,7 +12,17 @@ public struct NarrationDeliveryOptions: Codable, Equatable, Sendable {
     public init(expressive: Bool = false, blendedVoice: Bool = false) {
         self.expressive = expressive; self.blendedVoice = blendedVoice
     }
-    public var cacheIdentity: String { "delivery-options-1:expressive=\(expressive):blend=\(blendedVoice)" }
+    public var cacheIdentity: String { "delivery-options-2:expressive=\(expressive):blend=\(blendedVoice)" }
+    /// Same bounded preset pairing in every native language. This is opt-in;
+    /// the original primary style remains untouched when blending is disabled.
+    public func nativeBlend(for voiceID: String) -> CTVoiceBlend? {
+        guard blendedVoice,
+              let voice = NarrationModel.plus.nativeVoices.first(where: { $0.id == voiceID }) else { return nil }
+        let styles = CTAssets.styles.filter { $0.first == voice.styleID.first }
+        guard let index = styles.firstIndex(of: voice.styleID), styles.count > 1 else { return nil }
+        let secondary = styles[(index + 1) % styles.count]
+        return CTVoiceBlend(secondaryVoiceID: "dk-" + secondary.lowercased() + "-v1", weight: 0.2)
+    }
     /// Small reviewed audition pairings only. Unsupported voices retain their
     /// original reference; a new book or chapter never chooses a random blend.
     public func secondaryVoice(for voiceID: String) -> (id: String, weight: Float)? {

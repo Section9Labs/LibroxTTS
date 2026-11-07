@@ -17,6 +17,7 @@ public actor CTEngine {
     public enum VocoderMode: Sendable { case bounded, wholePassage }
     private let vocoderMode: VocoderMode
     private var voiceID = CTAssets.voiceID
+    private var activeBlend: CTVoiceBlend?
     private var backend: Backend
     private var state: State?
     private struct State {
@@ -48,7 +49,7 @@ public actor CTEngine {
     public init(directory: URL, backend: Backend = .coreMLCPU, vocoderMode: VocoderMode = .bounded) {
         self.directory = directory; self.backend = backend; self.vocoderMode = vocoderMode
     }
-    public func unload() { state = nil }
+    public func unload() { state = nil; activeBlend = nil }
     /// Foreground GPU and background CPU share the text models and styles.
     /// Retire heavy allocations before replacement; never hold both backends.
     public func setBackend(_ selection: Backend) throws {
@@ -67,6 +68,7 @@ public actor CTEngine {
     }
     public func load() throws {
         guard state == nil else { return }
+        activeBlend = nil
         try Task.checkCancellation()
         try CTAssets.validate(directory)
         var coreML: [String: CTCoreMLGraph] = [:]
@@ -89,20 +91,33 @@ public actor CTEngine {
             totalStep: CTCoreMLGraph.feature(CTTensor([Float(10)], shape: [1])),
             steps: (0..<10).map { try CTCoreMLGraph.feature(CTTensor([Float($0)], shape: [1])) })
     }
-    /// Select an explicitly pinned style without reloading the synthesis graphs.
-    public func setVoice(_ selected: String) throws {
-        guard let name = CTAssets.voiceStyles[selected] else { throw CTError.unsupportedVoice }
-        guard selected != voiceID else { return }
+    /// Select pinned styles without reloading graphs. A blend is a deterministic
+    /// interpolation of both conditioning tables, never a mix of rendered audio.
+    public func setVoice(_ selected: String, blend: CTVoiceBlend? = nil) throws {
+        guard CTAssets.voiceStyles[selected] != nil else { throw CTError.unsupportedVoice }
         guard state != nil else { throw CTError.notLoaded }
-        let style = try JSONDecoder().decode(Style.self, from: Data(contentsOf: directory.appendingPathComponent("voice_styles/\(name).json")))
-        let ttl = try CTTensor(style.style_ttl.data.flatMap { $0.flatMap { $0 } }, shape: style.style_ttl.dims)
-        let dp = try CTTensor(style.style_dp.data.flatMap { $0.flatMap { $0 } }, shape: style.style_dp.dims)
-        guard ttl.shape == [1, 50, 256], dp.shape == [1, 8, 16],
-              try ttl.floats().allSatisfy(\.isFinite), try dp.floats().allSatisfy(\.isFinite) else { throw CTError.invalidAssets(name) }
+        let blend = try blend?.validated(primaryVoiceID: selected)
+        guard selected != voiceID || blend != activeBlend else { return }
+        func table(_ voice: String) throws -> (CTTensor, CTTensor) {
+            guard let name = CTAssets.voiceStyles[voice] else { throw CTError.unsupportedVoice }
+            let style = try JSONDecoder().decode(Style.self, from: Data(contentsOf: directory.appendingPathComponent("voice_styles/\(name).json")))
+            let ttl = try CTTensor(style.style_ttl.data.flatMap { $0.flatMap { $0 } }, shape: style.style_ttl.dims)
+            let dp = try CTTensor(style.style_dp.data.flatMap { $0.flatMap { $0 } }, shape: style.style_dp.dims)
+            guard ttl.shape == [1, 50, 256], dp.shape == [1, 8, 16],
+                  try ttl.floats().allSatisfy(\.isFinite), try dp.floats().allSatisfy(\.isFinite) else { throw CTError.invalidAssets(name) }
+            return (ttl, dp)
+        }
+        var (ttl, dp) = try table(selected)
+        if let blend {
+            let (otherTTL, otherDP) = try table(blend.secondaryVoiceID)
+            ttl = try blend.interpolate(ttl, otherTTL)
+            dp = try blend.interpolate(dp, otherDP)
+        }
         let ttlFeature = try CTCoreMLGraph.feature(ttl), dpFeature = try CTCoreMLGraph.feature(dp)
+        try Task.checkCancellation()
         state?.ttl = ttl; state?.dp = dp
         state?.ttlFeature = ttlFeature; state?.dpFeature = dpFeature
-        voiceID = selected
+        voiceID = selected; activeBlend = blend
     }
     /// Saved noise is a diagnostic input, never an integer-seed parity promise.
     /// Voice and language are checked even when callers bypass the app facade.
@@ -148,7 +163,7 @@ public actor CTEngine {
         let early: MLFeatureValue
         var contextDisposition: TextContextDisposition = textContext == nil ? .absent : .rejected
         var preparedContext: (CTTextContext.Binding, [Int64])?
-        if let textContext, !completeSentence,
+        if let textContext, !completeSentence, activeBlend == nil,
            let style = CTAssets.voiceStyles[self.voiceID],
            CTTextContext.validates(textContext, spokenText: text, language: language,
                modelFingerprint: try CTTextContext.modelFingerprint(), styleID: style),

@@ -25,7 +25,7 @@ public enum NarrationModel: String, CaseIterable, Codable, Sendable, Identifiabl
     public var usesTextNativePlanning: Bool { self == .plus }
     public var supportsCharacterVoices: Bool { self == .compact || self == .kokoroDesktop || self == .plus }
     public var supportsExpressiveDelivery: Bool { self == .compact || self == .kokoroDesktop }
-    public var supportsVoiceBlending: Bool { self == .kokoroDesktop }
+    public var supportsVoiceBlending: Bool { self == .kokoroDesktop || self == .plus }
     public var supportsPronunciationDialect: Bool { self == .compact || self == .kokoroDesktop }
     /// Unsupported saved controls remain saved by the host, but must not create
     /// a different preparation/cache request for identical native audio.
@@ -42,7 +42,8 @@ public enum NarrationModel: String, CaseIterable, Codable, Sendable, Identifiabl
         self == .plus ? "dk-delivery-v1:native44100:source-boundaries:native-dynamics" : "profiled-narration-runtime-1"
     }
     public func renderIdentity(for unit: BookNarrationUnit) -> String {
-        self == .plus ? deliveryIdentity : deliveryProfile.renderIdentity(for: unit)
+        self == .plus ? deliveryIdentity + ":context=" + (unit.nativeTextContext?.renderCacheKey ?? "none")
+            : deliveryProfile.renderIdentity(for: unit)
     }
     public struct NativeVoice: Identifiable, Sendable {
         public let id: String

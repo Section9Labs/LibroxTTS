@@ -47,7 +47,7 @@ func everyNativeStyleSurvivesEverySupportedLanguage(_ style: String) {
 
 @Test func unsupportedDeliverySettingsDoNotCreateDifferentNativeRequests() {
     let selected = NarrationDeliveryOptions(expressive: true, blendedVoice: true)
-    #expect(NarrationModel.plus.resolvedDeliveryOptions(selected) == .init())
+    #expect(NarrationModel.plus.resolvedDeliveryOptions(selected) == .init(blendedVoice: true))
     #expect(NarrationModel.compact.resolvedDeliveryOptions(selected) == .init(expressive: true))
     #expect(NarrationModel.kokoroDesktop.resolvedDeliveryOptions(selected) == selected)
     #expect(!NarrationModel.plus.supportsPronunciationDialect)

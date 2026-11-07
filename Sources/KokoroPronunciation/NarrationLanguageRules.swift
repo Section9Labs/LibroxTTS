@@ -4,6 +4,15 @@ import Foundation
 /// coreference, sentiment, or gender from a person's name. All model languages
 /// have a profile; each profile is exercised by source-range/cast fixtures.
 public enum NarrationLanguageRules {
+    /// Reuse literal attribution grammar for seam timing without inventing a
+    /// speaker or changing the cast. The caller still decides whether the source
+    /// actually borders quoted speech.
+    public static func beginsWithNamedSpeechTag(_ text: String, language: String) -> Bool {
+        (try? MultilingualSpeakerAttribution.Matcher(language: language).suffix(text)) != nil
+    }
+    public static func endsWithNamedSpeechTag(_ text: String, language: String) -> Bool {
+        (try? MultilingualSpeakerAttribution.Matcher(language: language).prefix(text)) != nil
+    }
     public struct Profile: Sendable {
         public let reportingVerbs: [String]
         public let excludedNames: Set<String>

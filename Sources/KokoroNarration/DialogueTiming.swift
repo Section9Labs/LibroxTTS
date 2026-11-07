@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 import Foundation
+import KokoroPronunciation
 
 public enum DialogueTimingRole: String, Sendable, Equatable {
     case unknown, narration, dialogue, attribution
@@ -98,7 +99,7 @@ public struct DialogueTimingDecision: Sendable, Equatable {
 }
 
 public enum DialogueTiming {
-    public static let revision = "dialogue-timing-2"
+    public static let revision = "dialogue-timing-3"
 
     public static func classify(_ context: DialogueTimingContext,
                                 profile: DialogueTimingProfile = .init()) -> DialogueTimingDecision {
@@ -190,11 +191,13 @@ public enum DialogueTiming {
     }
 
     private static func startsQuote(_ text: String) -> Bool {
-        text.first.map { "\"'‘“«‹「『".contains($0) } == true
+        text.first.map { "\"'‘“„”«‹「『".contains($0) } == true
     }
 
     private static func startsReportingClause(_ text: String, language: String?) -> Bool {
-        guard language == "en" || language == "es" else { return false }
+        guard language == "en" || language == "es" else {
+            return language.map { NarrationLanguageRules.beginsWithNamedSpeechTag(text, language: $0) } ?? false
+        }
         let value = text.precomposedStringWithCanonicalMapping.trimmingCharacters(in: attributionLeading)
         let firstClause = String(value.prefix { !".!?。！？;；\n\r".contains($0) })
         // Only a leading speech verb or subject + speech verb qualifies. A later
@@ -212,6 +215,9 @@ public enum DialogueTiming {
         // A tag that has ended in a full stop is a completed sentence, not an
         // instruction to shorten the next quoted sentence's boundary.
         guard text.last.map({ ",:，：—–".contains($0) }) == true else { return false }
+        if let language, !["en", "es"].contains(language) {
+            return NarrationLanguageRules.endsWithNamedSpeechTag(text, language: language)
+        }
         var clause = text
         if let cut = clause.lastIndex(where: { ".!?。！？;；\n\r\"”»」』".contains($0) }) {
             clause = String(clause[clause.index(after: cut)...])

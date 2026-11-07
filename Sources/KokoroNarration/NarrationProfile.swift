@@ -90,6 +90,8 @@ public enum BoundedNarrationContext {
 /// transitions use current context rather than replaying previously added gaps.
 public struct NarrationPlaybackCadence: Sendable {
     private let profile: NarrationProfile
+    private var nativeTiming = false
+    private var enabled = true
     private var basic = NarrationCadence(pacing: .audiobook)
     private var conversation = ConversationCadence()
     private struct Edge: Sendable {
@@ -100,12 +102,24 @@ public struct NarrationPlaybackCadence: Sendable {
     }
     private var previous: Edge?
     public init(profile: NarrationProfile) { self.profile = profile }
+    /// Both adapters share semantic timing. Native timing is explicitly opt-in
+    /// while its listening comparison is reviewed; old playback stays exact.
+    public init(model: NarrationModel, nativeTiming: Bool = false) {
+        profile = model.deliveryProfile
+        self.nativeTiming = model.usesTextNativePlanning
+        enabled = !model.usesTextNativePlanning || nativeTiming
+    }
+    public mutating func reset() {
+        basic = NarrationCadence(pacing: .audiobook)
+        conversation.reset(); previous = nil
+    }
 
     @discardableResult
     public mutating func apply(to samples: inout [Float], unit: BookNarrationUnit,
                                sampleRate: Int = 24_000, chapterBreak: Bool = false,
                                sourceGap: String = "") -> Int {
-        guard profile == .enhanced else {
+        guard enabled else { return 0 }
+        guard profile == .enhanced || nativeTiming else {
             return basic.apply(to: &samples, boundaryAfter: unit.boundaryAfter,
                 voiceID: unit.voiceID, sampleRate: sampleRate, chapterBreak: chapterBreak)
         }
@@ -113,7 +127,8 @@ public struct NarrationPlaybackCadence: Sendable {
             previousSpeakerID: previous?.speaker, nextSpeakerID: unit.speakerID,
             previousRole: previous?.role ?? .unknown, nextRole: unit.role,
             structuralBreak: chapterBreak ? .chapter : previous?.boundary == .paragraph ? .paragraph : .none,
-            sourceGap: sourceGap, languageCode: Voice.named(unit.voiceID)?.language.rawValue), sampleRate: sampleRate)
+            sourceGap: sourceGap, languageCode: Voice.named(unit.voiceID)?.language.rawValue
+                ?? NarrationModel.plus.nativeVoices.first(where: { $0.id == unit.voiceID })?.language), sampleRate: sampleRate)
         if result.accepted {
             previous = Edge(text: String(String.UnicodeScalarView(unit.text.unicodeScalars.suffix(256))),
                 speaker: unit.speakerID, role: unit.role, boundary: unit.boundaryAfter)

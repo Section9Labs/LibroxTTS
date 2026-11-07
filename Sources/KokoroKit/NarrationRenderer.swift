@@ -116,9 +116,9 @@ public actor NarrationRenderer {
             guard let voice = NarrationModel.plus.nativeVoices.first(where: { $0.id == unit.voiceID }) else {
                 throw CTError.unsupportedVoice
             }
-            try await plus.setVoice(voice.engineVoiceID)
+            try await plus.setVoice(voice.engineVoiceID, blend: delivery.nativeBlend(for: unit.voiceID))
             return try await renderNative(unit.synthesisText, language: voice.language, engine: plus,
-                                          textContext: unit.nativeTextContext)
+                                          textContext: delivery.nativeBlend(for: unit.voiceID) == nil ? unit.nativeTextContext : nil)
         }
         guard let kokoro else { throw RenderError.invalidAudio }
         let audio: Audio
@@ -168,15 +168,18 @@ public actor NarrationRenderer {
 
     /// Native-only review of one bounded unit with supplied noise. Uses the same
     /// model, voice and delivery as render(); does not silently split a comparison.
-    public func renderNativeDiagnostic(_ unit: BookNarrationUnit, initialNoise: CTTensor? = nil) async throws -> NativeDiagnostic {
+    public func renderNativeDiagnostic(_ unit: BookNarrationUnit, initialNoise: CTTensor? = nil,
+                                       delivery: NarrationDeliveryOptions = .init()) async throws -> NativeDiagnostic {
         await acquire(); defer { release() }
         try Task.checkCancellation()
         guard let plus, let voice = NarrationModel.plus.nativeVoices.first(where: { $0.id == unit.voiceID }) else {
             throw RenderError.invalidAudio
         }
-        try await plus.setVoice(voice.engineVoiceID)
+        let blend = delivery.nativeBlend(for: unit.voiceID)
+        try await plus.setVoice(voice.engineVoiceID, blend: blend)
         let native = try await plus.synthesize(unit.synthesisText, language: voice.language,
-            initialNoise: initialNoise, captureTrace: true, completeSentence: false, textContext: unit.nativeTextContext)
+            initialNoise: initialNoise, captureTrace: true, completeSentence: false,
+            textContext: blend == nil ? unit.nativeTextContext : nil)
         let prepared = try CTDelivery.prepare(native.samples, sampleRate: NarrationModel.plus.outputSampleRate,
                                              level: .nativeDynamics)
         return NativeDiagnostic(samples: prepared.samples, native: native)
