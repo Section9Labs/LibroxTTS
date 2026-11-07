@@ -2,8 +2,9 @@
 
 This branch integrates the cumulative human-approved Round 07 into published
 LibroxTTS 0.4.0-beta.1 source (`c61248927b285e162d1b3fb089b953ae0643f906`).
-It is an opt-in qualification candidate, not a published SDK/model update or a
-TestFlight delivery. The release owner retains all distribution ownership.
+It is packaged as SDK 0.4.0-beta.2 with the immutable Round 07 model release.
+See [the upgrade contract](UPGRADE-0.4.0-beta.2.md). App integration and actual
+TestFlight availability remain separate; Release Manager owns distribution.
 
 ## Frozen acoustic contract
 
@@ -34,7 +35,7 @@ for independent qualification. The new installation identity
 pass the same `repositoryID` to `NarrationPipeline.plan` and `NarrationRenderer.load`.
 Old DK/CT installations keep their own validation, preparation and playback identities. A prepared expression unit is rejected if its
 engine lacks the matching expression configuration, rather than silently using
-the earlier gather algorithm. The default application path remains unchanged.
+the earlier gather algorithm. Older installed identities keep their existing path.
 
 `BookNarrationUnit.nativeExpression` carries only its bounded source evidence.
 `NarrationModel.renderIdentity(for:)` includes the graph, carry, context position,
@@ -77,15 +78,14 @@ identical to already installed DK weights. A real-asset test verifies reuse of a
 package files, plus the expression manifest metadata, for an existing DK install.
 The SDK now registers the complete 40-file installation, including the pinned
 graph manifest and supplemental modifications notice. `stage_approved_expression_release.py`
-produces verified model files and seven prospective public release attachments.
+produces verified model files and seven public release attachments.
 The exact new download is 382,281 bytes for a valid DK installation. Public
-selection/download activation remains off until publication and app integration.
+selection/download activation is enabled for the new identity in beta.2.
 
 ## Next release integration
 
-Before enabling this in Librox, complete physical qualification and make a new
-immutable versioned asset installation carrying both base DK and approved expression
-identity. Reuse existing verified DK bytes and preserve the working DK/CT installation
+The immutable installation carries both base DK and approved expression
+identity. iPhone SDK qualification passed; iPad is unavailable and remains unverified. Reuse existing verified DK bytes and preserve the working DK/CT installation
 until replacement verification/preparation succeeds. Do not change published
 `plus-dk-coreml-preview-v2` assets or its hashes. Qualification supports both the original additive graph directory and the complete
 versioned installation. The actual app update/activation remains separate release work.
@@ -94,8 +94,8 @@ Playback, preparation, opening/resume cache and voice preview must select the sa
 installed expression version and planning option. Every generation and prepared-PCM
 cache must include the installed runtime identity. Retain current UI, saved cast,
 blending and Natural pauses settings; do not enable an unsupported blended expression
-path. The app's existing expression capability flag remains off until that integration
-is ready. Ship via a new SDK version and exact resolved graphs, with a combined app
+path. The app's general expression-control capability flag remains off; approved context
+conditioning follows the installed identity, not a new emotion control. Ship via a new SDK version and exact resolved graphs, with a combined app
 SHA, archive and verified TestFlight receipt owned by Release Manager.
 
 ## Initial iPhone qualification

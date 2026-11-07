@@ -6,11 +6,18 @@ import LibroxCTNative
 /// Opt-in public-download acceptance. Uses the same SDK installer as hosts.
 @main struct CTInstallProbe {
     static func main() async throws {
-        guard CommandLine.arguments.count == 2 else {
-            throw CocoaError(.fileNoSuchFile, userInfo: [NSLocalizedDescriptionKey: "Usage: ct-install-probe NEW_DIRECTORY"])
+        guard (2...3).contains(CommandLine.arguments.count) else {
+            throw CocoaError(.fileNoSuchFile, userInfo: [NSLocalizedDescriptionKey: "Usage: ct-install-probe NEW_DIRECTORY [EXISTING_DK_DIRECTORY]"])
         }
         let directory = URL(fileURLWithPath: CommandLine.arguments[1], isDirectory: true)
         guard !FileManager.default.fileExists(atPath: directory.path) else { throw CocoaError(.fileWriteFileExists) }
+        let manifest = try NarrationAssets.manifest(.plus)
+        let existing = CommandLine.arguments.count == 3
+            ? URL(fileURLWithPath: CommandLine.arguments[2], isDirectory: true) : nil
+        let reused = try existing.map {
+            try NarrationAssets.reuseVerifiedFiles(manifest: manifest, from: [$0], into: directory)
+        } ?? []
+        let pendingBytes = manifest.files.filter { !reused.contains($0.path) }.reduce(Int64(0)) { $0 + $1.size }
         let start = Date()
         try await NarrationAssets.download(.plus, to: directory)
         let installSeconds = Date().timeIntervalSince(start)
@@ -27,7 +34,7 @@ import LibroxCTNative
         for (text, voice) in [("The book was waiting where she had left it.", "plus-f1-en-v1"),
                               ("El libro estaba donde lo había dejado.", "plus-f1-es-v1")] {
             let plan = try await NarrationPipeline().plan(text, model: .plus, bookID: "install-probe",
-                chapterID: "0", narratorVoiceID: voice)
+                chapterID: "0", narratorVoiceID: voice, repositoryID: NarrationAssets.repositoryID(.plus))
             for unit in plan.units {
                 let start = Date()
                 let audio = try await renderer.render(unit)
@@ -37,8 +44,12 @@ import LibroxCTNative
             }
         }
         await renderer.unload()
-        let receipt: [String: Any] = ["release": CTAssets.releaseTag, "installSeconds": installSeconds,
-            "downloadedBytes": try NarrationAssets.manifest(.plus).downloadSize,
+        if let existing {
+            try NarrationAssets.validate(existing, manifest: NarrationAssets.manifest(.plus, repositoryID: CTAssets.identity))
+        }
+        let receipt: [String: Any] = ["release": try NarrationAssets.manifest(.plus).revision, "installSeconds": installSeconds,
+            "installedBytes": manifest.downloadSize, "initialDownloadBytes": pendingBytes,
+            "verifiedReusedFiles": reused.count, "existingDKPreserved": existing != nil,
             "sameSizeCorruptionRepaired": true, "renders": rows]
         let data = try JSONSerialization.data(withJSONObject: receipt, options: [.prettyPrinted, .sortedKeys])
         try data.write(to: directory.appendingPathComponent("acceptance.json"))

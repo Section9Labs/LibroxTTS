@@ -12,7 +12,7 @@ extension NarrationPipelineProbe {
         let renderer = NarrationRenderer(compactDirectory: assets, harmonicSource: nil)
         let pipeline = NarrationPipeline()
         let start = Date()
-        try await renderer.load(.plus, directory: assets, executionContext: .foreground)
+        try await renderer.load(.plus, directory: assets, executionContext: .foreground, repositoryID: CTAssets.identity)
         let loadSeconds = Date().timeIntervalSince(start)
         var records: [[String: Any]] = []
         func digest(_ data: Data) -> String { SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined() }

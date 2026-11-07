@@ -35,7 +35,7 @@ extension NarrationPipelineProbe {
         let manifest = try CTAssets.manifest()
         let renderer = NarrationRenderer(compactDirectory: assets, harmonicSource: nil)
         let started = Date()
-        try await renderer.load(.plus, directory: assets, executionContext: .foreground)
+        try await renderer.load(.plus, directory: assets, executionContext: .foreground, repositoryID: CTAssets.identity)
         let loaded = Date()
         var samples: [Float] = []
         var units: [[String: Any]] = []

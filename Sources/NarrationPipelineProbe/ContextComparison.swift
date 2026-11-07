@@ -80,7 +80,7 @@ extension NarrationPipelineProbe {
             roleEvidence: usesRoleEvidence ? roleEvidence : [:],
             reportingEvidence: graphObject["reportingPoolMode"] != nil ? reportingEvidence : [:]) : nil
         let renderer = NarrationRenderer(compactDirectory: assets, harmonicSource: nil, contextStyleDiagnostic: diagnostic)
-        try await renderer.load(.plus, directory: assets, executionContext: .foreground)
+        try await renderer.load(.plus, directory: assets, executionContext: .foreground, repositoryID: CTAssets.identity)
         var baseline: [Float] = [], candidate: [Float] = []
         var records: [[String: Any]] = []
         var checkedIdentity = false

@@ -1,13 +1,13 @@
 import Foundation
 import CryptoKit
 
-/// Frozen cumulative Round 07 configuration for SDK/device qualification.
+/// Frozen cumulative Round 07 configuration for the versioned expression beta.
 /// This additive asset bundle never reinterprets or replaces an installed DK model.
 public enum CTApprovedExpression {
     public static let installationIdentity = "librox-plus-dk-expression-round07-v1"
     public static let releaseTag = "plus-dk-expression-round07-v1"
-    /// The public selection stays on DK v2 until the expression release is published.
-    public static let isDownloadPublished = false
+    /// The immutable expression release is publicly downloadable and hash-verified.
+    public static let isDownloadPublished = true
     public static let manifestSHA256 = "07166b8dbcc7de7d987e39bec031977eae8b86ca56d8c11ecb59ffe31619211e"
     public static let identity = "librox-plus-expression-round07-v1:"
         + manifestSHA256 + ":" + CTContextStyleDiagnostic.carryRevision

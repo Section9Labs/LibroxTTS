@@ -2,6 +2,7 @@ import Foundation
 import CryptoKit
 import Testing
 import LibroxTTS
+import LibroxCTNative
 
 @Test func modelUpdateReusesOnlyCurrentHashesAndPreservesOldInstallation() throws {
     let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
@@ -63,7 +64,7 @@ func approvedExpressionReusesInstalledDKWeightsAtNewPaths() throws {
     let environment = ProcessInfo.processInfo.environment
     let installed = URL(fileURLWithPath: try #require(environment["LIBROX_EXPRESSION_REUSE_ASSETS"]))
     let graphs = URL(fileURLWithPath: try #require(environment["LIBROX_EXPRESSION_REUSE_GRAPHS"]))
-    let base = try NarrationAssets.manifest(.plus)
+    let base = try NarrationAssets.manifest(.plus, repositoryID: CTAssets.identity)
     var json = try #require(JSONSerialization.jsonObject(with: JSONEncoder().encode(base)) as? [String: Any])
     let graphManifest = try #require(JSONSerialization.jsonObject(with:
         Data(contentsOf: graphs.appendingPathComponent("manifest.json"))) as? [String: Any])

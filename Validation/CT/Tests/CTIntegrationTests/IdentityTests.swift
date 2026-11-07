@@ -57,13 +57,13 @@ func modelReplacementRetiresPlusAndRecoversAfterMissingBasicAssets() async throw
     let missing = URL.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     let renderer = NarrationRenderer(compactDirectory: missing, harmonicSource: nil)
     let unit = try #require(TextNativeNarrationPlanner.plan("She came home.", voiceID: "plus-f1-en-v1").first)
-    try await renderer.load(.plus, directory: assets)
+    try await renderer.load(.plus, directory: assets, repositoryID: CTAssets.identity)
     let audio = try await renderer.render(unit)
     #expect(audio.count > 24_000)
     #expect(audio.allSatisfy { $0.isFinite && abs($0) <= 1 })
     await #expect(throws: (any Error).self) { try await renderer.load(.kokoroDesktop, directory: missing) }
     await #expect(throws: (any Error).self) { try await renderer.render(unit) }
-    try await renderer.load(.plus, directory: assets)
+    try await renderer.load(.plus, directory: assets, repositoryID: CTAssets.identity)
     await renderer.unload()
     await #expect(throws: (any Error).self) { try await renderer.render(unit) }
 }

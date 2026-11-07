@@ -16,7 +16,7 @@ extension NarrationPipelineProbe {
         let sources = ["en": "The lamp was still burning beside the window. She opened the letter, read the first line, and smiled. Tomorrow, they would finally see each other again.",
                        "es": "La lámpara seguía encendida junto a la ventana. Ella abrió la carta, leyó la primera línea y sonrió. Mañana, por fin, volverían a verse."]
         let started = Date()
-        try await renderer.load(.plus, directory: assets, executionContext: .foreground)
+        try await renderer.load(.plus, directory: assets, executionContext: .foreground, repositoryID: CTAssets.identity)
         let loadSeconds = Date().timeIntervalSince(started)
         var cases: [[String: Any]] = []
         do {

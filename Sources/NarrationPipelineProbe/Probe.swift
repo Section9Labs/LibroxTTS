@@ -43,7 +43,7 @@ import LibroxCTNative
         try FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
         let pipeline = NarrationPipeline()
         let renderer = NarrationRenderer(compactDirectory: assets, harmonicSource: nil)
-        try await renderer.load(.plus, directory: assets, executionContext: .foreground)
+        try await renderer.load(.plus, directory: assets, executionContext: .foreground, repositoryID: CTAssets.identity)
         var results: [[String: Any]] = []
         for language in NarrationLanguage.textNativeCodes {
             let text = NarrationLanguage.sampleText(language)!
