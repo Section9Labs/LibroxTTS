@@ -5,7 +5,7 @@ import KokoroPronunciation
 /// The common entry point for book playback, preparation, exports and auditions.
 /// Hosts persist the optional cast; model adapters own their input representation.
 public actor NarrationPipeline {
-    public static let revision = "narration-pipeline-2:native-characters-2:" + TextNativeNarrationPlanner.revision
+    public static let revision = "narration-pipeline-2:native-characters-3:" + TextNativeNarrationPlanner.revision
     public struct Plan: Sendable {
         public let units: [BookNarrationUnit]
         public let narratorVoiceID: String

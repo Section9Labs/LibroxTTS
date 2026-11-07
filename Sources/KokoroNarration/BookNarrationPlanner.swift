@@ -84,9 +84,10 @@ public actor BookNarrationPlanner {
             guard let voice = Voice.named(id) else { throw PlanningError.invalidVoice }
             guard voice.language.rawValue == original.language.rawValue else { throw PlanningError.languageMismatch }
         }
+        guard let phoneticLanguage = original.language.pronunciationLanguage else { throw PlanningError.languageMismatch }
         var cast = original
         let conversation = prosody == .conversationContext || prosody == .structuredConversation
-        let supportsAttribution = cast.language == .english || cast.language == .spanish
+        let supportsAttribution = SpeakerAttributor.supportedLanguageCodes.contains(cast.language.rawValue)
         let attribution: ChapterAttribution?
         if (characterVoices || conversation) && supportsAttribution {
             attribution = try SpeakerAttributor().analyze(text, bookID: cast.bookID, chapterID: chapterID, cast: &cast)
@@ -155,7 +156,7 @@ public actor BookNarrationPlanner {
         let mergedSpans = renderingSpans(spans,
             policy: prosody == .structuredConversation ? .conversationContext : prosody,
             languageCode: cast.language.rawValue)
-        let preparedSpans = prosody == .structuredConversation && cast.language == .spanish
+        let preparedSpans = prosody == .structuredConversation
             ? structuredSpans(mergedSpans, source: text, cast: cast, characterVoices: characterVoices)
             : mergedSpans
         for span in preparedSpans {
@@ -176,7 +177,7 @@ public actor BookNarrationPlanner {
             let passages = conversation && span.isDialogue
                 ? expressionPassages(span.text, voiceID: span.voiceID) : [span.text]
             let planned = try passages.flatMap {
-                try planner.plan($0, language: cast.language, options: options, targetPhonemes: targetPhonemes)
+                try planner.plan($0, language: phoneticLanguage, options: options, targetPhonemes: targetPhonemes)
             }
             for unit in planned {
                 let source = text as NSString
@@ -185,10 +186,10 @@ public actor BookNarrationPlanner {
                     ? source.substring(with: NSRange(location: end, length: min(192, source.length - end))) : ""
                 let fragments: [PreparedFragment]
                 if prosody != .baseline {
-                    fragments = try sourceContextFragments(unit.text, language: cast.language, options: options,
+                    fragments = try sourceContextFragments(unit.text, language: phoneticLanguage, options: options,
                         voiceID: span.voiceID, followingAttribution: following)
                 } else {
-                    let result = try pronunciation.phonemize(unit.text, language: cast.language, options: options)
+                    let result = try pronunciation.phonemize(unit.text, language: phoneticLanguage, options: options)
                     fragments = [.init(text: unit.text, phonemes: result.phonemes, prosody: nil,
                                        diagnostics: result.diagnostics)]
                 }
@@ -220,7 +221,7 @@ public actor BookNarrationPlanner {
             for i in prepared.indices where !prepared[i].phonemes.isEmpty {
                 prepared[i].expressiveFocus = try NarrationExpressiveDelivery.focus(
                     text: prepared[i].text, sourceRange: prepared[i].range, phonemes: prepared[i].phonemes,
-                    source: text, language: cast.language,
+                    source: text, language: phoneticLanguage,
                     options: options ?? .init(britishEnglish: Voice.named(prepared[i].voiceID)?.isBritish ?? false))
             }
         }

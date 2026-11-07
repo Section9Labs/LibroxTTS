@@ -35,7 +35,7 @@ enum TextNativeCharacterPlanner {
             Span(text: $0.text, offset: $0.offset, voiceID: $0.voiceID,
                  role: $0.role == .dialogue ? .dialogue : .narration, speakerID: $0.speakerID)
         }
-        if language == "es", let structure = StageDialogueStructure.parseBook(text, languageCode: language,
+        if let structure = StageDialogueStructure.parseBook(text, languageCode: language,
             establishedDialogue: spans.filter { $0.role == .dialogue }.map {
                 .init(range: NSRange(location: $0.offset, length: $0.text.utf16.count), speakerID: $0.speakerID)
             }, knownSpeakerLabels: cast.aliases),

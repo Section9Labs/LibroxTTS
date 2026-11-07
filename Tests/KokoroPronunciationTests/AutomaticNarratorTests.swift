@@ -105,7 +105,7 @@ private func analyze(_ text: String, _ cast: inout BookVoiceCast, chapter: Strin
     #expect(throws: BookVoiceCast.CastError.invalidState) {
         try BookVoiceCast.restore(JSONSerialization.data(withJSONObject: object), bookID: "book-1")
     }
-    var other = try newCast(.japanese)
+    var other = try BookVoiceCast(bookID: "book-1", languageCode: "xx", narratorVoiceID: "narrator", voicePool: [])
     #expect(throws: SpeakerAttributor.AttributionError.unsupportedLanguage) { try analyze("こんにちは", &other) }
 }
 

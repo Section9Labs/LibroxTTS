@@ -12,7 +12,7 @@ public struct SpokenTextLexicon: Sendable {
             self.written = written; self.spoken = spoken; self.language = language
         }
     }
-    public static let revision = "spoken-text-2"
+    public static let revision = "spoken-text-3"
     private let entries: [Entry]
     public init(entries: [Entry] = []) { self.entries = entries }
 
@@ -39,6 +39,8 @@ public struct SpokenTextLexicon: Sendable {
         var text = applyingReadings(to: source, language: language)
         if let language = PronunciationLanguage(rawValue: language) {
             text = TextNormalizer.normalize(text, language: language)
+        } else {
+            text = LocalizedSpokenNumbers.expand(text, language: language)
         }
         // English's shared normalizer leaves general numbers to its G2P.
         // Native text gets the same number words without passing phonemes.

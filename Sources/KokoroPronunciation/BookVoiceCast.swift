@@ -4,6 +4,30 @@ import Foundation
 /// Small, book-scoped identity store. Persist with encoded()/restore(); never
 /// rebuild it at a chapter boundary. Voice IDs are validated by the host catalog.
 public struct BookVoiceCast: Codable, Sendable, Equatable {
+    /// Persist the language independently of the phoneme frontend's catalog.
+    /// Single-value encoding preserves the existing schema-1 JSON strings.
+    public struct Language: RawRepresentable, Codable, Sendable, Equatable, Hashable {
+        public let rawValue: String
+        public init?(rawValue: String) {
+            guard rawValue.count == 2, rawValue.unicodeScalars.allSatisfy({ (97...122).contains($0.value) }) else { return nil }
+            self.rawValue = rawValue
+        }
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.singleValueContainer()
+            let code = try container.decode(String.self)
+            guard let value = Self(rawValue: code) else {
+                throw DecodingError.dataCorruptedError(in: container, debugDescription: "Invalid book language")
+            }
+            self = value
+        }
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.singleValueContainer(); try container.encode(rawValue)
+        }
+        public var pronunciationLanguage: PronunciationLanguage? { .init(rawValue: rawValue) }
+        public static let english = Self(rawValue: "en")!
+        public static let spanish = Self(rawValue: "es")!
+    }
+
     public enum Gender: String, Codable, Sendable { case unknown, female, male, conflicting }
     public enum VoiceSharing: String, Codable, Sendable { case narratorFallback, reuseCompatible }
     public enum VoiceAssignment: String, Codable, Sendable { case automatic, manual }
@@ -33,7 +57,7 @@ public struct BookVoiceCast: Codable, Sendable, Equatable {
     public static let maximumEncodedBytes = 131_072
     public private(set) var schemaVersion = 1
     public let bookID: String
-    public let language: PronunciationLanguage
+    public let language: Language
     public let narratorVoiceID: String
     public let voicePool: [String]
     /// Host-supplied voice catalog metadata, including the narrator if known.
@@ -47,6 +71,14 @@ public struct BookVoiceCast: Codable, Sendable, Equatable {
     public init(bookID: String, language: PronunciationLanguage, narratorVoiceID: String,
                 voicePool: [String], styleRow: Int = 158,
                 voiceGenders: [String: Gender] = [:], voiceSharing: VoiceSharing = .narratorFallback) throws {
+        try self.init(bookID: bookID, languageCode: language.rawValue, narratorVoiceID: narratorVoiceID,
+            voicePool: voicePool, styleRow: styleRow, voiceGenders: voiceGenders, voiceSharing: voiceSharing)
+    }
+
+    public init(bookID: String, languageCode: String, narratorVoiceID: String,
+                voicePool: [String], styleRow: Int = 158,
+                voiceGenders: [String: Gender] = [:], voiceSharing: VoiceSharing = .narratorFallback) throws {
+        guard let language = Language(rawValue: languageCode) else { throw CastError.invalidState }
         self.bookID = bookID; self.language = language
         self.narratorVoiceID = narratorVoiceID; self.voicePool = voicePool; self.styleRow = styleRow
         self.voiceGenders = voiceGenders; self.voiceSharing = voiceSharing
@@ -57,7 +89,7 @@ public struct BookVoiceCast: Codable, Sendable, Equatable {
     /// narrator becomes an available character voice; nobody is silently recast.
     public func replacingNarrator(with voiceID: String) throws -> Self {
         guard voiceID == narratorVoiceID || voicePool.contains(voiceID) else { throw CastError.invalidState }
-        var replacement = try Self(bookID: bookID, language: language, narratorVoiceID: voiceID,
+        var replacement = try Self(bookID: bookID, languageCode: language.rawValue, narratorVoiceID: voiceID,
             voicePool: (voicePool + [narratorVoiceID]).filter { $0 != voiceID }, styleRow: styleRow,
             voiceGenders: voiceGenders, voiceSharing: voiceSharing)
         replacement.characters = characters; replacement.aliases = aliases
@@ -79,7 +111,7 @@ public struct BookVoiceCast: Codable, Sendable, Equatable {
         var pool = voicePool
         for voice in voices where voice != narratorVoiceID && !pool.contains(voice) { pool.append(voice) }
         let metadata = voiceGenders.merging(genders) { _, latest in latest }
-        var result = try Self(bookID: bookID, language: language, narratorVoiceID: narratorVoiceID,
+        var result = try Self(bookID: bookID, languageCode: language.rawValue, narratorVoiceID: narratorVoiceID,
             voicePool: pool, styleRow: styleRow, voiceGenders: metadata, voiceSharing: voiceSharing)
         result.characters = characters; result.aliases = aliases
         try result.validate()

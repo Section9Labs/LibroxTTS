@@ -31,10 +31,10 @@ import KokoroPronunciation
     #expect(result.attribution == nil)
 }
 
-@Test func unsupportedAttributionIsReportedWithoutInventingSpeakers() async throws {
+@Test func supportedAttributionDoesNotInventSpeakersWithoutEvidence() async throws {
     let cast = try BookVoiceCast(bookID: "book", language: .italian, narratorVoiceID: "if_sara", voicePool: ["im_nicola"])
     let result = try await BookNarrationPlanner().plan("La luce della sera entrava nella stanza.", chapterID: "1", cast: cast, characterVoices: true)
-    #expect(!result.characterAttributionSupported)
+    #expect(result.characterAttributionSupported)
     #expect(result.cast == cast)
     #expect(result.units.allSatisfy { $0.voiceID == "if_sara" })
 }

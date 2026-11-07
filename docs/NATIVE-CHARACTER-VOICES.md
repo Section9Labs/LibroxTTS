@@ -88,3 +88,7 @@ It persists `cast.json` before rendering and writes `native.wav` plus a receipt
 with each unit's source range, speaker, actual native voice and role. Use a new
 output directory. No additional audition processing is applied. These SDK
 results do not mean the app character UI has been integrated or shipped.
+
+## All-language expansion
+
+See [ALL-LANGUAGE-NARRATION.md](ALL-LANGUAGE-NARRATION.md): explicit attribution, saved native casts and localized stage cues now cover all 31 Plus languages. Earlier EN/ES-only implementation statements describe the initial rollout; original listening evidence remains scoped to the actual clips reviewed.

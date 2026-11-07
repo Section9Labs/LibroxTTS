@@ -27,22 +27,22 @@ extension NarrationModel {
     /// Unresolved dialogue uses the narrator; no alternating-speaker guesses.
     public func supportsAutomaticCharacterAttribution(language: String) -> Bool {
         guard supportsCharacterVoices, let language = NarrationLanguage.normalize(language) else { return false }
-        return supportedLanguageCodes.contains(language) && ["en", "es"].contains(language)
+        return supportedLanguageCodes.contains(language) && SpeakerAttributor.supportedLanguageCodes.contains(language)
     }
 
     /// Persist the returned cast before playback and retain it between chapters.
-    /// Existing BookVoiceCast language storage covers the pronunciation languages;
-    /// automatic attribution is currently English/Spanish for every model.
+    /// BookVoiceCast stores a language code independent of the phoneme catalog.
+    /// Localized explicit speech tags and labels share the same persisted cast.
     public func makeVoiceCast(bookID: String, language: String, narratorVoiceID: String) throws -> BookVoiceCast {
         guard let code = NarrationLanguage.normalize(language),
-              let castLanguage = PronunciationLanguage(rawValue: code) else {
+              supportedLanguageCodes.contains(code) else {
             throw NarrationPipeline.PlanningError.unsupportedLanguage(language)
         }
         let voices = characterVoiceCatalog(language: code)
         guard voices.contains(where: { $0.id == narratorVoiceID }) else {
             throw NarrationPipeline.PlanningError.invalidVoice
         }
-        return try BookVoiceCast(bookID: bookID, language: castLanguage, narratorVoiceID: narratorVoiceID,
+        return try BookVoiceCast(bookID: bookID, languageCode: code, narratorVoiceID: narratorVoiceID,
             voicePool: voices.map(\.id).filter { $0 != narratorVoiceID },
             voiceGenders: Dictionary(uniqueKeysWithValues: voices.map { ($0.id, $0.gender) }),
             voiceSharing: .reuseCompatible)

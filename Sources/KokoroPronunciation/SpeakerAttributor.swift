@@ -23,11 +23,12 @@ public struct ChapterAttribution: Codable, Sendable {
     public let decisions: [SpeakerDecision]
 }
 
-/// Bounded English/Spanish speech tags and narrow local continuations. Pronouns
-/// require an immediately adjacent identified speaker; untagged alternating
-/// turns and cross-chapter conversational state are deliberately not inferred.
+/// Localized explicit speech tags and labels across the narration catalog.
+/// Existing English/Spanish narrow local continuations remain; other languages
+/// require explicit names. Untagged turns never imply speaker alternation.
 public struct SpeakerAttributor {
     public enum AttributionError: Error { case unsupportedLanguage, invalidChapter, tooManyCandidates }
+    public static var supportedLanguageCodes: Set<String> { Set(NarrationLanguageRules.profiles.keys) }
     public init() {}
 
     public func analyze(_ text: String, bookID: String, chapterID: String,
@@ -38,9 +39,13 @@ public struct SpeakerAttributor {
         try cast.validate()
         guard cast.bookID == bookID else { throw BookVoiceCast.CastError.wrongBook }
         guard !chapterID.isEmpty, chapterID.utf8.count <= 128 else { throw AttributionError.invalidChapter }
-        guard cast.language == .english || cast.language == .spanish else { throw AttributionError.unsupportedLanguage }
+        guard Self.supportedLanguageCodes.contains(cast.language.rawValue) else { throw AttributionError.unsupportedLanguage }
+        if cast.language != .english && cast.language != .spanish {
+            return try MultilingualSpeakerAttribution.analyze(text, bookID: bookID, chapterID: chapterID, cast: &cast)
+        }
         let source = text as NSString
-        let rules = try Rules(language: cast.language)
+        let rules = try Rules(language: cast.language.pronunciationLanguage!)
+        let sharedLabels = try MultilingualSpeakerAttribution.Matcher(language: cast.language.rawValue)
         var candidates = try StoryNarrator().quotedCandidates(in: text).map { NSRange(location: $0.offset, length: $0.length) }
         // Include punctuation immediately following closing quotation marks.
         candidates = candidates.map { range in
@@ -74,6 +79,7 @@ public struct SpeakerAttributor {
             let beforeStart = max(0, range.location - 240)
             let before = source.substring(with: NSRange(location: beforeStart, length: range.location - beforeStart))
             if let tag = rules.prefixTag(before) { evidence.append(tag) }
+            else if let tag = sharedLabels.explicitLabel(before) { evidence.append(Tag(name: tag.name, evidence: tag.evidence)) }
             let after = source.substring(with: NSRange(location: NSMaxRange(range), length: min(180, source.length - NSMaxRange(range))))
             let suffixTag = rules.suffixTag(after)
             if let suffixTag { evidence.append(suffixTag) }
@@ -116,7 +122,7 @@ public struct SpeakerAttributor {
                 if let cached = contextEvidence[identity] {
                     sourceEvidence = cached
                 } else {
-                    sourceEvidence = try CharacterContext.evidence(for: selected.name, in: text, language: pending.language,
+                    sourceEvidence = try CharacterContext.evidence(for: selected.name, in: text, language: pending.language.pronunciationLanguage!,
                                                                    chapterID: chapterID, aliases: aliases)
                 }
                 var context = sourceEvidence

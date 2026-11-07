@@ -75,14 +75,14 @@ public struct StoryNarrator: Sendable {
         guard text.unicodeScalars.count <= PronunciationEngine.maximumInputScalars else {
             throw PronunciationError.inputTooLong(limit: PronunciationEngine.maximumInputScalars)
         }
-        let pairs: [Character: Character] = ["«": "»", "“": "”", "\"": "\""]
+        let pairs: [Character: Character] = ["«": "»", "“": "”", "”": "”", "„": "“", "‘": "’", "「": "」", "『": "』", "《": "》", "\"": "\""]
         var opener: String.Index?
         var closing: Character?
         var nested = false
         var result: [DialogueAnnotation] = []
         for index in text.indices {
             let char = text[index]
-            if let start = opener, char == closing {
+            if let start = opener, char == closing || (text[start] == "„" && char == "”") {
                 if !nested {
                     let range = NSRange(start..<text.index(after: index), in: text)
                     result.append(.init(offset: range.location, length: range.length))
