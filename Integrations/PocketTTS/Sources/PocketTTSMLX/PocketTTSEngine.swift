@@ -34,6 +34,7 @@ public actor PocketTTSEngine {
                            samplerSteps: Int = PocketTTSSamplingOptions.defaultSamplerSteps) throws -> Output {
         try chunking.validate()
         guard (1...8).contains(samplerSteps) else { throw PocketTTSError.invalidSamplerSteps }
+        try PocketTTSSamplingOptions(temperature: temperature, samplerSteps: samplerSteps).validate()
         guard let voice = PocketTTSCatalog.voice(id: voiceID) else { throw PocketTTSError.invalidVoice }
         guard text.unicodeScalars.count <= 16_384 else { throw PocketTTSError.textTooLong }
         let model = try loadedModel(language: voice.language)
@@ -50,19 +51,27 @@ public actor PocketTTSEngine {
     }
     /// Frame callbacks are synchronous and apply backpressure. The consumer must
     /// discard staged output on errors/cancellation; only success completes a unit.
-    public func renderFrames(_ text: String, voiceID: String,
+    public func renderFrames(_ text: String, voiceID: String, temperature: Float = 0.3,
+                             continueChunks: Bool = true,
                              chunking: PocketTTSChunkingOptions = .init(),
                              role: PocketTTSPassageRole = .narration,
                              samplerSteps: Int = PocketTTSSamplingOptions.defaultSamplerSteps,
                              receive: @Sendable ([Float]) throws -> Void) throws {
         try chunking.validate()
         guard (1...8).contains(samplerSteps) else { throw PocketTTSError.invalidSamplerSteps }
+        try PocketTTSSamplingOptions(temperature: temperature, samplerSteps: samplerSteps).validate()
         guard let voice = PocketTTSCatalog.voice(id: voiceID) else { throw PocketTTSError.invalidVoice }
+        guard text.unicodeScalars.count <= 16_384 else { throw PocketTTSError.textTooLong }
         let model = try loadedModel(language: voice.language)
-        model.temp = 0.3
+        model.temp = temperature
         model.lsd_decode_steps = samplerSteps
-        try model.render(text: text, voice: voice.name, chunking: chunking, role: role,
-                         language: voice.language, onChunk: receive)
+        var sampleCount = 0
+        try model.render(text: text, voice: voice.name, continuation: continueChunks,
+                         chunking: chunking, role: role, language: voice.language) { chunk in
+            guard sampleCount + chunk.count <= 24_000 * 300 else { throw PocketTTSError.textTooLong }
+            sampleCount += chunk.count
+            try receive(chunk)
+        }
     }
     /// Inspect the same token-aware decisions used by synthesis before generating audio.
     public func previewChunks(_ text: String, voiceID: String,

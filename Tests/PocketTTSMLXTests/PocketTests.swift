@@ -26,6 +26,7 @@ import KokoroCatalog
 }
 
 import Foundation
+import Synchronization
 import MLX
 import LibroxTTS
 
@@ -67,6 +68,14 @@ import LibroxTTS
         }
         await #expect(throws: PocketTTSError.invalidSamplerSteps) {
             try await engine.renderFrames("Hello.", voiceID: "pocket-alba-en-v1", samplerSteps: steps) { _ in }
+        }
+    }
+    for temperature: Float in [-1, .nan, .infinity] {
+        await #expect(throws: PocketTTSSamplingOptions.ValidationError.self) {
+            try await engine.synthesize("Hello.", voiceID: "pocket-alba-en-v1", temperature: temperature)
+        }
+        await #expect(throws: PocketTTSSamplingOptions.ValidationError.self) {
+            try await engine.renderFrames("Hello.", voiceID: "pocket-alba-en-v1", temperature: temperature) { _ in }
         }
     }
 }
@@ -197,6 +206,14 @@ func pocketRendererHonorsSamplingAndRestoresQualityAfterExplicitFallback() async
         #expect(!actual.isEmpty)
         #expect(actual.count == expected.count)
         #expect(zip(actual, expected).allSatisfy { abs($0 - $1) < 0.000001 })
+        let frames = Mutex<[Float]>([])
+        try await direct.renderFrames(unit.synthesisText, voiceID: unit.voiceID,
+                                      temperature: 0, samplerSteps: steps) { chunk in
+            frames.withLock { $0.append(contentsOf: chunk) }
+        }
+        let streamed = frames.withLock { $0 }
+        #expect(streamed.count == expected.count)
+        #expect(zip(streamed, expected).allSatisfy { abs($0 - $1) < 0.000001 })
         if steps == 4 { quality = expected }
     }
     // A preceding explicit fallback must not leak into later default requests.

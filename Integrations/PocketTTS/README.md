@@ -72,7 +72,9 @@ Keep per-language download receipts; do not mark the full model installed after
 one pack. Switching language unloads the previous model and verifies the new pack.
 
 `PocketTTSEngine.renderFrames` supplies 80 ms PCM frames through a synchronous,
-throwing callback with backpressure. Stage output until success; cancellation or
+throwing callback with backpressure. Both streaming and buffered entry points
+accept temperature, sampler steps, continuation and chunking settings. Both bound
+a unit to five minutes. Stage output until success; cancellation or
 EOS-limit failure must discard incomplete units. `synthesize` buffers a bounded
 unit (maximum five minutes), never a whole book. Source input is capped at 16,384
 Unicode scalars; normal pipeline groups default to at most 2,400 scalars (configurable), then the

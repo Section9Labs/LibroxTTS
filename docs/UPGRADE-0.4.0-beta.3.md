@@ -25,7 +25,8 @@ No App Store or TestFlight app release is included in this SDK publication.
 
 The SDK provides Codable sampling and phrasing settings for an app to persist
 under the selected model, language and voice. Apply the same settings to preview,
-foreground preparation and playback planning:
+foreground preparation and playback planning. Direct `synthesize` and `renderFrames`
+also accept matching temperature, sampler-step and continuation controls:
 
 ```swift
 let sampling = PocketTTSSamplingOptions(temperature: 0.3, samplerSteps: 8)

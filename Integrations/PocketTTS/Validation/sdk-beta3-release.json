@@ -1,6 +1,5 @@
 {
   "sdk": "0.4.0-beta.3",
-  "implementationCommit": "9b717ca72c01776db2939746959b33f0ed36c703",
   "assetRelease": "pocket-tts-mlx-2026-11-07-v2",
   "host": "Mac15,14 / M3 Ultra / 256 GiB / Xcode 27.1 / Swift 6.4",
   "voices": 23,
@@ -136,5 +135,13 @@
     "Original 118-clip user listening suite is preserved; retained voices and acoustic settings are unchanged.",
     "Apple silicon Mac generation only; physical iPhone/iPad qualification and app integration/release are not included.",
     "Hosted CI runs are reported separately on the SDK release; this file records local validation."
-  ]
+  ],
+  "baselineImplementationCommit": "9b717ca72c01776db2939746959b33f0ed36c703",
+  "streamingFollowup": {
+    "pocketTests": 18,
+    "passed": true,
+    "installedAssetsAndReferenceEnabled": true,
+    "verified": "Streaming and buffered PCM match with temperature 0 at four and one sampler steps; invalid temperatures reject before loading assets.",
+    "engineSHA256": "a4429b36d7549c7a0a7acf856702bae747d778fc41853971b22f877abae4b083"
+  }
 }
