@@ -27,7 +27,8 @@ public enum NarrationAssets {
     /// Older playback is explicit and restricted to that installation's voices.
     /// A retained CT F1 installation is never relabelled as the ten-style DK bank.
     public static func supportedNativeStyles(repositoryID: String) -> [String] {
-        [CTAssets.identity, CTApprovedExpression.installationIdentity].contains(repositoryID)
+        if repositoryID == PocketTTSCatalog.identity { return PocketTTSCatalog.voiceNames }
+        return [CTAssets.identity, CTApprovedExpression.installationIdentity].contains(repositoryID)
             ? CTAssets.styles : repositoryID == CTAssets.releasedIdentity ? ["F1"] : []
     }
     /// Manifest-derived estimate only; corrupt/missing installed files download

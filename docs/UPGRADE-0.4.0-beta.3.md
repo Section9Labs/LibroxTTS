@@ -1,5 +1,8 @@
 # Upgrade to LibroxTTS 0.4.0-beta.3
 
+Historical beta.3 guidance. [Beta.4](UPGRADE-0.4.0-beta.4.md) names this model Max
+and removes the temporary Mac-only eligibility gate; use beta.4 for the app integration.
+
 Pin exact `0.4.0-beta.3` in every SwiftPM graph. This SDK beta adds Pocket TTS as
 `.pocket` (`pocketTTSV1`); existing Basic/Plus IDs and stored choices are preserved.
 Swift 6.3 or newer is now required by the pinned MLX Swift 0.32.3 dependency.

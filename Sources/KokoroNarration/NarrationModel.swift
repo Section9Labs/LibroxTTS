@@ -5,15 +5,15 @@ import LibroxCTNative
 /// Stable, persisted selection. Eligibility never rewrites a user's choice.
 public enum NarrationModel: String, CaseIterable, Codable, Sendable, Identifiable {
     case compact, enhanced, kokoroDesktop, qwenDesktop
-    case pocket = "pocketTTSV1"
     case plus = "ctPlusV1"
+    case pocket = "pocketTTSV1"
     public var id: String { rawValue }
     public var name: String {
         switch self {
         case .compact: "Previous Basic"
         case .enhanced: "Previous Enhanced"
         case .kokoroDesktop: "Basic"
-        case .pocket: "Pocket TTS"
+        case .pocket: "Max"
         case .plus: "Plus"
         case .qwenDesktop: "Previous Studio"
         }
@@ -108,19 +108,19 @@ public enum NarrationModel: String, CaseIterable, Codable, Sendable, Identifiabl
             self.physicalMemory = physicalMemory; self.identifier = identifier
         }
     }
-    /// Development qualification, not a promise based on chip generation alone.
-    /// Expand phone/tablet eligibility only after real-app memory/lifecycle trials.
+    /// Product availability is distinct from device qualification. Max is offered
+    /// across supported Apple silicon platforms for TestFlight evaluation; hosts
+    /// still own foreground GPU lifecycle and runtime resource failures.
     public static func available(on device: Device) -> [Self] {
         allCases.filter { $0.unavailableReason(on: device) == nil }
     }
     public func unavailableReason(on device: Device) -> String? {
         guard device.appleSilicon else { return "These voices require Apple silicon." }
         guard isEnabled else {
-            return "These earlier voices are temporarily unavailable. Choose Basic, Plus or System voices in Listening settings."
+            return "These earlier voices are temporarily unavailable. Choose Basic, Plus, Max or System voices in Listening settings."
         }
         switch self {
         case .pocket:
-            guard device.desktop else { return "Pocket TTS uses MLX GPU generation. iPhone and iPad qualification is pending; prepare audio on an Apple silicon Mac." }
             return nil
         case .compact: return nil
         case .plus:

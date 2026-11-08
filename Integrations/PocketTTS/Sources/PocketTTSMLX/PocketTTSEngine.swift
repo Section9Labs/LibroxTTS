@@ -8,18 +8,19 @@ public enum PocketTTSError: LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .emptyText: "There is no text to speak."
-        case .textTooLong: "This passage exceeds the bounded Pocket TTS input or audio limit. Split it into shorter passages."
-        case .invalidVoice: "This voice is not in the Pocket TTS catalog."
-        case .unsupportedLanguage: "Pocket TTS does not support this language."
-        case .invalidAssets: "The Pocket TTS language pack is missing or invalid. Download it again."
-        case .invalidAudio: "Pocket TTS did not produce valid audio."
-        case .invalidSamplerSteps: "Pocket TTS sampler steps must be between 1 and 8."
+        case .textTooLong: "This passage exceeds the bounded Max input or audio limit. Split it into shorter passages."
+        case .invalidVoice: "This voice is not in the Max catalog."
+        case .unsupportedLanguage: "Max does not support this language."
+        case .invalidAssets: "The Max language pack is missing or invalid. Download it again."
+        case .invalidAudio: "Max did not produce valid audio."
+        case .invalidSamplerSteps: "Max sampler steps must be between 1 and 8."
         }
     }
 }
 
 /// Serialized native Swift MLX owner. MLX arrays and caches never cross this actor.
-/// GPU generation is foreground/preparation-only until physical-device qualification.
+/// GPU generation is foreground/preparation-only. Platform availability does not
+/// imply sustained performance or background-generation qualification.
 public actor PocketTTSEngine {
     public static let runtimeIdentity = "pocket-mlx-28770c06-v3:quality4:adaptive:warm12:eos6:fp32"
     public struct Output: Sendable { public let samples: [Float]; public let sampleRate: Int }

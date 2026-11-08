@@ -1,6 +1,7 @@
-# Pocket TTS in LibroxTTS
+# Max (Pocket TTS) in LibroxTTS
 
-Pocket TTS is an additional, explicitly selected narration model (`.pocket`).
+Max is an additional, explicitly selected narration tier above Plus, powered by
+Pocket TTS (`NarrationModel.pocket`, persisted identity `pocketTTSV1`).
 It uses the latest pinned Kyutai reference, ported to **native Swift MLX**, with
 local 24 kHz mono PCM output. Python is used only for preparation and validation.
 Basic and Plus retain their existing model IDs and voices.
@@ -12,8 +13,8 @@ ship an app update. MLX is now a pinned package dependency; existing Basic/Plus
 inference still uses their own renderers.
 
 [Hosted language packs](https://github.com/Section9Labs/LibroxTTS/releases/tag/pocket-tts-mlx-2026-11-07-v2)
-are published as an asset prerelease. The SDK integration remains on the
-`codex/pocket-tts` branch; the asset tag is not an SDK version tag.
+are published as an asset prerelease. Pin SDK `0.4.0-beta.4` separately;
+the asset tag is not an SDK version tag. Beta.4 reuses the existing v2 packs.
 
 ## Voices and languages
 
@@ -80,8 +81,11 @@ unit (maximum five minutes), never a whole book. Source input is capped at 16,38
 Unicode scalars; normal pipeline groups default to at most 2,400 scalars (configurable), then the
 model's real language tokenizer chooses sentence-aware generation chunks.
 
-The shared renderer rejects `.background` for Pocket GPU generation. Eligibility
-currently admits Apple silicon Macs; iPhone/iPad generation remains unqualified.
+The shared renderer rejects `.background` for Max GPU generation. Beta.4 removes
+the temporary desktop gate and offers Max on supported iPhones, iPads and Apple
+silicon Macs without a model-number or memory-size allowlist. This availability
+policy is not a physical-device performance qualification; TestFlight acceptance
+is pending. The Apple silicon requirement remains.
 Prepared PCM can use the app's existing background playback path. macOS build or
 short-sample success does not establish locked-screen GPU permission on a phone.
 
@@ -218,4 +222,5 @@ than live playback; do not downgrade merely because a one-off timing is slower.
 Include `NarrationModel.pocket.renderIdentity(for: unit)` in the prepared-audio
 key: it includes resolved sampling options and the new quality-first runtime
 revision. Stored one-step audio cannot masquerade as the new default. This is an
-SDK policy on the development branch, not a shipped Librox app change.
+SDK policy, not a shipped Librox app change. An app may explicitly select eight
+steps for its new Max profile without changing the SDK’s four-step default.
