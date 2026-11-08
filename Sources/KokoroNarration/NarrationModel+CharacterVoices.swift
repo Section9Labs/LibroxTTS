@@ -15,7 +15,9 @@ extension NarrationModel {
               supportedLanguageCodes.contains(language) else { return [] }
         if usesTextNativePlanning {
             return nativeVoices.filter { $0.language == language }.map {
-                CharacterVoice(id: $0.id, name: $0.name, gender: self == .pocket ? .unknown : ($0.styleID.hasPrefix("F") ? .female : .male))
+                CharacterVoice(id: $0.id, name: $0.name, gender: self == .pocket
+                    ? PocketTTSCatalog.voice(id: $0.id).flatMap { BookVoiceCast.Gender(rawValue: $0.gender.rawValue) } ?? .unknown
+                    : ($0.styleID.hasPrefix("F") ? .female : .male))
             }
         }
         return Voice.all.filter { $0.language.rawValue == language }.map {

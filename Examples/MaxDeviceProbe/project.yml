@@ -20,8 +20,14 @@ targets:
       properties:
         CFBundleDisplayName: Max Device Test
         UILaunchScreen: {}
+        UIBackgroundModes: [audio, processing]
+        BGTaskSchedulerPermittedIdentifiers: [com.section9labs.MaxDeviceProbe.narration.*]
         UIFileSharingEnabled: true
         LSSupportsOpeningDocumentsInPlace: true
+    entitlements:
+      path: MaxDeviceProbe.entitlements
+      properties:
+        com.apple.developer.background-tasks.continued-processing.gpu: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.section9labs.MaxDeviceProbe

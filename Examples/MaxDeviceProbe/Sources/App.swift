@@ -24,7 +24,7 @@ struct ProbeView: View {
         }.padding().task { if ProcessInfo.processInfo.arguments.contains("--run") { run() } }
         .onChange(of: phase) { _, value in
             UIApplication.shared.isIdleTimerDisabled = value == .active && job != nil
-            if value != .active { job?.cancel() }
+            if value != .active && !ProcessInfo.processInfo.arguments.contains("--background") { job?.cancel() }
         }
     }
     private func run() {
@@ -32,7 +32,11 @@ struct ProbeView: View {
         UIApplication.shared.isIdleTimerDisabled = true
         job = Task {
             do {
-                try await DeviceRun.run { status = $0 }
+                if #available(iOS 26.0, *), ProcessInfo.processInfo.arguments.contains("--background") {
+                    try await BackgroundRun.run { status = $0 }
+                } else {
+                    try await DeviceRun.run { status = $0 }
+                }
                 status = "Completed. Audio and measurements saved in Files."
             } catch { status = "Stopped: \(error.localizedDescription)" }
             UIApplication.shared.isIdleTimerDisabled = false
@@ -97,7 +101,7 @@ enum DeviceRun {
         let pipeline = NarrationPipeline()
         var rows: [Measurement] = []
         func save(completed: Bool, error: String? = nil) throws {
-            let report = Report(sdkCommit: "ae216a446ce22533e628fc79b0318b19136f5a21", os: ProcessInfo.processInfo.operatingSystemVersionString,
+            let report = Report(sdkCommit: "max-background-beta5-candidate", os: ProcessInfo.processInfo.operatingSystemVersionString,
                                 physicalMemory: ProcessInfo.processInfo.physicalMemory, completed: completed, error: error, measurements: rows)
             let encoder = JSONEncoder(); encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
             try encoder.encode(report).write(to: output.appendingPathComponent("report.json"), options: .atomic)

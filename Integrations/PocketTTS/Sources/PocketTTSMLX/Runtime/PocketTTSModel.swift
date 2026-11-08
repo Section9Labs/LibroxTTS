@@ -232,6 +232,7 @@ public final class PocketTTSModel: Module {
             input = forced[0..., (n - 1)..<n, 0...]
             // Match latest Kyutai: warm Mimi with the previous 12 frames, discard that PCM.
             for i in max(0, n - 12)..<n {
+                try Task.checkCancellation()
                 let latent = forced[0..., i..<(i + 1), 0...] * flow_lm.emb_std + flow_lm.emb_mean
                 eval(mimi.decodeStep(mimi.quantizer(latent.transposed(0, 2, 1))))
             }
@@ -249,6 +250,7 @@ public final class PocketTTSModel: Module {
             if let eosStep, step >= eosStep + framesAfterEOS { return latents }
             let latent = next * flow_lm.emb_std + flow_lm.emb_mean
             let audio = mimi.decodeStep(mimi.quantizer(latent.transposed(0, 2, 1)))[0, 0]
+            try Task.checkCancellation()
             eval(audio, next)
             try Task.checkCancellation()
             var samples = audio.asArray(Float.self)
@@ -271,7 +273,9 @@ public final class PocketTTSModel: Module {
         let model = try fromConfig(config, modelFolder: directory, encoderEnabled: false)
         let weights = model.sanitize(weights: raw)
         try model.update(parameters: ModuleParameters.unflattened(weights), verify: .all)
+        try Task.checkCancellation()
         model.flow_lm.cacheConditioning()
+        try Task.checkCancellation()
         eval(model)
         return model
     }

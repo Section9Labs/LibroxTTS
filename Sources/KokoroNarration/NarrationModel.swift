@@ -86,13 +86,16 @@ public enum NarrationModel: String, CaseIterable, Codable, Sendable, Identifiabl
         if let preferred, let voice = Voice.named(preferred), voice.language.rawValue == language { return preferred }
         return Language(rawValue: language).map { Voice.preferred(for: $0).id }
     }
-    public var requiresPreparation: Bool { self == .qwenDesktop || self == .pocket }
+    public var requiresPreparation: Bool { self == .qwenDesktop }
+    /// Generation during a host's active background-audio session. This does not
+    /// grant arbitrary background-task time when playback is stopped.
+    public var supportsBackgroundGeneration: Bool { isEnabled && self != .qwenDesktop }
     public var detail: String {
         switch self {
         case .compact: "Small download · Listen immediately"
         case .enhanced: "Richer narration · On-device listening"
         case .kokoroDesktop: "On-device listening"
-        case .pocket: "23 voices · 7 languages · Foreground preparation"
+        case .pocket: "23 voices · 7 languages · On-device listening"
         case .plus: "10 voices · 31 languages"
         case .qwenDesktop: "Expressive narration · Prepare chapters before listening"
         }

@@ -1,0 +1,54 @@
+{
+  "applicationState" : 2,
+  "freshBuffer" : false,
+  "gpuGranted" : false,
+  "gpuSupported" : true,
+  "os" : "Version 27.0.1 (Build 24A446)",
+  "rows" : [
+    {
+      "audioSeconds" : 8.2400000000000002,
+      "completedBackend" : "cpu",
+      "footprintBytes" : 450381024,
+      "language" : "en",
+      "playbackAfter" : 27.154124809999999,
+      "playbackBefore" : 17.018962968,
+      "playerRate" : 1,
+      "renderSeconds" : 10.132467031478882,
+      "stateAfter" : 2,
+      "stateBefore" : 2,
+      "thermalState" : 0,
+      "voice" : "pocket-alba-en-v1"
+    },
+    {
+      "audioSeconds" : 10.48,
+      "completedBackend" : "cpu",
+      "footprintBytes" : 591922520,
+      "language" : "es",
+      "playbackAfter" : 40.142488256,
+      "playbackBefore" : 27.164320836000002,
+      "playerRate" : 1,
+      "renderSeconds" : 12.975632905960083,
+      "stateAfter" : 2,
+      "stateBefore" : 2,
+      "thermalState" : 0,
+      "voice" : "pocket-lola-es-v1"
+    },
+    {
+      "audioSeconds" : 8,
+      "completedBackend" : "cpu",
+      "footprintBytes" : 501826856,
+      "language" : "en",
+      "playbackAfter" : 50.138834408000001,
+      "playbackBefore" : 40.151592725999997,
+      "playerRate" : 1,
+      "renderSeconds" : 9.9851319789886475,
+      "stateAfter" : 2,
+      "stateBefore" : 2,
+      "thermalState" : 0,
+      "voice" : "pocket-george-en-v1"
+    }
+  ],
+  "runtime" : "max-background-beta5-candidate",
+  "samplerSteps" : 4,
+  "stage" : "complete"
+}

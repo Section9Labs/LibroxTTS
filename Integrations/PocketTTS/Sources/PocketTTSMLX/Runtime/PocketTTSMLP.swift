@@ -37,7 +37,7 @@ public final class PocketRMSNorm: Module, UnaryLayer {
     }
 }
 
-public final class PocketLayerNorm: Module {
+public final class PocketLayerNorm: Module, UnaryLayer {
     public let eps: Float
     public var weight: MLXArray?
     public var bias: MLXArray?
@@ -55,6 +55,18 @@ public final class PocketLayerNorm: Module {
     }
 
     public func callAsFunction(_ x: MLXArray) -> MLXArray {
+        if Device.defaultDevice().deviceType == .cpu {
+            // MLX 0.32.3's C++ fast.layer_norm CPU fallback omits its stream
+            // argument on the normalization multiply, submitting GPU work.
+            // Keep the exact centered-variance equation on the scoped CPU.
+            let x32 = x.asType(.float32)
+            let centered = x32 - mean(x32, axis: -1, keepDims: true)
+            let variance = mean(centered * centered, axis: -1, keepDims: true)
+            var output = (centered * rsqrt(variance + eps)).asType(x.dtype)
+            if let weight { output = output * weight }
+            if let bias { output = output + bias }
+            return output
+        }
         return MLXFast.layerNorm(x, weight: weight, bias: bias, eps: eps)
     }
 }
@@ -72,7 +84,7 @@ public final class PocketTimestepEmbedder: Module {
         self.freqs = MLX.exp(indices * MLXArray(scale))
         self._mlp = ModuleInfo(wrappedValue: [
             Linear(frequencyEmbeddingSize, hiddenSize, bias: true),
-            SiLU(),
+            PocketSiLU(),
             Linear(hiddenSize, hiddenSize, bias: true),
             PocketRMSNorm(dim: hiddenSize, mode: timeRmsNorm)
         ])
@@ -98,12 +110,12 @@ public final class PocketResBlock: Module {
     public final class MLP: Module {
         @ModuleInfo(key: "0") public var linear1: Linear
         @ModuleInfo(key: "2") public var linear2: Linear
-        public let act1: SiLU
+        public let act1: PocketSiLU
 
         public init(channels: Int) {
             self._linear1 = ModuleInfo(wrappedValue: Linear(channels, channels, bias: true))
             self._linear2 = ModuleInfo(wrappedValue: Linear(channels, channels, bias: true))
-            self.act1 = SiLU()
+            self.act1 = PocketSiLU()
             super.init()
         }
 
@@ -122,11 +134,11 @@ public final class PocketResBlock: Module {
         self._in_ln = ModuleInfo(wrappedValue: PocketLayerNorm(channels: channels, eps: 1e-6))
         self._mlp = ModuleInfo(wrappedValue: [
             Linear(channels, channels, bias: true),
-            SiLU(),
+            PocketSiLU(),
             Linear(channels, channels, bias: true)
         ])
         self._adaLN_modulation = ModuleInfo(wrappedValue: [
-            SiLU(),
+            PocketSiLU(),
             Linear(channels, 3 * channels, bias: true)
         ])
         super.init()
@@ -159,7 +171,7 @@ public final class PocketFinalLayer: Module {
         self._norm_final = ModuleInfo(wrappedValue: PocketLayerNorm(channels: modelChannels, eps: 1e-6, elementwiseAffine: false))
         self._linear = ModuleInfo(wrappedValue: Linear(modelChannels, outChannels, bias: true))
         self._adaLN_modulation = ModuleInfo(wrappedValue: [
-            SiLU(),
+            PocketSiLU(),
             Linear(modelChannels, 2 * modelChannels, bias: true)
         ])
         super.init()

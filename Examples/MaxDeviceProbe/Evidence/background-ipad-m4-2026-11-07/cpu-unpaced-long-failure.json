@@ -1,0 +1,38 @@
+{
+  "applicationState": 2,
+  "controlledGrantRetirement": false,
+  "freshBuffer": false,
+  "gpuGranted": false,
+  "gpuSupported": true,
+  "longPassage": true,
+  "os": "Version 27.0.1 (Build 24A446)",
+  "rows": [
+    {
+      "audioSeconds": 23.84,
+      "completedBackend": "cpu",
+      "footprintBytes": 716948896,
+      "language": "en",
+      "playbackAfter": 44.616014207,
+      "playbackBefore": 12.83626287,
+      "playerRate": 1,
+      "renderSeconds": 31.776636004447937,
+      "stateAfter": 2,
+      "stateBefore": 2,
+      "thermalState": 0,
+      "voice": "pocket-george-en-v1"
+    }
+  ],
+  "runtime": "max-background-beta5-candidate",
+  "samplerSteps": 1,
+  "stage": "generating",
+  "termination": {
+    "signal": 9,
+    "event": "cpu usage",
+    "processCPUSeconds": 48,
+    "wallSeconds": 55,
+    "averageCPUPercent": 88,
+    "limitCPUPercent": 80,
+    "limitDurationSeconds": 60,
+    "action": "Process killed"
+  }
+}

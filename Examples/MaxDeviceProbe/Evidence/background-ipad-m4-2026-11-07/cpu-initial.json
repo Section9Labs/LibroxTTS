@@ -1,0 +1,47 @@
+{
+  "applicationState" : 2,
+  "os" : "Version 27.0.1 (Build 24A446)",
+  "rows" : [
+    {
+      "audioSeconds" : 8.1600000000000001,
+      "footprintBytes" : 589890928,
+      "language" : "en",
+      "playbackAfter" : 32.803407776,
+      "playbackBefore" : 22.188081126,
+      "playerRate" : 1,
+      "renderSeconds" : 10.608562111854553,
+      "stateAfter" : 2,
+      "stateBefore" : 2,
+      "thermalState" : 0,
+      "voice" : "pocket-alba-en-v1"
+    },
+    {
+      "audioSeconds" : 11.44,
+      "footprintBytes" : 693667232,
+      "language" : "es",
+      "playbackAfter" : 47.575234188000003,
+      "playbackBefore" : 32.815648670999998,
+      "playerRate" : 1,
+      "renderSeconds" : 14.756845951080322,
+      "stateAfter" : 2,
+      "stateBefore" : 2,
+      "thermalState" : 0,
+      "voice" : "pocket-lola-es-v1"
+    },
+    {
+      "audioSeconds" : 8.8800000000000008,
+      "footprintBytes" : 457245968,
+      "language" : "en",
+      "playbackAfter" : 59.060375655000001,
+      "playbackBefore" : 47.584734546999996,
+      "playerRate" : 1,
+      "renderSeconds" : 11.472631931304932,
+      "stateAfter" : 2,
+      "stateBefore" : 2,
+      "thermalState" : 0,
+      "voice" : "pocket-george-en-v1"
+    }
+  ],
+  "samplerSteps" : 8,
+  "stage" : "complete"
+}

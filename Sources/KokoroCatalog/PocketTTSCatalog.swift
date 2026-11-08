@@ -18,13 +18,24 @@ public enum PocketTTSCatalog {
     public static let voiceNames = ["alba", "anna", "azelma", "bill_boerst", "caro_davy", "charles", "daan", "eponine", "estelle", "eve", "fantine", "george", "giovanni", "jane", "javert", "lola", "marius", "mary", "michael", "paul", "peter_yearsley", "stuart_bell", "vera"]
     public static let defaultVoices = ["en": "alba", "fr": "estelle", "de": "alba", "pt": "alba", "it": "giovanni", "es": "lola", "nl": "daan"]
     private static let cc0Voices: Set<String> = ["bill_boerst", "caro_davy", "estelle", "giovanni", "javert", "lola", "marius", "peter_yearsley", "stuart_bell"]
+    public enum VoiceGender: String, Sendable { case female, male, unknown }
+    // Verified source metadata from CSTR VCTK 0.92 speaker-info.txt, not names
+    // or pitch inference. See Integrations/PocketTTS/VOICE-METADATA.md.
+    private static let vctkFemale: Set<String> = ["anna", "azelma", "eponine", "eve", "fantine", "jane", "mary", "vera"]
+    private static let vctkMale: Set<String> = ["charles", "george", "michael", "paul"]
     public struct Voice: Sendable, Identifiable {
         public let name: String
         public let language: String
         public var id: String { "pocket-\(name)-\(language)-v1" }
+        public var gender: VoiceGender {
+            PocketTTSCatalog.gender(for: name)
+        }
         /// License of the source recording. Model/voice-state distribution also
         /// retains Kyutai's CC BY 4.0 terms; this does not relicense the weights.
         public var sourceRecordingLicense: String { cc0Voices.contains(name) ? "CC0-1.0" : "CC-BY-4.0" }
+    }
+    private static func gender(for name: String) -> VoiceGender {
+        vctkFemale.contains(name) ? .female : vctkMale.contains(name) ? .male : .unknown
     }
     public static var voices: [Voice] { languages.flatMap { language in voiceNames.map { Voice(name: $0, language: language) } } }
     public static func voice(id: String) -> Voice? { voices.first { $0.id == id } }

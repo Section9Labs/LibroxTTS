@@ -215,7 +215,7 @@ public final class MlpGating: Module {
         let bpart = parts[1]
 
         // SiLU(a) * b -> [B,T,1,H] then reshape to [B,T,H]
-        let gated = silu(a) * bpart
+        let gated = pocketSiLU(a) * bpart
         let flat = gated.reshaped([b, t, hidden])
 
         return linear_out(flat)
@@ -236,7 +236,7 @@ public final class MlpNoGating: Module {
 
     public func callAsFunction(_ xs: MLXArray) -> MLXArray {
         let hidden = linear1(xs)
-        return linear2(_useExactGELU ? gelu(hidden) : geluApproximate(hidden))
+        return linear2(pocketGELU(hidden, approximate: !_useExactGELU))
     }
 }
 
@@ -262,8 +262,8 @@ public final class TransformerLayer: Module {
 
         switch cfg.norm {
         case "layer_norm":
-            self._norm1 = ModuleInfo(wrappedValue: LayerNorm(dimensions: cfg.dModel, eps: 1e-5))
-            self._norm2 = ModuleInfo(wrappedValue: LayerNorm(dimensions: cfg.dModel, eps: 1e-5))
+            self._norm1 = ModuleInfo(wrappedValue: PocketLayerNorm(channels: cfg.dModel, eps: 1e-5))
+            self._norm2 = ModuleInfo(wrappedValue: PocketLayerNorm(channels: cfg.dModel, eps: 1e-5))
         case "rms_norm":
             self._norm1 = ModuleInfo(wrappedValue: RMSNorm(dimensions: cfg.dModel, eps: 1e-8))
             self._norm2 = ModuleInfo(wrappedValue: RMSNorm(dimensions: cfg.dModel, eps: 1e-8))
@@ -290,7 +290,7 @@ public final class TransformerLayer: Module {
         var n1 = (norm1 as! UnaryLayer)(x)
         n1 = self_attn(n1, cache: cache)
         x = x + (layer_scale_1 as! LayerScale)(n1)
-        x = x + (layer_scale_2 as! LayerScale)((gating as! MlpNoGating)((norm2 as! LayerNorm)(x)))
+        x = x + (layer_scale_2 as! LayerScale)((gating as! MlpNoGating)((norm2 as! UnaryLayer)(x)))
         return x
     }
 }

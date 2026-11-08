@@ -33,7 +33,7 @@ import MLX
             // exactly one engine; never reset global RNG inside the shared SDK.
             let chunks = try await engine.previewChunks(trial.text, voiceID: trial.voiceID,
                 chunking: trial.chunking, role: trial.role)
-            MLXRandom.seed(trial.seed)
+            await engine.setRandomSeed(trial.seed)
             let started = Date()
             let audio = try await engine.synthesize(trial.text, voiceID: trial.voiceID,
                 temperature: trial.temperature, chunking: trial.chunking, role: trial.role,
