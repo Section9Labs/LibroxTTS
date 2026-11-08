@@ -1,3 +1,4 @@
+import KokoroCatalog
 import Foundation
 import NaturalLanguage
 import KokoroPronunciation
@@ -9,16 +10,23 @@ public enum TextNativeNarrationPlanner {
     public static let revision = "ct-context-tokens-3:" + SpokenTextLexicon.revision
     public enum PlanningError: Error { case invalidVoice, unbreakableText }
     public static func plan(_ text: String, voiceID: String,
-                            lexicon: SpokenTextLexicon = .init()) throws -> [BookNarrationUnit] {
+                            lexicon: SpokenTextLexicon = .init(), model: NarrationModel = .plus,
+                            pocketChunking: PocketTTSChunkingOptions = .init()) throws -> [BookNarrationUnit] {
         guard text.unicodeScalars.count <= PronunciationEngine.maximumInputScalars else {
             throw PronunciationError.inputTooLong(limit: PronunciationEngine.maximumInputScalars)
         }
-        guard let voice = NarrationModel.plus.nativeVoices.first(where: { $0.id == voiceID }) else {
+        guard let voice = model.nativeVoices.first(where: { $0.id == voiceID }) else {
             throw PlanningError.invalidVoice
         }
+        if model == .pocket { try pocketChunking.validate() }
         let source = text as NSString
         func spoken(_ range: NSRange) -> String { lexicon.text(source.substring(with: range), language: voice.language) }
         func fits(_ range: NSRange, allowEmptyPrefix: Bool = false) -> Bool {
+            if model == .pocket {
+                // The source planner preserves speaker/paragraph boundaries; the
+                // renderer applies sentence-aware budgets with the real tokenizer.
+                return spoken(range).unicodeScalars.count <= pocketChunking.maximumUnitScalars
+            }
             do {
                 let normalized = try CTTokenizer.normalize(spoken(range), language: voice.language,
                                                             completeSentence: false)
@@ -56,6 +64,9 @@ public enum TextNativeNarrationPlanner {
                 try Task.checkCancellation()
                 var end = NSMaxRange(sentence)
                 if !fits(NSRange(location: start, length: end - start)) {
+                    if model == .pocket, pocketChunking.grouping == .keepTogether {
+                        throw PlanningError.unbreakableText
+                    }
                     // Grow by grapheme clusters; never split a surrogate pair,
                     // combining sequence, or hang while scanning CJK text.
                     var cursor = start, lastBreak = start
@@ -76,7 +87,11 @@ public enum TextNativeNarrationPlanner {
                     let gap = source.substring(with: NSRange(location: NSMaxRange(prior), length: start - NSMaxRange(prior)))
                     let combined = NSRange(location: prior.location, length: end - prior.location)
                     if !gap.contains(where: { $0.isNewline }), fits(combined) { ranges[ranges.count - 1] = combined }
-                    else { ranges.append(part) }
+                    else {
+                        if model == .pocket, pocketChunking.grouping == .keepTogether,
+                           !gap.contains(where: { $0.isNewline }) { throw PlanningError.unbreakableText }
+                        ranges.append(part)
+                    }
                 } else { ranges.append(part) }
                 start = end
             }
@@ -91,6 +106,7 @@ public enum TextNativeNarrationPlanner {
             let boundary: NarrationBoundary = gap.contains(where: { $0.isNewline }) ? .paragraph : terminal ? .sentence : .continuation
             var unit = BookNarrationUnit(sourceText: original, sourceRange: range, narratorID: voiceID, boundaryAfter: boundary)
             unit.spokenText = spoken(range)
+            if model == .pocket { unit.pocketChunking = pocketChunking }
             unit.prosody = NarrationProsody.analyze(text: original, languageCode: voice.language)
             return unit
         }

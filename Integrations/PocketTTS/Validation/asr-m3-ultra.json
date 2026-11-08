@@ -1,0 +1,37 @@
+[
+  {
+    "language": "en",
+    "expected": "The library was quiet. Beyond the window, rain drifted through the evening light. She closed the book and listened.",
+    "transcript": " The library was quiet. Beyond the window, rain drifted through the evening light. She closed the book and listened."
+  },
+  {
+    "language": "es",
+    "expected": "La biblioteca estaba en silencio. Al otro lado de la ventana, la lluvia caía suavemente. Cerró el libro y se puso a escuchar.",
+    "transcript": " la biblioteca estaba en silencio al otro lado de la ventana la lluvia caía suavemente cerró el libro y se puso a escuchar"
+  },
+  {
+    "language": "fr",
+    "expected": "La bibliothèque était silencieuse. Derrière la fenêtre, la pluie tombait doucement. Elle ferma le livre et écouta.",
+    "transcript": " la bibliothèque était silencieuse derrière la fenêtre la pluie tombait doucement elle ferma le livre et écouta"
+  },
+  {
+    "language": "de",
+    "expected": "In der Bibliothek war es still. Vor dem Fenster fiel leise der Regen. Sie schloss das Buch und lauschte.",
+    "transcript": " In der Bibliothek war es still, vor dem Fenster fiel leise der Regen, sie schloss das Buch und lauschte."
+  },
+  {
+    "language": "it",
+    "expected": "La biblioteca era silenziosa. Oltre la finestra, la pioggia cadeva dolcemente. Chiuse il libro e si mise ad ascoltare.",
+    "transcript": " La biblioteca era silenziosa. Oltre la finestra la pioggia cadeva dolcemente. Chiuse il libro e si mise ad ascoltare."
+  },
+  {
+    "language": "pt",
+    "expected": "A biblioteca estava silenciosa. Do outro lado da janela, a chuva caía suavemente. Ela fechou o livro e ficou a ouvir.",
+    "transcript": " A biblioteca estava silenciosa. Do outro lado da janela, a chuva caía suavemente. Ela fechou o livro e ficou a ouvir."
+  },
+  {
+    "language": "nl",
+    "expected": "Het was stil in de bibliotheek. Buiten het raam viel de regen zachtjes. Ze sloot het boek en luisterde.",
+    "transcript": " Het was stil in de bibliotheek. Buiten het raam viel de regen zachtjes. Ze sloot het boek en luisterde."
+  }
+]

@@ -1,0 +1,147 @@
+{
+  "sdk": "0.4.0-beta.3",
+  "assetRelease": "pocket-tts-mlx-2026-11-07-v2",
+  "host": "Mac15,14 / M3 Ultra / 256 GiB / Xcode 27.1 / Swift 6.4",
+  "voices": 23,
+  "languageVoiceIDs": 161,
+  "withheld": [
+    "cosette",
+    "jean",
+    "juergen",
+    "rafael"
+  ],
+  "files": 203,
+  "bytes": 2517267608,
+  "hostedDigestsVerified": true,
+  "retainedTensorsByteIdenticalToDevelopmentPack": true,
+  "debugTests": {
+    "exitCode": 0,
+    "swiftTestingCases": 508,
+    "pocketCases": 18,
+    "installedAssetAndEnglishReferenceTestsEnabled": true
+  },
+  "releaseProbeBuildExitCode": 0,
+  "cleanInstall": {
+    "language": "en",
+    "files": 29,
+    "bytes": 359608440,
+    "output": "Installed en: 29 verified files, 359608440 bytes",
+    "render": "samples=92160 rate=24000 elapsed=0.5342199802398682 peak=0.6515996"
+  },
+  "languageSmoke": [
+    {
+      "language": "en",
+      "voice": "alba",
+      "text": "The library was quiet. Beyond the window, rain drifted through the evening light. She closed the book and listened.",
+      "exitCode": 0,
+      "output": "samples=155520 rate=24000 elapsed=0.8264449834823608 peak=0.78849477\n",
+      "errors": ""
+    },
+    {
+      "language": "es",
+      "voice": "lola",
+      "text": "La biblioteca estaba en silencio. Al otro lado de la ventana, la lluvia caía suavemente. Cerró el libro y se puso a escuchar.",
+      "exitCode": 0,
+      "output": "samples=224640 rate=24000 elapsed=1.0638809204101562 peak=0.52267843\n",
+      "errors": ""
+    },
+    {
+      "language": "fr",
+      "voice": "estelle",
+      "text": "La bibliothèque était silencieuse. Derrière la fenêtre, la pluie tombait doucement. Elle ferma le livre et écouta.",
+      "exitCode": 0,
+      "output": "samples=155520 rate=24000 elapsed=0.7806159257888794 peak=0.61523753\n",
+      "errors": ""
+    },
+    {
+      "language": "de",
+      "voice": "alba",
+      "text": "In der Bibliothek war es still. Vor dem Fenster fiel leise der Regen. Sie schloss das Buch und lauschte.",
+      "exitCode": 0,
+      "output": "samples=140160 rate=24000 elapsed=0.7449129819869995 peak=0.68115574\n",
+      "errors": ""
+    },
+    {
+      "language": "it",
+      "voice": "giovanni",
+      "text": "La biblioteca era silenziosa. Oltre la finestra, la pioggia cadeva dolcemente. Chiuse il libro e si mise ad ascoltare.",
+      "exitCode": 0,
+      "output": "samples=215040 rate=24000 elapsed=1.0038599967956543 peak=0.38259858\n",
+      "errors": ""
+    },
+    {
+      "language": "pt",
+      "voice": "alba",
+      "text": "A biblioteca estava silenciosa. Do outro lado da janela, a chuva caía suavemente. Ela fechou o livro e ficou a ouvir.",
+      "exitCode": 0,
+      "output": "samples=259200 rate=24000 elapsed=1.1710649728775024 peak=0.35866633\n",
+      "errors": ""
+    },
+    {
+      "language": "nl",
+      "voice": "daan",
+      "text": "Het was stil in de bibliotheek. Buiten het raam viel de regen zachtjes. Ze sloot het boek en luisterde.",
+      "exitCode": 0,
+      "output": "samples=159360 rate=24000 elapsed=0.8024599552154541 peak=0.42586702\n",
+      "errors": ""
+    }
+  ],
+  "asrScreen": [
+    {
+      "language": "en",
+      "expected": "The library was quiet. Beyond the window, rain drifted through the evening light. She closed the book and listened.",
+      "transcript": " The library was quiet. Beyond the window, rain drifted through the evening light. She closed the book and listened.",
+      "exactNormalizedWords": true
+    },
+    {
+      "language": "es",
+      "expected": "La biblioteca estaba en silencio. Al otro lado de la ventana, la lluvia caía suavemente. Cerró el libro y se puso a escuchar.",
+      "transcript": " La biblioteca estaba en silencio. Al otro lado de la ventana, la lluvia caía suavemente. Cerró el libro y se puso a escuchar.",
+      "exactNormalizedWords": true
+    },
+    {
+      "language": "fr",
+      "expected": "La bibliothèque était silencieuse. Derrière la fenêtre, la pluie tombait doucement. Elle ferma le livre et écouta.",
+      "transcript": " La bibliothèque était silencieuse. Derrière la fenêtre, la pluie tombait doucement. Elle ferma le livre et écouta.",
+      "exactNormalizedWords": true
+    },
+    {
+      "language": "de",
+      "expected": "In der Bibliothek war es still. Vor dem Fenster fiel leise der Regen. Sie schloss das Buch und lauschte.",
+      "transcript": " In der Bibliothek war es still. Vor dem Fenster fiel leise der Regen. Sie schloss das Buch und lauschte.",
+      "exactNormalizedWords": true
+    },
+    {
+      "language": "it",
+      "expected": "La biblioteca era silenziosa. Oltre la finestra, la pioggia cadeva dolcemente. Chiuse il libro e si mise ad ascoltare.",
+      "transcript": " La biblioteca era silenziosa. Oltre la finestra la pioggia cadeva dolcemente. Chiuse il libro e si mise ad ascoltare.",
+      "exactNormalizedWords": true
+    },
+    {
+      "language": "pt",
+      "expected": "A biblioteca estava silenciosa. Do outro lado da janela, a chuva caía suavemente. Ela fechou o livro e ficou a ouvir.",
+      "transcript": " a biblioteca estava silenciosa do outro lado da janela a chuva caia suavemente ela fechou o livro e ficou a ouvir",
+      "exactNormalizedWords": false
+    },
+    {
+      "language": "nl",
+      "expected": "Het was stil in de bibliotheek. Buiten het raam viel de regen zachtjes. Ze sloot het boek en luisterde.",
+      "transcript": " Het was stil in de bibliotheek. Buiten het raam viel de regen zachtjes. Ze sloot het boek en luisterde.",
+      "exactNormalizedWords": true
+    }
+  ],
+  "limitations": [
+    "ASR is a content screen, not listening acceptance. Portuguese differs on caía/caia; do not count it as an exact normalized word match.",
+    "Original 118-clip user listening suite is preserved; retained voices and acoustic settings are unchanged.",
+    "Apple silicon Mac generation only; physical iPhone/iPad qualification and app integration/release are not included.",
+    "Hosted CI runs are reported separately on the SDK release; this file records local validation."
+  ],
+  "baselineImplementationCommit": "9b717ca72c01776db2939746959b33f0ed36c703",
+  "streamingFollowup": {
+    "pocketTests": 18,
+    "passed": true,
+    "installedAssetsAndReferenceEnabled": true,
+    "verified": "Streaming and buffered PCM match with temperature 0 at four and one sampler steps; invalid temperatures reject before loading assets.",
+    "engineSHA256": "a4429b36d7549c7a0a7acf856702bae747d778fc41853971b22f877abae4b083"
+  }
+}

@@ -1,0 +1,58 @@
+[
+  {
+    "language": "en",
+    "voice": "alba",
+    "text": "The library was quiet. Beyond the window, rain drifted through the evening light. She closed the book and listened.",
+    "exitCode": 0,
+    "output": "samples=157440 rate=24000 elapsed=4.951458930969238 peak=0.52986777\n",
+    "errors": ""
+  },
+  {
+    "language": "es",
+    "voice": "lola",
+    "text": "La biblioteca estaba en silencio. Al otro lado de la ventana, la lluvia caía suavemente. Cerró el libro y se puso a escuchar.",
+    "exitCode": 0,
+    "output": "samples=220800 rate=24000 elapsed=0.8611520528793335 peak=0.5279424\n",
+    "errors": ""
+  },
+  {
+    "language": "fr",
+    "voice": "estelle",
+    "text": "La bibliothèque était silencieuse. Derrière la fenêtre, la pluie tombait doucement. Elle ferma le livre et écouta.",
+    "exitCode": 0,
+    "output": "samples=144000 rate=24000 elapsed=0.6597360372543335 peak=0.41348848\n",
+    "errors": ""
+  },
+  {
+    "language": "de",
+    "voice": "juergen",
+    "text": "In der Bibliothek war es still. Vor dem Fenster fiel leise der Regen. Sie schloss das Buch und lauschte.",
+    "exitCode": 0,
+    "output": "samples=155520 rate=24000 elapsed=0.6724709272384644 peak=0.25808686\n",
+    "errors": ""
+  },
+  {
+    "language": "it",
+    "voice": "giovanni",
+    "text": "La biblioteca era silenziosa. Oltre la finestra, la pioggia cadeva dolcemente. Chiuse il libro e si mise ad ascoltare.",
+    "exitCode": 0,
+    "output": "samples=216960 rate=24000 elapsed=0.8139060735702515 peak=0.530115\n",
+    "errors": ""
+  },
+  {
+    "language": "pt",
+    "voice": "rafael",
+    "text": "A biblioteca estava silenciosa. Do outro lado da janela, a chuva caía suavemente. Ela fechou o livro e ficou a ouvir.",
+    "exitCode": 0,
+    "output": "samples=197760 rate=24000 elapsed=0.7782809734344482 peak=0.40990594\n",
+    "errors": ""
+  },
+  {
+    "language": "nl",
+    "voice": "daan",
+    "text": "Het was stil in de bibliotheek. Buiten het raam viel de regen zachtjes. Ze sloot het boek en luisterde.",
+    "exitCode": 0,
+    "output": "samples=161280 rate=24000 elapsed=0.7019559144973755 peak=0.48584515\n",
+    "errors": ""
+  }
+]

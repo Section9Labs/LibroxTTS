@@ -1,0 +1,155 @@
+{
+  "text": "She opened the book and smiled. At last, the story could begin.",
+  "results": [
+    {
+      "voice": "alba",
+      "exitCode": 0,
+      "output": "samples=97920 rate=24000 elapsed=0.49444901943206787 peak=0.60457474\n",
+      "errors": ""
+    },
+    {
+      "voice": "anna",
+      "exitCode": 0,
+      "output": "samples=117120 rate=24000 elapsed=0.4870990514755249 peak=0.6196433\n",
+      "errors": ""
+    },
+    {
+      "voice": "azelma",
+      "exitCode": 0,
+      "output": "samples=130560 rate=24000 elapsed=0.526013970375061 peak=0.48821416\n",
+      "errors": ""
+    },
+    {
+      "voice": "bill_boerst",
+      "exitCode": 0,
+      "output": "samples=105600 rate=24000 elapsed=0.4586479663848877 peak=0.2846609\n",
+      "errors": ""
+    },
+    {
+      "voice": "caro_davy",
+      "exitCode": 0,
+      "output": "samples=136320 rate=24000 elapsed=0.5571349859237671 peak=0.34562555\n",
+      "errors": ""
+    },
+    {
+      "voice": "charles",
+      "exitCode": 0,
+      "output": "samples=119040 rate=24000 elapsed=0.5100290775299072 peak=0.60790294\n",
+      "errors": ""
+    },
+    {
+      "voice": "daan",
+      "exitCode": 0,
+      "output": "samples=107520 rate=24000 elapsed=0.5609999895095825 peak=0.31858474\n",
+      "errors": ""
+    },
+    {
+      "voice": "eponine",
+      "exitCode": 0,
+      "output": "samples=119040 rate=24000 elapsed=0.4940040111541748 peak=0.60529375\n",
+      "errors": ""
+    },
+    {
+      "voice": "estelle",
+      "exitCode": 0,
+      "output": "samples=99840 rate=24000 elapsed=0.44988298416137695 peak=0.3542857\n",
+      "errors": ""
+    },
+    {
+      "voice": "eve",
+      "exitCode": 0,
+      "output": "samples=113280 rate=24000 elapsed=0.482463002204895 peak=0.5836537\n",
+      "errors": ""
+    },
+    {
+      "voice": "fantine",
+      "exitCode": 0,
+      "output": "samples=105600 rate=24000 elapsed=0.4621230363845825 peak=0.58099604\n",
+      "errors": ""
+    },
+    {
+      "voice": "george",
+      "exitCode": 0,
+      "output": "samples=97920 rate=24000 elapsed=0.4635969400405884 peak=0.8818245\n",
+      "errors": ""
+    },
+    {
+      "voice": "giovanni",
+      "exitCode": 0,
+      "output": "samples=117120 rate=24000 elapsed=0.4912760257720947 peak=0.3425801\n",
+      "errors": ""
+    },
+    {
+      "voice": "jane",
+      "exitCode": 0,
+      "output": "samples=111360 rate=24000 elapsed=0.48208189010620117 peak=0.61506635\n",
+      "errors": ""
+    },
+    {
+      "voice": "javert",
+      "exitCode": 0,
+      "output": "samples=168960 rate=24000 elapsed=0.613569974899292 peak=0.28490555\n",
+      "errors": ""
+    },
+    {
+      "voice": "juergen",
+      "exitCode": 0,
+      "output": "samples=92160 rate=24000 elapsed=0.45597898960113525 peak=0.31802115\n",
+      "errors": ""
+    },
+    {
+      "voice": "lola",
+      "exitCode": 0,
+      "output": "samples=132480 rate=24000 elapsed=0.5277960300445557 peak=0.41637236\n",
+      "errors": ""
+    },
+    {
+      "voice": "marius",
+      "exitCode": 0,
+      "output": "samples=88320 rate=24000 elapsed=0.4288090467453003 peak=0.3094601\n",
+      "errors": ""
+    },
+    {
+      "voice": "mary",
+      "exitCode": 0,
+      "output": "samples=111360 rate=24000 elapsed=0.47243404388427734 peak=0.5529349\n",
+      "errors": ""
+    },
+    {
+      "voice": "michael",
+      "exitCode": 0,
+      "output": "samples=115200 rate=24000 elapsed=0.5353180170059204 peak=0.50442135\n",
+      "errors": ""
+    },
+    {
+      "voice": "paul",
+      "exitCode": 0,
+      "output": "samples=117120 rate=24000 elapsed=0.5091350078582764 peak=0.7232369\n",
+      "errors": ""
+    },
+    {
+      "voice": "peter_yearsley",
+      "exitCode": 0,
+      "output": "samples=109440 rate=24000 elapsed=0.5016489028930664 peak=0.239443\n",
+      "errors": ""
+    },
+    {
+      "voice": "rafael",
+      "exitCode": 0,
+      "output": "samples=115200 rate=24000 elapsed=0.5092020034790039 peak=0.310031\n",
+      "errors": ""
+    },
+    {
+      "voice": "stuart_bell",
+      "exitCode": 0,
+      "output": "samples=138240 rate=24000 elapsed=0.5642939805984497 peak=0.17776626\n",
+      "errors": ""
+    },
+    {
+      "voice": "vera",
+      "exitCode": 0,
+      "output": "samples=109440 rate=24000 elapsed=0.5402460098266602 peak=0.5755537\n",
+      "errors": ""
+    }
+  ]
+}

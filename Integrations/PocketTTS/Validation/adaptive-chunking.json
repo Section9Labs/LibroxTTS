@@ -1,0 +1,236 @@
+{
+  "runtime": "pocket-mlx-28770c06-v2:adaptive:warm12:eos6:fp32",
+  "host": "Mac15,14 M3 Ultra 256 GiB, Swift 6.4 / Xcode 27",
+  "policy": {
+    "grouping": "adaptive",
+    "narrationTargetTokens": 48,
+    "dialogueTargetTokens": 32,
+    "maximumTokens": 96,
+    "shortSentenceTokens": 12,
+    "maximumUnitScalars": 2400
+  },
+  "chunkPlans": [
+    {
+      "language": "en",
+      "text": "The library was quiet. Beyond the window, rain drifted through the evening light. She closed the book and listened.",
+      "chunks": [
+        {
+          "boundaryAfter": "paragraph",
+          "startsNewPassage": true,
+          "text": "The library was quiet. Beyond the window, rain drifted through the evening light. She closed the book and listened.",
+          "tokens": 37
+        }
+      ]
+    },
+    {
+      "language": "es",
+      "text": "La biblioteca estaba en silencio. Al otro lado de la ventana, la lluvia caía suavemente. Cerró el libro y se puso a escuchar.",
+      "chunks": [
+        {
+          "boundaryAfter": "paragraph",
+          "startsNewPassage": true,
+          "text": "La biblioteca estaba en silencio. Al otro lado de la ventana, la lluvia caía suavemente. Cerró el libro y se puso a escuchar.",
+          "tokens": 43
+        }
+      ]
+    },
+    {
+      "language": "fr",
+      "text": "La bibliothèque était silencieuse. Derrière la fenêtre, la pluie tombait doucement. Elle ferma le livre et écouta.",
+      "chunks": [
+        {
+          "boundaryAfter": "paragraph",
+          "startsNewPassage": true,
+          "text": "La bibliothèque était silencieuse. Derrière la fenêtre, la pluie tombait doucement. Elle ferma le livre et écouta.",
+          "tokens": 30
+        }
+      ]
+    },
+    {
+      "language": "de",
+      "text": "In der Bibliothek war es still. Vor dem Fenster fiel leise der Regen. Sie schloss das Buch und lauschte.",
+      "chunks": [
+        {
+          "boundaryAfter": "paragraph",
+          "startsNewPassage": true,
+          "text": "In der Bibliothek war es still. Vor dem Fenster fiel leise der Regen. Sie schloss das Buch und lauschte.",
+          "tokens": 31
+        }
+      ]
+    },
+    {
+      "language": "it",
+      "text": "La biblioteca era silenziosa. Oltre la finestra, la pioggia cadeva dolcemente. Chiuse il libro e si mise ad ascoltare.",
+      "chunks": [
+        {
+          "boundaryAfter": "paragraph",
+          "startsNewPassage": true,
+          "text": "La biblioteca era silenziosa. Oltre la finestra, la pioggia cadeva dolcemente. Chiuse il libro e si mise ad ascoltare.",
+          "tokens": 35
+        }
+      ]
+    },
+    {
+      "language": "pt",
+      "text": "A biblioteca estava silenciosa. Do outro lado da janela, a chuva caía suavemente. Ela fechou o livro e ficou a ouvir.",
+      "chunks": [
+        {
+          "boundaryAfter": "paragraph",
+          "startsNewPassage": true,
+          "text": "A biblioteca estava silenciosa. Do outro lado da janela, a chuva caía suavemente. Ela fechou o livro e ficou a ouvir.",
+          "tokens": 33
+        }
+      ]
+    },
+    {
+      "language": "nl",
+      "text": "Het was stil in de bibliotheek. Buiten het raam viel de regen zachtjes. Ze sloot het boek en luisterde.",
+      "chunks": [
+        {
+          "boundaryAfter": "paragraph",
+          "startsNewPassage": true,
+          "text": "Het was stil in de bibliotheek. Buiten het raam viel de regen zachtjes. Ze sloot het boek en luisterde.",
+          "tokens": 30
+        }
+      ]
+    }
+  ],
+  "auditions": [
+    {
+      "language": "en",
+      "voice": "alba",
+      "text": "The library was quiet. Beyond the window, rain drifted through the evening light. She closed the book and listened.",
+      "exitCode": 0,
+      "output": "samples=165120 rate=24000 elapsed=0.7502869367599487 peak=0.6186261\n",
+      "errors": ""
+    },
+    {
+      "language": "es",
+      "voice": "lola",
+      "text": "La biblioteca estaba en silencio. Al otro lado de la ventana, la lluvia caía suavemente. Cerró el libro y se puso a escuchar.",
+      "exitCode": 0,
+      "output": "samples=213120 rate=24000 elapsed=0.7776939868927002 peak=0.4497396\n",
+      "errors": ""
+    },
+    {
+      "language": "fr",
+      "voice": "estelle",
+      "text": "La bibliothèque était silencieuse. Derrière la fenêtre, la pluie tombait doucement. Elle ferma le livre et écouta.",
+      "exitCode": 0,
+      "output": "samples=144000 rate=24000 elapsed=0.6017990112304688 peak=0.71214813\n",
+      "errors": ""
+    },
+    {
+      "language": "de",
+      "voice": "juergen",
+      "text": "In der Bibliothek war es still. Vor dem Fenster fiel leise der Regen. Sie schloss das Buch und lauschte.",
+      "exitCode": 0,
+      "output": "samples=151680 rate=24000 elapsed=0.644987940788269 peak=0.2667895\n",
+      "errors": ""
+    },
+    {
+      "language": "it",
+      "voice": "giovanni",
+      "text": "La biblioteca era silenziosa. Oltre la finestra, la pioggia cadeva dolcemente. Chiuse il libro e si mise ad ascoltare.",
+      "exitCode": 0,
+      "output": "samples=207360 rate=24000 elapsed=0.7511589527130127 peak=0.4613758\n",
+      "errors": ""
+    },
+    {
+      "language": "pt",
+      "voice": "rafael",
+      "text": "A biblioteca estava silenciosa. Do outro lado da janela, a chuva caía suavemente. Ela fechou o livro e ficou a ouvir.",
+      "exitCode": 0,
+      "output": "samples=232320 rate=24000 elapsed=0.8308919668197632 peak=0.42873526\n",
+      "errors": ""
+    },
+    {
+      "language": "nl",
+      "voice": "daan",
+      "text": "Het was stil in de bibliotheek. Buiten het raam viel de regen zachtjes. Ze sloot het boek en luisterde.",
+      "exitCode": 0,
+      "output": "samples=159360 rate=24000 elapsed=0.6442950963973999 peak=0.42144436\n",
+      "errors": ""
+    }
+  ],
+  "transcriptions": [
+    {
+      "language": "en",
+      "expected": "The library was quiet. Beyond the window, rain drifted through the evening light. She closed the book and listened.",
+      "transcript": " The library was quiet. Beyond the window, rain drifted through the evening light. She closed the book and listened.",
+      "wordsMatch": true
+    },
+    {
+      "language": "es",
+      "expected": "La biblioteca estaba en silencio. Al otro lado de la ventana, la lluvia caía suavemente. Cerró el libro y se puso a escuchar.",
+      "transcript": " La biblioteca estaba en silencio. Al otro lado de la ventana, la lluvia caía suavemente. Cerró el libro y se puso a escuchar.",
+      "wordsMatch": true
+    },
+    {
+      "language": "fr",
+      "expected": "La bibliothèque était silencieuse. Derrière la fenêtre, la pluie tombait doucement. Elle ferma le livre et écouta.",
+      "transcript": " la bibliothèque était silencieuse derrière la fenêtre la pluie tombait doucement elle ferma le livre et écouta",
+      "wordsMatch": true
+    },
+    {
+      "language": "de",
+      "expected": "In der Bibliothek war es still. Vor dem Fenster fiel leise der Regen. Sie schloss das Buch und lauschte.",
+      "transcript": " In der Bibliothek war es still. Vor dem Fenster fiel leise der Regen. Sie schloss das Buch und lauschte.",
+      "wordsMatch": true
+    },
+    {
+      "language": "it",
+      "expected": "La biblioteca era silenziosa. Oltre la finestra, la pioggia cadeva dolcemente. Chiuse il libro e si mise ad ascoltare.",
+      "transcript": " la biblioteca era silenziosa. Oltre la finestra la pioggia cadeva dolcemente, chiuse il libro e si mise ad ascoltare.",
+      "wordsMatch": true
+    },
+    {
+      "language": "pt",
+      "expected": "A biblioteca estava silenciosa. Do outro lado da janela, a chuva caía suavemente. Ela fechou o livro e ficou a ouvir.",
+      "transcript": " A biblioteca estava silenciosa. Do outro lado da janela, a chuva caía suavemente. Ela fechou o livro e ficou ao ouvir.",
+      "wordsMatch": false
+    },
+    {
+      "language": "nl",
+      "expected": "Het was stil in de bibliotheek. Buiten het raam viel de regen zachtjes. Ze sloot het boek en luisterde.",
+      "transcript": " Het was stil in de bibliotheek. Buiten het raam viel de regen zachtjes. Ze sloot het boek en luisterde.",
+      "wordsMatch": true
+    }
+  ],
+  "narrativePlan": {
+    "text": "She rested her hand against the door. For a moment, she could almost hear his voice again. It was the small things she remembered: the way he folded the newspaper, the sound of his keys on the table, and the cup he always left beside the window. She waited. Nobody came.\n\nOutside, the last bus pulled away from the corner. Then the telephone rang.",
+    "chunks": [
+      {
+        "boundaryAfter": "sentence",
+        "startsNewPassage": true,
+        "text": "She rested her hand against the door. For a moment, she could almost hear his voice again.",
+        "tokens": 24
+      },
+      {
+        "boundaryAfter": "paragraph",
+        "startsNewPassage": false,
+        "text": "It was the small things she remembered: the way he folded the newspaper, the sound of his keys on the table, and the cup he always left beside the window. She waited. Nobody came.",
+        "tokens": 53
+      },
+      {
+        "boundaryAfter": "paragraph",
+        "startsNewPassage": true,
+        "text": "Outside, the last bus pulled away from the corner. Then the telephone rang.",
+        "tokens": 22
+      }
+    ]
+  },
+  "narrativeRender": {
+    "text": "She rested her hand against the door. For a moment, she could almost hear his voice again. It was the small things she remembered: the way he folded the newspaper, the sound of his keys on the table, and the cup he always left beside the window. She waited. Nobody came.\n\nOutside, the last bus pulled away from the corner. Then the telephone rang.",
+    "output": "samples=455040 rate=24000 elapsed=1.5150119066238403 peak=0.5860276\n",
+    "errors": "",
+    "transcript": " She rested her hand against the door. For a moment, she could almost hear his voice again. It was the small thing she remembered. The way he folded the newspaper, the sound of his keys on the table, and the cup he always left beside the window. She waited. Nobody came. Outside, the last bus pulled away from the corner. And the telephone rang.",
+    "wordsMatch": false
+  },
+  "limitations": [
+    "No native-listener or superiority acceptance.",
+    "One Portuguese a/ao discrepancy in ASR; audio vs recognizer cause not established.",
+    "Phone runtime and long-book endurance remain unqualified.",
+    "Longer English ASR reported things/thing and Then/And differences; fidelity needs listening review."
+  ]
+}

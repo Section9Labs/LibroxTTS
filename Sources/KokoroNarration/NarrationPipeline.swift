@@ -23,8 +23,11 @@ public actor NarrationPipeline {
                      narratorVoiceID: String?, language: String? = nil, metadataLanguage: String? = nil,
                      cast: BookVoiceCast? = nil, characterVoices: Bool = false,
                      options: PronunciationOptions = .init(), delivery: NarrationDeliveryOptions = .init(expressive: true),
-                     lexicon: SpokenTextLexicon = .init(), nativeExpression: Bool = false, repositoryID: String? = nil) async throws -> Plan {
+                     lexicon: SpokenTextLexicon = .init(), nativeExpression: Bool = false, repositoryID: String? = nil,
+                     pocketChunking: PocketTTSChunkingOptions = .init(),
+                     pocketSampling: PocketTTSSamplingOptions = .init()) async throws -> Plan {
         try Task.checkCancellation()
+        if model == .pocket { try pocketSampling.validate() }
         let delivery = model.resolvedDeliveryOptions(delivery)
         let preferredLanguage = narratorVoiceID.flatMap { id in
             model.nativeVoices.first { $0.id == id }?.language ?? Voice.named(id)?.language.rawValue
@@ -44,10 +47,10 @@ public actor NarrationPipeline {
             } else { nativeCast = nil }
             if let nativeCast {
                 let plan = try TextNativeCharacterPlanner.plan(text, bookID: bookID, chapterID: chapterID,
-                    language: language, cast: nativeCast, characterVoices: characterVoices, lexicon: lexicon)
+                    language: language, cast: nativeCast, characterVoices: characterVoices, lexicon: lexicon, model: model, pocketChunking: pocketChunking)
                 units = plan.units; updatedCast = plan.cast; originalPlan = plan
             } else {
-                units = try TextNativeNarrationPlanner.plan(text, voiceID: voiceID, lexicon: lexicon)
+                units = try TextNativeNarrationPlanner.plan(text, voiceID: voiceID, lexicon: lexicon, model: model, pocketChunking: pocketChunking)
                 updatedCast = nil
             }
         } else {
@@ -84,6 +87,9 @@ public actor NarrationPipeline {
            !delivery.blendedVoice {
             units = try NarrationNativeExpression.prepare(units: units, source: text,
                 decisions: originalPlan?.attribution?.decisions ?? [])
+        }
+        if model == .pocket {
+            for index in units.indices { units[index].pocketSampling = pocketSampling }
         }
         return Plan(units: units, narratorVoiceID: updatedCast?.narratorVoiceID ?? voiceID,
                     language: language, cast: updatedCast,

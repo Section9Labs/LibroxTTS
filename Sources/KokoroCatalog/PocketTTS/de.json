@@ -1,0 +1,356 @@
+{
+  "repository": "Section9Labs/LibroxTTS",
+  "revision": "pocket-tts-mlx-2026-11-07-v2",
+  "files": [
+    {
+      "path": "de/LICENSE-Kyutai.txt",
+      "size": 1023,
+      "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--LICENSE-Kyutai.txt"
+    },
+    {
+      "path": "de/NOTICE.json",
+      "size": 573,
+      "sha256": "0e120eea2fa58823456d01be1cd5fd11cc94505931a1a1dd9029fad99a3c1287",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--NOTICE.json"
+    },
+    {
+      "path": "de/VOICE-CREDITS.json",
+      "size": 8237,
+      "sha256": "8920f121cdfe529882a43e914c90ce6d51a8e24772a8580fdddbec01e5bd6f36",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--VOICE-CREDITS.json"
+    },
+    {
+      "path": "de/config.json",
+      "size": 2270,
+      "sha256": "0d736e0e0f5c19c8936e298c22e556f6ee5eb2a79da03491a08e7dda47247e40",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--config.json"
+    },
+    {
+      "path": "de/embeddings/alba.safetensors",
+      "size": 6244152,
+      "sha256": "e34da39d613abe74a8a255426c816738372f085a83604c0c441845d7ae6c8192",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--alba.safetensors"
+    },
+    {
+      "path": "de/embeddings/anna.safetensors",
+      "size": 7620408,
+      "sha256": "54e036b70a09478ed11a5108c1e651c6d59ddd63db8191ad9b8264c0cc0d677e",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--anna.safetensors"
+    },
+    {
+      "path": "de/embeddings/azelma.safetensors",
+      "size": 7178040,
+      "sha256": "0df5e6ab44f1adccd6717ddac4444a8a82e25bb9b2ef98c73aa20fd033cf87cb",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--azelma.safetensors"
+    },
+    {
+      "path": "de/embeddings/bill_boerst.safetensors",
+      "size": 6539064,
+      "sha256": "15c4f662fdd05a1d379a589466ce31a4fa34ebdec9a3e9d94ec6ef5d8a1efbd1",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--bill_boerst.safetensors"
+    },
+    {
+      "path": "de/embeddings/caro_davy.safetensors",
+      "size": 5064504,
+      "sha256": "1f19753a2d06366db2dc261bf9026f582836cde579fea9857a21e9f28c474362",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--caro_davy.safetensors"
+    },
+    {
+      "path": "de/embeddings/charles.safetensors",
+      "size": 6195000,
+      "sha256": "81199ad1a12f63dc2d47df1da3c55ca010cfe9e222ddffbeea056c372450af0b",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--charles.safetensors"
+    },
+    {
+      "path": "de/embeddings/daan.safetensors",
+      "size": 3884848,
+      "sha256": "1ab0faf983edda0f314db4c843e162858b7f424fe530ec93e7d78379ab3c8b6b",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--daan.safetensors"
+    },
+    {
+      "path": "de/embeddings/eponine.safetensors",
+      "size": 6932280,
+      "sha256": "73cddc2c86df453d4a0d8be05814a9e9d8c050be03cf2ce8bd9df0624c4c8a57",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--eponine.safetensors"
+    },
+    {
+      "path": "de/embeddings/estelle.safetensors",
+      "size": 7571256,
+      "sha256": "ea90dd538585661872343983fdf5ccff64e0013d749675d7dff81fcfe4dbe747",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--estelle.safetensors"
+    },
+    {
+      "path": "de/embeddings/eve.safetensors",
+      "size": 6145848,
+      "sha256": "de30237de9ab96251ca7d73746f1ecc8184b91b8f025f8c06096f7a33afe7bbf",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--eve.safetensors"
+    },
+    {
+      "path": "de/embeddings/fantine.safetensors",
+      "size": 6440760,
+      "sha256": "b77367001a30d0862e83741f19ba9263870d882310e19a0cac3ba8befe406b04",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--fantine.safetensors"
+    },
+    {
+      "path": "de/embeddings/george.safetensors",
+      "size": 5900088,
+      "sha256": "a6c1a5b927b8481dbac08beada45f00b478716aeaf81f080f98c6ba04e65c12b",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--george.safetensors"
+    },
+    {
+      "path": "de/embeddings/giovanni.safetensors",
+      "size": 4130608,
+      "sha256": "479b21d57d3fc2d0d6350ecdd265950f7fe7845c1a3da38dbc40414930a1c649",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--giovanni.safetensors"
+    },
+    {
+      "path": "de/embeddings/jane.safetensors",
+      "size": 7325496,
+      "sha256": "bd1bc91fd38a724b14f5c9cb4d67327f968568beb28d72fe7bb81f0fba75b685",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--jane.safetensors"
+    },
+    {
+      "path": "de/embeddings/javert.safetensors",
+      "size": 6145848,
+      "sha256": "c6ed2465f41a015d78c4dee4be1d4a517e25db3cb43e944e27f984e70006822f",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--javert.safetensors"
+    },
+    {
+      "path": "de/embeddings/lola.safetensors",
+      "size": 5457720,
+      "sha256": "66466f5601e1420824a7f5bb852c8807532d38cd8e29002e936b98bfb0e59a24",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--lola.safetensors"
+    },
+    {
+      "path": "de/embeddings/marius.safetensors",
+      "size": 6244152,
+      "sha256": "1919d2fed89aa8f894753569fe15079f20abc4c9859ed9da889c8b282b244449",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--marius.safetensors"
+    },
+    {
+      "path": "de/embeddings/mary.safetensors",
+      "size": 5949240,
+      "sha256": "aa2f706eeed7ff410778b3e23070b8f6dd27c27460b76cdd1baef4f7d7d61da5",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--mary.safetensors"
+    },
+    {
+      "path": "de/embeddings/michael.safetensors",
+      "size": 7128888,
+      "sha256": "cf14510456e4a0047160f052ccaa35a24b012eddf260b593b64dfa9fa1fe6d73",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--michael.safetensors"
+    },
+    {
+      "path": "de/embeddings/paul.safetensors",
+      "size": 6833976,
+      "sha256": "3b4afcddd3c88a4daa3a19a8e3d84a1c08cb06483442d3623d10bd00bdbe9bf5",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--paul.safetensors"
+    },
+    {
+      "path": "de/embeddings/peter_yearsley.safetensors",
+      "size": 3639088,
+      "sha256": "50360c335454f22bb80353e83070f33ccb08d7223449855f4078a3ebce6ca70d",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--peter_yearsley.safetensors"
+    },
+    {
+      "path": "de/embeddings/stuart_bell.safetensors",
+      "size": 5064504,
+      "sha256": "60062fc7b9f52bcdf7cfdfc574abb84e476595979283bdadfcd53cf6b5b3e384",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--stuart_bell.safetensors"
+    },
+    {
+      "path": "de/embeddings/vera.safetensors",
+      "size": 6686520,
+      "sha256": "b3e44170a5a4fa97ecdabaac23706cc06e03bd3e9c0492b2aa43582c6cdc18cc",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--vera.safetensors"
+    },
+    {
+      "path": "de/model.safetensors",
+      "size": 219029196,
+      "sha256": "9fe42605604832349e3f495177bde56b77ae8fee73b2ed4b63236092ccde7621",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--model.safetensors"
+    },
+    {
+      "path": "de/tokenizer.json",
+      "size": 245966,
+      "sha256": "2d77849811e3d1b6ae80e5b11b203f57e1847901104d8a0573b34f46f8dddb53",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--tokenizer.json"
+    }
+  ],
+  "installedFiles": [
+    {
+      "path": "de/LICENSE-Kyutai.txt",
+      "size": 1023,
+      "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--LICENSE-Kyutai.txt"
+    },
+    {
+      "path": "de/NOTICE.json",
+      "size": 573,
+      "sha256": "0e120eea2fa58823456d01be1cd5fd11cc94505931a1a1dd9029fad99a3c1287",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--NOTICE.json"
+    },
+    {
+      "path": "de/VOICE-CREDITS.json",
+      "size": 8237,
+      "sha256": "8920f121cdfe529882a43e914c90ce6d51a8e24772a8580fdddbec01e5bd6f36",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--VOICE-CREDITS.json"
+    },
+    {
+      "path": "de/config.json",
+      "size": 2270,
+      "sha256": "0d736e0e0f5c19c8936e298c22e556f6ee5eb2a79da03491a08e7dda47247e40",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--config.json"
+    },
+    {
+      "path": "de/embeddings/alba.safetensors",
+      "size": 6244152,
+      "sha256": "e34da39d613abe74a8a255426c816738372f085a83604c0c441845d7ae6c8192",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--alba.safetensors"
+    },
+    {
+      "path": "de/embeddings/anna.safetensors",
+      "size": 7620408,
+      "sha256": "54e036b70a09478ed11a5108c1e651c6d59ddd63db8191ad9b8264c0cc0d677e",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--anna.safetensors"
+    },
+    {
+      "path": "de/embeddings/azelma.safetensors",
+      "size": 7178040,
+      "sha256": "0df5e6ab44f1adccd6717ddac4444a8a82e25bb9b2ef98c73aa20fd033cf87cb",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--azelma.safetensors"
+    },
+    {
+      "path": "de/embeddings/bill_boerst.safetensors",
+      "size": 6539064,
+      "sha256": "15c4f662fdd05a1d379a589466ce31a4fa34ebdec9a3e9d94ec6ef5d8a1efbd1",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--bill_boerst.safetensors"
+    },
+    {
+      "path": "de/embeddings/caro_davy.safetensors",
+      "size": 5064504,
+      "sha256": "1f19753a2d06366db2dc261bf9026f582836cde579fea9857a21e9f28c474362",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--caro_davy.safetensors"
+    },
+    {
+      "path": "de/embeddings/charles.safetensors",
+      "size": 6195000,
+      "sha256": "81199ad1a12f63dc2d47df1da3c55ca010cfe9e222ddffbeea056c372450af0b",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--charles.safetensors"
+    },
+    {
+      "path": "de/embeddings/daan.safetensors",
+      "size": 3884848,
+      "sha256": "1ab0faf983edda0f314db4c843e162858b7f424fe530ec93e7d78379ab3c8b6b",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--daan.safetensors"
+    },
+    {
+      "path": "de/embeddings/eponine.safetensors",
+      "size": 6932280,
+      "sha256": "73cddc2c86df453d4a0d8be05814a9e9d8c050be03cf2ce8bd9df0624c4c8a57",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--eponine.safetensors"
+    },
+    {
+      "path": "de/embeddings/estelle.safetensors",
+      "size": 7571256,
+      "sha256": "ea90dd538585661872343983fdf5ccff64e0013d749675d7dff81fcfe4dbe747",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--estelle.safetensors"
+    },
+    {
+      "path": "de/embeddings/eve.safetensors",
+      "size": 6145848,
+      "sha256": "de30237de9ab96251ca7d73746f1ecc8184b91b8f025f8c06096f7a33afe7bbf",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--eve.safetensors"
+    },
+    {
+      "path": "de/embeddings/fantine.safetensors",
+      "size": 6440760,
+      "sha256": "b77367001a30d0862e83741f19ba9263870d882310e19a0cac3ba8befe406b04",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--fantine.safetensors"
+    },
+    {
+      "path": "de/embeddings/george.safetensors",
+      "size": 5900088,
+      "sha256": "a6c1a5b927b8481dbac08beada45f00b478716aeaf81f080f98c6ba04e65c12b",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--george.safetensors"
+    },
+    {
+      "path": "de/embeddings/giovanni.safetensors",
+      "size": 4130608,
+      "sha256": "479b21d57d3fc2d0d6350ecdd265950f7fe7845c1a3da38dbc40414930a1c649",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--giovanni.safetensors"
+    },
+    {
+      "path": "de/embeddings/jane.safetensors",
+      "size": 7325496,
+      "sha256": "bd1bc91fd38a724b14f5c9cb4d67327f968568beb28d72fe7bb81f0fba75b685",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--jane.safetensors"
+    },
+    {
+      "path": "de/embeddings/javert.safetensors",
+      "size": 6145848,
+      "sha256": "c6ed2465f41a015d78c4dee4be1d4a517e25db3cb43e944e27f984e70006822f",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--javert.safetensors"
+    },
+    {
+      "path": "de/embeddings/lola.safetensors",
+      "size": 5457720,
+      "sha256": "66466f5601e1420824a7f5bb852c8807532d38cd8e29002e936b98bfb0e59a24",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--lola.safetensors"
+    },
+    {
+      "path": "de/embeddings/marius.safetensors",
+      "size": 6244152,
+      "sha256": "1919d2fed89aa8f894753569fe15079f20abc4c9859ed9da889c8b282b244449",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--marius.safetensors"
+    },
+    {
+      "path": "de/embeddings/mary.safetensors",
+      "size": 5949240,
+      "sha256": "aa2f706eeed7ff410778b3e23070b8f6dd27c27460b76cdd1baef4f7d7d61da5",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--mary.safetensors"
+    },
+    {
+      "path": "de/embeddings/michael.safetensors",
+      "size": 7128888,
+      "sha256": "cf14510456e4a0047160f052ccaa35a24b012eddf260b593b64dfa9fa1fe6d73",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--michael.safetensors"
+    },
+    {
+      "path": "de/embeddings/paul.safetensors",
+      "size": 6833976,
+      "sha256": "3b4afcddd3c88a4daa3a19a8e3d84a1c08cb06483442d3623d10bd00bdbe9bf5",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--paul.safetensors"
+    },
+    {
+      "path": "de/embeddings/peter_yearsley.safetensors",
+      "size": 3639088,
+      "sha256": "50360c335454f22bb80353e83070f33ccb08d7223449855f4078a3ebce6ca70d",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--peter_yearsley.safetensors"
+    },
+    {
+      "path": "de/embeddings/stuart_bell.safetensors",
+      "size": 5064504,
+      "sha256": "60062fc7b9f52bcdf7cfdfc574abb84e476595979283bdadfcd53cf6b5b3e384",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--stuart_bell.safetensors"
+    },
+    {
+      "path": "de/embeddings/vera.safetensors",
+      "size": 6686520,
+      "sha256": "b3e44170a5a4fa97ecdabaac23706cc06e03bd3e9c0492b2aa43582c6cdc18cc",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--embeddings--vera.safetensors"
+    },
+    {
+      "path": "de/model.safetensors",
+      "size": 219029196,
+      "sha256": "9fe42605604832349e3f495177bde56b77ae8fee73b2ed4b63236092ccde7621",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--model.safetensors"
+    },
+    {
+      "path": "de/tokenizer.json",
+      "size": 245966,
+      "sha256": "2d77849811e3d1b6ae80e5b11b203f57e1847901104d8a0573b34f46f8dddb53",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-mlx-2026-11-07-v2/de--tokenizer.json"
+    }
+  ]
+}

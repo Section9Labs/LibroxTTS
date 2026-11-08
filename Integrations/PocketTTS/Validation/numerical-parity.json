@@ -1,0 +1,44 @@
+[
+  {
+    "language": "de",
+    "latentMaximumAbsoluteError": 2.5391579e-05,
+    "decoderMaximumAbsoluteError": 3.9488077e-07,
+    "passed": true
+  },
+  {
+    "language": "en",
+    "latentMaximumAbsoluteError": 6.482005e-06,
+    "decoderMaximumAbsoluteError": 1.9036233e-06,
+    "passed": true
+  },
+  {
+    "language": "es",
+    "latentMaximumAbsoluteError": 3.33786e-06,
+    "decoderMaximumAbsoluteError": 6.314367e-07,
+    "passed": true
+  },
+  {
+    "language": "fr",
+    "latentMaximumAbsoluteError": 1.0430813e-05,
+    "decoderMaximumAbsoluteError": 5.5879354e-07,
+    "passed": true
+  },
+  {
+    "language": "it",
+    "latentMaximumAbsoluteError": 4.2021275e-06,
+    "decoderMaximumAbsoluteError": 9.983778e-07,
+    "passed": true
+  },
+  {
+    "language": "nl",
+    "latentMaximumAbsoluteError": 5.2452087e-06,
+    "decoderMaximumAbsoluteError": 9.834766e-07,
+    "passed": true
+  },
+  {
+    "language": "pt",
+    "latentMaximumAbsoluteError": 5.5134296e-06,
+    "decoderMaximumAbsoluteError": 7.599592e-07,
+    "passed": true
+  }
+]

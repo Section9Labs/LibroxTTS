@@ -128,7 +128,8 @@ public struct NarrationPlaybackCadence: Sendable {
             previousRole: previous?.role ?? .unknown, nextRole: unit.role,
             structuralBreak: chapterBreak ? .chapter : previous?.boundary == .paragraph ? .paragraph : .none,
             sourceGap: sourceGap, languageCode: Voice.named(unit.voiceID)?.language.rawValue
-                ?? NarrationModel.plus.nativeVoices.first(where: { $0.id == unit.voiceID })?.language), sampleRate: sampleRate)
+                ?? NarrationModel.plus.nativeVoices.first(where: { $0.id == unit.voiceID })?.language
+                ?? PocketTTSCatalog.voice(id: unit.voiceID)?.language), sampleRate: sampleRate)
         if result.accepted {
             previous = Edge(text: String(String.UnicodeScalarView(unit.text.unicodeScalars.suffix(256))),
                 speaker: unit.speakerID, role: unit.role, boundary: unit.boundaryAfter)

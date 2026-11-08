@@ -4,15 +4,19 @@ permissions:
   contents: read
 jobs:
   package:
-    runs-on: macos-15
+    runs-on: macos-26
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
     steps:
       - uses: actions/checkout@v4
+      - name: Verify Swift toolchain
+        run: swift --version
       - name: Debug tests
         run: swift test
       - name: Release tests
         run: swift test -c release
       - name: Compile benchmark Python scripts
-        run: python3 -m compileall -q Benchmarks/Narration
+        run: python3 -m compileall -q Benchmarks/Narration Scripts/PocketTTS
       - name: Install XcodeGen
         run: brew install xcodegen
       - name: Generate iOS example
