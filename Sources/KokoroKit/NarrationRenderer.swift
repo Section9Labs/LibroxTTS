@@ -79,10 +79,10 @@ public actor NarrationRenderer {
         await acquire(); defer { release() }
         try Task.checkCancellation()
         guard selection.isEnabled else {
-            throw RenderError.unavailable("Choose Basic, Plus or System voices in Listening settings.")
+            throw RenderError.unavailable("Choose Basic, Plus, Max or System voices in Listening settings.")
         }
         if selection == .pocket, executionContext == .background {
-            throw RenderError.unavailable("Pocket TTS requires foreground GPU generation. Play prepared audio in the background.")
+            throw RenderError.unavailable("Max requires foreground GPU generation. Play prepared audio in the background.")
         }
         let backend: CTEngine.Backend = executionContext == .foreground ? .coreMLGPUHeavy : .coreMLCPU
         let directory = directory.standardizedFileURL
