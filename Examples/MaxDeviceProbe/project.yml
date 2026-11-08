@@ -1,0 +1,40 @@
+name: MaxDeviceProbe
+packages:
+  LibroxTTS:
+    path: ../..
+targets:
+  MaxDeviceProbe:
+    type: application
+    platform: iOS
+    deploymentTarget: '18.0'
+    sources:
+      - path: Sources
+      - path: Assets
+        type: folder
+        buildPhase: resources
+    dependencies:
+      - package: LibroxTTS
+        product: LibroxTTS
+    info:
+      path: Info.plist
+      properties:
+        CFBundleDisplayName: Max Device Test
+        UILaunchScreen: {}
+        UIFileSharingEnabled: true
+        LSSupportsOpeningDocumentsInPlace: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.section9labs.MaxDeviceProbe
+        DEVELOPMENT_TEAM: 995PCLM9KH
+        CODE_SIGN_STYLE: Automatic
+        SWIFT_VERSION: '6.0'
+        TARGETED_DEVICE_FAMILY: '1,2'
+        CURRENT_PROJECT_VERSION: 1
+        MARKETING_VERSION: '0.4.0'
+schemes:
+  MaxDeviceProbe:
+    build:
+      targets:
+        MaxDeviceProbe: all
+    run:
+      config: Release
