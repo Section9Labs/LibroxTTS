@@ -30,6 +30,16 @@ import Synchronization
 import MLX
 import LibroxTTS
 
+@Test func pocketLicensesReachAppAcknowledgements() {
+    let notices = KokoroAttribution.text
+    #expect(notices.contains("Pocket TTS native Swift MLX"))
+    #expect(notices.contains("Copyright (c) 2025 Prince Canuma"))
+    #expect(notices.contains("CC BY 4.0"))
+    #expect(notices.contains("MLX Swift 0.32.3"))
+    #expect(notices.contains("Swift Numerics"))
+    #expect(notices.contains("Permission is hereby granted"))
+}
+
 @Test func pocketPlanningPreservesSourceAndCast() async throws {
     let source = "“Wait,” said Maria.\n\nThe rain had stopped."
     let pipeline = NarrationPipeline()
