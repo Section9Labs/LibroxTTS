@@ -27,8 +27,8 @@ func pocketTTSSEANetNames(prefix: String, config: PocketTTSSeanetConfig, encoder
 }
 
 extension PocketTTSModel {
-    func sanitize(weights: [String: MLXArray]) -> [String: MLXArray] {
-        let weights = weights.filter {
+    func sanitize(weights: inout [String: MLXArray], checkpoint: (String) throws -> Void) throws -> [String: MLXArray] {
+        weights = weights.filter {
             !$0.key.contains("speaker_proj_weight") && !$0.key.hasPrefix("mimi.encoder.") && !$0.key.hasPrefix("mimi.encoder_transformer.") && !$0.key.hasPrefix("mimi.downsample.") && !$0.key.hasSuffix(".learnt_padding") && !["speaker_wavs", "emb", "audio_prompt"].contains($0.key)
         }
         guard weights.keys.contains(where: { $0.contains(".decoder.model.") || $0.contains(".condition_provider.") }) else {
@@ -40,7 +40,12 @@ extension PocketTTSModel {
         let prefixes = names.sorted { $0.key.count > $1.key.count }
         let targetKeys = Set(parameters().flattened().map(\.0))
         var mapped: [String: MLXArray] = [:]
-        for (source, tensor) in weights {
+        // Consume and materialize one tensor at a time. Keeping the original
+        // dictionary alive until eval(model) overlaps every BF16 source with
+        // every FP32 destination, unnecessarily inflating cold-load peak.
+        for source in weights.keys.sorted() {
+            try Task.checkCancellation()
+            guard let tensor = weights.removeValue(forKey: source) else { continue }
             if [".w_s_t.", ".quantizer.vq.", ".quantizer.logvar_proj."].contains(where: source.contains) { continue }
             var key = source.replacingOccurrences(
                 of: "flow_lm.condition_provider.conditioners.speaker_wavs.output_proj.weight", with: "speaker_proj_weight")
@@ -72,7 +77,9 @@ extension PocketTTSModel {
                     value = value.transposed(0, 2, 1)
                 }
             }
+            eval(value)
             mapped[key] = value
+            try checkpoint("load-tensor")
         }
         return mapped
     }

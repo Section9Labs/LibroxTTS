@@ -32,6 +32,14 @@ public actor NarrationRenderer {
             }
         }
     }
+    public typealias MaxResourceSnapshot = PocketTTSResourceSnapshot
+    private var maxResourceObserver: (@Sendable (MaxResourceSnapshot) -> Void)?
+    /// Opt-in diagnostics contain only runtime measurements, never book text.
+    public func setMaxResourceObserver(_ observer: (@Sendable (MaxResourceSnapshot) -> Void)?) async {
+        await acquire(); defer { release() }
+        maxResourceObserver = observer
+        await pocket?.setResourceObserver(observer)
+    }
     private var pocket: PocketTTSEngine?
     private var plus: CTEngine?
     private var plusBackend: CTEngine.Backend?
@@ -120,6 +128,7 @@ public actor NarrationRenderer {
         self.executionContext = executionContext
         if selection == .pocket {
             pocket = PocketTTSEngine(directory: directory, backend: executionContext == .background ? .cpu : .gpu)
+            await pocket?.setResourceObserver(maxResourceObserver)
             current = selection; currentDirectory = directory; currentRepositoryID = repositoryID
             return
         }
@@ -159,9 +168,17 @@ public actor NarrationRenderer {
         if let pocket {
             let sampling = unit.pocketSampling ?? .init()
             try sampling.validate()
-            return try await pocket.synthesize(unit.synthesisText, voiceID: unit.voiceID,
-                temperature: sampling.temperature, chunking: unit.pocketChunking ?? .init(),
-                role: unit.role == .dialogue ? .dialogue : .narration, samplerSteps: sampling.samplerSteps).samples
+            do {
+                return try await pocket.synthesize(unit.synthesisText, voiceID: unit.voiceID,
+                    temperature: sampling.temperature, chunking: unit.pocketChunking ?? .init(),
+                    role: unit.role == .dialogue ? .dialogue : .narration, samplerSteps: sampling.samplerSteps).samples
+            } catch let error as PocketTTSResourceError {
+                try Task.checkCancellation()
+                switch error {
+                case .memory: throw RenderError.memory
+                case .thermal: throw RenderError.thermal
+                }
+            }
         }
         if let plus {
             guard let voice = NarrationModel.plus.nativeVoices.first(where: { $0.id == unit.voiceID }) else {

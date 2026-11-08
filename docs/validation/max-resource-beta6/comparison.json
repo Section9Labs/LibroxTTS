@@ -1,0 +1,987 @@
+{
+  "schemaVersion": 1,
+  "baselineSHA": "8e4645bf4d6000b48d92803b430127b2e7e3580d",
+  "machine": "Apple M3 Ultra, 256 GiB RAM",
+  "toolchain": "Apple Swift 6.4 (swiftlang-6.4.0.34.1), Release",
+  "scope": "Mac technical comparison only. No physical iPhone or listening acceptance. Footprint sampled at codec frame boundaries; transient intraframe peaks may be larger. No speed or memory guarantee for iOS.",
+  "settings": {
+    "temperature": 0.3,
+    "seed": 42,
+    "samplerSteps": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "weights": "unchanged hosted v2 BF16 source, FP32 arithmetic",
+    "cacheRecycleThresholdMiB": 256,
+    "reserveMiB": 128
+  },
+  "gpuContinuedPassages": [
+    {
+      "case": "en-1-0",
+      "pcmSHA256": "a1b77a4d9ee64808fc922740684f192440b0b4cf4626e6cbd2058ceae43f0449",
+      "pcmBytes": 3233280,
+      "exactPCM": true,
+      "beta5": {
+        "activeBytes": 416793268,
+        "audioSeconds": 33.68,
+        "backend": "gpu",
+        "case": "en-1-0",
+        "maxFrameActiveBytes": 459587501,
+        "maxFrameCacheBytes": 2413606320,
+        "maxFrameFootprintBytes": 3546630040,
+        "peakBytes": 586246362,
+        "renderSeconds": 2.124863250006456
+      },
+      "candidate": {
+        "activeBytes": 398908468,
+        "audioSeconds": 33.68,
+        "backend": "gpu",
+        "case": "en-1-0",
+        "maxFrameActiveBytes": 469868253,
+        "maxFrameCacheBytes": 268419044,
+        "maxFrameFootprintBytes": 1571997304,
+        "peakBytes": 547094938,
+        "renderSeconds": 2.3080067500122823
+      },
+      "renderTimeChangePercent": 8.619072309960174
+    },
+    {
+      "case": "en-2-0",
+      "pcmSHA256": "a7570225f105d45e4b6dcff594f89ea37befb9e73e7ee9d3ab30befdf6a39cfb",
+      "pcmBytes": 3194880,
+      "exactPCM": true,
+      "beta5": {
+        "activeBytes": 417317556,
+        "audioSeconds": 33.28,
+        "backend": "gpu",
+        "case": "en-2-0",
+        "maxFrameActiveBytes": 462274172,
+        "maxFrameCacheBytes": 2360051889,
+        "maxFrameFootprintBytes": 3534735256,
+        "peakBytes": 557464431,
+        "renderSeconds": 2.2440927083371207
+      },
+      "candidate": {
+        "activeBytes": 398908468,
+        "audioSeconds": 33.28,
+        "backend": "gpu",
+        "case": "en-2-0",
+        "maxFrameActiveBytes": 478323603,
+        "maxFrameCacheBytes": 265681636,
+        "maxFrameFootprintBytes": 1494451832,
+        "peakBytes": 537755874,
+        "renderSeconds": 2.495877791661769
+      },
+      "renderTimeChangePercent": 11.219905594329127
+    },
+    {
+      "case": "en-4-0",
+      "pcmSHA256": "6457f7f0cd0ed52cd05530a645fa2b6ad29ddbcd00db211b4f349c0410339403",
+      "pcmBytes": 3425280,
+      "exactPCM": true,
+      "beta5": {
+        "activeBytes": 417579700,
+        "audioSeconds": 35.68,
+        "backend": "gpu",
+        "case": "en-4-0",
+        "maxFrameActiveBytes": 463207686,
+        "maxFrameCacheBytes": 2532348524,
+        "maxFrameFootprintBytes": 3671508912,
+        "peakBytes": 567189690,
+        "renderSeconds": 2.928407083352795
+      },
+      "candidate": {
+        "activeBytes": 398908468,
+        "audioSeconds": 35.68,
+        "backend": "gpu",
+        "case": "en-4-0",
+        "maxFrameActiveBytes": 455886805,
+        "maxFrameCacheBytes": 266759068,
+        "maxFrameFootprintBytes": 1513834104,
+        "peakBytes": 539654681,
+        "renderSeconds": 3.076846875017509
+      },
+      "renderTimeChangePercent": 5.068960272243372
+    },
+    {
+      "case": "en-8-0",
+      "pcmSHA256": "97fc395f4bebaf906dadb185f350610aebdc62646b82ea431a7906da87e291dc",
+      "pcmBytes": 3425280,
+      "exactPCM": true,
+      "beta5": {
+        "activeBytes": 417448628,
+        "audioSeconds": 35.68,
+        "backend": "gpu",
+        "case": "en-8-0",
+        "maxFrameActiveBytes": 463861922,
+        "maxFrameCacheBytes": 2570743316,
+        "maxFrameFootprintBytes": 3710076848,
+        "peakBytes": 567450573,
+        "renderSeconds": 3.6629286666575354
+      },
+      "candidate": {
+        "activeBytes": 398908468,
+        "audioSeconds": 35.68,
+        "backend": "gpu",
+        "case": "en-8-0",
+        "maxFrameActiveBytes": 464026613,
+        "maxFrameCacheBytes": 268777244,
+        "maxFrameFootprintBytes": 1426343544,
+        "peakBytes": 539809404,
+        "renderSeconds": 3.856447708327323
+      },
+      "renderTimeChangePercent": 5.28317800538487
+    },
+    {
+      "case": "es-1-0",
+      "pcmSHA256": "12e0c79e67e94acc41433c491593aa9e9af1ce42c2d8ba75ad65c75fbbe31cb7",
+      "pcmBytes": 3601920,
+      "exactPCM": true,
+      "beta5": {
+        "activeBytes": 410534580,
+        "audioSeconds": 37.52,
+        "backend": "gpu",
+        "case": "es-1-0",
+        "maxFrameActiveBytes": 470428820,
+        "maxFrameCacheBytes": 2564377420,
+        "maxFrameFootprintBytes": 4069345464,
+        "peakBytes": 585477524,
+        "renderSeconds": 2.3020024999859743
+      },
+      "candidate": {
+        "activeBytes": 398908468,
+        "audioSeconds": 37.52,
+        "backend": "gpu",
+        "case": "es-1-0",
+        "maxFrameActiveBytes": 470338265,
+        "maxFrameCacheBytes": 267201708,
+        "maxFrameFootprintBytes": 1819150208,
+        "peakBytes": 549252815,
+        "renderSeconds": 2.5769031250092667
+      },
+      "renderTimeChangePercent": 11.941803930489536
+    },
+    {
+      "case": "es-2-0",
+      "pcmSHA256": "a594f1594027ef36bef9ff17fe7c6ad8bf4e12709f8a6e7ccca9204f8ab9d926",
+      "pcmBytes": 3763200,
+      "exactPCM": true,
+      "beta5": {
+        "activeBytes": 412107444,
+        "audioSeconds": 39.2,
+        "backend": "gpu",
+        "case": "es-2-0",
+        "maxFrameActiveBytes": 463396358,
+        "maxFrameCacheBytes": 2590924619,
+        "maxFrameFootprintBytes": 4110649576,
+        "peakBytes": 553796435,
+        "renderSeconds": 2.6574493749940302
+      },
+      "candidate": {
+        "activeBytes": 398908468,
+        "audioSeconds": 39.2,
+        "backend": "gpu",
+        "case": "es-2-0",
+        "maxFrameActiveBytes": 463142608,
+        "maxFrameCacheBytes": 264175732,
+        "maxFrameFootprintBytes": 1982596992,
+        "peakBytes": 539852060,
+        "renderSeconds": 3.093349583330564
+      },
+      "renderTimeChangePercent": 16.402954368134036
+    },
+    {
+      "case": "es-4-0",
+      "pcmSHA256": "05e69fb892e24034a2e4fe71b76d34e467f4ef5a4a05f2114bd15b1a843b17e2",
+      "pcmBytes": 3648000,
+      "exactPCM": true,
+      "beta5": {
+        "activeBytes": 410141364,
+        "audioSeconds": 38,
+        "backend": "gpu",
+        "case": "es-4-0",
+        "maxFrameActiveBytes": 455673943,
+        "maxFrameCacheBytes": 2595532898,
+        "maxFrameFootprintBytes": 4109617360,
+        "peakBytes": 568979413,
+        "renderSeconds": 3.0549926666426472
+      },
+      "candidate": {
+        "activeBytes": 398908468,
+        "audioSeconds": 38,
+        "backend": "gpu",
+        "case": "es-4-0",
+        "maxFrameActiveBytes": 455424972,
+        "maxFrameCacheBytes": 266601372,
+        "maxFrameFootprintBytes": 1807583104,
+        "peakBytes": 539645284,
+        "renderSeconds": 3.3180882083252072
+      },
+      "renderTimeChangePercent": 8.611986030450769
+    },
+    {
+      "case": "es-8-0",
+      "pcmSHA256": "89cbac8bedadde0074faf4665d15a3e9a5b784777ef8cb12cf4e38745802c40f",
+      "pcmBytes": 3901440,
+      "exactPCM": true,
+      "beta5": {
+        "activeBytes": 412238516,
+        "audioSeconds": 40.64,
+        "backend": "gpu",
+        "case": "es-8-0",
+        "maxFrameActiveBytes": 464153553,
+        "maxFrameCacheBytes": 3092886132,
+        "maxFrameFootprintBytes": 4606773456,
+        "peakBytes": 577183811,
+        "renderSeconds": 4.305313291668426
+      },
+      "candidate": {
+        "activeBytes": 398908468,
+        "audioSeconds": 40.64,
+        "backend": "gpu",
+        "case": "es-8-0",
+        "maxFrameActiveBytes": 463504310,
+        "maxFrameCacheBytes": 267444360,
+        "maxFrameFootprintBytes": 1801930624,
+        "peakBytes": 541909765,
+        "renderSeconds": 4.4591751666448545
+      },
+      "renderTimeChangePercent": 3.5737672162947876
+    }
+  ],
+  "cpuShortPassages": [
+    {
+      "case": "en-1-0",
+      "pcmSHA256": "b48fe8e30ea725b45bb53ee478043cc92be5d52a571697bed27e216b298a7bc2",
+      "pcmBytes": 391680,
+      "exactPCM": true,
+      "beta5": {
+        "activeBytes": 408405912,
+        "audioSeconds": 4.08,
+        "backend": "cpu",
+        "case": "en-1-0",
+        "peakBytes": 453371796,
+        "renderSeconds": 5.413285166665446
+      },
+      "candidate": {
+        "activeBytes": 398908440,
+        "audioSeconds": 4.08,
+        "backend": "cpu",
+        "case": "en-1-0",
+        "maxFrameActiveBytes": 0,
+        "maxFrameCacheBytes": 0,
+        "maxFrameFootprintBytes": 0,
+        "peakBytes": 453297144,
+        "renderSeconds": 5.381080041668611
+      },
+      "renderTimeChangePercent": -0.5949275533303156
+    },
+    {
+      "case": "en-1-1",
+      "pcmSHA256": "b48fe8e30ea725b45bb53ee478043cc92be5d52a571697bed27e216b298a7bc2",
+      "pcmBytes": 391680,
+      "exactPCM": true,
+      "beta5": {
+        "activeBytes": 408422296,
+        "audioSeconds": 4.08,
+        "backend": "cpu",
+        "case": "en-1-1",
+        "peakBytes": 453371796,
+        "renderSeconds": 5.33957345833187
+      },
+      "candidate": {
+        "activeBytes": 398908440,
+        "audioSeconds": 4.08,
+        "backend": "cpu",
+        "case": "en-1-1",
+        "maxFrameActiveBytes": 0,
+        "maxFrameCacheBytes": 0,
+        "maxFrameFootprintBytes": 0,
+        "peakBytes": 453313125,
+        "renderSeconds": 5.341041250008857
+      },
+      "renderTimeChangePercent": 0.02748893124968621
+    },
+    {
+      "case": "en-1-2",
+      "pcmSHA256": "b48fe8e30ea725b45bb53ee478043cc92be5d52a571697bed27e216b298a7bc2",
+      "pcmBytes": 391680,
+      "exactPCM": true,
+      "beta5": {
+        "activeBytes": 408405912,
+        "audioSeconds": 4.08,
+        "backend": "cpu",
+        "case": "en-1-2",
+        "peakBytes": 453371796,
+        "renderSeconds": 5.387819833325921
+      },
+      "candidate": {
+        "activeBytes": 398908440,
+        "audioSeconds": 4.08,
+        "backend": "cpu",
+        "case": "en-1-2",
+        "maxFrameActiveBytes": 0,
+        "maxFrameCacheBytes": 0,
+        "maxFrameFootprintBytes": 0,
+        "peakBytes": 453315524,
+        "renderSeconds": 5.45756362497923
+      },
+      "renderTimeChangePercent": 1.2944714895979814
+    },
+    {
+      "case": "en-2-0",
+      "pcmSHA256": "a8a905bef1f4d5fbfa7aba71b1e61ccd0db03fda4e1c1cafbb2d0d732c4b62a6",
+      "pcmBytes": 399360,
+      "exactPCM": true,
+      "beta5": {
+        "activeBytes": 408536984,
+        "audioSeconds": 4.16,
+        "backend": "cpu",
+        "case": "en-2-0",
+        "peakBytes": 453636112,
+        "renderSeconds": 5.4791844583523925
+      },
+      "candidate": {
+        "activeBytes": 398908440,
+        "audioSeconds": 4.16,
+        "backend": "cpu",
+        "case": "en-2-0",
+        "maxFrameActiveBytes": 0,
+        "maxFrameCacheBytes": 0,
+        "maxFrameFootprintBytes": 0,
+        "peakBytes": 453641410,
+        "renderSeconds": 5.525472208333667
+      },
+      "renderTimeChangePercent": 0.8447926937505068
+    },
+    {
+      "case": "en-2-1",
+      "pcmSHA256": "a8a905bef1f4d5fbfa7aba71b1e61ccd0db03fda4e1c1cafbb2d0d732c4b62a6",
+      "pcmBytes": 399360,
+      "exactPCM": true,
+      "beta5": {
+        "activeBytes": 408553368,
+        "audioSeconds": 4.16,
+        "backend": "cpu",
+        "case": "en-2-1",
+        "peakBytes": 453652236,
+        "renderSeconds": 5.520608708349755
+      },
+      "candidate": {
+        "activeBytes": 398908440,
+        "audioSeconds": 4.16,
+        "backend": "cpu",
+        "case": "en-2-1",
+        "maxFrameActiveBytes": 0,
+        "maxFrameCacheBytes": 0,
+        "maxFrameFootprintBytes": 0,
+        "peakBytes": 453673701,
+        "renderSeconds": 5.580422333354363
+      },
+      "renderTimeChangePercent": 1.0834606863939111
+    },
+    {
+      "case": "en-2-2",
+      "pcmSHA256": "a8a905bef1f4d5fbfa7aba71b1e61ccd0db03fda4e1c1cafbb2d0d732c4b62a6",
+      "pcmBytes": 399360,
+      "exactPCM": true,
+      "beta5": {
+        "activeBytes": 408553368,
+        "audioSeconds": 4.16,
+        "backend": "cpu",
+        "case": "en-2-2",
+        "peakBytes": 453617684,
+        "renderSeconds": 5.503602083335863
+      },
+      "candidate": {
+        "activeBytes": 398908440,
+        "audioSeconds": 4.16,
+        "backend": "cpu",
+        "case": "en-2-2",
+        "maxFrameActiveBytes": 0,
+        "maxFrameCacheBytes": 0,
+        "maxFrameFootprintBytes": 0,
+        "peakBytes": 453622982,
+        "renderSeconds": 5.528974791668588
+      },
+      "renderTimeChangePercent": 0.4610200364875583
+    },
+    {
+      "case": "en-4-0",
+      "pcmSHA256": "7b886e185afbad1c8c1fcead2184ff092370f860e05067c7a1a96a95d031ee57",
+      "pcmBytes": 437760,
+      "exactPCM": true,
+      "beta5": {
+        "activeBytes": 409192344,
+        "audioSeconds": 4.56,
+        "backend": "cpu",
+        "case": "en-4-0",
+        "peakBytes": 454554256,
+        "renderSeconds": 6.518323708354728
+      },
+      "candidate": {
+        "activeBytes": 398908440,
+        "audioSeconds": 4.56,
+        "backend": "cpu",
+        "case": "en-4-0",
+        "maxFrameActiveBytes": 0,
+        "maxFrameCacheBytes": 0,
+        "maxFrameFootprintBytes": 0,
+        "peakBytes": 454475975,
+        "renderSeconds": 6.2169760833494365
+      },
+      "renderTimeChangePercent": -4.623084683858913
+    },
+    {
+      "case": "en-4-1",
+      "pcmSHA256": "7b886e185afbad1c8c1fcead2184ff092370f860e05067c7a1a96a95d031ee57",
+      "pcmBytes": 437760,
+      "exactPCM": true,
+      "beta5": {
+        "activeBytes": 409208728,
+        "audioSeconds": 4.56,
+        "backend": "cpu",
+        "case": "en-4-1",
+        "peakBytes": 454552212,
+        "renderSeconds": 6.2575118750100955
+      },
+      "candidate": {
+        "activeBytes": 398908440,
+        "audioSeconds": 4.56,
+        "backend": "cpu",
+        "case": "en-4-1",
+        "maxFrameActiveBytes": 0,
+        "maxFrameCacheBytes": 0,
+        "maxFrameFootprintBytes": 0,
+        "peakBytes": 454475975,
+        "renderSeconds": 6.178442166681634
+      },
+      "renderTimeChangePercent": -1.2635966164799894
+    },
+    {
+      "case": "en-4-2",
+      "pcmSHA256": "7b886e185afbad1c8c1fcead2184ff092370f860e05067c7a1a96a95d031ee57",
+      "pcmBytes": 437760,
+      "exactPCM": true,
+      "beta5": {
+        "activeBytes": 409208728,
+        "audioSeconds": 4.56,
+        "backend": "cpu",
+        "case": "en-4-2",
+        "peakBytes": 454535828,
+        "renderSeconds": 6.190216916671488
+      },
+      "candidate": {
+        "activeBytes": 398908440,
+        "audioSeconds": 4.56,
+        "backend": "cpu",
+        "case": "en-4-2",
+        "maxFrameActiveBytes": 0,
+        "maxFrameCacheBytes": 0,
+        "maxFrameFootprintBytes": 0,
+        "peakBytes": 454475975,
+        "renderSeconds": 6.304008833307307
+      },
+      "renderTimeChangePercent": 1.8382541059159818
+    },
+    {
+      "case": "en-8-0",
+      "pcmSHA256": "1e86c1c924e4f2137e8ff85523fa03372da94a1d58b28f3c317e000dc8ab2a21",
+      "pcmBytes": 437760,
+      "exactPCM": true,
+      "beta5": {
+        "activeBytes": 409192344,
+        "audioSeconds": 4.56,
+        "backend": "cpu",
+        "case": "en-8-0",
+        "peakBytes": 454570380,
+        "renderSeconds": 6.394532208330929
+      },
+      "candidate": {
+        "activeBytes": 398908440,
+        "audioSeconds": 4.56,
+        "backend": "cpu",
+        "case": "en-8-0",
+        "maxFrameActiveBytes": 0,
+        "maxFrameCacheBytes": 0,
+        "maxFrameFootprintBytes": 0,
+        "peakBytes": 454510372,
+        "renderSeconds": 6.409618916659383
+      },
+      "renderTimeChangePercent": 0.23593138382818069
+    },
+    {
+      "case": "en-8-1",
+      "pcmSHA256": "1e86c1c924e4f2137e8ff85523fa03372da94a1d58b28f3c317e000dc8ab2a21",
+      "pcmBytes": 437760,
+      "exactPCM": true,
+      "beta5": {
+        "activeBytes": 409192344,
+        "audioSeconds": 4.56,
+        "backend": "cpu",
+        "case": "en-8-1",
+        "peakBytes": 454554256,
+        "renderSeconds": 6.391916833323194
+      },
+      "candidate": {
+        "activeBytes": 398908440,
+        "audioSeconds": 4.56,
+        "backend": "cpu",
+        "case": "en-8-1",
+        "maxFrameActiveBytes": 0,
+        "maxFrameCacheBytes": 0,
+        "maxFrameFootprintBytes": 0,
+        "peakBytes": 454510372,
+        "renderSeconds": 6.351792416680837
+      },
+      "renderTimeChangePercent": -0.6277368383952431
+    },
+    {
+      "case": "en-8-2",
+      "pcmSHA256": "1e86c1c924e4f2137e8ff85523fa03372da94a1d58b28f3c317e000dc8ab2a21",
+      "pcmBytes": 437760,
+      "exactPCM": true,
+      "beta5": {
+        "activeBytes": 409208728,
+        "audioSeconds": 4.56,
+        "backend": "cpu",
+        "case": "en-8-2",
+        "peakBytes": 454535700,
+        "renderSeconds": 6.461740374972578
+      },
+      "candidate": {
+        "activeBytes": 398908440,
+        "audioSeconds": 4.56,
+        "backend": "cpu",
+        "case": "en-8-2",
+        "maxFrameActiveBytes": 0,
+        "maxFrameCacheBytes": 0,
+        "maxFrameFootprintBytes": 0,
+        "peakBytes": 454478019,
+        "renderSeconds": 6.431760416657198
+      },
+      "renderTimeChangePercent": -0.4639610472667255
+    },
+    {
+      "case": "es-1-0",
+      "pcmSHA256": "17728d9efb75c0f567e55dc9ad844134d2cede6d02a0e3037c5335ac03f9253a",
+      "pcmBytes": 506880,
+      "exactPCM": true,
+      "beta5": {
+        "activeBytes": 410388120,
+        "audioSeconds": 5.28,
+        "backend": "cpu",
+        "case": "es-1-0",
+        "peakBytes": 456127728,
+        "renderSeconds": 7.167292375001125
+      },
+      "candidate": {
+        "activeBytes": 398908440,
+        "audioSeconds": 5.28,
+        "backend": "cpu",
+        "case": "es-1-0",
+        "maxFrameActiveBytes": 0,
+        "maxFrameCacheBytes": 0,
+        "maxFrameFootprintBytes": 0,
+        "peakBytes": 456069153,
+        "renderSeconds": 6.971450833341805
+      },
+      "renderTimeChangePercent": -2.7324341105770644
+    },
+    {
+      "case": "es-1-1",
+      "pcmSHA256": "17728d9efb75c0f567e55dc9ad844134d2cede6d02a0e3037c5335ac03f9253a",
+      "pcmBytes": 506880,
+      "exactPCM": true,
+      "beta5": {
+        "activeBytes": 410388120,
+        "audioSeconds": 5.28,
+        "backend": "cpu",
+        "case": "es-1-1",
+        "peakBytes": 456127728,
+        "renderSeconds": 7.0083449583326
+      },
+      "candidate": {
+        "activeBytes": 398908440,
+        "audioSeconds": 5.28,
+        "backend": "cpu",
+        "case": "es-1-1",
+        "maxFrameActiveBytes": 0,
+        "maxFrameCacheBytes": 0,
+        "maxFrameFootprintBytes": 0,
+        "peakBytes": 456068722,
+        "renderSeconds": 6.943745166674489
+      },
+      "renderTimeChangePercent": -0.9217553080246854
+    },
+    {
+      "case": "es-1-2",
+      "pcmSHA256": "17728d9efb75c0f567e55dc9ad844134d2cede6d02a0e3037c5335ac03f9253a",
+      "pcmBytes": 506880,
+      "exactPCM": true,
+      "beta5": {
+        "activeBytes": 410388120,
+        "audioSeconds": 5.28,
+        "backend": "cpu",
+        "case": "es-1-2",
+        "peakBytes": 456127728,
+        "renderSeconds": 7.025280874979217
+      },
+      "candidate": {
+        "activeBytes": 398908440,
+        "audioSeconds": 5.28,
+        "backend": "cpu",
+        "case": "es-1-2",
+        "maxFrameActiveBytes": 0,
+        "maxFrameCacheBytes": 0,
+        "maxFrameFootprintBytes": 0,
+        "peakBytes": 456067109,
+        "renderSeconds": 6.957729791669408
+      },
+      "renderTimeChangePercent": -0.9615428124787773
+    },
+    {
+      "case": "es-2-0",
+      "pcmSHA256": "c570342bca5f29770085e223050925f96ec1cb0d553a1b9bc4071884a58ddaf6",
+      "pcmBytes": 499200,
+      "exactPCM": true,
+      "beta5": {
+        "activeBytes": 410257048,
+        "audioSeconds": 5.2,
+        "backend": "cpu",
+        "case": "es-2-0",
+        "peakBytes": 455978360,
+        "renderSeconds": 6.919838916655863
+      },
+      "candidate": {
+        "activeBytes": 398908440,
+        "audioSeconds": 5.2,
+        "backend": "cpu",
+        "case": "es-2-0",
+        "maxFrameActiveBytes": 0,
+        "maxFrameCacheBytes": 0,
+        "maxFrameFootprintBytes": 0,
+        "peakBytes": 455937866,
+        "renderSeconds": 6.888376958318986
+      },
+      "renderTimeChangePercent": -0.45466316074422863
+    },
+    {
+      "case": "es-2-1",
+      "pcmSHA256": "c570342bca5f29770085e223050925f96ec1cb0d553a1b9bc4071884a58ddaf6",
+      "pcmBytes": 499200,
+      "exactPCM": true,
+      "beta5": {
+        "activeBytes": 410257048,
+        "audioSeconds": 5.2,
+        "backend": "cpu",
+        "case": "es-2-1",
+        "peakBytes": 455996788,
+        "renderSeconds": 6.8741326666786335
+      },
+      "candidate": {
+        "activeBytes": 398908440,
+        "audioSeconds": 5.2,
+        "backend": "cpu",
+        "case": "es-2-1",
+        "maxFrameActiveBytes": 0,
+        "maxFrameCacheBytes": 0,
+        "maxFrameFootprintBytes": 0,
+        "peakBytes": 455919438,
+        "renderSeconds": 6.93465045830817
+      },
+      "renderTimeChangePercent": 0.8803698526635539
+    },
+    {
+      "case": "es-2-2",
+      "pcmSHA256": "c570342bca5f29770085e223050925f96ec1cb0d553a1b9bc4071884a58ddaf6",
+      "pcmBytes": 499200,
+      "exactPCM": true,
+      "beta5": {
+        "activeBytes": 410240664,
+        "audioSeconds": 5.2,
+        "backend": "cpu",
+        "case": "es-2-2",
+        "peakBytes": 455996528,
+        "renderSeconds": 7.097463333338965
+      },
+      "candidate": {
+        "activeBytes": 398908440,
+        "audioSeconds": 5.2,
+        "backend": "cpu",
+        "case": "es-2-2",
+        "maxFrameActiveBytes": 0,
+        "maxFrameCacheBytes": 0,
+        "maxFrameFootprintBytes": 0,
+        "peakBytes": 455939926,
+        "renderSeconds": 6.842910666659009
+      },
+      "renderTimeChangePercent": -3.586530211212846
+    },
+    {
+      "case": "es-4-0",
+      "pcmSHA256": "786d3596906facacfbd3b289db77be1e45286d53b490345584d5621b1ab1c7fc",
+      "pcmBytes": 514560,
+      "exactPCM": true,
+      "beta5": {
+        "activeBytes": 410519192,
+        "audioSeconds": 5.36,
+        "backend": "cpu",
+        "case": "es-4-0",
+        "peakBytes": 456259188,
+        "renderSeconds": 7.4248710833489895
+      },
+      "candidate": {
+        "activeBytes": 398908440,
+        "audioSeconds": 5.36,
+        "backend": "cpu",
+        "case": "es-4-0",
+        "maxFrameActiveBytes": 0,
+        "maxFrameCacheBytes": 0,
+        "maxFrameFootprintBytes": 0,
+        "peakBytes": 456181568,
+        "renderSeconds": 7.186761249991832
+      },
+      "renderTimeChangePercent": -3.2069221227442157
+    },
+    {
+      "case": "es-4-1",
+      "pcmSHA256": "786d3596906facacfbd3b289db77be1e45286d53b490345584d5621b1ab1c7fc",
+      "pcmBytes": 514560,
+      "exactPCM": true,
+      "beta5": {
+        "activeBytes": 410502808,
+        "audioSeconds": 5.36,
+        "backend": "cpu",
+        "case": "es-4-1",
+        "peakBytes": 456240760,
+        "renderSeconds": 7.318907041655621
+      },
+      "candidate": {
+        "activeBytes": 398908440,
+        "audioSeconds": 5.36,
+        "backend": "cpu",
+        "case": "es-4-1",
+        "maxFrameActiveBytes": 0,
+        "maxFrameCacheBytes": 0,
+        "maxFrameFootprintBytes": 0,
+        "peakBytes": 456179524,
+        "renderSeconds": 7.238428666692926
+      },
+      "renderTimeChangePercent": -1.0995955339322072
+    },
+    {
+      "case": "es-4-2",
+      "pcmSHA256": "786d3596906facacfbd3b289db77be1e45286d53b490345584d5621b1ab1c7fc",
+      "pcmBytes": 514560,
+      "exactPCM": true,
+      "beta5": {
+        "activeBytes": 410519192,
+        "audioSeconds": 5.36,
+        "backend": "cpu",
+        "case": "es-4-2",
+        "peakBytes": 456275312,
+        "renderSeconds": 7.229492250015028
+      },
+      "candidate": {
+        "activeBytes": 398908440,
+        "audioSeconds": 5.36,
+        "backend": "cpu",
+        "case": "es-4-2",
+        "maxFrameActiveBytes": 0,
+        "maxFrameCacheBytes": 0,
+        "maxFrameFootprintBytes": 0,
+        "peakBytes": 456195908,
+        "renderSeconds": 7.181525333347963
+      },
+      "renderTimeChangePercent": -0.6634894264803348
+    },
+    {
+      "case": "es-8-0",
+      "pcmSHA256": "842e6b32b64b62da681a3b2ba4760b1eadfaa8af70e51af642ddc8ac7ae98737",
+      "pcmBytes": 506880,
+      "exactPCM": true,
+      "beta5": {
+        "activeBytes": 410371736,
+        "audioSeconds": 5.28,
+        "backend": "cpu",
+        "case": "es-8-0",
+        "peakBytes": 456144112,
+        "renderSeconds": 7.342242583312327
+      },
+      "candidate": {
+        "activeBytes": 398908440,
+        "audioSeconds": 5.28,
+        "backend": "cpu",
+        "case": "es-8-0",
+        "maxFrameActiveBytes": 0,
+        "maxFrameCacheBytes": 0,
+        "maxFrameFootprintBytes": 0,
+        "peakBytes": 456052769,
+        "renderSeconds": 7.362824208306847
+      },
+      "renderTimeChangePercent": 0.2803179649947696
+    },
+    {
+      "case": "es-8-1",
+      "pcmSHA256": "842e6b32b64b62da681a3b2ba4760b1eadfaa8af70e51af642ddc8ac7ae98737",
+      "pcmBytes": 506880,
+      "exactPCM": true,
+      "beta5": {
+        "activeBytes": 410388120,
+        "audioSeconds": 5.28,
+        "backend": "cpu",
+        "case": "es-8-1",
+        "peakBytes": 456144112,
+        "renderSeconds": 7.3046670833427925
+      },
+      "candidate": {
+        "activeBytes": 398908440,
+        "audioSeconds": 5.28,
+        "backend": "cpu",
+        "case": "es-8-1",
+        "maxFrameActiveBytes": 0,
+        "maxFrameCacheBytes": 0,
+        "maxFrameFootprintBytes": 0,
+        "peakBytes": 456052769,
+        "renderSeconds": 7.306873083347455
+      },
+      "renderTimeChangePercent": 0.030199870568958787
+    },
+    {
+      "case": "es-8-2",
+      "pcmSHA256": "842e6b32b64b62da681a3b2ba4760b1eadfaa8af70e51af642ddc8ac7ae98737",
+      "pcmBytes": 506880,
+      "exactPCM": true,
+      "beta5": {
+        "activeBytes": 410388120,
+        "audioSeconds": 5.28,
+        "backend": "cpu",
+        "case": "es-8-2",
+        "peakBytes": 456127728,
+        "renderSeconds": 7.351608458353439
+      },
+      "candidate": {
+        "activeBytes": 398908440,
+        "audioSeconds": 5.28,
+        "backend": "cpu",
+        "case": "es-8-2",
+        "maxFrameActiveBytes": 0,
+        "maxFrameCacheBytes": 0,
+        "maxFrameFootprintBytes": 0,
+        "peakBytes": 456085106,
+        "renderSeconds": 7.348291000002064
+      },
+      "renderTimeChangePercent": -0.04512561258082082
+    }
+  ],
+  "summary": {
+    "beta5MaxSampledFootprintBytes": 4606773456,
+    "candidateMaxSampledFootprintBytes": 1982596992
+  },
+  "loadMeasurements": {
+    "beta5-trace": [
+      {
+        "language": "en",
+        "seconds": 0.26203204164630733,
+        "peakMLXBytes": 598357076,
+        "activeMLXBytes": 398902568
+      },
+      {
+        "language": "es",
+        "seconds": 0.24399366666330025,
+        "peakMLXBytes": 560961974,
+        "activeMLXBytes": 398902756
+      }
+    ],
+    "cache256-trace": [
+      {
+        "language": "en",
+        "seconds": 0.3240073333145119,
+        "peakMLXBytes": 399828876,
+        "activeMLXBytes": 398908888
+      },
+      {
+        "language": "es",
+        "seconds": 0.3014205000072252,
+        "peakMLXBytes": 399828912,
+        "activeMLXBytes": 398909204
+      }
+    ],
+    "beta5-cpu": [
+      {
+        "language": "en",
+        "seconds": 0.2796145833272021,
+        "peakMLXBytes": 454586254,
+        "activeMLXBytes": 398903192
+      },
+      {
+        "language": "es",
+        "seconds": 0.2871377083356492,
+        "peakMLXBytes": 452410516,
+        "activeMLXBytes": 398902936
+      }
+    ],
+    "cache256-cpu": [
+      {
+        "language": "en",
+        "seconds": 0.29995958335348405,
+        "peakMLXBytes": 399304588,
+        "activeMLXBytes": 398908440
+      },
+      {
+        "language": "es",
+        "seconds": 0.30075595833477564,
+        "peakMLXBytes": 399304596,
+        "activeMLXBytes": 398908440
+      }
+    ]
+  },
+  "sevenLanguageGPURegressions": [
+    {
+      "case": "de-8-0",
+      "exactPCM": true,
+      "samples": 103680,
+      "pcmSHA256": "3f2a9bd5b8cff9eb15e2b0e37277c8ab6116620b727a47044c0546e588ef4938"
+    },
+    {
+      "case": "en-8-0",
+      "exactPCM": true,
+      "samples": 109440,
+      "pcmSHA256": "7faa93186c3f78c5a09fb91acd71a257a39192998fb70cb48975db3b451cd9bd"
+    },
+    {
+      "case": "es-8-0",
+      "exactPCM": true,
+      "samples": 126720,
+      "pcmSHA256": "688382d8de9889d238a10b35949e1bf47642064ceb68c49b597f809ceaa15313"
+    },
+    {
+      "case": "fr-8-0",
+      "exactPCM": true,
+      "samples": 99840,
+      "pcmSHA256": "713849dc5ccf9a4c60c6c524e76e429df0ba58c63bad2187eddfd73fbee393dc"
+    },
+    {
+      "case": "it-8-0",
+      "exactPCM": true,
+      "samples": 115200,
+      "pcmSHA256": "0b7af07786dd258e988d05cc322bf0830916f4c954634c3e7c08ee91e0e9f633"
+    },
+    {
+      "case": "nl-8-0",
+      "exactPCM": true,
+      "samples": 115200,
+      "pcmSHA256": "78698bba367bc155b46a18be2c435438c35ea6dea8367c6f735d0d8dabed08f4"
+    },
+    {
+      "case": "pt-8-0",
+      "exactPCM": true,
+      "samples": 163200,
+      "pcmSHA256": "a0a9ca27a36782fb281c17610bc298dc7a1f3dab2afdae021d0faecf41bde2e2"
+    }
+  ],
+  "sevenLanguageTimingScope": "Concurrent independent comparison processes; used only for PCM equality, not speed claims."
+}

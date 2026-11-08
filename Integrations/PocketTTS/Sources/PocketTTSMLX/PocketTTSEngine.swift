@@ -28,6 +28,15 @@ public actor PocketTTSEngine {
     private var randomState: MLXRandom.RandomState?
     private var randomSeed: UInt64?
     private var hasAllocated = false
+    private var activeSamplerSteps: Int?
+    private var diagnostics: (@Sendable (PocketTTSResourceSnapshot) -> Void)?
+    public func setResourceObserver(_ observer: (@Sendable (PocketTTSResourceSnapshot) -> Void)?) {
+        diagnostics = observer
+    }
+    private var resources: PocketTTSResourceMonitor {
+        .init(backend: backend.rawValue, samplerSteps: activeSamplerSteps,
+              tokenCount: model?.diagnosticTokenCount, frameIndex: model?.diagnosticFrameIndex, observe: diagnostics)
+    }
     public struct Output: Sendable { public let samples: [Float]; public let sampleRate: Int }
     private let directory: URL
     private var model: PocketTTSModel?
@@ -51,7 +60,7 @@ public actor PocketTTSEngine {
     public func setRandomSeed(_ seed: UInt64) {
         randomSeed = seed; randomState = nil
     }
-    private func onBackend<R>(_ body: (PocketCPUWorkBudget?) throws -> R) rethrows -> R {
+    private func onBackend<R>(_ body: (PocketCPUWorkBudget?) throws -> R) throws -> R {
         try Device.withDefaultDevice(backend == .cpu ? .cpu : .gpu) {
             hasAllocated = true
             if randomState == nil {
@@ -61,10 +70,25 @@ public actor PocketTTSEngine {
                 defer {
                     // Do not retain unevaluated RNG splits on the previous device.
                     if Task.isCancelled { randomState = nil }
-                    else { eval(randomState!) }
+                    else if let randomState { eval(randomState) }
                     Memory.clearCache()
                 }
-                return try body(PocketCPUWorkBudget.backgroundBudget(cpu: backend == .cpu))
+                do {
+                    try resources.checkpoint("operation-start")
+                    let result = try body(PocketCPUWorkBudget.backgroundBudget(cpu: backend == .cpu))
+                    try Task.checkCancellation()
+                    diagnostics?(resources.snapshot("operation-complete"))
+                    return result
+                } catch {
+                    // Model.render resets streaming state on every exit. Failed
+                    // operations also discard loaded weights/RNG before returning.
+                    model = nil; language = nil; randomState = nil
+                    Stream.defaultStream.synchronize()
+                    Memory.clearCache()
+                    diagnostics?(resources.snapshot(Task.isCancelled ? "cancelled-retired" : "failed-retired"))
+                    if Task.isCancelled { throw CancellationError() }
+                    throw error
+                }
             }
         }
     }
@@ -78,13 +102,15 @@ public actor PocketTTSEngine {
         guard let voice = PocketTTSCatalog.voice(id: voiceID) else { throw PocketTTSError.invalidVoice }
         guard text.unicodeScalars.count <= 16_384 else { throw PocketTTSError.textTooLong }
         try Task.checkCancellation()
+        activeSamplerSteps = samplerSteps
+        defer { activeSamplerSteps = nil }
         return try onBackend { budget in
             let model = try loadedModel(language: voice.language)
             model.temp = temperature
             model.lsd_decode_steps = samplerSteps
             var samples: [Float] = []
             try model.render(text: text, voice: voice.name, continuation: continueChunks, chunking: chunking,
-                             role: role, language: voice.language) { chunk in
+                             role: role, language: voice.language, checkpoint: { try self.resources.checkpoint($0) }) { chunk in
                 guard samples.count + chunk.count <= 24_000 * 300 else { throw PocketTTSError.textTooLong }
                 samples += chunk
                 try budget?.checkpoint()
@@ -107,13 +133,15 @@ public actor PocketTTSEngine {
         guard let voice = PocketTTSCatalog.voice(id: voiceID) else { throw PocketTTSError.invalidVoice }
         guard text.unicodeScalars.count <= 16_384 else { throw PocketTTSError.textTooLong }
         try Task.checkCancellation()
+        activeSamplerSteps = samplerSteps
+        defer { activeSamplerSteps = nil }
         return try onBackend { budget in
             let model = try loadedModel(language: voice.language)
             model.temp = temperature
             model.lsd_decode_steps = samplerSteps
             var sampleCount = 0
             try model.render(text: text, voice: voice.name, continuation: continueChunks,
-                             chunking: chunking, role: role, language: voice.language) { chunk in
+                             chunking: chunking, role: role, language: voice.language, checkpoint: { try self.resources.checkpoint($0) }) { chunk in
                 guard sampleCount + chunk.count <= 24_000 * 300 else { throw PocketTTSError.textTooLong }
                 sampleCount += chunk.count
                 try budget?.checkpoint()
@@ -139,7 +167,14 @@ public actor PocketTTSEngine {
             Memory.clearCache()
             try Task.checkCancellation()
             try PocketTTSCatalog.validate(in: directory, language: requested)
-            model = try PocketTTSModel.fromModelDirectory(directory.appendingPathComponent(requested))
+            let modelDirectory = directory.appendingPathComponent(requested)
+            let bytes = try modelDirectory.appendingPathComponent("model.safetensors")
+                .resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0
+            // Allow mapped weights plus conversion/evaluation overlap at load.
+            try resources.checkpoint("before-load", additionalBytes: PocketTTSResourceMonitor.loadReservation(fileBytes: UInt64(max(0, bytes))))
+            model = try PocketTTSModel.fromModelDirectory(modelDirectory,
+                checkpoint: { try self.resources.checkpoint($0) })
+            try resources.checkpoint("after-load")
             language = requested
         }
         guard let model else { throw PocketTTSError.invalidAssets }

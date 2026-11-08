@@ -58,6 +58,8 @@ public final class StreamingAdd: Module {
 
     override public init() {}
 
+    public func resetState() { lhsHold = nil; rhsHold = nil }
+
     public func step(lhs: MLXArray, rhs: MLXArray) -> MLXArray {
         var l = lhs
         var r = rhs
@@ -122,6 +124,7 @@ public final class SeanetResnetBlock: Module {
     }
 
     public func resetState() {
+        streamingAdd.resetState()
         shortcut?.resetState()
         for b in block { b.resetState() }
     }

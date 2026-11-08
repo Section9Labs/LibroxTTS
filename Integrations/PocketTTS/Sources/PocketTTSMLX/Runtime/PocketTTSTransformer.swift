@@ -225,8 +225,14 @@ public final class PocketStreamingTransformer: Module {
     public func callAsFunction(_ x: MLXArray, cache: [KVCacheSimple]?) -> MLXArray {
         var h = x
         let caches = cache ?? (0..<layers.count).map { _ in KVCacheSimple() }
-        for (layer, layerCache) in zip(layers, caches) {
+        for (index, pair) in zip(layers, caches).enumerated() {
+            let (layer, layerCache) = pair
+            if Task.isCancelled { break }
             h = layer(h, cache: layerCache)
+            // Bound prefill graphs in groups of three layers. Per-layer
+            // barriers cost too much on short, low-step passages. Single-frame
+            // decoding retains its existing asynchronous graph scheduling.
+            if x.shape[1] > 1 && (index + 1).isMultiple(of: 3) { eval([h] + layerCache.state) }
         }
         return h
     }

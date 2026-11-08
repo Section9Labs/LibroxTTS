@@ -13,7 +13,7 @@ ship an app update. MLX is now a pinned package dependency; existing Basic/Plus
 inference still uses their own renderers.
 
 [Hosted language packs](https://github.com/Section9Labs/LibroxTTS/releases/tag/pocket-tts-mlx-2026-11-07-v2)
-are published as an asset prerelease. Pin SDK `0.4.0-beta.5` separately;
+are published as an asset prerelease. Pin SDK `0.4.0-beta.6` separately;
 the asset tag is not an SDK version tag. Beta.5 reuses the existing v2 packs.
 
 ## Voices and languages
@@ -90,7 +90,8 @@ system grant, wrap GPU work, and cancel/retire work when permission expires.
 Older OS versions and unsupported/denied grants use CPU during legitimate audio
 playback. Neither backend gives an unlimited background execution allowance.
 Max no longer requires chapter preparation before listening. See the complete
-[beta.5 host integration](../../docs/UPGRADE-0.4.0-beta.5.md).
+[beta.5 host integration](../../docs/UPGRADE-0.4.0-beta.5.md) and
+[beta.6 resource recovery](../../docs/UPGRADE-0.4.0-beta.6.md).
 
 Physical M4 iPad trials generated new English and Spanish PCM with both backends
 while genuine narration played and the app was backgrounded. These short trials

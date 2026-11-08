@@ -10,6 +10,8 @@ public struct PocketTTSState {
 }
 
 public final class PocketTTSModel: Module {
+    private(set) var diagnosticTokenCount: Int?
+    private(set) var diagnosticFrameIndex: Int?
     public let config: PocketTTSModelConfig
     private let modelFolder: URL
     @ModuleInfo(key: "flow_lm") public var flow_lm: FlowLMModel
@@ -195,8 +197,11 @@ public final class PocketTTSModel: Module {
     public func render(text: String, voice: String, continuation: Bool = true,
                        chunking: PocketTTSChunkingOptions = .init(),
                        role: PocketTTSPassageRole = .narration, language: String = "en",
+                       checkpoint: (String) throws -> Void = { _ in },
                        onChunk: ([Float]) throws -> Void) throws {
         try validateSampling()
+        defer { mimi.resetState(); diagnosticTokenCount = nil; diagnosticFrameIndex = nil }
+        try checkpoint("before-voice")
         var state = try loadVoiceState(voice)
         let promptFrames = getFlowCacheNumFrames(state)
         let chunks = try chunkPlan(text: text, language: language, role: role, options: chunking)
@@ -212,7 +217,7 @@ public final class PocketTTSModel: Module {
             let (preparedText, _) = try PocketTTSTextUtils.prepareTextPrompt(joined, config: config)
             let (_, tail) = try PocketTTSTextUtils.prepareTextPrompt(chunk, config: config)
             previousLatents = try renderChunk(state: &state, text: preparedText, forced: forced,
-                framesAfterEOS: config.framesAfterEOS ?? tail + 2, onChunk: onChunk)
+                framesAfterEOS: config.framesAfterEOS ?? tail + 2, checkpoint: checkpoint, onChunk: onChunk)
             previousText = chunk
         }
     }
@@ -220,9 +225,12 @@ public final class PocketTTSModel: Module {
     private var modelFadeSamples: Int { sampleRate / 200 }
 
     private func renderChunk(state: inout PocketTTSState, text: String, forced: MLXArray?,
-                             framesAfterEOS: Int, onChunk: ([Float]) throws -> Void) throws -> [MLXArray] {
+                             framesAfterEOS: Int, checkpoint: (String) throws -> Void, onChunk: ([Float]) throws -> Void) throws -> [MLXArray] {
         mimi.resetState()
+        defer { mimi.resetState() }
+        try checkpoint("before-prefill")
         let prepared = flow_lm.conditioner.prepare(text)
+        diagnosticTokenCount = prepared.tokens.shape[1]
         let maxFrames = min(1500, Int(ceil((Double(prepared.tokens.shape[1]) / 3 + 2) * mimi.frameRate)))
         var input = MLXArray.ones([1, 1, flow_lm.ldim]) * Float.nan
         if let forced {
@@ -233,21 +241,29 @@ public final class PocketTTSModel: Module {
             // Match latest Kyutai: warm Mimi with the previous 12 frames, discard that PCM.
             for i in max(0, n - 12)..<n {
                 try Task.checkCancellation()
+                try checkpoint("codec-warmup")
                 let latent = forced[0..., i..<(i + 1), 0...] * flow_lm.emb_std + flow_lm.emb_mean
                 eval(mimi.decodeStep(mimi.quantizer(latent.transposed(0, 2, 1))))
             }
         } else {
             _ = runFlowLMAndIncrementStep(&state, textTokens: prepared.tokens)
         }
+        try Task.checkCancellation()
+        eval(state.flowCache.flatMap(\.state))
+        try checkpoint("after-prefill")
         var eosStep: Int?
         var latents: [MLXArray] = []
         for step in 0..<maxFrames {
+            diagnosticFrameIndex = step
             try Task.checkCancellation()
+            try checkpoint("before-flow")
             guard let (next, eos) = runFlowLMAndIncrementStep(&state, backboneInputLatents: input) else {
                 throw Self.modelError("Missing generated frame")
             }
+            try Task.checkCancellation()
             if eosStep == nil, step >= 6, eos.item(Bool.self) { eosStep = step }
             if let eosStep, step >= eosStep + framesAfterEOS { return latents }
+            try checkpoint("before-codec")
             let latent = next * flow_lm.emb_std + flow_lm.emb_mean
             let audio = mimi.decodeStep(mimi.quantizer(latent.transposed(0, 2, 1)))[0, 0]
             try Task.checkCancellation()
@@ -259,6 +275,7 @@ public final class PocketTTSModel: Module {
                 for i in 0..<n { samples[i] *= Float(i) / Float(max(1, modelFadeSamples - 1)) }
             }
             guard !samples.isEmpty, samples.allSatisfy({ $0.isFinite }) else { throw Self.modelError("Invalid audio") }
+            try checkpoint("after-codec")
             try onChunk(samples)
             latents.append(next)
             input = next
@@ -267,16 +284,23 @@ public final class PocketTTSModel: Module {
         throw Self.modelError("Generation limit reached without completed EOS")
     }
 
-    public static func fromModelDirectory(_ directory: URL) throws -> PocketTTSModel {
+    public static func fromModelDirectory(_ directory: URL,
+                                          checkpoint: (String) throws -> Void = { _ in }) throws -> PocketTTSModel {
+        try Task.checkCancellation()
+        try checkpoint("load-config")
         let config = try PocketTTSModelConfig.load(from: directory.appendingPathComponent("config.json"))
-        let raw = try MLX.loadArrays(url: directory.appendingPathComponent("model.safetensors"))
+        var raw = try MLX.loadArrays(url: directory.appendingPathComponent("model.safetensors"))
+        try checkpoint("load-weights")
         let model = try fromConfig(config, modelFolder: directory, encoderEnabled: false)
-        let weights = model.sanitize(weights: raw)
+        let weights = try model.sanitize(weights: &raw, checkpoint: checkpoint)
         try model.update(parameters: ModuleParameters.unflattened(weights), verify: .all)
         try Task.checkCancellation()
+        try checkpoint("load-conditioning")
         model.flow_lm.cacheConditioning()
         try Task.checkCancellation()
         eval(model)
+        try Task.checkCancellation()
+        try checkpoint("load-complete")
         return model
     }
 }
