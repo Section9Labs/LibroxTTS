@@ -37,7 +37,9 @@ positions. Complete the following wiring and test it in the real app:
    `BGTaskSchedulerPermittedIdentifiers`. Use a fresh matching UUID identifier
    per request. Enable the Background Modes audio/processing capabilities.
    Check the signed app/profile, not just the source entitlement file.
-6. Wrap **both load and render** in `grant.withGPUWork` before choosing
+6. The SDK rejects unowned `.backgroundGPU` loading and rendering on iOS. Its
+   task-local authorization is revoked at operation completion or expiration.
+   Wrap **both load and render** in `grant.withGPUWork` before choosing
    `.backgroundGPU`. For CPU, explicitly load `.background` before each retry
    or new unit; a prior GPU renderer must never remain selected after expiration.
    See the example below. GPU fallback preserves voice, text, sampling and
@@ -140,7 +142,14 @@ production must use the real reader's ownership, cache and cancellation rules.
 
 ## Quality under CPU pressure
 
-The short eight-step M4 iPad CPU trial was slower than real time. Keep eight steps
+The M4 iPad CPU trials were slower than real time, including a one-step long
+passage. An unpaced sustained run was killed by the iOS CPU watchdog; the SDK
+now paces iOS CPU execution against process CPU time at frame boundaries, aiming
+for 50% of one CPU to leave headroom. This is a conservative execution budget,
+not a guarantee of runtime or throughput on every device. The paced one-step
+M4 iPad run generated 73 seconds of audio in 214 seconds while backgrounded.
+Prepare enough audio
+ahead while foreground/GPU execution is available. Keep eight steps
 when the buffer permits, and prefer GPU when granted. Optional policy example:
 
 ```swift
@@ -168,6 +177,8 @@ opt-in and does not silently alter prepared/offline output or saved preferences.
   avoids an MLX 0.32.3 fallback operation accidentally targeting GPU.
 - Per-engine random state and explicit backend retirement, avoiding CPU renders
   retaining GPU graphs across transitions.
+- iOS CPU work pacing at frame boundaries to respect background CPU limits;
+  this can require substantial prepared-audio buffering.
 - Allocator cache trimming between renders/languages and unloading; no model
   weight or precision downgrade.
 - Granted background GPU execution with expiration/cancellation ownership.

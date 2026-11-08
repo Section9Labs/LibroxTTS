@@ -16,6 +16,7 @@ import LibroxTTS
         let pipeline = NarrationPipeline()
         var grant: NarrationBackgroundGPUGrant?
         var rows: [[String: Any]] = []
+        var rejectedUnownedGPU = false
         let arguments = ProcessInfo.processInfo.arguments
         let steps = arguments.contains("--one-step") ? 1 : arguments.contains("--four-steps") ? 4 : 8
         func save(_ stage: String, error: String? = nil) throws {
@@ -25,12 +26,20 @@ import LibroxTTS
                 "freshBuffer": arguments.contains("--fresh-buffer"),
                 "controlledGrantRetirement": arguments.contains("--retire-grant"),
                 "longPassage": arguments.contains("--long"),
+                "rejectedUnownedGPU": rejectedUnownedGPU,
                 "gpuSupported": NarrationBackgroundGPUGrant.isSupported, "gpuGranted": grant != nil]
             if let error { report["error"] = error }
             try JSONSerialization.data(withJSONObject: report, options: [.prettyPrinted, .sortedKeys])
                 .write(to: output.appendingPathComponent("report.json"), options: .atomic)
         }
         do {
+            do {
+                try await renderer.load(.pocket, directory: assets, executionContext: .backgroundGPU)
+            } catch { rejectedUnownedGPU = true }
+            guard rejectedUnownedGPU else {
+                throw NSError(domain: "MaxDeviceProbe", code: 1,
+                              userInfo: [NSLocalizedDescriptionKey: "Unowned background GPU request was accepted"])
+            }
             try save("preparingBuffer")
             progress("Preparing a real narration buffer before the background test…")
             try await renderer.load(.pocket, directory: assets, executionContext: .foreground)
@@ -44,7 +53,10 @@ import LibroxTTS
             }
             try AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio)
             try AVAudioSession.sharedInstance().setActive(true)
-            player = AVQueuePlayer(items: [AVPlayerItem(url: bufferURL)])
+            // The sustained CPU trial starts with four real narrated passages cached
+            // ahead, so resource-budget validation is not an audio-starvation test.
+            let bufferedPassages = arguments.contains("--long") ? 4 : 1
+            player = AVQueuePlayer(items: (0..<bufferedPassages).map { _ in AVPlayerItem(url: bufferURL) })
             player?.play()
             while UIApplication.shared.applicationState != .active { try await Task.sleep(for: .milliseconds(100)) }
             if ProcessInfo.processInfo.arguments.contains("--prefer-gpu") {

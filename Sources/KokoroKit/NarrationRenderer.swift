@@ -41,6 +41,7 @@ public actor NarrationRenderer {
     private var current: NarrationModel?
     private var currentDirectory: URL?
     private var currentRepositoryID: String?
+    private var executionContext: ExecutionContext = .background
     private let compactDirectory: URL
     private let harmonicSource: URL?
     private let contextStyleDiagnostic: CTContextStyleDiagnostic.Configuration?
@@ -79,12 +80,22 @@ public actor NarrationRenderer {
         await kokoro?.unload()
         kokoro = nil
         current = nil; currentDirectory = nil; currentRepositoryID = nil
+        executionContext = .background
+    }
+
+    private func validateGPUAuthorization(_ context: ExecutionContext) throws {
+        #if os(iOS) && !targetEnvironment(macCatalyst)
+        if context == .backgroundGPU, !NarrationGPUAuthorization.granted {
+            throw RenderError.unavailable("Background GPU rendering requires an active narration GPU grant.")
+        }
+        #endif
     }
 
     public func load(_ selection: NarrationModel, directory: URL,
                      executionContext: ExecutionContext = .background, repositoryID: String? = nil) async throws {
         await acquire(); defer { release() }
         try Task.checkCancellation()
+        try validateGPUAuthorization(executionContext)
         guard selection.isEnabled else {
             throw RenderError.unavailable("Choose Basic, Plus, Max or System voices in Listening settings.")
         }
@@ -102,9 +113,11 @@ public actor NarrationRenderer {
                 do { try await plus.setBackend(backend); plusBackend = backend }
                 catch { await unloadHeld(); throw error }
             }
+            self.executionContext = executionContext
             return
         }
         await unloadHeld()
+        self.executionContext = executionContext
         if selection == .pocket {
             pocket = PocketTTSEngine(directory: directory, backend: executionContext == .background ? .cpu : .gpu)
             current = selection; currentDirectory = directory; currentRepositoryID = repositoryID
@@ -142,6 +155,7 @@ public actor NarrationRenderer {
     public func render(_ unit: BookNarrationUnit, delivery: NarrationDeliveryOptions = .init()) async throws -> [Float] {
         await acquire(); defer { release() }
         try Task.checkCancellation()
+        try validateGPUAuthorization(executionContext)
         if let pocket {
             let sampling = unit.pocketSampling ?? .init()
             try sampling.validate()

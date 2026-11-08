@@ -27,6 +27,7 @@ public actor PocketTTSEngine {
     public private(set) var backend: Backend
     private var randomState: MLXRandom.RandomState?
     private var randomSeed: UInt64?
+    private var hasAllocated = false
     public struct Output: Sendable { public let samples: [Float]; public let sampleRate: Int }
     private let directory: URL
     private var model: PocketTTSModel?
@@ -36,7 +37,8 @@ public actor PocketTTSEngine {
     }
     public func unload() {
         model = nil; language = nil; randomState = nil
-        Memory.clearCache()
+        // A never-loaded engine must not initialize Metal just to unload.
+        if hasAllocated { Memory.clearCache(); hasAllocated = false }
     }
     /// Call after cancelling and awaiting an in-flight render. Actor serialization
     /// also prevents backend replacement while a synchronous frame is evaluating.
@@ -49,8 +51,9 @@ public actor PocketTTSEngine {
     public func setRandomSeed(_ seed: UInt64) {
         randomSeed = seed; randomState = nil
     }
-    private func onBackend<R>(_ body: () throws -> R) rethrows -> R {
+    private func onBackend<R>(_ body: (PocketCPUWorkBudget?) throws -> R) rethrows -> R {
         try Device.withDefaultDevice(backend == .cpu ? .cpu : .gpu) {
+            hasAllocated = true
             if randomState == nil {
                 randomState = randomSeed.map(MLXRandom.RandomState.init(seed:)) ?? MLXRandom.RandomState()
             }
@@ -61,7 +64,7 @@ public actor PocketTTSEngine {
                     else { eval(randomState!) }
                     Memory.clearCache()
                 }
-                return try body()
+                return try body(PocketCPUWorkBudget.backgroundBudget(cpu: backend == .cpu))
             }
         }
     }
@@ -75,7 +78,7 @@ public actor PocketTTSEngine {
         guard let voice = PocketTTSCatalog.voice(id: voiceID) else { throw PocketTTSError.invalidVoice }
         guard text.unicodeScalars.count <= 16_384 else { throw PocketTTSError.textTooLong }
         try Task.checkCancellation()
-        return try onBackend {
+        return try onBackend { budget in
             let model = try loadedModel(language: voice.language)
             model.temp = temperature
             model.lsd_decode_steps = samplerSteps
@@ -84,6 +87,7 @@ public actor PocketTTSEngine {
                              role: role, language: voice.language) { chunk in
                 guard samples.count + chunk.count <= 24_000 * 300 else { throw PocketTTSError.textTooLong }
                 samples += chunk
+                try budget?.checkpoint()
             }
             guard !samples.isEmpty, samples.allSatisfy({ $0.isFinite }) else { throw PocketTTSError.invalidAudio }
             return Output(samples: samples, sampleRate: model.sampleRate)
@@ -103,7 +107,7 @@ public actor PocketTTSEngine {
         guard let voice = PocketTTSCatalog.voice(id: voiceID) else { throw PocketTTSError.invalidVoice }
         guard text.unicodeScalars.count <= 16_384 else { throw PocketTTSError.textTooLong }
         try Task.checkCancellation()
-        return try onBackend {
+        return try onBackend { budget in
             let model = try loadedModel(language: voice.language)
             model.temp = temperature
             model.lsd_decode_steps = samplerSteps
@@ -112,6 +116,7 @@ public actor PocketTTSEngine {
                              chunking: chunking, role: role, language: voice.language) { chunk in
                 guard sampleCount + chunk.count <= 24_000 * 300 else { throw PocketTTSError.textTooLong }
                 sampleCount += chunk.count
+                try budget?.checkpoint()
                 try receive(chunk)
             }
         }
@@ -120,7 +125,7 @@ public actor PocketTTSEngine {
     public func previewChunks(_ text: String, voiceID: String,
                               chunking: PocketTTSChunkingOptions = .init(),
                               role: PocketTTSPassageRole = .narration) throws -> [PocketTTSTextChunk] {
-        return try onBackend {
+        return try onBackend { _ in
             try chunking.validate()
             guard let voice = PocketTTSCatalog.voice(id: voiceID) else { throw PocketTTSError.invalidVoice }
             return try loadedModel(language: voice.language).chunkPlan(text: text, language: voice.language,

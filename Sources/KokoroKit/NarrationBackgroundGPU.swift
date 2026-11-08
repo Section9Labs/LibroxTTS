@@ -3,6 +3,17 @@ import UIKit
 import BackgroundTasks
 import Synchronization
 
+// Inherited by the render task and its actor calls. A bare execution-context
+// flag cannot authorize GPU work outside the system grant's owned operation.
+enum NarrationGPUAuthorization {
+    final class Scope: Sendable {
+        let valid = Mutex(true)
+        func revoke() { valid.withLock { $0 = false } }
+    }
+    @TaskLocal static var scope: Scope?
+    static var granted: Bool { scope?.valid.withLock { $0 } == true }
+}
+
 /// A real iOS 26+ background-GPU grant, never inferred from OS version alone.
 /// The host requests this in response to a foreground user action and supplies
 /// the Background GPU Access entitlement and permitted task identifier pattern.
@@ -101,9 +112,16 @@ import Synchronization
         try Task.checkCancellation()
         guard isValid, !running else { throw GrantError.expired }
         running = true
-        let work = Task { try await operation() }
+        let authorization = NarrationGPUAuthorization.Scope()
+        defer { authorization.revoke() }
+        let work = Task {
+            try await NarrationGPUAuthorization.$scope.withValue(authorization) {
+                try Task.checkCancellation()
+                return try await operation()
+            }
+        }
         retireWork = { _ = await work.result }
-        guard gate.install({ work.cancel() }) else {
+        guard gate.install({ authorization.revoke(); work.cancel() }) else {
             work.cancel(); _ = await work.result; running = false; retireWork = nil
             throw GrantError.expired
         }

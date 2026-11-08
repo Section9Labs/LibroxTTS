@@ -46,6 +46,8 @@ The production app needs its own entitlement and profile.
   path; it does not claim the OS expiration handler was induced.
 - Add `--four-steps` or `--one-step` for explicit lower-compute comparisons.
 - Add `--long` for a three-paragraph English passage without language switches.
+  It queues four genuine narrated buffer passages first, to measure CPU resource
+  budgeting without starving the audio session during slower generation.
 
 Wait for `Documents/BackgroundResults/report.json` to say
 `waitingForBackground`, then press Home or launch another app. The report saves
@@ -58,3 +60,7 @@ starting another run so new launch arguments take effect.
 This harness currently requires iOS 26 for its background test entry point;
 the SDK CPU backend and production fallback support iOS 18+. Older-OS device,
 lock-screen, system-induced expiration and production reader tests are separate.
+
+The background probe first verifies that an unowned `.backgroundGPU` request
+is rejected, then requests a grant normally. iOS CPU rendering is paced to leave
+CPU headroom; this can be substantially slower than playback.
