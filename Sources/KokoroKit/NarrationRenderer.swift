@@ -7,10 +7,17 @@ import os
 import LibroxCTNative
 @_exported import KokoroNarration
 
-/// Serial owner of the Basic Kokoro and Plus CT renderers. Legacy model selections
+/// Serial owner of the Basic Kokoro, Plus CT and Max Pocket renderers. Legacy model selections
 /// are rejected before loading; they never reinterpret a previous model receipt.
 public actor NarrationRenderer {
-    public enum ExecutionContext: Sendable { case foreground, background }
+    public enum ExecutionContext: Sendable {
+        case foreground
+        /// CPU execution during the host's background audio session.
+        case background
+        /// GPU execution only while a granted continued-processing task owns
+        /// GPU access. Use NarrationBackgroundGPUGrant.withGPUWork on iOS 26+.
+        case backgroundGPU
+    }
     // User playback rate controls the base pace. Delivery cues may still make
     // local expressive adjustments, but Spanish has no hidden global slowdown.
     public static let deliveryRevision = "profiled-narration-runtime-1"
@@ -81,16 +88,16 @@ public actor NarrationRenderer {
         guard selection.isEnabled else {
             throw RenderError.unavailable("Choose Basic, Plus, Max or System voices in Listening settings.")
         }
-        if selection == .pocket, executionContext == .background {
-            throw RenderError.unavailable("Max requires foreground GPU generation. Play prepared audio in the background.")
-        }
-        let backend: CTEngine.Backend = executionContext == .foreground ? .coreMLGPUHeavy : .coreMLCPU
+        let backend: CTEngine.Backend = executionContext == .background ? .coreMLCPU : .coreMLGPUHeavy
         let directory = directory.standardizedFileURL
         let repositoryID = repositoryID ?? NarrationAssets.repositoryID(selection)
         guard NarrationAssets.compatibleRepositoryIDs(selection).contains(repositoryID) else {
             throw RenderError.unavailable("This installed voice version is not supported by the current library.")
         }
         if current == selection, currentDirectory == directory, currentRepositoryID == repositoryID {
+            if selection == .pocket, let pocket {
+                await pocket.setBackend(executionContext == .background ? .cpu : .gpu)
+            }
             if selection == .plus, plusBackend != backend, let plus {
                 do { try await plus.setBackend(backend); plusBackend = backend }
                 catch { await unloadHeld(); throw error }
@@ -99,7 +106,7 @@ public actor NarrationRenderer {
         }
         await unloadHeld()
         if selection == .pocket {
-            pocket = PocketTTSEngine(directory: directory)
+            pocket = PocketTTSEngine(directory: directory, backend: executionContext == .background ? .cpu : .gpu)
             current = selection; currentDirectory = directory; currentRepositoryID = repositoryID
             return
         }

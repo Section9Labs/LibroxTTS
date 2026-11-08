@@ -129,7 +129,7 @@ public final class SeanetResnetBlock: Module {
     public func callAsFunction(_ xs: MLXArray) -> MLXArray {
         var x = xs
         for b in block {
-            x = b(elu(x, alpha: 1.0))
+            x = b(pocketELU(x, alpha: 1.0))
         }
         if let sc = shortcut {
             x = x + sc(xs)
@@ -142,7 +142,7 @@ public final class SeanetResnetBlock: Module {
     public func step(_ xs: MLXArray) -> MLXArray {
         var x = xs
         for b in block {
-            x = b.step(elu(x, alpha: 1.0))
+            x = b.step(pocketELU(x, alpha: 1.0))
         }
         if let sc = shortcut {
             return streamingAdd.step(lhs: x, rhs: sc.step(xs))
@@ -193,13 +193,13 @@ public final class EncoderLayer: Module {
     public func callAsFunction(_ xs: MLXArray) -> MLXArray {
         var x = xs
         for r in residuals { x = r(x) }
-        return downsample(elu(x, alpha: 1.0))
+        return downsample(pocketELU(x, alpha: 1.0))
     }
 
     public func step(_ xs: MLXArray) -> MLXArray {
         var x = xs
         for r in residuals { x = r.step(x) }
-        return downsample.step(elu(x, alpha: 1.0))
+        return downsample.step(pocketELU(x, alpha: 1.0))
     }
 }
 
@@ -242,14 +242,14 @@ public final class SeanetEncoder: Module {
     public func callAsFunction(_ xs: MLXArray) -> MLXArray {
         var x = init_conv1d(xs)
         for l in layers { x = l(x) }
-        x = elu(x, alpha: 1.0)
+        x = pocketELU(x, alpha: 1.0)
         return final_conv1d(x)
     }
 
     public func step(_ xs: MLXArray) -> MLXArray {
         var x = init_conv1d.step(xs)
         for l in layers { x = l.step(x) }
-        x = elu(x, alpha: 1.0)
+        x = pocketELU(x, alpha: 1.0)
         return final_conv1d.step(x)
     }
 }
@@ -290,13 +290,13 @@ public final class DecoderLayer: Module {
     }
 
     public func callAsFunction(_ xs: MLXArray) -> MLXArray {
-        var x = upsample(elu(xs, alpha: 1.0))
+        var x = upsample(pocketELU(xs, alpha: 1.0))
         for r in residuals { x = r(x) }
         return x
     }
 
     public func step(_ xs: MLXArray) -> MLXArray {
-        var x = upsample.step(elu(xs, alpha: 1.0))
+        var x = upsample.step(pocketELU(xs, alpha: 1.0))
         for r in residuals { x = r.step(x) }
         return x
     }
@@ -341,14 +341,14 @@ public final class SeanetDecoder: Module {
     public func callAsFunction(_ xs: MLXArray) -> MLXArray {
         var x = init_conv1d(xs)
         for l in layers { x = l(x) }
-        x = elu(x, alpha: 1.0)
+        x = pocketELU(x, alpha: 1.0)
         return final_conv1d(x)
     }
 
     public func step(_ xs: MLXArray) -> MLXArray {
         var x = init_conv1d.step(xs)
         for l in layers { x = l.step(x) }
-        x = elu(x, alpha: 1.0)
+        x = pocketELU(x, alpha: 1.0)
         return final_conv1d.step(x)
     }
 }

@@ -6,22 +6,24 @@ Offline speech synthesis and book narration for iPhone, iPad and Mac. **Librox P
 
 ## Max — powered by Pocket TTS (SDK beta)
 
-Version 0.4.0-beta.4 offers Max, powered by the pinned Kyutai Pocket TTS, as a native
+Version 0.4.0-beta.5 offers Max, powered by the pinned Kyutai Pocket TTS, as a native
 Swift MLX option alongside Basic and Plus: 23 preset voices across English,
 French, German, Portuguese, Italian, Spanish and Dutch, with streaming 24 kHz
 PCM and chunk-continuation narration. Downloads use pinned GitHub release assets
 with SHA-256 verification; each language is optional. See the
 [Pocket TTS integration](Integrations/PocketTTS/README.md) for SDK APIs, provenance,
 reading behavior and validation. Max is available across supported iPhones, iPads
-and Apple silicon Macs without a tested-device allowlist. Generation requires
-the foreground; physical-device narration acceptance is pending TestFlight testing.
+and Apple silicon Macs without a tested-device allowlist. Max supports background CPU generation on iOS 18+ and prefers granted background
+GPU execution on iOS 26+. See the [beta.5 integration guide](docs/UPGRADE-0.4.0-beta.5.md)
+for the required host lifecycle, entitlement and fallback wiring. Physical M4 iPad
+trials cover both backends; iPhone and production app acceptance remain pending.
 
 ## Install
 
 Add the versioned Swift package:
 
 ```swift
-.package(url: "https://github.com/Section9Labs/LibroxTTS.git", exact: "0.4.0-beta.4")
+.package(url: "https://github.com/Section9Labs/LibroxTTS.git", exact: "0.4.0-beta.5")
 ```
 
 Products include `LibroxTTS` (host-facing synthesis/install API), `LibroxCTNative` (Core ML CT runtime), `KokoroCatalog` (Kokoro voices/assets), and `KokoroPronunciation` (Kokoro text to model phonemes). The shared runtime depends on MLX Swift 0.32.3. Swift 6.3 or newer, **iOS/Catalyst 18+ or macOS 15+** are required. Apple system language facilities are required, so Linux is not supported.
@@ -30,7 +32,7 @@ Products include `LibroxTTS` (host-facing synthesis/install API), `LibroxCTNativ
 
 See [the narrator integration API](docs/book-planning.md), [casting rules](docs/story-narrator.md), and [enhancement API and validation limits](docs/audio-enhancement.md). The optional, separately imported `QwenANE` product retains the Qwen renderer work; its existence does not establish device eligibility or sustained background performance. The shared LibroxTTS product now links the Pocket TTS MLX runtime; KokoroCatalog, KokoroPronunciation and KokoroNarration remain independent of MLX. Rejected model auditions are not app dependencies.
 
-Version 0.4.0-beta.4 names Pocket TTS **Max**, enables iPhone/iPad availability, and fixes native-style discovery for all 23 presets. Read the [Max upgrade guide](docs/UPGRADE-0.4.0-beta.4.md). Sampling, adaptive phrasing, model weights and cache identities are unchanged from beta.3. Version 0.4.0-beta.1 introduced the ten-style DK bank, shared character casting and persisted readings across all 31 Plus languages, opt-in native blending, and retained CT playback during updates. Read the [beta upgrade guide](docs/UPGRADE-0.4.0-beta.1.md). Native expression research remains off; this beta does not claim full acoustic parity or listening certification across every language. Stable 0.3.0 remains available with its original CT F1 bank.
+Version 0.4.0-beta.5 names Pocket TTS **Max**, enables iPhone/iPad availability, and fixes native-style discovery for all 23 presets. Read the [Max upgrade guide](docs/UPGRADE-0.4.0-beta.5.md). Sampling, adaptive phrasing, model weights and cache identities are unchanged from beta.3. Version 0.4.0-beta.1 introduced the ten-style DK bank, shared character casting and persisted readings across all 31 Plus languages, opt-in native blending, and retained CT playback during updates. Read the [beta upgrade guide](docs/UPGRADE-0.4.0-beta.1.md). Native expression research remains off; this beta does not claim full acoustic parity or listening certification across every language. Stable 0.3.0 remains available with its original CT F1 bank.
 
 ## Speak with Plus
 

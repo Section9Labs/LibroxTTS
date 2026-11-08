@@ -19,16 +19,52 @@ public enum PocketTTSError: LocalizedError {
 }
 
 /// Serialized native Swift MLX owner. MLX arrays and caches never cross this actor.
-/// GPU generation is foreground/preparation-only. Platform availability does not
-/// imply sustained performance or background-generation qualification.
+/// Foreground and granted background work may use GPU; other background work uses CPU.
+/// Backend changes retire all model and RNG state before creating new operations.
 public actor PocketTTSEngine {
     public static let runtimeIdentity = "pocket-mlx-28770c06-v3:quality4:adaptive:warm12:eos6:fp32"
+    public enum Backend: String, Codable, Sendable { case gpu, cpu }
+    public private(set) var backend: Backend
+    private var randomState: MLXRandom.RandomState?
+    private var randomSeed: UInt64?
     public struct Output: Sendable { public let samples: [Float]; public let sampleRate: Int }
     private let directory: URL
     private var model: PocketTTSModel?
     private var language: String?
-    public init(directory: URL) { self.directory = directory }
-    public func unload() { model = nil; language = nil }
+    public init(directory: URL, backend: Backend = .gpu) {
+        self.directory = directory; self.backend = backend
+    }
+    public func unload() {
+        model = nil; language = nil; randomState = nil
+        Memory.clearCache()
+    }
+    /// Call after cancelling and awaiting an in-flight render. Actor serialization
+    /// also prevents backend replacement while a synchronous frame is evaluating.
+    public func setBackend(_ value: Backend) {
+        guard value != backend else { return }
+        unload()
+        backend = value
+    }
+    /// Reproducible audition seed, isolated from other MLX engines in the process.
+    public func setRandomSeed(_ seed: UInt64) {
+        randomSeed = seed; randomState = nil
+    }
+    private func onBackend<R>(_ body: () throws -> R) rethrows -> R {
+        try Device.withDefaultDevice(backend == .cpu ? .cpu : .gpu) {
+            if randomState == nil {
+                randomState = randomSeed.map(MLXRandom.RandomState.init(seed:)) ?? MLXRandom.RandomState()
+            }
+            return try withRandomState(randomState!) {
+                defer {
+                    // Do not retain unevaluated RNG splits on the previous device.
+                    if Task.isCancelled { randomState = nil }
+                    else { eval(randomState!) }
+                    Memory.clearCache()
+                }
+                return try body()
+            }
+        }
+    }
     public func synthesize(_ text: String, voiceID: String, temperature: Float = 0.3,
                            continueChunks: Bool = true, chunking: PocketTTSChunkingOptions = .init(),
                            role: PocketTTSPassageRole = .narration,
@@ -38,17 +74,20 @@ public actor PocketTTSEngine {
         try PocketTTSSamplingOptions(temperature: temperature, samplerSteps: samplerSteps).validate()
         guard let voice = PocketTTSCatalog.voice(id: voiceID) else { throw PocketTTSError.invalidVoice }
         guard text.unicodeScalars.count <= 16_384 else { throw PocketTTSError.textTooLong }
-        let model = try loadedModel(language: voice.language)
-        model.temp = temperature
-        model.lsd_decode_steps = samplerSteps
-        var samples: [Float] = []
-        try model.render(text: text, voice: voice.name, continuation: continueChunks, chunking: chunking,
-                         role: role, language: voice.language) { chunk in
-            guard samples.count + chunk.count <= 24_000 * 300 else { throw PocketTTSError.textTooLong }
-            samples += chunk
+        try Task.checkCancellation()
+        return try onBackend {
+            let model = try loadedModel(language: voice.language)
+            model.temp = temperature
+            model.lsd_decode_steps = samplerSteps
+            var samples: [Float] = []
+            try model.render(text: text, voice: voice.name, continuation: continueChunks, chunking: chunking,
+                             role: role, language: voice.language) { chunk in
+                guard samples.count + chunk.count <= 24_000 * 300 else { throw PocketTTSError.textTooLong }
+                samples += chunk
+            }
+            guard !samples.isEmpty, samples.allSatisfy({ $0.isFinite }) else { throw PocketTTSError.invalidAudio }
+            return Output(samples: samples, sampleRate: model.sampleRate)
         }
-        guard !samples.isEmpty, samples.allSatisfy({ $0.isFinite }) else { throw PocketTTSError.invalidAudio }
-        return Output(samples: samples, sampleRate: model.sampleRate)
     }
     /// Frame callbacks are synchronous and apply backpressure. The consumer must
     /// discard staged output on errors/cancellation; only success completes a unit.
@@ -63,30 +102,37 @@ public actor PocketTTSEngine {
         try PocketTTSSamplingOptions(temperature: temperature, samplerSteps: samplerSteps).validate()
         guard let voice = PocketTTSCatalog.voice(id: voiceID) else { throw PocketTTSError.invalidVoice }
         guard text.unicodeScalars.count <= 16_384 else { throw PocketTTSError.textTooLong }
-        let model = try loadedModel(language: voice.language)
-        model.temp = temperature
-        model.lsd_decode_steps = samplerSteps
-        var sampleCount = 0
-        try model.render(text: text, voice: voice.name, continuation: continueChunks,
-                         chunking: chunking, role: role, language: voice.language) { chunk in
-            guard sampleCount + chunk.count <= 24_000 * 300 else { throw PocketTTSError.textTooLong }
-            sampleCount += chunk.count
-            try receive(chunk)
+        try Task.checkCancellation()
+        return try onBackend {
+            let model = try loadedModel(language: voice.language)
+            model.temp = temperature
+            model.lsd_decode_steps = samplerSteps
+            var sampleCount = 0
+            try model.render(text: text, voice: voice.name, continuation: continueChunks,
+                             chunking: chunking, role: role, language: voice.language) { chunk in
+                guard sampleCount + chunk.count <= 24_000 * 300 else { throw PocketTTSError.textTooLong }
+                sampleCount += chunk.count
+                try receive(chunk)
+            }
         }
     }
     /// Inspect the same token-aware decisions used by synthesis before generating audio.
     public func previewChunks(_ text: String, voiceID: String,
                               chunking: PocketTTSChunkingOptions = .init(),
                               role: PocketTTSPassageRole = .narration) throws -> [PocketTTSTextChunk] {
-        try chunking.validate()
-        guard let voice = PocketTTSCatalog.voice(id: voiceID) else { throw PocketTTSError.invalidVoice }
-        return try loadedModel(language: voice.language).chunkPlan(text: text, language: voice.language,
-                                                                  role: role, options: chunking)
+        return try onBackend {
+            try chunking.validate()
+            guard let voice = PocketTTSCatalog.voice(id: voiceID) else { throw PocketTTSError.invalidVoice }
+            return try loadedModel(language: voice.language).chunkPlan(text: text, language: voice.language,
+                                                                      role: role, options: chunking)
+        }
     }
 
     private func loadedModel(language requested: String) throws -> PocketTTSModel {
         if language != requested {
             model = nil; language = nil
+            Memory.clearCache()
+            try Task.checkCancellation()
             try PocketTTSCatalog.validate(in: directory, language: requested)
             model = try PocketTTSModel.fromModelDirectory(directory.appendingPathComponent(requested))
             language = requested

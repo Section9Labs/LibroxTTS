@@ -187,7 +187,7 @@ public final class PocketStreamingTransformerLayer: Module {
         let attnOut = self_attn(norm1(x), cache: cache)
         var h = x + applyScale(attnOut, layer_scale_1)
         let hidden = linear1(norm2(h))
-        let ff = linear2(_useExactGELU ? gelu(hidden) : geluApproximate(hidden))
+        let ff = linear2(pocketGELU(hidden, approximate: !_useExactGELU))
         h = h + applyScale(ff, layer_scale_2)
         return h
     }

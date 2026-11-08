@@ -13,8 +13,8 @@ ship an app update. MLX is now a pinned package dependency; existing Basic/Plus
 inference still uses their own renderers.
 
 [Hosted language packs](https://github.com/Section9Labs/LibroxTTS/releases/tag/pocket-tts-mlx-2026-11-07-v2)
-are published as an asset prerelease. Pin SDK `0.4.0-beta.4` separately;
-the asset tag is not an SDK version tag. Beta.4 reuses the existing v2 packs.
+are published as an asset prerelease. Pin SDK `0.4.0-beta.5` separately;
+the asset tag is not an SDK version tag. Beta.5 reuses the existing v2 packs.
 
 ## Voices and languages
 
@@ -34,7 +34,9 @@ into a multilingual model. IDs look like `pocket-alba-en-v1` and
 `pocket-lola-es-v1`. Cross-language voice identity is available through the supplied
 states, but accent and narration quality need listening review. Automatic speaker
 attribution remains limited to the languages supported by Librox's attribution
-layer. Pocket voice genders are unspecified rather than guessed from names.
+layer. Twelve presets now carry verified VCTK gender metadata for automatic casting;
+the remaining presets stay unknown rather than guessed from names. See
+[voice metadata](VOICE-METADATA.md). Saved and manual assignments are preserved.
 
 The unfiltered upstream catalog has 27 voices. We omit Cosette and Jean because
 of their noncommercial recording licenses. Juergen and Rafael are also withheld because
@@ -81,13 +83,18 @@ unit (maximum five minutes), never a whole book. Source input is capped at 16,38
 Unicode scalars; normal pipeline groups default to at most 2,400 scalars (configurable), then the
 model's real language tokenizer chooses sentence-aware generation chunks.
 
-The shared renderer rejects `.background` for Max GPU generation. Beta.4 removes
-the temporary desktop gate and offers Max on supported iPhones, iPads and Apple
-silicon Macs without a model-number or memory-size allowlist. This availability
-policy is not a physical-device performance qualification; TestFlight acceptance
-is pending. The Apple silicon requirement remains.
-Prepared PCM can use the app's existing background playback path. macOS build or
-short-sample success does not establish locked-screen GPU permission on a phone.
+The shared renderer uses CPU for `.background`, GPU for `.foreground`, and GPU
+for `.backgroundGPU` only under a real iOS 26+ continued-processing GPU grant.
+The iOS 18+ minimum remains. Use `NarrationBackgroundGPUGrant` to acquire the
+system grant, wrap GPU work, and cancel/retire work when permission expires.
+Older OS versions and unsupported/denied grants use CPU during legitimate audio
+playback. Neither backend gives an unlimited background execution allowance.
+Max no longer requires chapter preparation before listening. See the complete
+[beta.5 host integration](../../docs/UPGRADE-0.4.0-beta.5.md).
+
+Physical M4 iPad trials generated new English and Spanish PCM with both backends
+while genuine narration played and the app was backgrounded. These short trials
+do not qualify older iPhones, lock-screen transitions or whole-book thermals.
 
 ## Reading behavior
 
