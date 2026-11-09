@@ -347,6 +347,6 @@
     "preserveSavedChoices": true
   },
   "listeningAcceptanceScope": "English Caro/Calm book scene accepted; not a blanket acceptance of all 364 states",
-  "newBookDefaultTests": "Passed new-book preset and all-seven-language manifests, preserving explicit voice/cast/settings; 53 matching test functions passed with 14 opt-in skips",
+  "newBookDefaultTests": "Passed new-book preset and all-seven-language manifests, preserving explicit voice/cast/settings; focused default/style, Max/Pocket and shared-pipeline regression runs passed",
   "defaultNarratorInstall": "Combined base/Caro Calm manifest installation and preparation passed against the verified hosted installation"
 }
