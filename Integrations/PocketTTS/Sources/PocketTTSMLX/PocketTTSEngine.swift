@@ -41,7 +41,10 @@ public actor PocketTTSEngine {
     private let directory: URL
     private var model: PocketTTSModel?
     private var language: String?
-    public init(directory: URL, backend: Backend = .gpu) {
+    /// CPU duty cycle for `.cpu` renders on iOS; nil = unmetered. Default 0.5.
+    public private(set) var cpuBudgetFraction: Double? = PocketCPUWorkBudget.defaultFraction
+    public func setCPUBudgetFraction(_ fraction: Double?) { cpuBudgetFraction = fraction }
+        public init(directory: URL, backend: Backend = .gpu) {
         self.directory = directory; self.backend = backend
     }
     public func unload() {
@@ -75,7 +78,7 @@ public actor PocketTTSEngine {
                 }
                 do {
                     try resources.checkpoint("operation-start")
-                    let result = try body(PocketCPUWorkBudget.backgroundBudget(cpu: backend == .cpu))
+                    let result = try body(PocketCPUWorkBudget.backgroundBudget(cpu: backend == .cpu, fraction: cpuBudgetFraction))
                     try Task.checkCancellation()
                     diagnostics?(resources.snapshot("operation-complete"))
                     return result

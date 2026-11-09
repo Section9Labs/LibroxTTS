@@ -99,6 +99,16 @@ public actor NarrationRenderer {
         #endif
     }
 
+    /// Host-selected CPU budget for Max `.background` renders (design §8):
+    /// nil = unmetered (charging processing task), otherwise a fraction of one
+    /// core (default 0.5, clamped 0.1…0.8). Applies to the loaded and any
+    /// later-loaded Max engine.
+    public func setCPUBudget(fraction: Double?) async {
+        cpuBudgetFraction = fraction
+        await pocket?.setCPUBudgetFraction(fraction)
+    }
+    private var cpuBudgetFraction: Double? = 0.5
+
     public func load(_ selection: NarrationModel, directory: URL,
                      executionContext: ExecutionContext = .background, repositoryID: String? = nil) async throws {
         await acquire(); defer { release() }
@@ -129,6 +139,7 @@ public actor NarrationRenderer {
         if selection == .pocket {
             pocket = PocketTTSEngine(directory: directory, backend: executionContext == .background ? .cpu : .gpu)
             await pocket?.setResourceObserver(maxResourceObserver)
+            await pocket?.setCPUBudgetFraction(cpuBudgetFraction)
             current = selection; currentDirectory = directory; currentRepositoryID = repositoryID
             return
         }
