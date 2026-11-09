@@ -25,7 +25,8 @@ public actor NarrationPipeline {
                      options: PronunciationOptions = .init(), delivery: NarrationDeliveryOptions = .init(expressive: true),
                      lexicon: SpokenTextLexicon = .init(), nativeExpression: Bool = false, repositoryID: String? = nil,
                      pocketChunking: PocketTTSChunkingOptions = .init(),
-                     pocketSampling: PocketTTSSamplingOptions = .init()) async throws -> Plan {
+                     pocketSampling: PocketTTSSamplingOptions = .init(),
+                     pocketDelivery: PocketTTSBookDelivery = .init()) async throws -> Plan {
         try Task.checkCancellation()
         if model == .pocket { try pocketSampling.validate() }
         let delivery = model.resolvedDeliveryOptions(delivery)
@@ -90,6 +91,7 @@ public actor NarrationPipeline {
         }
         if model == .pocket {
             for index in units.indices { units[index].pocketSampling = pocketSampling }
+            units = try pocketDelivery.applying(to: units)
         }
         return Plan(units: units, narratorVoiceID: updatedCast?.narratorVoiceID ?? voiceID,
                     language: language, cast: updatedCast,

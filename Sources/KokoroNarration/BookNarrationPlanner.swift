@@ -21,6 +21,9 @@ public struct BookNarrationUnit: Sendable {
     /// Nil uses the quality-first default of four sampler steps. Persist explicit
     /// device fallbacks with the book/profile and include them in render identity.
     public var pocketSampling: PocketTTSSamplingOptions? = nil
+    /// Optional reference-based delivery. A host may override a complete planned
+    /// unit; include renderIdentity(for:) in cache keys before rendering it.
+    public var pocketDeliveryStyle: PocketTTSDeliveryStyle? = nil
     public var synthesisText: String { spokenText ?? text }
     public var expression: NarrationExpression = .neutral
     /// Present for the opt-in source-context plan. Does not select a render rate.

@@ -163,6 +163,30 @@ public enum NarrationAssets {
         guard isDownloadPublished(model) else { throw CTError.invalidAssets("unavailable model") }
         if model == .compact { try await ModelAssets.download(to: directory, progress: progress); return }
         let pinned = try manifest(model, language: language)
+        try await downloadFiles(pinned, to: directory, progress: progress)
+        try prepare(directory, model: model, language: language)
+        try configureForPlayback(directory)
+    }
+
+    /// Install the optional reference performances beside the base language pack.
+    /// The caller must serialize installation with generation for this directory.
+    public static func downloadPocketDeliveryStyles(to directory: URL, language: String,
+                                                    progress: (@Sendable (Double) -> Void)? = nil) async throws {
+        let pinned = try PocketTTSDeliveryCatalog.manifest(language: language)
+        try await downloadFiles(pinned, to: directory, progress: progress)
+        try preparePocketDeliveryStyles(in: directory, language: language)
+    }
+
+    /// Background URLSession hosts use PocketTTSDeliveryCatalog.manifest and then
+    /// call this after installation. This also applies background-readable protection.
+    public static func preparePocketDeliveryStyles(in directory: URL, language: String) throws {
+        try PocketTTSCatalog.validate(in: directory, language: language)
+        try PocketTTSDeliveryCatalog.validate(in: directory, language: language)
+        try configureForPlayback(directory)
+    }
+
+    private static func downloadFiles(_ pinned: AssetManifest, to directory: URL,
+                                      progress: (@Sendable (Double) -> Void)?) async throws {
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         var downloaded: Int64 = 0
         for file in pinned.files {
@@ -186,8 +210,6 @@ public enum NarrationAssets {
             downloaded += file.size
             progress?(Double(downloaded) / Double(pinned.downloadSize))
         }
-        try prepare(directory, model: model, language: language)
-        try configureForPlayback(directory)
     }
     /// Fast receipt/UI check. Loading separately verifies every pinned hash.
     public static func isPrepared(_ directory: URL, model: NarrationModel, repositoryID: String? = nil, language: String? = nil) -> Bool {

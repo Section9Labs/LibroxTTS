@@ -27,6 +27,9 @@ public enum NarrationModel: String, CaseIterable, Codable, Sendable, Identifiabl
     public var usesTextNativePlanning: Bool { self == .plus || self == .pocket }
     public var supportsCharacterVoices: Bool { self == .compact || self == .kokoroDesktop || self == .plus || self == .pocket }
     public var supportsExpressiveDelivery: Bool { self == .compact || self == .kokoroDesktop }
+    /// Separate from the legacy waveform/prosody delivery toggle. Check the
+    /// delivery catalog for published/installed styles for the selected voice.
+    public var supportsReferenceDeliveryStyles: Bool { self == .pocket }
     public var supportsVoiceBlending: Bool { self == .kokoroDesktop || self == .plus }
     public var supportsPronunciationDialect: Bool { self == .compact || self == .kokoroDesktop }
     /// Unsupported saved controls remain saved by the host, but must not create
@@ -46,7 +49,9 @@ public enum NarrationModel: String, CaseIterable, Codable, Sendable, Identifiabl
     public func renderIdentity(for unit: BookNarrationUnit) -> String {
         self == .pocket ? deliveryIdentity + ":" + (unit.pocketChunking ?? .init()).cacheIdentity
             + ":" + (unit.pocketSampling ?? .init()).cacheIdentity
-            + ":role=" + (unit.role == .dialogue ? "dialogue" : "narration") : self == .plus ? deliveryIdentity + ":context="
+            + ":role=" + (unit.role == .dialogue ? "dialogue" : "narration")
+            + ((unit.pocketDeliveryStyle ?? .original) == .original ? "" : ":delivery=" + unit.pocketDeliveryStyle!.cacheIdentity)
+            : self == .plus ? deliveryIdentity + ":context="
             + (unit.nativeExpression?.cacheIdentity ?? unit.nativeTextContext?.renderCacheKey ?? "none")
             : deliveryProfile.renderIdentity(for: unit)
     }

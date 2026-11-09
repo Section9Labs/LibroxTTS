@@ -171,7 +171,8 @@ public actor NarrationRenderer {
             do {
                 return try await pocket.synthesize(unit.synthesisText, voiceID: unit.voiceID,
                     temperature: sampling.temperature, chunking: unit.pocketChunking ?? .init(),
-                    role: unit.role == .dialogue ? .dialogue : .narration, samplerSteps: sampling.samplerSteps).samples
+                    role: unit.role == .dialogue ? .dialogue : .narration, samplerSteps: sampling.samplerSteps,
+                    deliveryStyle: unit.pocketDeliveryStyle ?? .original).samples
             } catch let error as PocketTTSResourceError {
                 try Task.checkCancellation()
                 switch error {

@@ -6,6 +6,11 @@ It uses the latest pinned Kyutai reference, ported to **native Swift MLX**, with
 local 24 kHz mono PCM output. Python is used only for preparation and validation.
 Basic and Plus retain their existing model IDs and voices.
 
+The optional [reference-based delivery integration](../../docs/MAX-DELIVERY-STYLES.md)
+adds per-book narrator and per-character style routing. Its emotional voice
+exports are still pending authorized model access and listening validation;
+no emotional style downloads are currently advertised.
+
 The SDK registers model identity, downloads, language/voice selection, text-native
 planning, spoken dictionary readings, source ranges, persistent character casts,
 rendering and prepared-audio identities. It does not change Librox app defaults or

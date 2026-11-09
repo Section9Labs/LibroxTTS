@@ -1,0 +1,28 @@
+{
+  "date": "2026-11-08",
+  "baseSDK": "0.4.0-beta.6",
+  "baseCommit": "d81a9a4cb1b6f229f596bc3a49165530a54c34ed",
+  "sourceRepository": "https://github.com/OwenTyme/voice-zero",
+  "sourceCommit": "490cfbee850a6d409076f477c766f567000a79b6",
+  "verifiedReferenceFiles": 52,
+  "referenceVerification": "Pinned source Git blob IDs and recorded SHA-256 hashes",
+  "voices": [
+    "bill_boerst",
+    "caro_davy",
+    "peter_yearsley",
+    "stuart_bell"
+  ],
+  "stylesPerVoice": 13,
+  "macOSBuild": "passed",
+  "iOSRuntimeBuild": "passed",
+  "iOSSDKBuild": "passed",
+  "regressionTests": "38 test functions passed; 14 opt-in runtime/fixture tests skipped in that run",
+  "realAssetPipelineTests": "2 passed with the existing shipped Original states; includes buffered/streaming sampling parity",
+  "exportedEmotionalStates": 0,
+  "publishedEmotionalStates": 0,
+  "emotionalNarrationListeningAccepted": false,
+  "physicalDeviceStyleValidation": false,
+  "blocker": "Kyutai cloning-enabled checkpoint requires authenticated authorized access. Exporter refused preset-only fallback.",
+  "scope": "SDK routing, identity, optional asset installation, export/audition tooling; app integration and emotional asset release remain outstanding.",
+  "focusedStyleTests": "4 passed after final cache-identity and real-state test additions; emotional real-state test skipped pending export"
+}

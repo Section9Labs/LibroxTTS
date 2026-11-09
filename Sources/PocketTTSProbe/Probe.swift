@@ -16,6 +16,7 @@ import MLX
         let seed: UInt64
         let chunking: PocketTTSChunkingOptions
         let role: PocketTTSPassageRole
+        let deliveryStyle: PocketTTSDeliveryStyle?
     }
     static func main() async {
         do { try await run() }
@@ -37,12 +38,13 @@ import MLX
             let started = Date()
             let audio = try await engine.synthesize(trial.text, voiceID: trial.voiceID,
                 temperature: trial.temperature, chunking: trial.chunking, role: trial.role,
-                samplerSteps: trial.samplerSteps)
+                samplerSteps: trial.samplerSteps, deliveryStyle: trial.deliveryStyle ?? .original)
             let elapsed = Date().timeIntervalSince(started)
             try write(audio, to: trial.output)
             let row: [String: Any] = ["samples": audio.samples.count, "sampleRate": audio.sampleRate,
                 "renderSeconds": elapsed, "peak": audio.samples.map { abs($0) }.max() ?? 0,
                 "runtime": PocketTTSEngine.runtimeIdentity,
+                "deliveryStyle": (trial.deliveryStyle ?? .original).rawValue,
                 "chunks": chunks.map { ["text": $0.text, "tokens": $0.tokenCount,
                     "boundaryAfter": $0.boundaryAfter.rawValue, "startsNewPassage": $0.startsNewPassage] as [String: Any] }]
             print(String(decoding: try JSONSerialization.data(withJSONObject: row, options: [.sortedKeys]), as: UTF8.self))
