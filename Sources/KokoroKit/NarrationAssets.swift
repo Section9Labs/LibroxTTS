@@ -177,6 +177,24 @@ public enum NarrationAssets {
         try preparePocketDeliveryStyles(in: directory, language: language)
     }
 
+    public static func downloadPocketDeliveryStyle(_ style: PocketTTSDeliveryStyle, voiceID: String,
+                                                   to directory: URL,
+                                                   progress: (@Sendable (Double) -> Void)? = nil) async throws {
+        let pinned = try PocketTTSDeliveryCatalog.manifest(voiceID: voiceID, style: style)
+        try await downloadFiles(pinned, to: directory, progress: progress)
+        try preparePocketDeliveryStyle(style, voiceID: voiceID, in: directory)
+    }
+
+    public static func preparePocketDeliveryStyle(_ style: PocketTTSDeliveryStyle, voiceID: String,
+                                                  in directory: URL) throws {
+        guard let voice = PocketTTSCatalog.voice(id: voiceID) else {
+            throw PocketTTSDeliveryCatalog.DeliveryError.unsupportedVoice
+        }
+        try PocketTTSCatalog.validate(in: directory, language: voice.language)
+        try validate(directory, manifest: PocketTTSDeliveryCatalog.manifest(voiceID: voiceID, style: style))
+        try configureForPlayback(directory)
+    }
+
     /// Background URLSession hosts use PocketTTSDeliveryCatalog.manifest and then
     /// call this after installation. This also applies background-readable protection.
     public static func preparePocketDeliveryStyles(in directory: URL, language: String) throws {

@@ -1,9 +1,10 @@
 # Max reference-based delivery for audiobooks
 
-Status: SDK implementation candidate based on 0.4.0-beta.6. Emotional assets are
-not exported, published or listening-qualified yet. No app or SDK release has
-been made for this feature. Until pinned export manifests are bundled, the
-published style picker returns only Original.
+The 0.4.0-beta.7 candidate adds 364 reference-based preview performances:
+13 styles for four speakers, encoded independently for each of seven languages.
+Original remains the default. Preview styles have not received human narration
+acceptance and must not be labeled recommended or guaranteed to convey an emotion.
+Use `PocketTTSDeliveryStyle.isPreview` to label them in the app.
 
 ## Reading behavior
 
@@ -91,7 +92,11 @@ cannot be copied into the Spanish pack. Emotion references are currently English
 cross-language style retention and pronunciation require independent auditions.
 
 `PocketTTSDeliveryCatalog.manifest(language:)` exposes a separate pinned optional
-manifest. For foreground installation use
+manifest. For a single performance use
+`PocketTTSDeliveryCatalog.manifest(voiceID:style:)` and
+`NarrationAssets.downloadPocketDeliveryStyle(_:voiceID:to:)`. This includes its
+credits and licenses; use the manifest's download size in the UI. To download
+all styles in a language use
 `NarrationAssets.downloadPocketDeliveryStyles(to:language:)`. Background
 URLSession hosts download that manifest's files and call
 `NarrationAssets.preparePocketDeliveryStyles(in:language:)`. Use the same root as
@@ -107,11 +112,12 @@ the shipped pack before exporting. It does not publish anything. The SDK only
 loads exported states; it does not embed Python or require an audio encoder on
 the phone.
 
-After listening validation, publish the immutable optional assets and bundle
+For preview distribution, publish the immutable optional assets and bundle
 their `delivery-LANGUAGE.json` manifests in `Sources/KokoroCatalog/PocketTTS/`.
 Local audition builds may temporarily bundle candidate manifests and install
 candidate states without a release. Do not distribute an SDK advertising those
-manifests before the hosted files are available and the listening gate is met.
+manifests before the hosted files are available. Preview distribution is for
+listening evaluation; promotion to a recommended narrator requires human review.
 For a revised state, change the delivery catalog identity and release tag so
 prepared audio from old states cannot be reused.
 

@@ -7,9 +7,11 @@ import argparse,hashlib,json,pathlib,subprocess,tempfile
 def gh(*args):
  return subprocess.check_output(['gh',*args],text=True)
 def main():
- p=argparse.ArgumentParser();p.add_argument('--assets',type=pathlib.Path,required=True);p.add_argument('--manifests',type=pathlib.Path,required=True);p.add_argument('--commit',required=True);p.add_argument('--notes',type=pathlib.Path,required=True);p.add_argument('--publish',action='store_true');a=p.parse_args()
- repo='Section9Labs/LibroxTTS';tag='pocket-tts-mlx-2026-11-07-v2'
- files=[f for path in sorted(a.manifests.glob('*.json')) for f in json.loads(path.read_text())['files']]
+ p=argparse.ArgumentParser();p.add_argument('--assets',type=pathlib.Path,required=True);p.add_argument('--manifests',type=pathlib.Path,required=True);p.add_argument('--commit',required=True);p.add_argument('--notes',type=pathlib.Path,required=True);p.add_argument('--publish',action='store_true');p.add_argument('--tag',default='pocket-tts-mlx-2026-11-07-v2');p.add_argument('--manifest-pattern',default='*.json');p.add_argument('--title',default='Pocket TTS native MLX — seven language packs');a=p.parse_args()
+ repo='Section9Labs/LibroxTTS';tag=a.tag
+ manifests=[json.loads(path.read_text()) for path in sorted(a.manifests.glob(a.manifest_pattern))]
+ if not manifests or any(m['revision']!=tag for m in manifests):raise ValueError('Missing manifests or release identity mismatch')
+ files=[f for manifest in manifests for f in manifest['files']]
  if len(files)!=len({f['path'] for f in files}):raise ValueError('Duplicate asset paths')
  for f in files:
   source=a.assets/f['path']
@@ -19,7 +21,7 @@ def main():
   links=[]
   for f in files:
    link=pathlib.Path(tmp)/f['path'].replace('/','--');link.symlink_to((a.assets/f['path']).resolve());links.append(str(link))
-  gh('release','create',tag,'--repo',repo,'--target',a.commit,'--draft','--prerelease','--latest=false','--title','Pocket TTS native MLX — seven language packs','--notes-file',str(a.notes))
+  gh('release','create',tag,'--repo',repo,'--target',a.commit,'--draft','--prerelease','--latest=false','--title',a.title,'--notes-file',str(a.notes))
   try:
    gh('release','upload',tag,*links,'--repo',repo)
    api_url=json.loads(gh('release','view',tag,'--repo',repo,'--json','apiUrl'))['apiUrl']

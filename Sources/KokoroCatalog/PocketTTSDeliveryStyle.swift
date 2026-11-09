@@ -8,6 +8,8 @@ public enum PocketTTSDeliveryStyle: String, CaseIterable, Codable, Hashable, Sen
     case anger, confused, enthused, excited, frustrated, shout, tired
 
     public var name: String { rawValue.capitalized }
+    /// New reference performances need the listener's own narration audition.
+    public var isPreview: Bool { self != .original }
     public var cacheIdentity: String {
         self == .original ? "original" : PocketTTSDeliveryCatalog.identity + ":" + rawValue
     }
@@ -49,6 +51,21 @@ public enum PocketTTSDeliveryCatalog {
         let manifest = try JSONDecoder().decode(AssetManifest.self, from: Data(contentsOf: url))
         guard manifest.revision == identity else { throw DeliveryError.missingOrInvalidAsset }
         return manifest
+    }
+
+    /// A single performance plus provenance, avoiding a whole-language download.
+    public static func manifest(voiceID: String, style: PocketTTSDeliveryStyle) throws -> AssetManifest {
+        let name = try stateName(voiceID: voiceID, style: style)
+        guard style != .original else { return try PocketTTSCatalog.manifest(language: PocketTTSCatalog.voice(id: voiceID)!.language) }
+        let voice = PocketTTSCatalog.voice(id: voiceID)!
+        let full = try manifest(language: voice.language)
+        let path = "\(voice.language)/embeddings/\(name).safetensors"
+        guard full.installedFiles.contains(where: { $0.path == path }) else {
+            throw DeliveryError.missingOrInvalidAsset
+        }
+        let selected: (AssetManifest.File) -> Bool = { $0.path == path || !$0.path.contains("/embeddings/") }
+        return AssetManifest(repository: full.repository, revision: full.revision,
+                             files: full.files.filter(selected), installedFiles: full.installedFiles.filter(selected))
     }
 
     /// Suitable for a download picker. Availability is derived from actual exports,

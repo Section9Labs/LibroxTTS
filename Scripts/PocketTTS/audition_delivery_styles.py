@@ -23,6 +23,7 @@ def main():
     parser.add_argument('--styles', nargs='+', choices=['original'] + STYLES,
                         default=['original', 'neutral', 'calm'])
     parser.add_argument('--languages', nargs='+', choices=TEXTS, default=['en'])
+    parser.add_argument('--passages', nargs='+', choices=TEXTS['en'], default=list(TEXTS['en']))
     parser.add_argument('--temperature', type=float, default=0.3)
     parser.add_argument('--steps', type=int, choices=range(1, 9), default=4)
     args = parser.parse_args()
@@ -37,6 +38,8 @@ def main():
                 state = args.assets / language / 'embeddings' / f'{state_name}.safetensors'
                 state_hash = hashlib.sha256(state.read_bytes()).hexdigest()
                 for passage, text in TEXTS[language].items():
+                    if passage not in args.passages:
+                        continue
                     name = f'{language}-{voice}-{style}-{passage}'
                     wav = args.output / (name + '.wav')
                     request = dict(assets=str(args.assets.resolve()), output=str(wav.resolve()),

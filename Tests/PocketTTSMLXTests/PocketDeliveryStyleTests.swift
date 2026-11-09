@@ -76,9 +76,42 @@ import Synchronization
                 #expect(try PocketTTSDeliveryCatalog.manifest(language: language).installedFiles.contains {
                     $0.path == "\(language)/embeddings/\(state).safetensors"
                 })
+                let single = try PocketTTSDeliveryCatalog.manifest(voiceID: voiceID, style: style)
+                #expect(single.files.filter { $0.path.contains("/embeddings/") }.count == 1)
+                #expect(single.files.contains { $0.path.hasSuffix("DELIVERY-CREDITS.json") })
+                #expect(style.isPreview)
             }
         }
     }
+}
+
+@Test(.enabled(if: ProcessInfo.processInfo.environment["POCKET_DELIVERY_SMOKE_OUTPUT"] != nil))
+func pocketDeliveryAllExportedStatesRender() async throws {
+    PocketTestMetal.configure()
+    let env = ProcessInfo.processInfo.environment
+    let engine = PocketTTSEngine(directory: URL(fileURLWithPath: env["POCKET_DELIVERY_ASSETS"]!))
+    let texts = ["en": "She opened the book.", "es": "Ella abrió el libro.",
+                 "fr": "Elle ouvrit le livre.", "de": "Sie öffnete das Buch.",
+                 "it": "Lei aprì il libro.", "pt": "Ela abriu o livro.", "nl": "Ze opende het boek."]
+    var rows: [[String: String]] = []
+    let destination = URL(fileURLWithPath: env["POCKET_DELIVERY_SMOKE_OUTPUT"]!)
+    for language in PocketTTSCatalog.languages {
+        for voice in PocketTTSDeliveryCatalog.referenceVoiceNames {
+            for style in PocketTTSDeliveryStyle.allCases where style != .original {
+                await engine.setRandomSeed(42)
+                let audio = try await engine.synthesize(texts[language]!, voiceID: "pocket-\(voice)-\(language)-v1",
+                    deliveryStyle: style)
+                #expect(!audio.samples.isEmpty)
+                #expect(audio.samples.allSatisfy { $0.isFinite })
+                #expect(audio.samples.count < 24_000 * 30)
+                rows.append(["language": language, "voice": voice, "style": style.rawValue,
+                             "samples": String(audio.samples.count)])
+                try JSONSerialization.data(withJSONObject: rows, options: [.prettyPrinted, .sortedKeys]).write(to: destination)
+            }
+        }
+    }
+    #expect(rows.count == 364)
+    await engine.unload()
 }
 
 @Test func pocketMissingStyleFailsBeforeGPUAllocationOnBothEntryPoints() async throws {

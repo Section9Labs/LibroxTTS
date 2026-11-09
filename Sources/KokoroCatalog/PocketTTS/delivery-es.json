@@ -1,0 +1,692 @@
+{
+  "repository": "Section9Labs/LibroxTTS",
+  "revision": "pocket-delivery-voicezero-490cfbee-v1",
+  "files": [
+    {
+      "path": "es/embeddings/bill_boerst__neutral.safetensors",
+      "size": 3983152,
+      "sha256": "9916845bd92418a25a5a10b60d0daac0a020bc2cbde68c37ceb675961b73991c",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--bill_boerst__neutral.safetensors"
+    },
+    {
+      "path": "es/embeddings/bill_boerst__calm.safetensors",
+      "size": 4572976,
+      "sha256": "e41b10456443cbda75ab19e14028fceaceeb68aeabafaa30e6b52f0e0b6971bf",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--bill_boerst__calm.safetensors"
+    },
+    {
+      "path": "es/embeddings/bill_boerst__happy.safetensors",
+      "size": 4671280,
+      "sha256": "18b470e36d54b0e4c2c547642482619c6312ef31d90e2d23c86b02e9bbd77584",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--bill_boerst__happy.safetensors"
+    },
+    {
+      "path": "es/embeddings/bill_boerst__sad.safetensors",
+      "size": 4327216,
+      "sha256": "cdcd7c48747b04e1bcf40b718a2d05fc30a5ce5a31522f2c3f41e3449c4f1181",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--bill_boerst__sad.safetensors"
+    },
+    {
+      "path": "es/embeddings/bill_boerst__worried.safetensors",
+      "size": 4671280,
+      "sha256": "d13b15344a538223d504edbc3064598e8e1388cdb747bf2cc29032507463b58d",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--bill_boerst__worried.safetensors"
+    },
+    {
+      "path": "es/embeddings/bill_boerst__surprised.safetensors",
+      "size": 3540784,
+      "sha256": "d39a9a0fee01971d6a3bc925bcf8f7957218796ee6d5c22104a0f55b2e3ebdd3",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--bill_boerst__surprised.safetensors"
+    },
+    {
+      "path": "es/embeddings/bill_boerst__anger.safetensors",
+      "size": 4425520,
+      "sha256": "1f4a087c0ab8a1bb9a717f4d0662eb9eefc6ede6c607f1a10ca9390990bac885",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--bill_boerst__anger.safetensors"
+    },
+    {
+      "path": "es/embeddings/bill_boerst__confused.safetensors",
+      "size": 3688240,
+      "sha256": "2cdb6dc7d5ba2992d3d242254574421f0e3dd08009eda168575200c0431841e5",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--bill_boerst__confused.safetensors"
+    },
+    {
+      "path": "es/embeddings/bill_boerst__enthused.safetensors",
+      "size": 3639088,
+      "sha256": "e501e1baea9da07b195943ccea24fbe2ed5dc22496a8cf86abc88d77980d8866",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--bill_boerst__enthused.safetensors"
+    },
+    {
+      "path": "es/embeddings/bill_boerst__excited.safetensors",
+      "size": 4867888,
+      "sha256": "06aa726f9cf60b862dbd3dcea29348f74de5073fe1000073d1fac9c9dd6c6cda",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--bill_boerst__excited.safetensors"
+    },
+    {
+      "path": "es/embeddings/bill_boerst__frustrated.safetensors",
+      "size": 3589936,
+      "sha256": "4aec58009e530ca13462410d18f7357ed5a172ce6bfce9908ce1cbbf03cc453e",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--bill_boerst__frustrated.safetensors"
+    },
+    {
+      "path": "es/embeddings/bill_boerst__shout.safetensors",
+      "size": 4474672,
+      "sha256": "bde390e92f7ca1f45e3c05e55a6ba7d724b38ecac5404967354cb977b5e63a94",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--bill_boerst__shout.safetensors"
+    },
+    {
+      "path": "es/embeddings/bill_boerst__tired.safetensors",
+      "size": 4720432,
+      "sha256": "ce9854c12548e8e06ce68f642fb503eeceba4c76a878ed5906578add72b9dcd3",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--bill_boerst__tired.safetensors"
+    },
+    {
+      "path": "es/embeddings/caro_davy__neutral.safetensors",
+      "size": 3983152,
+      "sha256": "1980a278b1d7e003ab0542055a9e3e764a6f80b7ac8990b0e0e99d79947ca4fd",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--caro_davy__neutral.safetensors"
+    },
+    {
+      "path": "es/embeddings/caro_davy__calm.safetensors",
+      "size": 5162808,
+      "sha256": "89a09dd108f2e3858f5e028008cfa2fa4e94bcdfec386b15bfe8ad85c3a3e874",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--caro_davy__calm.safetensors"
+    },
+    {
+      "path": "es/embeddings/caro_davy__happy.safetensors",
+      "size": 4572976,
+      "sha256": "c45b4741998e8dd9006c41f5aba6368edbbc2ea0bf6301e27868f2ba4bcbd555",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--caro_davy__happy.safetensors"
+    },
+    {
+      "path": "es/embeddings/caro_davy__sad.safetensors",
+      "size": 5064504,
+      "sha256": "e013702300f4eea126cca3b88a7462ec19870fe194b7d9cc41cdcc2c40597097",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--caro_davy__sad.safetensors"
+    },
+    {
+      "path": "es/embeddings/caro_davy__worried.safetensors",
+      "size": 4966200,
+      "sha256": "543a2ae52ae96e0f75bebd39a91a6455ac41c47cb05e52dbc62dfc168a38eebb",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--caro_davy__worried.safetensors"
+    },
+    {
+      "path": "es/embeddings/caro_davy__surprised.safetensors",
+      "size": 4671280,
+      "sha256": "b6c2bc6709c7322eff9a2a430a90a7c699bba1b2c4be9abed340b013e8ba7f4f",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--caro_davy__surprised.safetensors"
+    },
+    {
+      "path": "es/embeddings/caro_davy__anger.safetensors",
+      "size": 5015352,
+      "sha256": "99828bb2e908f7491c8df0740d3d6793cd3bb50fdeb93f0e7bc725d3ae7790e5",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--caro_davy__anger.safetensors"
+    },
+    {
+      "path": "es/embeddings/caro_davy__confused.safetensors",
+      "size": 4671280,
+      "sha256": "f0350f9f5fbc0fd98a922c0797e5845e3b83ef94be40d51c86bb67570c943d12",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--caro_davy__confused.safetensors"
+    },
+    {
+      "path": "es/embeddings/caro_davy__enthused.safetensors",
+      "size": 5015352,
+      "sha256": "22863b4be03f302739ada6ea8bfb10155912d860b0a438654259319677b05fef",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--caro_davy__enthused.safetensors"
+    },
+    {
+      "path": "es/embeddings/caro_davy__excited.safetensors",
+      "size": 4867888,
+      "sha256": "db5ca17067adc4fe8243fdeccd61972b505be49c8f7c4416214fe5dc53dd6fd5",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--caro_davy__excited.safetensors"
+    },
+    {
+      "path": "es/embeddings/caro_davy__frustrated.safetensors",
+      "size": 5211960,
+      "sha256": "2b19f6c724dae1867860bfdb49fa66a5d059830ccba97b8f0d21eae72e48d664",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--caro_davy__frustrated.safetensors"
+    },
+    {
+      "path": "es/embeddings/caro_davy__shout.safetensors",
+      "size": 4769584,
+      "sha256": "2b0117f0edab9d6daf51f5135849ea45f0eb099cfe5c42ed984fe23912780699",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--caro_davy__shout.safetensors"
+    },
+    {
+      "path": "es/embeddings/caro_davy__tired.safetensors",
+      "size": 5900088,
+      "sha256": "0dbdad655b3b9bf1e08309784162524252a718ef6e9d47232ccd15b5d4464ce6",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--caro_davy__tired.safetensors"
+    },
+    {
+      "path": "es/embeddings/peter_yearsley__neutral.safetensors",
+      "size": 4523824,
+      "sha256": "baf01359b08a6b83d67540c5b804209be2b0399a1ef0f83e188a962145bb4083",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--peter_yearsley__neutral.safetensors"
+    },
+    {
+      "path": "es/embeddings/peter_yearsley__calm.safetensors",
+      "size": 4720432,
+      "sha256": "edadc64ebcaa0c99ac5f0014df9372a1ff84f770d3baef41f746b9527683a98c",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--peter_yearsley__calm.safetensors"
+    },
+    {
+      "path": "es/embeddings/peter_yearsley__happy.safetensors",
+      "size": 3786544,
+      "sha256": "d5b724330a52907c6354d6cd75862d46553379d92e8e82751ac2426c4729083e",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--peter_yearsley__happy.safetensors"
+    },
+    {
+      "path": "es/embeddings/peter_yearsley__sad.safetensors",
+      "size": 5064504,
+      "sha256": "f16650bec65a4c2510847f4fe29b06a0d0241fd0c9e77d21250902ac5af0d28b",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--peter_yearsley__sad.safetensors"
+    },
+    {
+      "path": "es/embeddings/peter_yearsley__worried.safetensors",
+      "size": 5211960,
+      "sha256": "32b95943ac4c2f95cc7e9a7952dd4facea4f2a855370c0919035d0f35cc708a5",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--peter_yearsley__worried.safetensors"
+    },
+    {
+      "path": "es/embeddings/peter_yearsley__surprised.safetensors",
+      "size": 4228912,
+      "sha256": "7c276e52e4ffaca6c021ce26ede974d962da481c4ebd17bc695da93746987013",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--peter_yearsley__surprised.safetensors"
+    },
+    {
+      "path": "es/embeddings/peter_yearsley__anger.safetensors",
+      "size": 4966200,
+      "sha256": "bfa84da4b5b4da0c15def36ab5bcec183bbfabf62af05208b1f5aef87a32d15c",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--peter_yearsley__anger.safetensors"
+    },
+    {
+      "path": "es/embeddings/peter_yearsley__confused.safetensors",
+      "size": 4376368,
+      "sha256": "470a7e773d9bcfca167d83cb1a21a12c171017b009652c28a949d324aea2260a",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--peter_yearsley__confused.safetensors"
+    },
+    {
+      "path": "es/embeddings/peter_yearsley__enthused.safetensors",
+      "size": 4622128,
+      "sha256": "e835358874de3b15102d839d5c30db4aa9a10b1b07316de8b014ecc3c0dc9111",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--peter_yearsley__enthused.safetensors"
+    },
+    {
+      "path": "es/embeddings/peter_yearsley__excited.safetensors",
+      "size": 4720432,
+      "sha256": "7237af20b3ff7d6989468e22c4a489ce3fd877955f7fd787d6fea85de539e566",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--peter_yearsley__excited.safetensors"
+    },
+    {
+      "path": "es/embeddings/peter_yearsley__frustrated.safetensors",
+      "size": 4867888,
+      "sha256": "8e2504acc2750e7dc3efede69d816a4b1bf49d4908851ec70f028a5efe669f36",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--peter_yearsley__frustrated.safetensors"
+    },
+    {
+      "path": "es/embeddings/peter_yearsley__shout.safetensors",
+      "size": 4769584,
+      "sha256": "30592e24f4a5aa4482227ef1348f51288acde39ba1c4501bfe439849e01c5cd0",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--peter_yearsley__shout.safetensors"
+    },
+    {
+      "path": "es/embeddings/peter_yearsley__tired.safetensors",
+      "size": 5211960,
+      "sha256": "34db7fd30327e0c89213988a219b64dc114e0916700e302e2ebf5a081e5479d4",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--peter_yearsley__tired.safetensors"
+    },
+    {
+      "path": "es/embeddings/stuart_bell__neutral.safetensors",
+      "size": 5900088,
+      "sha256": "feeba09199499a14b84261ae560f980be7c234ca8212a583a2cbafc75073fc05",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--stuart_bell__neutral.safetensors"
+    },
+    {
+      "path": "es/embeddings/stuart_bell__calm.safetensors",
+      "size": 5654328,
+      "sha256": "aaa4c932b9027fb469967c07daa860192e1c8c9f7296670b27f3e00449c411f6",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--stuart_bell__calm.safetensors"
+    },
+    {
+      "path": "es/embeddings/stuart_bell__happy.safetensors",
+      "size": 5703480,
+      "sha256": "a26361931fdd754132d90987c0aeb63f7bf8000791f46f8c84fa32c2d9e9d8b6",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--stuart_bell__happy.safetensors"
+    },
+    {
+      "path": "es/embeddings/stuart_bell__sad.safetensors",
+      "size": 5506872,
+      "sha256": "8c1b577e65cbf2a79c283a1e2208569cef2217bdfd26d485aaa6409353f3a2ac",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--stuart_bell__sad.safetensors"
+    },
+    {
+      "path": "es/embeddings/stuart_bell__worried.safetensors",
+      "size": 5556024,
+      "sha256": "17164917ef0a4e6697be0fc05394f23bf5bdccb601474967ddf5fae83a7198c1",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--stuart_bell__worried.safetensors"
+    },
+    {
+      "path": "es/embeddings/stuart_bell__surprised.safetensors",
+      "size": 5162808,
+      "sha256": "72f62d652a1e9983b57fa89f86a3d0dde004ae1468facdfae1625791937ab6b0",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--stuart_bell__surprised.safetensors"
+    },
+    {
+      "path": "es/embeddings/stuart_bell__anger.safetensors",
+      "size": 5310264,
+      "sha256": "4d54c78c54b27b787b5ef28728dc6901cfae799c31a8cad688d5b8a96aa28877",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--stuart_bell__anger.safetensors"
+    },
+    {
+      "path": "es/embeddings/stuart_bell__confused.safetensors",
+      "size": 5457720,
+      "sha256": "6de802d884d7fea9697e5448ce435caf54550bf83358ff5a0cc7f1c74dba22ed",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--stuart_bell__confused.safetensors"
+    },
+    {
+      "path": "es/embeddings/stuart_bell__enthused.safetensors",
+      "size": 5703480,
+      "sha256": "0d704cabeef4f15e61537673ca07bac6998a1532d4e90c6bef3c6e173ecb0069",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--stuart_bell__enthused.safetensors"
+    },
+    {
+      "path": "es/embeddings/stuart_bell__excited.safetensors",
+      "size": 5703480,
+      "sha256": "0bf8abcd2a7536e03c78b40d986c41638a1845fa0c2e00470df1b1028cf54c24",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--stuart_bell__excited.safetensors"
+    },
+    {
+      "path": "es/embeddings/stuart_bell__frustrated.safetensors",
+      "size": 5900088,
+      "sha256": "654beb6d89afb4054505c73e114b1dcd06f22579cc1bc2b349d101e64f8741a8",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--stuart_bell__frustrated.safetensors"
+    },
+    {
+      "path": "es/embeddings/stuart_bell__shout.safetensors",
+      "size": 5015352,
+      "sha256": "ba5b21e8abffdb8597cf4268e3bfeac4028671cf2babf405cdf9f35ee28aabbd",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--stuart_bell__shout.safetensors"
+    },
+    {
+      "path": "es/embeddings/stuart_bell__tired.safetensors",
+      "size": 5801784,
+      "sha256": "60a2ddccb1c9720a6066cc8826f80fd0fb2a2158c3f9b48c6b9d084fc5bff104",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--stuart_bell__tired.safetensors"
+    },
+    {
+      "path": "es/DELIVERY-CREDITS.json",
+      "size": 45550,
+      "sha256": "2a7ffe2abeaa452b27185f50612137aeb0eef3bbd7729d1e289672fffe06672d",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--DELIVERY-CREDITS.json"
+    },
+    {
+      "path": "es/DELIVERY-SOURCE-README.md",
+      "size": 6672,
+      "sha256": "9b5d1a9f485f00a6d12479d8fb929da176547b11614c096bed566722c17e511b",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--DELIVERY-SOURCE-README.md"
+    },
+    {
+      "path": "es/DELIVERY-SOURCE-voices-README.md",
+      "size": 31301,
+      "sha256": "5dddbfa4da35e135848009487c2e2f173d08040fe9397b4c07e17604499ad517",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--DELIVERY-SOURCE-voices-README.md"
+    },
+    {
+      "path": "es/DELIVERY-SOURCE-voices-emotion-README.md",
+      "size": 3224,
+      "sha256": "6187017b594b59a5eadc8c8197191dec236677853ddf459a365571bed24ca2cc",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--DELIVERY-SOURCE-voices-emotion-README.md"
+    },
+    {
+      "path": "es/DELIVERY-SOURCE-LICENSE.md",
+      "size": 473,
+      "sha256": "c6c81cd9ab9c5270859579c0c511363a34b3c11652de662576e0ff4319191a47",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--DELIVERY-SOURCE-LICENSE.md"
+    }
+  ],
+  "installedFiles": [
+    {
+      "path": "es/embeddings/bill_boerst__neutral.safetensors",
+      "size": 3983152,
+      "sha256": "9916845bd92418a25a5a10b60d0daac0a020bc2cbde68c37ceb675961b73991c",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--bill_boerst__neutral.safetensors"
+    },
+    {
+      "path": "es/embeddings/bill_boerst__calm.safetensors",
+      "size": 4572976,
+      "sha256": "e41b10456443cbda75ab19e14028fceaceeb68aeabafaa30e6b52f0e0b6971bf",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--bill_boerst__calm.safetensors"
+    },
+    {
+      "path": "es/embeddings/bill_boerst__happy.safetensors",
+      "size": 4671280,
+      "sha256": "18b470e36d54b0e4c2c547642482619c6312ef31d90e2d23c86b02e9bbd77584",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--bill_boerst__happy.safetensors"
+    },
+    {
+      "path": "es/embeddings/bill_boerst__sad.safetensors",
+      "size": 4327216,
+      "sha256": "cdcd7c48747b04e1bcf40b718a2d05fc30a5ce5a31522f2c3f41e3449c4f1181",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--bill_boerst__sad.safetensors"
+    },
+    {
+      "path": "es/embeddings/bill_boerst__worried.safetensors",
+      "size": 4671280,
+      "sha256": "d13b15344a538223d504edbc3064598e8e1388cdb747bf2cc29032507463b58d",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--bill_boerst__worried.safetensors"
+    },
+    {
+      "path": "es/embeddings/bill_boerst__surprised.safetensors",
+      "size": 3540784,
+      "sha256": "d39a9a0fee01971d6a3bc925bcf8f7957218796ee6d5c22104a0f55b2e3ebdd3",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--bill_boerst__surprised.safetensors"
+    },
+    {
+      "path": "es/embeddings/bill_boerst__anger.safetensors",
+      "size": 4425520,
+      "sha256": "1f4a087c0ab8a1bb9a717f4d0662eb9eefc6ede6c607f1a10ca9390990bac885",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--bill_boerst__anger.safetensors"
+    },
+    {
+      "path": "es/embeddings/bill_boerst__confused.safetensors",
+      "size": 3688240,
+      "sha256": "2cdb6dc7d5ba2992d3d242254574421f0e3dd08009eda168575200c0431841e5",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--bill_boerst__confused.safetensors"
+    },
+    {
+      "path": "es/embeddings/bill_boerst__enthused.safetensors",
+      "size": 3639088,
+      "sha256": "e501e1baea9da07b195943ccea24fbe2ed5dc22496a8cf86abc88d77980d8866",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--bill_boerst__enthused.safetensors"
+    },
+    {
+      "path": "es/embeddings/bill_boerst__excited.safetensors",
+      "size": 4867888,
+      "sha256": "06aa726f9cf60b862dbd3dcea29348f74de5073fe1000073d1fac9c9dd6c6cda",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--bill_boerst__excited.safetensors"
+    },
+    {
+      "path": "es/embeddings/bill_boerst__frustrated.safetensors",
+      "size": 3589936,
+      "sha256": "4aec58009e530ca13462410d18f7357ed5a172ce6bfce9908ce1cbbf03cc453e",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--bill_boerst__frustrated.safetensors"
+    },
+    {
+      "path": "es/embeddings/bill_boerst__shout.safetensors",
+      "size": 4474672,
+      "sha256": "bde390e92f7ca1f45e3c05e55a6ba7d724b38ecac5404967354cb977b5e63a94",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--bill_boerst__shout.safetensors"
+    },
+    {
+      "path": "es/embeddings/bill_boerst__tired.safetensors",
+      "size": 4720432,
+      "sha256": "ce9854c12548e8e06ce68f642fb503eeceba4c76a878ed5906578add72b9dcd3",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--bill_boerst__tired.safetensors"
+    },
+    {
+      "path": "es/embeddings/caro_davy__neutral.safetensors",
+      "size": 3983152,
+      "sha256": "1980a278b1d7e003ab0542055a9e3e764a6f80b7ac8990b0e0e99d79947ca4fd",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--caro_davy__neutral.safetensors"
+    },
+    {
+      "path": "es/embeddings/caro_davy__calm.safetensors",
+      "size": 5162808,
+      "sha256": "89a09dd108f2e3858f5e028008cfa2fa4e94bcdfec386b15bfe8ad85c3a3e874",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--caro_davy__calm.safetensors"
+    },
+    {
+      "path": "es/embeddings/caro_davy__happy.safetensors",
+      "size": 4572976,
+      "sha256": "c45b4741998e8dd9006c41f5aba6368edbbc2ea0bf6301e27868f2ba4bcbd555",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--caro_davy__happy.safetensors"
+    },
+    {
+      "path": "es/embeddings/caro_davy__sad.safetensors",
+      "size": 5064504,
+      "sha256": "e013702300f4eea126cca3b88a7462ec19870fe194b7d9cc41cdcc2c40597097",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--caro_davy__sad.safetensors"
+    },
+    {
+      "path": "es/embeddings/caro_davy__worried.safetensors",
+      "size": 4966200,
+      "sha256": "543a2ae52ae96e0f75bebd39a91a6455ac41c47cb05e52dbc62dfc168a38eebb",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--caro_davy__worried.safetensors"
+    },
+    {
+      "path": "es/embeddings/caro_davy__surprised.safetensors",
+      "size": 4671280,
+      "sha256": "b6c2bc6709c7322eff9a2a430a90a7c699bba1b2c4be9abed340b013e8ba7f4f",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--caro_davy__surprised.safetensors"
+    },
+    {
+      "path": "es/embeddings/caro_davy__anger.safetensors",
+      "size": 5015352,
+      "sha256": "99828bb2e908f7491c8df0740d3d6793cd3bb50fdeb93f0e7bc725d3ae7790e5",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--caro_davy__anger.safetensors"
+    },
+    {
+      "path": "es/embeddings/caro_davy__confused.safetensors",
+      "size": 4671280,
+      "sha256": "f0350f9f5fbc0fd98a922c0797e5845e3b83ef94be40d51c86bb67570c943d12",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--caro_davy__confused.safetensors"
+    },
+    {
+      "path": "es/embeddings/caro_davy__enthused.safetensors",
+      "size": 5015352,
+      "sha256": "22863b4be03f302739ada6ea8bfb10155912d860b0a438654259319677b05fef",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--caro_davy__enthused.safetensors"
+    },
+    {
+      "path": "es/embeddings/caro_davy__excited.safetensors",
+      "size": 4867888,
+      "sha256": "db5ca17067adc4fe8243fdeccd61972b505be49c8f7c4416214fe5dc53dd6fd5",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--caro_davy__excited.safetensors"
+    },
+    {
+      "path": "es/embeddings/caro_davy__frustrated.safetensors",
+      "size": 5211960,
+      "sha256": "2b19f6c724dae1867860bfdb49fa66a5d059830ccba97b8f0d21eae72e48d664",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--caro_davy__frustrated.safetensors"
+    },
+    {
+      "path": "es/embeddings/caro_davy__shout.safetensors",
+      "size": 4769584,
+      "sha256": "2b0117f0edab9d6daf51f5135849ea45f0eb099cfe5c42ed984fe23912780699",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--caro_davy__shout.safetensors"
+    },
+    {
+      "path": "es/embeddings/caro_davy__tired.safetensors",
+      "size": 5900088,
+      "sha256": "0dbdad655b3b9bf1e08309784162524252a718ef6e9d47232ccd15b5d4464ce6",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--caro_davy__tired.safetensors"
+    },
+    {
+      "path": "es/embeddings/peter_yearsley__neutral.safetensors",
+      "size": 4523824,
+      "sha256": "baf01359b08a6b83d67540c5b804209be2b0399a1ef0f83e188a962145bb4083",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--peter_yearsley__neutral.safetensors"
+    },
+    {
+      "path": "es/embeddings/peter_yearsley__calm.safetensors",
+      "size": 4720432,
+      "sha256": "edadc64ebcaa0c99ac5f0014df9372a1ff84f770d3baef41f746b9527683a98c",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--peter_yearsley__calm.safetensors"
+    },
+    {
+      "path": "es/embeddings/peter_yearsley__happy.safetensors",
+      "size": 3786544,
+      "sha256": "d5b724330a52907c6354d6cd75862d46553379d92e8e82751ac2426c4729083e",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--peter_yearsley__happy.safetensors"
+    },
+    {
+      "path": "es/embeddings/peter_yearsley__sad.safetensors",
+      "size": 5064504,
+      "sha256": "f16650bec65a4c2510847f4fe29b06a0d0241fd0c9e77d21250902ac5af0d28b",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--peter_yearsley__sad.safetensors"
+    },
+    {
+      "path": "es/embeddings/peter_yearsley__worried.safetensors",
+      "size": 5211960,
+      "sha256": "32b95943ac4c2f95cc7e9a7952dd4facea4f2a855370c0919035d0f35cc708a5",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--peter_yearsley__worried.safetensors"
+    },
+    {
+      "path": "es/embeddings/peter_yearsley__surprised.safetensors",
+      "size": 4228912,
+      "sha256": "7c276e52e4ffaca6c021ce26ede974d962da481c4ebd17bc695da93746987013",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--peter_yearsley__surprised.safetensors"
+    },
+    {
+      "path": "es/embeddings/peter_yearsley__anger.safetensors",
+      "size": 4966200,
+      "sha256": "bfa84da4b5b4da0c15def36ab5bcec183bbfabf62af05208b1f5aef87a32d15c",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--peter_yearsley__anger.safetensors"
+    },
+    {
+      "path": "es/embeddings/peter_yearsley__confused.safetensors",
+      "size": 4376368,
+      "sha256": "470a7e773d9bcfca167d83cb1a21a12c171017b009652c28a949d324aea2260a",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--peter_yearsley__confused.safetensors"
+    },
+    {
+      "path": "es/embeddings/peter_yearsley__enthused.safetensors",
+      "size": 4622128,
+      "sha256": "e835358874de3b15102d839d5c30db4aa9a10b1b07316de8b014ecc3c0dc9111",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--peter_yearsley__enthused.safetensors"
+    },
+    {
+      "path": "es/embeddings/peter_yearsley__excited.safetensors",
+      "size": 4720432,
+      "sha256": "7237af20b3ff7d6989468e22c4a489ce3fd877955f7fd787d6fea85de539e566",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--peter_yearsley__excited.safetensors"
+    },
+    {
+      "path": "es/embeddings/peter_yearsley__frustrated.safetensors",
+      "size": 4867888,
+      "sha256": "8e2504acc2750e7dc3efede69d816a4b1bf49d4908851ec70f028a5efe669f36",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--peter_yearsley__frustrated.safetensors"
+    },
+    {
+      "path": "es/embeddings/peter_yearsley__shout.safetensors",
+      "size": 4769584,
+      "sha256": "30592e24f4a5aa4482227ef1348f51288acde39ba1c4501bfe439849e01c5cd0",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--peter_yearsley__shout.safetensors"
+    },
+    {
+      "path": "es/embeddings/peter_yearsley__tired.safetensors",
+      "size": 5211960,
+      "sha256": "34db7fd30327e0c89213988a219b64dc114e0916700e302e2ebf5a081e5479d4",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--peter_yearsley__tired.safetensors"
+    },
+    {
+      "path": "es/embeddings/stuart_bell__neutral.safetensors",
+      "size": 5900088,
+      "sha256": "feeba09199499a14b84261ae560f980be7c234ca8212a583a2cbafc75073fc05",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--stuart_bell__neutral.safetensors"
+    },
+    {
+      "path": "es/embeddings/stuart_bell__calm.safetensors",
+      "size": 5654328,
+      "sha256": "aaa4c932b9027fb469967c07daa860192e1c8c9f7296670b27f3e00449c411f6",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--stuart_bell__calm.safetensors"
+    },
+    {
+      "path": "es/embeddings/stuart_bell__happy.safetensors",
+      "size": 5703480,
+      "sha256": "a26361931fdd754132d90987c0aeb63f7bf8000791f46f8c84fa32c2d9e9d8b6",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--stuart_bell__happy.safetensors"
+    },
+    {
+      "path": "es/embeddings/stuart_bell__sad.safetensors",
+      "size": 5506872,
+      "sha256": "8c1b577e65cbf2a79c283a1e2208569cef2217bdfd26d485aaa6409353f3a2ac",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--stuart_bell__sad.safetensors"
+    },
+    {
+      "path": "es/embeddings/stuart_bell__worried.safetensors",
+      "size": 5556024,
+      "sha256": "17164917ef0a4e6697be0fc05394f23bf5bdccb601474967ddf5fae83a7198c1",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--stuart_bell__worried.safetensors"
+    },
+    {
+      "path": "es/embeddings/stuart_bell__surprised.safetensors",
+      "size": 5162808,
+      "sha256": "72f62d652a1e9983b57fa89f86a3d0dde004ae1468facdfae1625791937ab6b0",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--stuart_bell__surprised.safetensors"
+    },
+    {
+      "path": "es/embeddings/stuart_bell__anger.safetensors",
+      "size": 5310264,
+      "sha256": "4d54c78c54b27b787b5ef28728dc6901cfae799c31a8cad688d5b8a96aa28877",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--stuart_bell__anger.safetensors"
+    },
+    {
+      "path": "es/embeddings/stuart_bell__confused.safetensors",
+      "size": 5457720,
+      "sha256": "6de802d884d7fea9697e5448ce435caf54550bf83358ff5a0cc7f1c74dba22ed",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--stuart_bell__confused.safetensors"
+    },
+    {
+      "path": "es/embeddings/stuart_bell__enthused.safetensors",
+      "size": 5703480,
+      "sha256": "0d704cabeef4f15e61537673ca07bac6998a1532d4e90c6bef3c6e173ecb0069",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--stuart_bell__enthused.safetensors"
+    },
+    {
+      "path": "es/embeddings/stuart_bell__excited.safetensors",
+      "size": 5703480,
+      "sha256": "0bf8abcd2a7536e03c78b40d986c41638a1845fa0c2e00470df1b1028cf54c24",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--stuart_bell__excited.safetensors"
+    },
+    {
+      "path": "es/embeddings/stuart_bell__frustrated.safetensors",
+      "size": 5900088,
+      "sha256": "654beb6d89afb4054505c73e114b1dcd06f22579cc1bc2b349d101e64f8741a8",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--stuart_bell__frustrated.safetensors"
+    },
+    {
+      "path": "es/embeddings/stuart_bell__shout.safetensors",
+      "size": 5015352,
+      "sha256": "ba5b21e8abffdb8597cf4268e3bfeac4028671cf2babf405cdf9f35ee28aabbd",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--stuart_bell__shout.safetensors"
+    },
+    {
+      "path": "es/embeddings/stuart_bell__tired.safetensors",
+      "size": 5801784,
+      "sha256": "60a2ddccb1c9720a6066cc8826f80fd0fb2a2158c3f9b48c6b9d084fc5bff104",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--embeddings--stuart_bell__tired.safetensors"
+    },
+    {
+      "path": "es/DELIVERY-CREDITS.json",
+      "size": 45550,
+      "sha256": "2a7ffe2abeaa452b27185f50612137aeb0eef3bbd7729d1e289672fffe06672d",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--DELIVERY-CREDITS.json"
+    },
+    {
+      "path": "es/DELIVERY-SOURCE-README.md",
+      "size": 6672,
+      "sha256": "9b5d1a9f485f00a6d12479d8fb929da176547b11614c096bed566722c17e511b",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--DELIVERY-SOURCE-README.md"
+    },
+    {
+      "path": "es/DELIVERY-SOURCE-voices-README.md",
+      "size": 31301,
+      "sha256": "5dddbfa4da35e135848009487c2e2f173d08040fe9397b4c07e17604499ad517",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--DELIVERY-SOURCE-voices-README.md"
+    },
+    {
+      "path": "es/DELIVERY-SOURCE-voices-emotion-README.md",
+      "size": 3224,
+      "sha256": "6187017b594b59a5eadc8c8197191dec236677853ddf459a365571bed24ca2cc",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--DELIVERY-SOURCE-voices-emotion-README.md"
+    },
+    {
+      "path": "es/DELIVERY-SOURCE-LICENSE.md",
+      "size": 473,
+      "sha256": "c6c81cd9ab9c5270859579c0c511363a34b3c11652de662576e0ff4319191a47",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-delivery-voicezero-490cfbee-v1/es--DELIVERY-SOURCE-LICENSE.md"
+    }
+  ]
+}

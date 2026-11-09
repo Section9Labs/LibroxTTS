@@ -7,9 +7,9 @@ local 24 kHz mono PCM output. Python is used only for preparation and validation
 Basic and Plus retain their existing model IDs and voices.
 
 The optional [reference-based delivery integration](../../docs/MAX-DELIVERY-STYLES.md)
-adds per-book narrator and per-character style routing. Its emotional voice
-exports are still pending authorized model access and listening validation;
-no emotional style downloads are currently advertised.
+adds per-book narrator and per-character style routing, with optional preview
+performances for Bill Boerst, Caro Davy, Peter Yearsley and Stuart Bell.
+Original stays the default; preview styles require individual listening review.
 
 The SDK registers model identity, downloads, language/voice selection, text-native
 planning, spoken dictionary readings, source ranges, persistent character casts,
