@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.4.0 — 2026-11-08
+
+- Stable Max tier using native Swift MLX Pocket TTS alongside Basic and Plus.
+- Seven optional language packs, 23 Original voices, verified hosted assets.
+- New-book default: accepted English Caro Davy / Calm configuration, Careful
+  reading, temperature 0.3, four sampler steps; saved choices remain unchanged.
+- 364 optional delivery states with per-book narrator/per-character routing,
+  individual downloads, credits and style-aware cache identities. Other
+  performances and languages remain listening previews.
+- Foreground GPU, granted iOS 26+ background GPU, iOS 18+ CPU fallback, measured
+  realtime quality policy and resource/cancellation recovery.
+- Full [app integration prompt](docs/UPGRADE-0.4.0.md), download manifest index
+  and 117 audition clips. SDK release only; app/device acceptance is separate.
+
 ## 0.2.1 — 2026-11-06
 
 - Add the Spanish regional selection API used by the app: explicit Argentina

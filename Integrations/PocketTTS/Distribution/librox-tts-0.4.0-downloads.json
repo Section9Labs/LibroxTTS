@@ -1,0 +1,160 @@
+{
+  "sdkVersion": "0.4.0",
+  "sdkTag": "v0.4.0",
+  "repository": "Section9Labs/LibroxTTS",
+  "baseIdentity": "pocket-tts-mlx-2026-11-07-v2",
+  "deliveryIdentity": "pocket-delivery-voicezero-490cfbee-v1",
+  "defaultNarrator": {
+    "name": "Caro Davy",
+    "delivery": "calm",
+    "temperature": 0.3,
+    "samplerSteps": 4,
+    "phrasing": "carefulReading",
+    "preserveSavedSettings": true,
+    "listeningAcceptedLanguages": [
+      "en"
+    ]
+  },
+  "languages": [
+    {
+      "language": "en",
+      "defaultVoiceID": "pocket-caro_davy-en-v1",
+      "baseManifest": {
+        "url": "https://github.com/Section9Labs/LibroxTTS/releases/download/v0.4.0/max-base-en.json",
+        "sha256": "ed115389556a70c66fb7dd21889a1e0fba3cc8054f6db543a9b64f124d099eb4",
+        "bytes": 18064
+      },
+      "deliveryManifest": {
+        "url": "https://github.com/Section9Labs/LibroxTTS/releases/download/v0.4.0/max-delivery-en.json",
+        "sha256": "d3de73c62baa8f0c90e4eae3b202a71a70aabc2c2811c9498039f4f1a2af1b12",
+        "bytes": 39873
+      },
+      "defaultNarratorManifest": {
+        "url": "https://github.com/Section9Labs/LibroxTTS/releases/download/v0.4.0/max-narrator-en.json",
+        "sha256": "d255ff9aa5f4abfc05ccf28fc124fc1315c3ccb61946f163f73326657c50d804",
+        "bytes": 21984
+      },
+      "defaultNarratorDownloadBytes": 364858468
+    },
+    {
+      "language": "fr",
+      "defaultVoiceID": "pocket-caro_davy-fr-v1",
+      "baseManifest": {
+        "url": "https://github.com/Section9Labs/LibroxTTS/releases/download/v0.4.0/max-base-fr.json",
+        "sha256": "f8801b7ea320b1ad75ad6aa7b4a0b379425b7f11a31d8b398764102d734489cc",
+        "bytes": 18064
+      },
+      "deliveryManifest": {
+        "url": "https://github.com/Section9Labs/LibroxTTS/releases/download/v0.4.0/max-delivery-fr.json",
+        "sha256": "9106e8b30a03e36a4bea797b43c15dbf4db4a34a0c1101adbb8a98cfc9c57750",
+        "bytes": 39873
+      },
+      "defaultNarratorManifest": {
+        "url": "https://github.com/Section9Labs/LibroxTTS/releases/download/v0.4.0/max-narrator-fr.json",
+        "sha256": "503137fc4d6580cc68a23cf0339a3a29e2a87a125742694843e2b2dbd7bad48a",
+        "bytes": 21984
+      },
+      "defaultNarratorDownloadBytes": 364859964
+    },
+    {
+      "language": "de",
+      "defaultVoiceID": "pocket-caro_davy-de-v1",
+      "baseManifest": {
+        "url": "https://github.com/Section9Labs/LibroxTTS/releases/download/v0.4.0/max-base-de.json",
+        "sha256": "fdd5a07238bbb09ba2603316708f40d62046e957a509636f0622afe9e50a9eae",
+        "bytes": 18064
+      },
+      "deliveryManifest": {
+        "url": "https://github.com/Section9Labs/LibroxTTS/releases/download/v0.4.0/max-delivery-de.json",
+        "sha256": "5e31ed1652ebc18c5bd13b1f5aabb5597cd1e019ccb8d547bb76cd44e5c1659f",
+        "bytes": 39873
+      },
+      "defaultNarratorManifest": {
+        "url": "https://github.com/Section9Labs/LibroxTTS/releases/download/v0.4.0/max-narrator-de.json",
+        "sha256": "04433ac17f3866c99529c75cf81d146cce9c7f386ee04b560fd910b8fcf1726b",
+        "bytes": 21984
+      },
+      "defaultNarratorDownloadBytes": 364859529
+    },
+    {
+      "language": "pt",
+      "defaultVoiceID": "pocket-caro_davy-pt-v1",
+      "baseManifest": {
+        "url": "https://github.com/Section9Labs/LibroxTTS/releases/download/v0.4.0/max-base-pt.json",
+        "sha256": "04bbc952f4e4a8ae578af27d8be4a437421f727489fac90e5c0570e5a635a516",
+        "bytes": 18064
+      },
+      "deliveryManifest": {
+        "url": "https://github.com/Section9Labs/LibroxTTS/releases/download/v0.4.0/max-delivery-pt.json",
+        "sha256": "f0212d34a83a95a684fbe125b7b58249ba233156d42fa22aaef6ac3ab538e7cc",
+        "bytes": 39873
+      },
+      "defaultNarratorManifest": {
+        "url": "https://github.com/Section9Labs/LibroxTTS/releases/download/v0.4.0/max-narrator-pt.json",
+        "sha256": "fff73197c901ea561fedae4d7ead976fded6c45d225d6b1f32223e72b7151262",
+        "bytes": 21984
+      },
+      "defaultNarratorDownloadBytes": 364860752
+    },
+    {
+      "language": "it",
+      "defaultVoiceID": "pocket-caro_davy-it-v1",
+      "baseManifest": {
+        "url": "https://github.com/Section9Labs/LibroxTTS/releases/download/v0.4.0/max-base-it.json",
+        "sha256": "51b781e29735f879812c194c179ae71b6381e800da1117503d8d74e1b364ea02",
+        "bytes": 18064
+      },
+      "deliveryManifest": {
+        "url": "https://github.com/Section9Labs/LibroxTTS/releases/download/v0.4.0/max-delivery-it.json",
+        "sha256": "c0e9f6a4bbdf20f6972be05008c0c3210bc20b7f8e5d524d825a37f26362b108",
+        "bytes": 39873
+      },
+      "defaultNarratorManifest": {
+        "url": "https://github.com/Section9Labs/LibroxTTS/releases/download/v0.4.0/max-narrator-it.json",
+        "sha256": "07ad496f7f1911cc358e6dbdfc0e12fda9c068be0b1ad0d665065eee73e33d08",
+        "bytes": 21984
+      },
+      "defaultNarratorDownloadBytes": 364860159
+    },
+    {
+      "language": "es",
+      "defaultVoiceID": "pocket-caro_davy-es-v1",
+      "baseManifest": {
+        "url": "https://github.com/Section9Labs/LibroxTTS/releases/download/v0.4.0/max-base-es.json",
+        "sha256": "36da793539035e3b2be146029a973e0a984e21e1bd8579e222bcb8679744cdc5",
+        "bytes": 18064
+      },
+      "deliveryManifest": {
+        "url": "https://github.com/Section9Labs/LibroxTTS/releases/download/v0.4.0/max-delivery-es.json",
+        "sha256": "238d1fba9b6c42cb70863548c306e89f11295e1144a9e0a15173682612d5dfa7",
+        "bytes": 39873
+      },
+      "defaultNarratorManifest": {
+        "url": "https://github.com/Section9Labs/LibroxTTS/releases/download/v0.4.0/max-narrator-es.json",
+        "sha256": "894ec5b0cb3410ada5d9aa7d0f6681db0246bb85635ec2bd542b4506debd02d9",
+        "bytes": 21984
+      },
+      "defaultNarratorDownloadBytes": 364860211
+    },
+    {
+      "language": "nl",
+      "defaultVoiceID": "pocket-caro_davy-nl-v1",
+      "baseManifest": {
+        "url": "https://github.com/Section9Labs/LibroxTTS/releases/download/v0.4.0/max-base-nl.json",
+        "sha256": "971b9036dc059eb03001f4c3aecb1d1d2c622c8a3896821263b76cca2eaf3d1e",
+        "bytes": 18064
+      },
+      "deliveryManifest": {
+        "url": "https://github.com/Section9Labs/LibroxTTS/releases/download/v0.4.0/max-delivery-nl.json",
+        "sha256": "ad931f8c8c8badf66960dd28658984e78019d4f41b38e072d1809f4fbfeeecae",
+        "bytes": 39873
+      },
+      "defaultNarratorManifest": {
+        "url": "https://github.com/Section9Labs/LibroxTTS/releases/download/v0.4.0/max-narrator-nl.json",
+        "sha256": "af2e9af4aad1867bfb2a4d6368af55becf671678cdf89044c0064bfafbb8418f",
+        "bytes": 21984
+      },
+      "defaultNarratorDownloadBytes": 364858669
+    }
+  ]
+}

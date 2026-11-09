@@ -1,6 +1,6 @@
 # Max reference-based delivery for audiobooks
 
-The 0.4.0-beta.7 candidate adds 364 reference-based preview performances:
+LibroxTTS 0.4.0 adds 364 reference-based preview performances:
 13 styles for four speakers, encoded independently for each of seven languages.
 The default for new Max books is **Caro Davy / Calm**, with Careful reading,
 temperature 0.3 and four sampler steps. Matt accepted the English book scene for

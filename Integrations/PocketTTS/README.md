@@ -12,7 +12,7 @@ performances for Bill Boerst, Caro Davy, Peter Yearsley and Stuart Bell.
 New Max books default to Caro Davy / Calm with Careful reading, temperature 0.3
 and four sampler steps, matching the accepted English book scene. Preserve saved
 book settings; other performances and languages remain listening previews. See
-[the beta.7 app handoff](../../docs/UPGRADE-0.4.0-beta.7.md) for initialization and
+[the stable app handoff](../../docs/UPGRADE-0.4.0.md) for initialization and
 the combined base-model/default-narrator installer.
 
 The SDK registers model identity, downloads, language/voice selection, text-native
@@ -22,7 +22,7 @@ ship an app update. MLX is now a pinned package dependency; existing Basic/Plus
 inference still uses their own renderers.
 
 [Hosted language packs](https://github.com/Section9Labs/LibroxTTS/releases/tag/pocket-tts-mlx-2026-11-07-v2)
-are published as an asset prerelease. Pin SDK `0.4.0-beta.7` separately;
+are hosted independently. Pin stable SDK `0.4.0` separately;
 the asset tag is not an SDK version tag. Beta.5 reuses the existing v2 packs.
 
 ## Voices and languages
