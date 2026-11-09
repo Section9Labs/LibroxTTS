@@ -30,7 +30,7 @@
   "hostedInstall": "Clean base-only installation downloaded only Caro Davy Calm plus credits; hash validation and native render passed",
   "assetRelease": "https://github.com/Section9Labs/LibroxTTS/releases/tag/pocket-delivery-voicezero-490cfbee-v1",
   "githubAssetDigestsVerified": 399,
-  "generatedAuditionClips": 116,
+  "generatedAuditionClips": 117,
   "wordScreening": {
     "balancedEnglish": {
       "exactMatches": 26,
@@ -322,5 +322,17 @@
       ]
     }
   },
-  "wordScreeningQualification": "ASR flags require listening review. Exact words do not prove narrator quality or emotion accuracy. One careful-English flag is seven versus 7."
+  "wordScreeningQualification": "ASR flags require listening review. Exact words do not prove narrator quality or emotion accuracy. One careful-English flag is seven versus 7.",
+  "bookScene": {
+    "units": 7,
+    "narrator": "caro_davy/calm",
+    "characters": [
+      "peter_yearsley/happy",
+      "bill_boerst/worried"
+    ],
+    "samples": 593280,
+    "sampleRate": 24000,
+    "wordScreeningExact": true,
+    "humanListeningAccepted": false
+  }
 }

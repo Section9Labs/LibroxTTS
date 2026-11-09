@@ -18,7 +18,7 @@ ship an app update. MLX is now a pinned package dependency; existing Basic/Plus
 inference still uses their own renderers.
 
 [Hosted language packs](https://github.com/Section9Labs/LibroxTTS/releases/tag/pocket-tts-mlx-2026-11-07-v2)
-are published as an asset prerelease. Pin SDK `0.4.0-beta.6` separately;
+are published as an asset prerelease. Pin SDK `0.4.0-beta.7` separately;
 the asset tag is not an SDK version tag. Beta.5 reuses the existing v2 packs.
 
 ## Voices and languages
