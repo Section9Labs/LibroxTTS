@@ -1,0 +1,2186 @@
+[
+  {
+    "language" : "en",
+    "samples" : "34560",
+    "style" : "neutral",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "en",
+    "samples" : "38400",
+    "style" : "calm",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "en",
+    "samples" : "34560",
+    "style" : "happy",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "en",
+    "samples" : "38400",
+    "style" : "sad",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "en",
+    "samples" : "38400",
+    "style" : "worried",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "en",
+    "samples" : "36480",
+    "style" : "surprised",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "en",
+    "samples" : "34560",
+    "style" : "anger",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "en",
+    "samples" : "34560",
+    "style" : "confused",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "en",
+    "samples" : "32640",
+    "style" : "enthused",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "en",
+    "samples" : "38400",
+    "style" : "excited",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "en",
+    "samples" : "30720",
+    "style" : "frustrated",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "en",
+    "samples" : "34560",
+    "style" : "shout",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "en",
+    "samples" : "38400",
+    "style" : "tired",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "en",
+    "samples" : "40320",
+    "style" : "neutral",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "en",
+    "samples" : "42240",
+    "style" : "calm",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "en",
+    "samples" : "40320",
+    "style" : "happy",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "en",
+    "samples" : "40320",
+    "style" : "sad",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "en",
+    "samples" : "40320",
+    "style" : "worried",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "en",
+    "samples" : "42240",
+    "style" : "surprised",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "en",
+    "samples" : "44160",
+    "style" : "anger",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "en",
+    "samples" : "38400",
+    "style" : "confused",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "en",
+    "samples" : "44160",
+    "style" : "enthused",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "en",
+    "samples" : "44160",
+    "style" : "excited",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "en",
+    "samples" : "42240",
+    "style" : "frustrated",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "en",
+    "samples" : "34560",
+    "style" : "shout",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "en",
+    "samples" : "44160",
+    "style" : "tired",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "en",
+    "samples" : "38400",
+    "style" : "neutral",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "en",
+    "samples" : "38400",
+    "style" : "calm",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "en",
+    "samples" : "36480",
+    "style" : "happy",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "en",
+    "samples" : "40320",
+    "style" : "sad",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "en",
+    "samples" : "38400",
+    "style" : "worried",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "en",
+    "samples" : "34560",
+    "style" : "surprised",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "en",
+    "samples" : "38400",
+    "style" : "anger",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "en",
+    "samples" : "36480",
+    "style" : "confused",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "en",
+    "samples" : "40320",
+    "style" : "enthused",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "en",
+    "samples" : "34560",
+    "style" : "excited",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "en",
+    "samples" : "40320",
+    "style" : "frustrated",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "en",
+    "samples" : "34560",
+    "style" : "shout",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "en",
+    "samples" : "38400",
+    "style" : "tired",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "en",
+    "samples" : "44160",
+    "style" : "neutral",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "en",
+    "samples" : "40320",
+    "style" : "calm",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "en",
+    "samples" : "40320",
+    "style" : "happy",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "en",
+    "samples" : "42240",
+    "style" : "sad",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "en",
+    "samples" : "42240",
+    "style" : "worried",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "en",
+    "samples" : "38400",
+    "style" : "surprised",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "en",
+    "samples" : "38400",
+    "style" : "anger",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "en",
+    "samples" : "42240",
+    "style" : "confused",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "en",
+    "samples" : "42240",
+    "style" : "enthused",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "en",
+    "samples" : "40320",
+    "style" : "excited",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "en",
+    "samples" : "42240",
+    "style" : "frustrated",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "en",
+    "samples" : "40320",
+    "style" : "shout",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "en",
+    "samples" : "42240",
+    "style" : "tired",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "fr",
+    "samples" : "36480",
+    "style" : "neutral",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "fr",
+    "samples" : "38400",
+    "style" : "calm",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "fr",
+    "samples" : "42240",
+    "style" : "happy",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "fr",
+    "samples" : "46080",
+    "style" : "sad",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "fr",
+    "samples" : "34560",
+    "style" : "worried",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "fr",
+    "samples" : "42240",
+    "style" : "surprised",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "fr",
+    "samples" : "44160",
+    "style" : "anger",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "fr",
+    "samples" : "38400",
+    "style" : "confused",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "fr",
+    "samples" : "42240",
+    "style" : "enthused",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "fr",
+    "samples" : "42240",
+    "style" : "excited",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "fr",
+    "samples" : "40320",
+    "style" : "frustrated",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "fr",
+    "samples" : "42240",
+    "style" : "shout",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "fr",
+    "samples" : "44160",
+    "style" : "tired",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "fr",
+    "samples" : "44160",
+    "style" : "neutral",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "fr",
+    "samples" : "44160",
+    "style" : "calm",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "fr",
+    "samples" : "44160",
+    "style" : "happy",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "fr",
+    "samples" : "46080",
+    "style" : "sad",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "fr",
+    "samples" : "36480",
+    "style" : "worried",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "fr",
+    "samples" : "46080",
+    "style" : "surprised",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "fr",
+    "samples" : "44160",
+    "style" : "anger",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "fr",
+    "samples" : "42240",
+    "style" : "confused",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "fr",
+    "samples" : "51840",
+    "style" : "enthused",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "fr",
+    "samples" : "44160",
+    "style" : "excited",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "fr",
+    "samples" : "49920",
+    "style" : "frustrated",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "fr",
+    "samples" : "44160",
+    "style" : "shout",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "fr",
+    "samples" : "46080",
+    "style" : "tired",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "fr",
+    "samples" : "38400",
+    "style" : "neutral",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "fr",
+    "samples" : "42240",
+    "style" : "calm",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "fr",
+    "samples" : "34560",
+    "style" : "happy",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "fr",
+    "samples" : "42240",
+    "style" : "sad",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "fr",
+    "samples" : "44160",
+    "style" : "worried",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "fr",
+    "samples" : "34560",
+    "style" : "surprised",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "fr",
+    "samples" : "40320",
+    "style" : "anger",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "fr",
+    "samples" : "36480",
+    "style" : "confused",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "fr",
+    "samples" : "44160",
+    "style" : "enthused",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "fr",
+    "samples" : "42240",
+    "style" : "excited",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "fr",
+    "samples" : "34560",
+    "style" : "frustrated",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "fr",
+    "samples" : "36480",
+    "style" : "shout",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "fr",
+    "samples" : "42240",
+    "style" : "tired",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "fr",
+    "samples" : "46080",
+    "style" : "neutral",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "fr",
+    "samples" : "46080",
+    "style" : "calm",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "fr",
+    "samples" : "44160",
+    "style" : "happy",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "fr",
+    "samples" : "46080",
+    "style" : "sad",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "fr",
+    "samples" : "46080",
+    "style" : "worried",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "fr",
+    "samples" : "46080",
+    "style" : "surprised",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "fr",
+    "samples" : "46080",
+    "style" : "anger",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "fr",
+    "samples" : "42240",
+    "style" : "confused",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "fr",
+    "samples" : "49920",
+    "style" : "enthused",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "fr",
+    "samples" : "46080",
+    "style" : "excited",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "fr",
+    "samples" : "49920",
+    "style" : "frustrated",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "fr",
+    "samples" : "44160",
+    "style" : "shout",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "fr",
+    "samples" : "44160",
+    "style" : "tired",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "de",
+    "samples" : "42240",
+    "style" : "neutral",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "de",
+    "samples" : "48000",
+    "style" : "calm",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "de",
+    "samples" : "48000",
+    "style" : "happy",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "de",
+    "samples" : "46080",
+    "style" : "sad",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "de",
+    "samples" : "46080",
+    "style" : "worried",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "de",
+    "samples" : "46080",
+    "style" : "surprised",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "de",
+    "samples" : "46080",
+    "style" : "anger",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "de",
+    "samples" : "46080",
+    "style" : "confused",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "de",
+    "samples" : "46080",
+    "style" : "enthused",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "de",
+    "samples" : "48000",
+    "style" : "excited",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "de",
+    "samples" : "46080",
+    "style" : "frustrated",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "de",
+    "samples" : "46080",
+    "style" : "shout",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "de",
+    "samples" : "48000",
+    "style" : "tired",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "de",
+    "samples" : "48000",
+    "style" : "neutral",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "de",
+    "samples" : "51840",
+    "style" : "calm",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "de",
+    "samples" : "48000",
+    "style" : "happy",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "de",
+    "samples" : "49920",
+    "style" : "sad",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "de",
+    "samples" : "49920",
+    "style" : "worried",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "de",
+    "samples" : "48000",
+    "style" : "surprised",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "de",
+    "samples" : "46080",
+    "style" : "anger",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "de",
+    "samples" : "49920",
+    "style" : "confused",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "de",
+    "samples" : "53760",
+    "style" : "enthused",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "de",
+    "samples" : "49920",
+    "style" : "excited",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "de",
+    "samples" : "46080",
+    "style" : "frustrated",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "de",
+    "samples" : "44160",
+    "style" : "shout",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "de",
+    "samples" : "55680",
+    "style" : "tired",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "de",
+    "samples" : "48000",
+    "style" : "neutral",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "de",
+    "samples" : "48000",
+    "style" : "calm",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "de",
+    "samples" : "48000",
+    "style" : "happy",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "de",
+    "samples" : "49920",
+    "style" : "sad",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "de",
+    "samples" : "48000",
+    "style" : "worried",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "de",
+    "samples" : "44160",
+    "style" : "surprised",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "de",
+    "samples" : "48000",
+    "style" : "anger",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "de",
+    "samples" : "49920",
+    "style" : "confused",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "de",
+    "samples" : "46080",
+    "style" : "enthused",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "de",
+    "samples" : "44160",
+    "style" : "excited",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "de",
+    "samples" : "46080",
+    "style" : "frustrated",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "de",
+    "samples" : "44160",
+    "style" : "shout",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "de",
+    "samples" : "49920",
+    "style" : "tired",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "de",
+    "samples" : "53760",
+    "style" : "neutral",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "de",
+    "samples" : "53760",
+    "style" : "calm",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "de",
+    "samples" : "46080",
+    "style" : "happy",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "de",
+    "samples" : "53760",
+    "style" : "sad",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "de",
+    "samples" : "51840",
+    "style" : "worried",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "de",
+    "samples" : "44160",
+    "style" : "surprised",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "de",
+    "samples" : "44160",
+    "style" : "anger",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "de",
+    "samples" : "48000",
+    "style" : "confused",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "de",
+    "samples" : "53760",
+    "style" : "enthused",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "de",
+    "samples" : "48000",
+    "style" : "excited",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "de",
+    "samples" : "51840",
+    "style" : "frustrated",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "de",
+    "samples" : "48000",
+    "style" : "shout",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "de",
+    "samples" : "53760",
+    "style" : "tired",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "pt",
+    "samples" : "38400",
+    "style" : "neutral",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "pt",
+    "samples" : "40320",
+    "style" : "calm",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "pt",
+    "samples" : "40320",
+    "style" : "happy",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "pt",
+    "samples" : "42240",
+    "style" : "sad",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "pt",
+    "samples" : "42240",
+    "style" : "worried",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "pt",
+    "samples" : "40320",
+    "style" : "surprised",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "pt",
+    "samples" : "42240",
+    "style" : "anger",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "pt",
+    "samples" : "40320",
+    "style" : "confused",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "pt",
+    "samples" : "36480",
+    "style" : "enthused",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "pt",
+    "samples" : "40320",
+    "style" : "excited",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "pt",
+    "samples" : "38400",
+    "style" : "frustrated",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "pt",
+    "samples" : "38400",
+    "style" : "shout",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "pt",
+    "samples" : "40320",
+    "style" : "tired",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "pt",
+    "samples" : "40320",
+    "style" : "neutral",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "pt",
+    "samples" : "42240",
+    "style" : "calm",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "pt",
+    "samples" : "40320",
+    "style" : "happy",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "pt",
+    "samples" : "40320",
+    "style" : "sad",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "pt",
+    "samples" : "38400",
+    "style" : "worried",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "pt",
+    "samples" : "40320",
+    "style" : "surprised",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "pt",
+    "samples" : "40320",
+    "style" : "anger",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "pt",
+    "samples" : "38400",
+    "style" : "confused",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "pt",
+    "samples" : "42240",
+    "style" : "enthused",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "pt",
+    "samples" : "42240",
+    "style" : "excited",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "pt",
+    "samples" : "40320",
+    "style" : "frustrated",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "pt",
+    "samples" : "40320",
+    "style" : "shout",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "pt",
+    "samples" : "38400",
+    "style" : "tired",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "pt",
+    "samples" : "38400",
+    "style" : "neutral",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "pt",
+    "samples" : "40320",
+    "style" : "calm",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "pt",
+    "samples" : "40320",
+    "style" : "happy",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "pt",
+    "samples" : "44160",
+    "style" : "sad",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "pt",
+    "samples" : "44160",
+    "style" : "worried",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "pt",
+    "samples" : "38400",
+    "style" : "surprised",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "pt",
+    "samples" : "46080",
+    "style" : "anger",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "pt",
+    "samples" : "44160",
+    "style" : "confused",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "pt",
+    "samples" : "40320",
+    "style" : "enthused",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "pt",
+    "samples" : "44160",
+    "style" : "excited",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "pt",
+    "samples" : "42240",
+    "style" : "frustrated",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "pt",
+    "samples" : "38400",
+    "style" : "shout",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "pt",
+    "samples" : "46080",
+    "style" : "tired",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "pt",
+    "samples" : "44160",
+    "style" : "neutral",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "pt",
+    "samples" : "46080",
+    "style" : "calm",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "pt",
+    "samples" : "42240",
+    "style" : "happy",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "pt",
+    "samples" : "44160",
+    "style" : "sad",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "pt",
+    "samples" : "44160",
+    "style" : "worried",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "pt",
+    "samples" : "42240",
+    "style" : "surprised",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "pt",
+    "samples" : "40320",
+    "style" : "anger",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "pt",
+    "samples" : "46080",
+    "style" : "confused",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "pt",
+    "samples" : "40320",
+    "style" : "enthused",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "pt",
+    "samples" : "42240",
+    "style" : "excited",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "pt",
+    "samples" : "40320",
+    "style" : "frustrated",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "pt",
+    "samples" : "42240",
+    "style" : "shout",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "pt",
+    "samples" : "44160",
+    "style" : "tired",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "it",
+    "samples" : "42240",
+    "style" : "neutral",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "it",
+    "samples" : "42240",
+    "style" : "calm",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "it",
+    "samples" : "44160",
+    "style" : "happy",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "it",
+    "samples" : "36480",
+    "style" : "sad",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "it",
+    "samples" : "36480",
+    "style" : "worried",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "it",
+    "samples" : "46080",
+    "style" : "surprised",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "it",
+    "samples" : "46080",
+    "style" : "anger",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "it",
+    "samples" : "42240",
+    "style" : "confused",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "it",
+    "samples" : "36480",
+    "style" : "enthused",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "it",
+    "samples" : "44160",
+    "style" : "excited",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "it",
+    "samples" : "42240",
+    "style" : "frustrated",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "it",
+    "samples" : "38400",
+    "style" : "shout",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "it",
+    "samples" : "48000",
+    "style" : "tired",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "it",
+    "samples" : "42240",
+    "style" : "neutral",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "it",
+    "samples" : "49920",
+    "style" : "calm",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "it",
+    "samples" : "36480",
+    "style" : "happy",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "it",
+    "samples" : "49920",
+    "style" : "sad",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "it",
+    "samples" : "40320",
+    "style" : "worried",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "it",
+    "samples" : "44160",
+    "style" : "surprised",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "it",
+    "samples" : "42240",
+    "style" : "anger",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "it",
+    "samples" : "44160",
+    "style" : "confused",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "it",
+    "samples" : "51840",
+    "style" : "enthused",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "it",
+    "samples" : "36480",
+    "style" : "excited",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "it",
+    "samples" : "42240",
+    "style" : "frustrated",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "it",
+    "samples" : "42240",
+    "style" : "shout",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "it",
+    "samples" : "42240",
+    "style" : "tired",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "it",
+    "samples" : "42240",
+    "style" : "neutral",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "it",
+    "samples" : "46080",
+    "style" : "calm",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "it",
+    "samples" : "36480",
+    "style" : "happy",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "it",
+    "samples" : "49920",
+    "style" : "sad",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "it",
+    "samples" : "36480",
+    "style" : "worried",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "it",
+    "samples" : "42240",
+    "style" : "surprised",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "it",
+    "samples" : "42240",
+    "style" : "anger",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "it",
+    "samples" : "36480",
+    "style" : "confused",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "it",
+    "samples" : "46080",
+    "style" : "enthused",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "it",
+    "samples" : "36480",
+    "style" : "excited",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "it",
+    "samples" : "42240",
+    "style" : "frustrated",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "it",
+    "samples" : "36480",
+    "style" : "shout",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "it",
+    "samples" : "36480",
+    "style" : "tired",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "it",
+    "samples" : "38400",
+    "style" : "neutral",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "it",
+    "samples" : "46080",
+    "style" : "calm",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "it",
+    "samples" : "40320",
+    "style" : "happy",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "it",
+    "samples" : "49920",
+    "style" : "sad",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "it",
+    "samples" : "48000",
+    "style" : "worried",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "it",
+    "samples" : "42240",
+    "style" : "surprised",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "it",
+    "samples" : "44160",
+    "style" : "anger",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "it",
+    "samples" : "42240",
+    "style" : "confused",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "it",
+    "samples" : "53760",
+    "style" : "enthused",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "it",
+    "samples" : "36480",
+    "style" : "excited",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "it",
+    "samples" : "49920",
+    "style" : "frustrated",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "it",
+    "samples" : "51840",
+    "style" : "shout",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "it",
+    "samples" : "49920",
+    "style" : "tired",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "es",
+    "samples" : "38400",
+    "style" : "neutral",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "es",
+    "samples" : "46080",
+    "style" : "calm",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "es",
+    "samples" : "40320",
+    "style" : "happy",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "es",
+    "samples" : "38400",
+    "style" : "sad",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "es",
+    "samples" : "38400",
+    "style" : "worried",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "es",
+    "samples" : "36480",
+    "style" : "surprised",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "es",
+    "samples" : "49920",
+    "style" : "anger",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "es",
+    "samples" : "44160",
+    "style" : "confused",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "es",
+    "samples" : "44160",
+    "style" : "enthused",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "es",
+    "samples" : "38400",
+    "style" : "excited",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "es",
+    "samples" : "32640",
+    "style" : "frustrated",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "es",
+    "samples" : "40320",
+    "style" : "shout",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "es",
+    "samples" : "48000",
+    "style" : "tired",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "es",
+    "samples" : "46080",
+    "style" : "neutral",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "es",
+    "samples" : "49920",
+    "style" : "calm",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "es",
+    "samples" : "48000",
+    "style" : "happy",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "es",
+    "samples" : "51840",
+    "style" : "sad",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "es",
+    "samples" : "49920",
+    "style" : "worried",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "es",
+    "samples" : "48000",
+    "style" : "surprised",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "es",
+    "samples" : "53760",
+    "style" : "anger",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "es",
+    "samples" : "51840",
+    "style" : "confused",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "es",
+    "samples" : "51840",
+    "style" : "enthused",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "es",
+    "samples" : "42240",
+    "style" : "excited",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "es",
+    "samples" : "44160",
+    "style" : "frustrated",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "es",
+    "samples" : "49920",
+    "style" : "shout",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "es",
+    "samples" : "53760",
+    "style" : "tired",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "es",
+    "samples" : "40320",
+    "style" : "neutral",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "es",
+    "samples" : "46080",
+    "style" : "calm",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "es",
+    "samples" : "34560",
+    "style" : "happy",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "es",
+    "samples" : "46080",
+    "style" : "sad",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "es",
+    "samples" : "46080",
+    "style" : "worried",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "es",
+    "samples" : "36480",
+    "style" : "surprised",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "es",
+    "samples" : "40320",
+    "style" : "anger",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "es",
+    "samples" : "44160",
+    "style" : "confused",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "es",
+    "samples" : "34560",
+    "style" : "enthused",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "es",
+    "samples" : "36480",
+    "style" : "excited",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "es",
+    "samples" : "44160",
+    "style" : "frustrated",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "es",
+    "samples" : "36480",
+    "style" : "shout",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "es",
+    "samples" : "44160",
+    "style" : "tired",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "es",
+    "samples" : "44160",
+    "style" : "neutral",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "es",
+    "samples" : "42240",
+    "style" : "calm",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "es",
+    "samples" : "40320",
+    "style" : "happy",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "es",
+    "samples" : "38400",
+    "style" : "sad",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "es",
+    "samples" : "46080",
+    "style" : "worried",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "es",
+    "samples" : "44160",
+    "style" : "surprised",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "es",
+    "samples" : "44160",
+    "style" : "anger",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "es",
+    "samples" : "40320",
+    "style" : "confused",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "es",
+    "samples" : "51840",
+    "style" : "enthused",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "es",
+    "samples" : "51840",
+    "style" : "excited",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "es",
+    "samples" : "44160",
+    "style" : "frustrated",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "es",
+    "samples" : "46080",
+    "style" : "shout",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "es",
+    "samples" : "51840",
+    "style" : "tired",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "nl",
+    "samples" : "40320",
+    "style" : "neutral",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "nl",
+    "samples" : "44160",
+    "style" : "calm",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "nl",
+    "samples" : "44160",
+    "style" : "happy",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "nl",
+    "samples" : "44160",
+    "style" : "sad",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "nl",
+    "samples" : "44160",
+    "style" : "worried",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "nl",
+    "samples" : "46080",
+    "style" : "surprised",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "nl",
+    "samples" : "44160",
+    "style" : "anger",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "nl",
+    "samples" : "44160",
+    "style" : "confused",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "nl",
+    "samples" : "44160",
+    "style" : "enthused",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "nl",
+    "samples" : "48000",
+    "style" : "excited",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "nl",
+    "samples" : "44160",
+    "style" : "frustrated",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "nl",
+    "samples" : "44160",
+    "style" : "shout",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "nl",
+    "samples" : "46080",
+    "style" : "tired",
+    "voice" : "bill_boerst"
+  },
+  {
+    "language" : "nl",
+    "samples" : "48000",
+    "style" : "neutral",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "nl",
+    "samples" : "49920",
+    "style" : "calm",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "nl",
+    "samples" : "46080",
+    "style" : "happy",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "nl",
+    "samples" : "48000",
+    "style" : "sad",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "nl",
+    "samples" : "46080",
+    "style" : "worried",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "nl",
+    "samples" : "48000",
+    "style" : "surprised",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "nl",
+    "samples" : "48000",
+    "style" : "anger",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "nl",
+    "samples" : "51840",
+    "style" : "confused",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "nl",
+    "samples" : "51840",
+    "style" : "enthused",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "nl",
+    "samples" : "49920",
+    "style" : "excited",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "nl",
+    "samples" : "49920",
+    "style" : "frustrated",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "nl",
+    "samples" : "46080",
+    "style" : "shout",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "nl",
+    "samples" : "51840",
+    "style" : "tired",
+    "voice" : "caro_davy"
+  },
+  {
+    "language" : "nl",
+    "samples" : "46080",
+    "style" : "neutral",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "nl",
+    "samples" : "46080",
+    "style" : "calm",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "nl",
+    "samples" : "46080",
+    "style" : "happy",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "nl",
+    "samples" : "46080",
+    "style" : "sad",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "nl",
+    "samples" : "46080",
+    "style" : "worried",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "nl",
+    "samples" : "44160",
+    "style" : "surprised",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "nl",
+    "samples" : "46080",
+    "style" : "anger",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "nl",
+    "samples" : "48000",
+    "style" : "confused",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "nl",
+    "samples" : "46080",
+    "style" : "enthused",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "nl",
+    "samples" : "46080",
+    "style" : "excited",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "nl",
+    "samples" : "48000",
+    "style" : "frustrated",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "nl",
+    "samples" : "42240",
+    "style" : "shout",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "nl",
+    "samples" : "46080",
+    "style" : "tired",
+    "voice" : "peter_yearsley"
+  },
+  {
+    "language" : "nl",
+    "samples" : "51840",
+    "style" : "neutral",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "nl",
+    "samples" : "51840",
+    "style" : "calm",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "nl",
+    "samples" : "46080",
+    "style" : "happy",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "nl",
+    "samples" : "49920",
+    "style" : "sad",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "nl",
+    "samples" : "49920",
+    "style" : "worried",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "nl",
+    "samples" : "48000",
+    "style" : "surprised",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "nl",
+    "samples" : "48000",
+    "style" : "anger",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "nl",
+    "samples" : "44160",
+    "style" : "confused",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "nl",
+    "samples" : "48000",
+    "style" : "enthused",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "nl",
+    "samples" : "44160",
+    "style" : "excited",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "nl",
+    "samples" : "51840",
+    "style" : "frustrated",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "nl",
+    "samples" : "49920",
+    "style" : "shout",
+    "voice" : "stuart_bell"
+  },
+  {
+    "language" : "nl",
+    "samples" : "51840",
+    "style" : "tired",
+    "voice" : "stuart_bell"
+  }
+]

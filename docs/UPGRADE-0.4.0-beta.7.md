@@ -26,6 +26,8 @@ Use the [complete delivery integration](MAX-DELIVERY-STYLES.md). Required app wo
 6. Keep temperature labeled Variation, separate from the reference style. Retain
    quality-first sampler settings, measured fallback policy and beta.5/beta.6
    background GPU authorization, CPU fallback and resource recovery.
+   Offer `PocketTTSChunkingOptions.carefulReading` as a separate **Careful reading**
+   phrasing preset for audition; preserve existing saved chunk settings.
 7. Surface unsupported/missing-style errors. Do not silently substitute a voice,
    language, style or model. Do not automatically guess emotions sentence by sentence.
 

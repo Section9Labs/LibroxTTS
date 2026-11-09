@@ -5,6 +5,8 @@ import PocketTTSMLX
 import Synchronization
 
 @Test func pocketDeliveryPreservesOriginalCacheAndSeparatesPerformances() throws {
+    try PocketTTSChunkingOptions.carefulReading.validate()
+    #expect(PocketTTSChunkingOptions.carefulReading.cacheIdentity != PocketTTSChunkingOptions().cacheIdentity)
     var unit = BookNarrationUnit(sourceText: "She waited.",
         sourceRange: NSRange(location: 0, length: 11), narratorID: "pocket-caro_davy-en-v1")
     let original = NarrationModel.pocket.renderIdentity(for: unit)

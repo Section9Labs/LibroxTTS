@@ -18,11 +18,309 @@
   "iOSSDKBuild": "passed",
   "regressionTests": "38 test functions passed; 14 opt-in runtime/fixture tests skipped in that run",
   "realAssetPipelineTests": "2 passed with the existing shipped Original states; includes buffered/streaming sampling parity",
-  "exportedEmotionalStates": 0,
-  "publishedEmotionalStates": 0,
+  "exportedEmotionalStates": 364,
+  "publishedEmotionalStates": 364,
   "emotionalNarrationListeningAccepted": false,
   "physicalDeviceStyleValidation": false,
-  "blocker": "Kyutai cloning-enabled checkpoint requires authenticated authorized access. Exporter refused preset-only fallback.",
-  "scope": "SDK routing, identity, optional asset installation, export/audition tooling; app integration and emotional asset release remain outstanding.",
-  "focusedStyleTests": "4 passed after final cache-identity and real-state test additions; emotional real-state test skipped pending export"
+  "blocker": null,
+  "scope": "SDK integration and hosted preview voice states. App integration, physical-device style acceptance and human listening verdict remain outstanding.",
+  "focusedStyleTests": "5 passed with all seven exported manifests",
+  "allExportedStatesRender": "364/364 passed, seven languages, four voices, thirteen styles, four sampler steps",
+  "cpuGPUPipelineParity": "Passed both backends, English/Spanish, Original/Calm/Worried/Original; buffered/streaming comparison and Original restoration",
+  "hostedInstall": "Clean base-only installation downloaded only Caro Davy Calm plus credits; hash validation and native render passed",
+  "assetRelease": "https://github.com/Section9Labs/LibroxTTS/releases/tag/pocket-delivery-voicezero-490cfbee-v1",
+  "githubAssetDigestsVerified": 399,
+  "generatedAuditionClips": 116,
+  "wordScreening": {
+    "balancedEnglish": {
+      "exactMatches": 26,
+      "total": 36,
+      "flags": [
+        {
+          "sample": "en-bill_boerst-original-reflective",
+          "differences": [
+            {
+              "kind": "replace",
+              "expected": "things",
+              "heard": "thing"
+            }
+          ]
+        },
+        {
+          "sample": "en-bill_boerst-neutral-dialogue",
+          "differences": [
+            {
+              "kind": "insert",
+              "expected": "",
+              "heard": "she said there is still time"
+            }
+          ]
+        },
+        {
+          "sample": "en-bill_boerst-calm-reflective",
+          "differences": [
+            {
+              "kind": "replace",
+              "expected": "things",
+              "heard": "thing"
+            }
+          ]
+        },
+        {
+          "sample": "en-bill_boerst-calm-dialogue",
+          "differences": [
+            {
+              "kind": "insert",
+              "expected": "",
+              "heard": "she said there is still time"
+            }
+          ]
+        },
+        {
+          "sample": "en-caro_davy-neutral-reflective",
+          "differences": [
+            {
+              "kind": "replace",
+              "expected": "things",
+              "heard": "thing"
+            }
+          ]
+        },
+        {
+          "sample": "en-peter_yearsley-original-descriptive",
+          "differences": [
+            {
+              "kind": "replace",
+              "expected": "a",
+              "heard": "the"
+            }
+          ]
+        },
+        {
+          "sample": "en-peter_yearsley-original-dialogue",
+          "differences": [
+            {
+              "kind": "insert",
+              "expected": "",
+              "heard": "sit down she said"
+            }
+          ]
+        },
+        {
+          "sample": "en-peter_yearsley-calm-dialogue",
+          "differences": [
+            {
+              "kind": "replace",
+              "expected": "there is still time",
+              "heard": "sit down she said sit down"
+            }
+          ]
+        },
+        {
+          "sample": "en-stuart_bell-neutral-dialogue",
+          "differences": [
+            {
+              "kind": "replace",
+              "expected": "there is still time",
+              "heard": "sit"
+            }
+          ]
+        },
+        {
+          "sample": "en-stuart_bell-calm-reflective",
+          "differences": [
+            {
+              "kind": "replace",
+              "expected": "things",
+              "heard": "thing"
+            }
+          ]
+        }
+      ]
+    },
+    "balancedSpanish": {
+      "exactMatches": 9,
+      "total": 18,
+      "flags": [
+        {
+          "sample": "es-caro_davy-original-reflective",
+          "differences": [
+            {
+              "kind": "delete",
+              "expected": "nadie vino",
+              "heard": ""
+            }
+          ]
+        },
+        {
+          "sample": "es-caro_davy-original-dialogue",
+          "differences": [
+            {
+              "kind": "delete",
+              "expected": "todav\u00eda estamos a tiempo",
+              "heard": ""
+            }
+          ]
+        },
+        {
+          "sample": "es-caro_davy-neutral-reflective",
+          "differences": [
+            {
+              "kind": "delete",
+              "expected": "nadie vino",
+              "heard": ""
+            }
+          ]
+        },
+        {
+          "sample": "es-caro_davy-neutral-dialogue",
+          "differences": [
+            {
+              "kind": "delete",
+              "expected": "todav\u00eda estamos a tiempo",
+              "heard": ""
+            }
+          ]
+        },
+        {
+          "sample": "es-caro_davy-calm-reflective",
+          "differences": [
+            {
+              "kind": "delete",
+              "expected": "esper\u00f3 en silencio nadie vino",
+              "heard": ""
+            }
+          ]
+        },
+        {
+          "sample": "es-caro_davy-calm-dialogue",
+          "differences": [
+            {
+              "kind": "delete",
+              "expected": "todav\u00eda estamos a tiempo",
+              "heard": ""
+            }
+          ]
+        },
+        {
+          "sample": "es-bill_boerst-original-reflective",
+          "differences": [
+            {
+              "kind": "delete",
+              "expected": "esper\u00f3 en silencio nadie vino",
+              "heard": ""
+            }
+          ]
+        },
+        {
+          "sample": "es-bill_boerst-original-dialogue",
+          "differences": [
+            {
+              "kind": "delete",
+              "expected": "acerc\u00f3 la silla",
+              "heard": ""
+            }
+          ]
+        },
+        {
+          "sample": "es-bill_boerst-calm-reflective",
+          "differences": [
+            {
+              "kind": "delete",
+              "expected": "nadie vino",
+              "heard": ""
+            }
+          ]
+        }
+      ]
+    },
+    "carefulEnglish": {
+      "exactMatches": 33,
+      "total": 36,
+      "flags": [
+        {
+          "sample": "en-bill_boerst-original-reflective",
+          "differences": [
+            {
+              "kind": "replace",
+              "expected": "things",
+              "heard": "thing"
+            }
+          ]
+        },
+        {
+          "sample": "en-caro_davy-neutral-reflective",
+          "differences": [
+            {
+              "kind": "replace",
+              "expected": "things",
+              "heard": "thing"
+            }
+          ]
+        },
+        {
+          "sample": "en-stuart_bell-neutral-descriptive",
+          "differences": [
+            {
+              "kind": "replace",
+              "expected": "seven",
+              "heard": "7"
+            }
+          ]
+        }
+      ]
+    },
+    "carefulSpanish": {
+      "exactMatches": 18,
+      "total": 18,
+      "flags": []
+    },
+    "strongerDialogue": {
+      "exactMatches": 5,
+      "total": 8,
+      "flags": [
+        {
+          "sample": "en-caro_davy-happy-dialogue",
+          "differences": [
+            {
+              "kind": "delete",
+              "expected": "there is still time",
+              "heard": ""
+            }
+          ]
+        },
+        {
+          "sample": "en-caro_davy-surprised-dialogue",
+          "differences": [
+            {
+              "kind": "replace",
+              "expected": "photograph",
+              "heard": "forgot"
+            },
+            {
+              "kind": "delete",
+              "expected": "there is still time",
+              "heard": ""
+            }
+          ]
+        },
+        {
+          "sample": "en-peter_yearsley-sad-dialogue",
+          "differences": [
+            {
+              "kind": "insert",
+              "expected": "",
+              "heard": "sit down she said"
+            },
+            {
+              "kind": "replace",
+              "expected": "is",
+              "heard": "s"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "wordScreeningQualification": "ASR flags require listening review. Exact words do not prove narrator quality or emotion accuracy. One careful-English flag is seven versus 7."
 }

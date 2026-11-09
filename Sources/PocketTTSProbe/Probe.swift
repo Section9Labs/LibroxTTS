@@ -3,6 +3,7 @@ import Foundation
 import LibroxTTS
 import PocketTTSMLX
 import KokoroCatalog
+import KokoroPronunciation
 import AVFoundation
 import MLX
 @main struct Probe {
@@ -27,6 +28,45 @@ import MLX
     }
     static func run() async throws {
         let a = CommandLine.arguments
+        if a.count == 4, a[1] == "--book-demo" {
+            let text = "The rain had stopped. Beside the window, James closed his book.\n\n“You came back. I thought you had forgotten,” said James.\n\nThomas put the old photograph on the table. “I was worried. But every road brought me here,” said Thomas.\n\nFor a while, neither of them spoke. Outside, the first birds began to sing."
+            let narrator = "pocket-caro_davy-en-v1"
+            let pipeline = NarrationPipeline()
+            let initial = try BookVoiceCast(bookID: "delivery-demo", languageCode: "en", narratorVoiceID: narrator,
+                voicePool: ["pocket-peter_yearsley-en-v1", "pocket-bill_boerst-en-v1"])
+            let discovered = try await pipeline.plan(text, model: .pocket, bookID: "delivery-demo", chapterID: "one",
+                narratorVoiceID: narrator, language: "en", cast: initial, characterVoices: true)
+            guard var cast = discovered.cast, !cast.characters.isEmpty else { throw PocketTTSError.invalidVoice }
+            var delivery = PocketTTSBookDelivery(narratorStyle: .calm)
+            for character in cast.characters {
+                let james = character.name.lowercased() == "james"
+                try cast.setVoice(james ? "pocket-peter_yearsley-en-v1" : "pocket-bill_boerst-en-v1", for: character.id)
+                delivery.characterStyles[character.id] = james ? .happy : .worried
+            }
+            let plan = try await pipeline.plan(text, model: .pocket, bookID: "delivery-demo", chapterID: "one",
+                narratorVoiceID: narrator, language: "en", cast: cast, characterVoices: true,
+                pocketChunking: .carefulReading, pocketDelivery: delivery)
+            let renderer = NarrationRenderer(compactDirectory: URL(fileURLWithPath: "/unused"), harmonicSource: nil)
+            try await renderer.load(.pocket, directory: URL(fileURLWithPath: a[2]), executionContext: .foreground)
+            var samples: [Float] = []
+            for unit in plan.units { samples += try await renderer.render(unit) }
+            await renderer.unload()
+            try write(samples, sampleRate: 24_000, to: a[3])
+            let rows = plan.units.map { ["text": $0.text, "voice": $0.voiceID,
+                "speaker": $0.speakerID ?? "", "style": ($0.pocketDeliveryStyle ?? .original).rawValue,
+                "renderIdentity": NarrationModel.pocket.renderIdentity(for: $0)] }
+            try JSONSerialization.data(withJSONObject: rows, options: [.prettyPrinted, .sortedKeys])
+                .write(to: URL(fileURLWithPath: a[3] + ".json"))
+            print("Rendered \(plan.units.count) book units, \(samples.count) samples")
+            return
+        }
+        if a.count == 5, a[1] == "--download-style", let style = PocketTTSDeliveryStyle(rawValue: a[4]) {
+            let directory = URL(fileURLWithPath: a[2])
+            try await NarrationAssets.downloadPocketDeliveryStyle(style, voiceID: a[3], to: directory)
+            let installed = try PocketTTSDeliveryCatalog.installedStyles(voiceID: a[3], in: directory)
+            print("Installed delivery styles: " + installed.map(\.rawValue).joined(separator: ", "))
+            return
+        }
         if a.count == 3, a[1] == "--trial" {
             let trial = try JSONDecoder().decode(Trial.self, from: Data(contentsOf: URL(fileURLWithPath: a[2])))
             let engine = PocketTTSEngine(directory: URL(fileURLWithPath: trial.assets))
@@ -87,10 +127,13 @@ import MLX
         print("samples=\(audio.samples.count) rate=\(audio.sampleRate) elapsed=\(Date().timeIntervalSince(started)) peak=\(audio.samples.map { abs($0) }.max() ?? 0)")
     }
     static func write(_ audio: PocketTTSEngine.Output, to path: String) throws {
-        let format = AVAudioFormat(standardFormatWithSampleRate: Double(audio.sampleRate), channels: 1)!
-        let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: AVAudioFrameCount(audio.samples.count))!
+        try write(audio.samples, sampleRate: audio.sampleRate, to: path)
+    }
+    static func write(_ samples: [Float], sampleRate: Int, to path: String) throws {
+        let format = AVAudioFormat(standardFormatWithSampleRate: Double(sampleRate), channels: 1)!
+        let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: AVAudioFrameCount(samples.count))!
         buffer.frameLength = buffer.frameCapacity
-        audio.samples.withUnsafeBufferPointer { buffer.floatChannelData![0].update(from: $0.baseAddress!, count: $0.count) }
+        samples.withUnsafeBufferPointer { buffer.floatChannelData![0].update(from: $0.baseAddress!, count: $0.count) }
         let file = try AVAudioFile(forWriting: URL(fileURLWithPath: path), settings: format.settings)
         try file.write(from: buffer)
     }

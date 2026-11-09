@@ -30,7 +30,10 @@ For a manually edited passage, set `unit.pocketDeliveryStyle` before cache looku
 and render. An override applies to the complete planned unit. To style only part
 of a larger unit, replan that passage with correct source ranges first; do not
 insert acting instructions or emotion tags into the book text. No automatic
-emotion classifier or style-state interpolation is implemented.
+emotion classifier or style-state interpolation is implemented. Styles follow
+the existing planner's speaker roles; they do not improve speaker detection.
+Unrecognized quoted passages can remain with the narrator. Review the cast and
+planned assignments when precise character performance matters.
 
 ## App integration
 
@@ -60,7 +63,7 @@ let delivery = PocketTTSBookDelivery(narratorStyle: .calm)
 let plan = try await NarrationPipeline().plan(
     chapterText, model: .pocket, bookID: bookID, chapterID: chapterID,
     narratorVoiceID: narratorID, language: "en", cast: savedCast,
-    characterVoices: true, pocketDelivery: delivery
+    characterVoices: true, pocketChunking: .carefulReading, pocketDelivery: delivery
 )
 // Persist plan.cast and delivery before playing newly assigned characters.
 for unit in plan.units {
@@ -135,6 +138,16 @@ It holds seed, temperature, steps and phrasing constant, records binary/state
 hashes, and fails if a selected preset is missing. Its default compares the
 four voices in Original, Neutral and Calm. Alternating-character playback must
 also be reviewed through the shared book pipeline in the app.
+
+Use `--phrasing short` for a controlled comparison with smaller targets. Initial
+ASR screening flagged repeated/missing endings with some balanced-grouping clips,
+including Original. Short grouping resolved both initial spot checks; this is
+word-screening evidence, not a listening verdict. Preserve the user's explicit
+phrasing settings and keep Delivery, Phrasing and Variation as separate controls.
+The SDK exposes the same 24/16-token, no-short-sentence-grouping configuration as
+`PocketTTSChunkingOptions.carefulReading`. Offer it as **Careful reading** without
+overwriting existing saved phrasing. Whole sentences still stay together when
+they fit the hard token cap.
 
 Listen for speaker identity, intelligibility, expressive restraint, unnatural
 breaths, harshness, pacing and abrupt transitions. A higher temperature or a

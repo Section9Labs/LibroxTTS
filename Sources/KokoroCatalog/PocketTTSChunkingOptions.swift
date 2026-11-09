@@ -17,6 +17,13 @@ public struct PocketTTSChunkingOptions: Codable, Hashable, Sendable {
     public var shortSentenceTokens: Int
     public var maximumUnitScalars: Int
 
+    /// An explicit smaller-phrase audition preset. Keeps complete sentences when
+    /// possible while reducing grouping of trailing short sentences. Does not
+    /// replace saved phrasing or claim universal perceptual superiority.
+    public static var carefulReading: Self {
+        .init(narrationTargetTokens: 24, dialogueTargetTokens: 16, shortSentenceTokens: 0)
+    }
+
     public init(narrationTargetTokens: Int = 48, dialogueTargetTokens: Int = 32,
                 maximumTokens: Int = 96, shortSentenceTokens: Int = 12,
                 maximumUnitScalars: Int = 2400, grouping: Grouping = .adaptive) {

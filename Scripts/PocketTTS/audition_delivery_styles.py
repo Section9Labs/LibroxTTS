@@ -26,6 +26,7 @@ def main():
     parser.add_argument('--passages', nargs='+', choices=TEXTS['en'], default=list(TEXTS['en']))
     parser.add_argument('--temperature', type=float, default=0.3)
     parser.add_argument('--steps', type=int, choices=range(1, 9), default=4)
+    parser.add_argument('--phrasing', choices=POLICIES, default='balanced')
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
     probe_hash = hashlib.sha256(args.probe.read_bytes()).hexdigest()
@@ -45,7 +46,7 @@ def main():
                     request = dict(assets=str(args.assets.resolve()), output=str(wav.resolve()),
                         voiceID=f'pocket-{voice}-{language}-v1', text=text,
                         deliveryStyle=style, temperature=args.temperature,
-                        samplerSteps=args.steps, seed=42, chunking=POLICIES['balanced'],
+                        samplerSteps=args.steps, seed=42, chunking=POLICIES[args.phrasing],
                         role='dialogue' if passage == 'dialogue' else 'narration')
                     request_file = args.output / (name + '.request.json')
                     request_file.write_text(json.dumps(request, indent=2, ensure_ascii=False) + '\n')

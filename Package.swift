@@ -26,7 +26,7 @@ let package = Package(
     dependencies: [.package(url: "https://github.com/ml-explore/mlx-swift.git", exact: "0.32.3")],
     targets: [
         .target(name: "PocketTTSMLX", dependencies: ["KokoroCatalog", .product(name: "MLX", package: "mlx-swift"), .product(name: "MLXNN", package: "mlx-swift"), .product(name: "MLXFast", package: "mlx-swift"), .product(name: "MLXRandom", package: "mlx-swift")], path: "Integrations/PocketTTS/Sources/PocketTTSMLX"),
-        .executableTarget(name: "PocketTTSProbe", dependencies: ["LibroxTTS", "PocketTTSMLX"]),
+        .executableTarget(name: "PocketTTSProbe", dependencies: ["LibroxTTS", "PocketTTSMLX", "KokoroPronunciation"]),
         .testTarget(name: "PocketTTSMLXTests", dependencies: ["PocketTTSMLX", "LibroxTTS"]),
         .target(name: "LibroxCTNative", dependencies: ["KokoroCatalog"], path: "Integrations/CTNative/Sources/LibroxCTNative", resources: [.process("Resources")]),
         .executableTarget(name: "CTInstallProbe", dependencies: ["LibroxTTS", "LibroxCTNative"]),
