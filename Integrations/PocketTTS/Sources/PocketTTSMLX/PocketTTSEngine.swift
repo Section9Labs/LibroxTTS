@@ -41,6 +41,8 @@ public actor PocketTTSEngine {
     private let directory: URL
     private var model: PocketTTSModel?
     private var language: String?
+    /// The language whose model is held in memory, or nil.
+    public var loadedLanguage: String? { language }
     /// CPU duty cycle for `.cpu` renders on iOS; nil = unmetered. Default 0.5.
     public private(set) var cpuBudgetFraction: Double? = PocketCPUWorkBudget.defaultFraction
     public func setCPUBudgetFraction(_ fraction: Double?) { cpuBudgetFraction = fraction }

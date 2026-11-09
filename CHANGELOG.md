@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.4.2 — 2026-11-09
+
+- Per-language Max uninstall. `NarrationAssets.uninstallPocketLanguage(_:in:)`
+  removes one language's base pack, voices and delivery styles (`<language>/`)
+  and returns the bytes freed; other languages and host receipts are untouched,
+  and a second call frees 0. `NarrationRenderer.uninstallPocketLanguage(_:in:)`
+  does the same serialized with rendering and releases that language's model
+  first if it is loaded. Also `installedPocketBytes(language:in:)`,
+  `installedPocketLanguages(in:)`, `NarrationRenderer.loadedPocketLanguage` and
+  `PocketTTSEngine.loadedLanguage`. Model bytes and cache identities are unchanged.
+
 ## 0.4.1 — 2026-11-09
 
 - Host-selectable CPU budget for background Max renders:

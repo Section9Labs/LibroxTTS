@@ -81,6 +81,22 @@ public actor NarrationRenderer {
         await acquire(); defer { release() }
         await unloadHeld()
     }
+
+    /// The Max language whose model is in memory, or nil.
+    public var loadedPocketLanguage: String? {
+        get async { await pocket?.loadedLanguage }
+    }
+
+    /// Removes one Max language, serialized with rendering: waits for any
+    /// in-flight render, releases that language's model if it is loaded, then
+    /// deletes its files. Other languages, and a loaded other language, stay.
+    /// A later render of the removed language fails with `invalidAssets`.
+    @discardableResult
+    public func uninstallPocketLanguage(_ language: String, in directory: URL) async throws -> Int64 {
+        await acquire(); defer { release() }
+        if let pocket, await pocket.loadedLanguage == language { await pocket.unload() }
+        return try NarrationAssets.uninstallPocketLanguage(language, in: directory)
+    }
     private func unloadHeld() async {
         await pocket?.unload(); pocket = nil
         await plus?.unload(); plus = nil
