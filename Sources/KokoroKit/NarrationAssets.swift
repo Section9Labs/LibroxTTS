@@ -168,6 +168,26 @@ public enum NarrationAssets {
         try configureForPlayback(directory)
     }
 
+    /// Complete new-book narrator download, including the base language pack and
+    /// the default Calm state with its credits. Existing base-only receipts stay valid.
+    public static func manifestPocketNarratorPreset(language: String) throws -> AssetManifest {
+        let preset = try PocketTTSNarratorPreset.defaultNarrator(language: language)
+        return try PocketTTSDeliveryCatalog.narratorManifest(voiceID: preset.voiceID,
+                                                             style: preset.delivery.narratorStyle)
+    }
+
+    public static func downloadPocketNarratorPreset(to directory: URL, language: String,
+                                                    progress: (@Sendable (Double) -> Void)? = nil) async throws {
+        try await downloadFiles(manifestPocketNarratorPreset(language: language), to: directory, progress: progress)
+        try preparePocketNarratorPreset(in: directory, language: language)
+    }
+
+    /// Pair with manifestPocketNarratorPreset for background URLSession transfers.
+    public static func preparePocketNarratorPreset(in directory: URL, language: String) throws {
+        let preset = try PocketTTSNarratorPreset.defaultNarrator(language: language)
+        try preparePocketDeliveryStyle(preset.delivery.narratorStyle, voiceID: preset.voiceID, in: directory)
+    }
+
     /// Install the optional reference performances beside the base language pack.
     /// The caller must serialize installation with generation for this directory.
     public static func downloadPocketDeliveryStyles(to directory: URL, language: String,

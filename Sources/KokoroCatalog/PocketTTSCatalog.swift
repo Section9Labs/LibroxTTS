@@ -16,7 +16,7 @@ public enum PocketTTSCatalog {
     public static let isDownloadPublished = true
     public static let languages = ["en", "fr", "de", "pt", "it", "es", "nl"]
     public static let voiceNames = ["alba", "anna", "azelma", "bill_boerst", "caro_davy", "charles", "daan", "eponine", "estelle", "eve", "fantine", "george", "giovanni", "jane", "javert", "lola", "marius", "mary", "michael", "paul", "peter_yearsley", "stuart_bell", "vera"]
-    public static let defaultVoices = ["en": "alba", "fr": "estelle", "de": "alba", "pt": "alba", "it": "giovanni", "es": "lola", "nl": "daan"]
+    public static let defaultVoices = Dictionary(uniqueKeysWithValues: languages.map { ($0, "caro_davy") })
     private static let cc0Voices: Set<String> = ["bill_boerst", "caro_davy", "estelle", "giovanni", "javert", "lola", "marius", "peter_yearsley", "stuart_bell"]
     public enum VoiceGender: String, Sendable { case female, male, unknown }
     // Verified source metadata from CSTR VCTK 0.92 speaker-info.txt, not names

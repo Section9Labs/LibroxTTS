@@ -23,7 +23,7 @@
   "emotionalNarrationListeningAccepted": false,
   "physicalDeviceStyleValidation": false,
   "blocker": null,
-  "scope": "SDK integration and hosted preview voice states. App integration, physical-device style acceptance and human listening verdict remain outstanding.",
+  "scope": "SDK integration, hosted voice states, and accepted English Caro/Calm default for new books. Other styles/languages remain preview; app integration and physical-device style validation remain outstanding.",
   "focusedStyleTests": "5 passed with all seven exported manifests",
   "allExportedStatesRender": "364/364 passed, seven languages, four voices, thirteen styles, four sampler steps",
   "cpuGPUPipelineParity": "Passed both backends, English/Spanish, Original/Calm/Worried/Original; buffered/streaming comparison and Original restoration",
@@ -333,6 +333,20 @@
     "samples": 593280,
     "sampleRate": 24000,
     "wordScreeningExact": true,
-    "humanListeningAccepted": false
-  }
+    "humanListeningAccepted": true,
+    "acceptance": "Matt: The book scene sounds amazing. This should be our default voice / mood for narrators."
+  },
+  "defaultNarrator": {
+    "voice": "caro_davy",
+    "style": "calm",
+    "phrasing": "carefulReading",
+    "temperature": 0.3,
+    "samplerSteps": 4,
+    "acceptedLanguage": "en",
+    "otherLanguagesListeningAccepted": false,
+    "preserveSavedChoices": true
+  },
+  "listeningAcceptanceScope": "English Caro/Calm book scene accepted; not a blanket acceptance of all 364 states",
+  "newBookDefaultTests": "Passed new-book preset and all-seven-language manifests, preserving explicit voice/cast/settings; 53 matching test functions passed with 14 opt-in skips",
+  "defaultNarratorInstall": "Combined base/Caro Calm manifest installation and preparation passed against the verified hosted installation"
 }

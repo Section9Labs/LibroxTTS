@@ -1,8 +1,41 @@
 import Foundation
 import Testing
 import LibroxTTS
+import KokoroPronunciation
 import PocketTTSMLX
 import Synchronization
+
+@Test func pocketNewBookDefaultsMatchAcceptedNarratorAndPreserveSavedSelections() async throws {
+    let pipeline = NarrationPipeline()
+    let source = "The rain had stopped. Beside the window, James closed his book."
+    for language in PocketTTSCatalog.languages {
+        let preset = try PocketTTSNarratorPreset.defaultNarrator(language: language)
+        let plan = try await pipeline.plan(source, model: .pocket, bookID: "new", chapterID: "one",
+                                          narratorVoiceID: nil, language: language)
+        #expect(plan.narratorVoiceID == preset.voiceID)
+        #expect(plan.units.allSatisfy { $0.voiceID == preset.voiceID && $0.pocketDeliveryStyle == .calm
+            && $0.pocketChunking == preset.chunking && $0.pocketSampling == preset.sampling })
+        let manifest = try NarrationAssets.manifestPocketNarratorPreset(language: language)
+        #expect(Set(manifest.files.map(\.path)).count == manifest.files.count)
+        #expect(manifest.files.contains { $0.path == "\(language)/embeddings/caro_davy__calm.safetensors" })
+        #expect(manifest.files.contains { $0.path.hasSuffix("DELIVERY-CREDITS.json") })
+    }
+    let explicit = try await pipeline.plan(source, model: .pocket, bookID: "old", chapterID: "one",
+                                          narratorVoiceID: "pocket-alba-en-v1", language: "en")
+    #expect(explicit.narratorVoiceID == "pocket-alba-en-v1")
+    #expect(explicit.units.allSatisfy { $0.pocketDeliveryStyle == nil && $0.pocketChunking == .init() })
+    let cast = try BookVoiceCast(bookID: "old", languageCode: "en", narratorVoiceID: "pocket-alba-en-v1", voicePool: [])
+    let saved = try await pipeline.plan(source, model: .pocket, bookID: "old", chapterID: "one",
+                                       narratorVoiceID: nil, language: "en", cast: cast)
+    #expect(saved.narratorVoiceID == "pocket-alba-en-v1")
+    #expect(saved.units.allSatisfy { $0.pocketDeliveryStyle == nil && $0.voiceID == "pocket-alba-en-v1" })
+    let original = try await pipeline.plan(source, model: .pocket, bookID: "new", chapterID: "two",
+        narratorVoiceID: nil, language: "en", pocketChunking: .init(), pocketDelivery: .init())
+    #expect(original.units.allSatisfy { $0.pocketDeliveryStyle == nil && $0.pocketChunking == .init() })
+    #expect(!PocketTTSDeliveryCatalog.isPreview(voiceID: "pocket-caro_davy-en-v1", style: .calm))
+    #expect(PocketTTSDeliveryCatalog.isPreview(voiceID: "pocket-caro_davy-es-v1", style: .calm))
+    #expect(PocketTTSDeliveryCatalog.isPreview(voiceID: "pocket-peter_yearsley-en-v1", style: .calm))
+}
 
 @Test func pocketDeliveryPreservesOriginalCacheAndSeparatesPerformances() throws {
     try PocketTTSChunkingOptions.carefulReading.validate()

@@ -24,9 +24,9 @@ public actor NarrationPipeline {
                      cast: BookVoiceCast? = nil, characterVoices: Bool = false,
                      options: PronunciationOptions = .init(), delivery: NarrationDeliveryOptions = .init(expressive: true),
                      lexicon: SpokenTextLexicon = .init(), nativeExpression: Bool = false, repositoryID: String? = nil,
-                     pocketChunking: PocketTTSChunkingOptions = .init(),
+                     pocketChunking: PocketTTSChunkingOptions? = nil,
                      pocketSampling: PocketTTSSamplingOptions = .init(),
-                     pocketDelivery: PocketTTSBookDelivery = .init()) async throws -> Plan {
+                     pocketDelivery: PocketTTSBookDelivery? = nil) async throws -> Plan {
         try Task.checkCancellation()
         if model == .pocket { try pocketSampling.validate() }
         let delivery = model.resolvedDeliveryOptions(delivery)
@@ -36,6 +36,12 @@ public actor NarrationPipeline {
         let language = NarrationLanguage.normalize(language)
             ?? NarrationLanguage.detect(metadata: metadataLanguage, sample: text) ?? preferredLanguage ?? "en"
         guard model.supportedLanguageCodes.contains(language) else { throw PlanningError.unsupportedLanguage(language) }
+        // Only a fresh selection receives new-book defaults. Explicit voices,
+        // saved casts and explicit settings retain their previous behavior.
+        let preset = model == .pocket && narratorVoiceID == nil && cast == nil
+            ? try PocketTTSNarratorPreset.defaultNarrator(language: language) : nil
+        let pocketChunking = pocketChunking ?? preset?.chunking ?? .init()
+        let pocketDelivery = pocketDelivery ?? preset?.delivery ?? .init()
         guard let voiceID = model.resolvedVoiceID(narratorVoiceID, language: language) else { throw PlanningError.invalidVoice }
         var units: [BookNarrationUnit]
         let updatedCast: BookVoiceCast?

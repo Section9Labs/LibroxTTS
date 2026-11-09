@@ -53,7 +53,8 @@ import LibroxTTS
         #expect(unit.voiceID.hasPrefix("pocket-"))
     }
     #expect(NarrationModel.pocket.resolvedVoiceID(nil, language: "ja") == nil)
-    #expect(NarrationModel.pocket.resolvedVoiceID(nil, language: "es") == "pocket-lola-es-v1")
+    #expect(NarrationModel.pocket.resolvedVoiceID(nil, language: "es") == "pocket-caro_davy-es-v1")
+    #expect(NarrationModel.pocket.resolvedVoiceID("pocket-lola-es-v1", language: "es") == "pocket-lola-es-v1")
     #expect(NarrationModel.pocket.resolvedVoiceID("pocket-cosette-en-v1", language: "en") == nil)
     #expect(NarrationModel.pocket.resolvedVoiceID("af_heart", language: "en") == nil)
     #expect(NarrationModel.pocket.isEnabled)

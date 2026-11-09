@@ -2,13 +2,23 @@
 
 The 0.4.0-beta.7 candidate adds 364 reference-based preview performances:
 13 styles for four speakers, encoded independently for each of seven languages.
-Original remains the default. Preview styles have not received human narration
-acceptance and must not be labeled recommended or guaranteed to convey an emotion.
-Use `PocketTTSDeliveryStyle.isPreview` to label them in the app.
+The default for new Max books is **Caro Davy / Calm**, with Careful reading,
+temperature 0.3 and four sampler steps. Matt accepted the English book scene for
+default narration on 2026-11-08. Existing books retain their saved selections.
+Other voice/style combinations and non-English performances remain previews.
+Use `PocketTTSDeliveryCatalog.isPreview(voiceID:style:)` for contextual labels;
+style-only `isPreview` is conservative and cannot express speaker acceptance.
 
 ## Reading behavior
 
-The reader selects a narrator and a delivery style once for a book. Prose,
+Initialize new books with `PocketTTSNarratorPreset.defaultNarrator(language:)`
+and persist its voiceID, delivery, chunking and sampling fields. A pipeline call
+with no explicit narrator and no saved cast selects these defaults. Supplying a
+voice or cast preserves the previous Original/balanced behavior unless the host
+passes saved or preset settings explicitly. Never use absence of a delivery
+setting alone as permission to change an existing book.
+
+The reader can change the narrator and delivery style for a book. Prose,
 attributions and speaker labels keep that narrator style across chapters.
 Original uses the existing voice state unchanged. Calm, Neutral and the other
 styles select different reference performances of the same named speaker;
@@ -52,18 +62,20 @@ Stuart Bell. Other voices continue to offer Original only.
 ```swift
 import LibroxTTS
 
-let narratorID = "pocket-caro_davy-en-v1"
+let preset = try PocketTTSNarratorPreset.defaultNarrator(language: "en")
+let narratorID = preset.voiceID
 let installed = try PocketTTSDeliveryCatalog.installedStyles(
     voiceID: narratorID, in: modelDirectory)
 // Offer only the returned choices. This example is run after Calm is installed.
 guard installed.contains(.calm) else {
     throw PocketTTSDeliveryCatalog.DeliveryError.missingOrInvalidAsset
 }
-let delivery = PocketTTSBookDelivery(narratorStyle: .calm)
+var delivery = preset.delivery
 let plan = try await NarrationPipeline().plan(
     chapterText, model: .pocket, bookID: bookID, chapterID: chapterID,
     narratorVoiceID: narratorID, language: "en", cast: savedCast,
-    characterVoices: true, pocketChunking: .carefulReading, pocketDelivery: delivery
+    characterVoices: true, pocketChunking: preset.chunking,
+    pocketSampling: preset.sampling, pocketDelivery: delivery
 )
 // Persist plan.cast and delivery before playing newly assigned characters.
 for unit in plan.units {
@@ -89,6 +101,13 @@ chapter plan. Retire any
 in-flight generation before applying changed settings.
 
 ## Optional asset installation and release
+
+For the new default, `NarrationAssets.downloadPocketNarratorPreset(to:language:)`
+installs the base language model plus Caro/Calm and credits in one operation.
+Background-transfer hosts use `manifestPocketNarratorPreset(language:)` and
+`preparePocketNarratorPreset(in:language:)`. Its manifest supplies the full size
+and hashes. Existing base-only installations remain valid for Original voices;
+install the selected delivery state before changing them to Calm.
 
 Each language needs states encoded with its exact checkpoint. An English export
 cannot be copied into the Spanish pack. Emotion references are currently English;
@@ -145,7 +164,7 @@ including Original. Short grouping resolved both initial spot checks; this is
 word-screening evidence, not a listening verdict. Preserve the user's explicit
 phrasing settings and keep Delivery, Phrasing and Variation as separate controls.
 The SDK exposes the same 24/16-token, no-short-sentence-grouping configuration as
-`PocketTTSChunkingOptions.carefulReading`. Offer it as **Careful reading** without
+`PocketTTSChunkingOptions.carefulReading`. Use it for new books and offer it as **Careful reading** without
 overwriting existing saved phrasing. Whole sentences still stay together when
 they fit the hard token cap.
 

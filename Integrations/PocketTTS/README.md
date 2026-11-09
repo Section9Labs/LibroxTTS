@@ -9,7 +9,11 @@ Basic and Plus retain their existing model IDs and voices.
 The optional [reference-based delivery integration](../../docs/MAX-DELIVERY-STYLES.md)
 adds per-book narrator and per-character style routing, with optional preview
 performances for Bill Boerst, Caro Davy, Peter Yearsley and Stuart Bell.
-Original stays the default; preview styles require individual listening review.
+New Max books default to Caro Davy / Calm with Careful reading, temperature 0.3
+and four sampler steps, matching the accepted English book scene. Preserve saved
+book settings; other performances and languages remain listening previews. See
+[the beta.7 app handoff](../../docs/UPGRADE-0.4.0-beta.7.md) for initialization and
+the combined base-model/default-narrator installer.
 
 The SDK registers model identity, downloads, language/voice selection, text-native
 planning, spoken dictionary readings, source ranges, persistent character casts,

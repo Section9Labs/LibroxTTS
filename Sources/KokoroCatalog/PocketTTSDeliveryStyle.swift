@@ -8,7 +8,8 @@ public enum PocketTTSDeliveryStyle: String, CaseIterable, Codable, Hashable, Sen
     case anger, confused, enthused, excited, frustrated, shout, tired
 
     public var name: String { rawValue.capitalized }
-    /// New reference performances need the listener's own narration audition.
+    /// Conservative style-only status. Use the catalog's voice-specific status
+    /// in the app: acceptance applies to a speaker/language/performance, not a mood.
     public var isPreview: Bool { self != .original }
     public var cacheIdentity: String {
         self == .original ? "original" : PocketTTSDeliveryCatalog.identity + ":" + rawValue
@@ -22,6 +23,23 @@ public enum PocketTTSDeliveryCatalog {
     public static let sourceRevision = "490cfbee850a6d409076f477c766f567000a79b6"
     public static let identity = "pocket-delivery-voicezero-490cfbee-v1"
     public static let referenceVoiceNames = ["bill_boerst", "caro_davy", "peter_yearsley", "stuart_bell"]
+
+    /// The English Caro/Calm book scene was accepted for default narration.
+    /// This does not qualify every Calm voice or every language by association.
+    public static func isPreview(voiceID: String, style: PocketTTSDeliveryStyle) -> Bool {
+        style != .original && !(voiceID == "pocket-caro_davy-en-v1" && style == .calm)
+    }
+
+    /// Base language pack and selected narrator performance, including credits.
+    public static func narratorManifest(voiceID: String, style: PocketTTSDeliveryStyle) throws -> AssetManifest {
+        guard let voice = PocketTTSCatalog.voice(id: voiceID) else { throw DeliveryError.unsupportedVoice }
+        let base = try PocketTTSCatalog.manifest(language: voice.language)
+        guard style != .original else { return base }
+        let performance = try manifest(voiceID: voiceID, style: style)
+        return AssetManifest(repository: base.repository, revision: base.revision + ":" + performance.revision,
+                             files: base.files + performance.files,
+                             installedFiles: base.installedFiles + performance.installedFiles)
+    }
 
     public enum DeliveryError: LocalizedError {
         case unsupportedVoice, unpublishedLanguage, missingOrInvalidAsset
