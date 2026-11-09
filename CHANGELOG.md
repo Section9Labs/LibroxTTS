@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.1 — 2026-11-09
+
+- Host-selectable CPU budget for background Max renders:
+  `NarrationRenderer.setCPUBudget(fraction:)` /
+  `PocketTTSEngine.setCPUBudgetFraction(_:)`. `nil` is unmetered (for a
+  charging `BGProcessingTask`, where iOS lifts CPU limits); other values are a
+  fraction of one core clamped to 0.1…0.8. The default stays 0.5 for every
+  caller that doesn't opt in. Model bytes, sampling and cache identities are
+  unchanged.
+
 ## 0.4.0 — 2026-11-08
 
 - Stable Max tier using native Swift MLX Pocket TTS alongside Basic and Plus.
