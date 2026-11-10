@@ -24,8 +24,11 @@ public struct PocketTTSBookDelivery: Codable, Hashable, Sendable {
 
     /// Unattributed dialogue stays Original; narrator styling never leaks into
     /// dialogue. Narration, speaker labels and attribution use narrator delivery.
+    /// A voice without exported styles (Original only) always reads Original.
     public func style(for unit: BookNarrationUnit) -> PocketTTSDeliveryStyle {
-        unit.role == .dialogue ? unit.speakerID.flatMap { characterStyles[$0] } ?? .original : narratorStyle
+        let requested = unit.role == .dialogue
+            ? unit.speakerID.flatMap { characterStyles[$0] } ?? .original : narratorStyle
+        return PocketTTSDeliveryCatalog.resolvedStyle(requested, voiceID: unit.voiceID)
     }
 
     public func applying(to units: [BookNarrationUnit]) throws -> [BookNarrationUnit] {

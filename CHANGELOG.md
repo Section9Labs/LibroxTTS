@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.5.0 — 2026-11-09
+
+- **Original-only voices read Original instead of failing.** Only Bill Boerst,
+  Caro Davy, Peter Yearsley and Stuart Bell have delivery styles; the other 19
+  Max voices are Original only. `PocketTTSBookDelivery.style(for:)` and
+  `applying(to:)` now resolve each unit's style against the voice that speaks
+  it, so a book saved with Calm (narrator or character) on an Original-only
+  voice plans and renders in Original rather than throwing `unsupportedVoice`.
+  New `PocketTTSDeliveryCatalog.offersStyles(voiceID:)` and
+  `resolvedStyle(_:voiceID:)`. Explicit single-style APIs
+  (`manifest(voiceID:style:)`, engine `deliveryStyle:`) still reject them.
+- **Breaking:** the preview status is removed —
+  `PocketTTSDeliveryStyle.isPreview` and
+  `PocketTTSDeliveryCatalog.isPreview(voiceID:style:)` no longer exist. Every
+  published style is a regular choice.
+- Model bytes, manifests and cache identities are unchanged.
+
 ## 0.4.2 — 2026-11-09
 
 - Per-language Max uninstall. `NarrationAssets.uninstallPocketLanguage(_:in:)`

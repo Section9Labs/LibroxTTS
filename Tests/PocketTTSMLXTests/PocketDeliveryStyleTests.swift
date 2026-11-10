@@ -32,9 +32,6 @@ import Synchronization
     let original = try await pipeline.plan(source, model: .pocket, bookID: "new", chapterID: "two",
         narratorVoiceID: nil, language: "en", pocketChunking: .init(), pocketDelivery: .init())
     #expect(original.units.allSatisfy { $0.pocketDeliveryStyle == nil && $0.pocketChunking == .init() })
-    #expect(!PocketTTSDeliveryCatalog.isPreview(voiceID: "pocket-caro_davy-en-v1", style: .calm))
-    #expect(PocketTTSDeliveryCatalog.isPreview(voiceID: "pocket-caro_davy-es-v1", style: .calm))
-    #expect(PocketTTSDeliveryCatalog.isPreview(voiceID: "pocket-peter_yearsley-en-v1", style: .calm))
 }
 
 @Test func pocketDeliveryPreservesOriginalCacheAndSeparatesPerformances() throws {
@@ -83,7 +80,7 @@ import Synchronization
     #expect(a.cacheIdentity != delivery.cacheIdentity)
 }
 
-@Test func pocketDeliveryFlowsThroughBookPlanningAndRejectsUnsupportedVoices() async throws {
+@Test func pocketDeliveryFlowsThroughBookPlanningAndOriginalOnlyVoicesReadOriginal() async throws {
     let source = "She waited by the window.\n\nThe rain had stopped."
     let plan = try await NarrationPipeline().plan(source, model: .pocket,
         bookID: "book", chapterID: "chapter", narratorVoiceID: "pocket-caro_davy-en-v1", language: "en",
@@ -91,11 +88,44 @@ import Synchronization
     #expect(!plan.units.isEmpty)
     #expect(plan.units.allSatisfy { $0.pocketDeliveryStyle == .calm })
     for unit in plan.units { #expect((source as NSString).substring(with: unit.range) == unit.text) }
-    await #expect(throws: PocketTTSDeliveryCatalog.DeliveryError.self) {
-        try await NarrationPipeline().plan(source, model: .pocket,
-            bookID: "book", chapterID: "chapter", narratorVoiceID: "pocket-alba-en-v1", language: "en",
-            pocketDelivery: .init(narratorStyle: .calm))
+    // Alba has no exported styles: a saved Calm reads in Original instead of failing.
+    let alba = try await NarrationPipeline().plan(source, model: .pocket,
+        bookID: "book", chapterID: "chapter", narratorVoiceID: "pocket-alba-en-v1", language: "en",
+        pocketDelivery: .init(narratorStyle: .calm))
+    #expect(!alba.units.isEmpty)
+    #expect(alba.units.allSatisfy { $0.pocketDeliveryStyle == nil && $0.voiceID == "pocket-alba-en-v1" })
+}
+
+@Test func originalOnlyVoicesResolveEveryStyleToOriginal() throws {
+    for language in PocketTTSCatalog.languages {
+        for name in PocketTTSCatalog.voiceNames {
+            let voiceID = "pocket-\(name)-\(language)-v1"
+            let offers = PocketTTSDeliveryCatalog.referenceVoiceNames.contains(name)
+            #expect(PocketTTSDeliveryCatalog.offersStyles(voiceID: voiceID) == offers)
+            #expect(PocketTTSDeliveryCatalog.offersStyles(voiceID: voiceID)
+                == (PocketTTSDeliveryCatalog.publishedStyles(voiceID: voiceID).count > 1))
+            for style in PocketTTSDeliveryStyle.allCases {
+                #expect(PocketTTSDeliveryCatalog.resolvedStyle(style, voiceID: voiceID) == (offers ? style : .original))
+            }
+        }
     }
+    #expect(!PocketTTSDeliveryCatalog.offersStyles(voiceID: "invalid"))
+    #expect(PocketTTSDeliveryCatalog.resolvedStyle(.calm, voiceID: "invalid") == .original)
+}
+
+@Test func pocketDeliveryRoutesOriginalOnlyCharactersToOriginal() throws {
+    let narrator = BookNarrationUnit(sourceText: "She waited.",
+        sourceRange: NSRange(location: 0, length: 11), narratorID: "pocket-lola-es-v1", role: .narration)
+    // A unit's narratorID is the voice that speaks it: Javert is Original only, Bill has styles.
+    let clara = BookNarrationUnit(sourceText: "Quédate.",
+        sourceRange: NSRange(location: 12, length: 8), narratorID: "pocket-javert-es-v1", role: .dialogue, speakerID: "clara")
+    let james = BookNarrationUnit(sourceText: "No.",
+        sourceRange: NSRange(location: 21, length: 3), narratorID: "pocket-bill_boerst-es-v1", role: .dialogue, speakerID: "james")
+    let delivery = PocketTTSBookDelivery(narratorStyle: .calm, characterStyles: ["clara": .worried, "james": .happy])
+    let output = try delivery.applying(to: [narrator, clara, james])
+    #expect(output.map(\.pocketDeliveryStyle) == [nil, nil, .happy])
+    #expect(delivery.style(for: narrator) == .original)
+    #expect(delivery.style(for: james) == .happy)
 }
 
 @Test func pocketDeliveryNeverAdvertisesUnexportedStates() throws {
@@ -114,7 +144,6 @@ import Synchronization
                 let single = try PocketTTSDeliveryCatalog.manifest(voiceID: voiceID, style: style)
                 #expect(single.files.filter { $0.path.contains("/embeddings/") }.count == 1)
                 #expect(single.files.contains { $0.path.hasSuffix("DELIVERY-CREDITS.json") })
-                #expect(style.isPreview)
             }
         }
     }

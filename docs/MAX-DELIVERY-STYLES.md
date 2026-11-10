@@ -1,13 +1,17 @@
 # Max reference-based delivery for audiobooks
 
-LibroxTTS 0.4.0 adds 364 reference-based preview performances:
-13 styles for four speakers, encoded independently for each of seven languages.
+LibroxTTS 0.4.0 adds 364 reference-based performances:
+13 styles for four speakers (Bill Boerst, Caro Davy, Peter Yearsley, Stuart Bell),
+encoded independently for each of seven languages.
 The default for new Max books is **Caro Davy / Calm**, with Careful reading,
-temperature 0.3 and four sampler steps. Matt accepted the English book scene for
-default narration on 2026-11-08. Existing books retain their saved selections.
-Other voice/style combinations and non-English performances remain previews.
-Use `PocketTTSDeliveryCatalog.isPreview(voiceID:style:)` for contextual labels;
-style-only `isPreview` is conservative and cannot express speaker acceptance.
+temperature 0.3 and four sampler steps. Existing books retain their saved selections.
+
+Since 0.5.0 every published style is a regular choice; the "preview" status
+(`isPreview`) is gone. The other 19 voices are **Original only**:
+`PocketTTSDeliveryCatalog.offersStyles(voiceID:)` is false for them, and
+`resolvedStyle(_:voiceID:)` / `PocketTTSBookDelivery` read them in Original
+instead of failing, so a saved style survives a switch to such a voice and
+applies again when the reader returns to a voice that has it.
 
 ## Reading behavior
 
