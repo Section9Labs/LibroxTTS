@@ -1,3 +1,5 @@
+> This candidate is on hold because its default background CPU pacing was slower than playback. Do not use it as the app integration target. See the replacement [0.6.1 handoff](UPGRADE-0.6.1.md).
+
 # Librox app implementation prompt — LibroxTTS 0.6.0
 
 Integrate the published LibroxTTS **0.6.0** SDK into the existing Librox app.

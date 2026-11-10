@@ -7,7 +7,8 @@ import Darwin
 /// Frame callbacks are synchronous; sleeps are bounded to 50 ms with cancellation
 /// checks. This runs on the engine actor, never on the UI thread.
 public struct PocketCPUWorkBudget {
-    /// Watchdog-safe default for background audio (80% over 60 s kills).
+    /// Conservative legacy budget. This is not a guarantee against OS resource
+    /// termination; watchdog limits depend on the device and execution context.
     public static let defaultFraction = 0.5
     private let started = ProcessInfo.processInfo.systemUptime
     private let cpuStarted = Self.cpuTime()
@@ -23,8 +24,8 @@ public struct PocketCPUWorkBudget {
         #endif
     }
 
-    /// `fraction` nil = unmetered (host-selected, e.g. a charging processing
-    /// task where iOS lifts CPU limits). Otherwise clamped to 0.1…0.8.
+    /// `fraction` nil skips library-inserted delays. iOS resource policies still
+    /// apply. Otherwise clamped to 0.1…0.8 of one core's process CPU time.
     static func make(cpu: Bool, fraction: Double?, watchdogPlatform: Bool) -> Self? {
         guard cpu, watchdogPlatform, let fraction, fraction.isFinite else { return nil }
         return Self(fraction: min(0.8, max(0.1, fraction)))

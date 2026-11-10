@@ -1,4 +1,5 @@
 import Foundation
+import Darwin
 import CoreML
 import CryptoKit
 import KokoroCatalog
@@ -6,7 +7,7 @@ import PocketTTSMLX
 import MLX
 import MLXRandom
 
-/// Experimental, actor-owned Core ML acoustic backend. MLX is used only on CPU
+/// Actor-owned Core ML acoustic backend. MLX is used only on CPU
 /// for reading existing safetensors and the unchanged seeded noise generator.
 /// All transformer, flow and Mimi neural inference runs through Core ML.
 public actor PocketTTSCoreMLEngine {
@@ -30,9 +31,17 @@ public actor PocketTTSCoreMLEngine {
     public func setRandomSeed(_ value: UInt64) { seed = value; random = nil }
     public func unload() { loaded = nil; random = nil }
     public var loadedLanguage: String? { loaded?.language }
+    public struct StageTiming: Sendable, Codable {
+        public var calls: Int = 0
+        public var wallSeconds: Double = 0
+        public var cpuSeconds: Double = 0
+    }
+    private var collectTimings = false
+    public func setTimingCollection(_ enabled: Bool) { collectTimings = enabled; loaded?.collectTimings = enabled }
+    public var stageTimings: [String: StageTiming] { loaded?.timings ?? [:] }
     private var cpuBudgetFraction: Double?
     /// Paces execution without changing any model or sampling settings. The
-    /// host facade applies its background budget; direct benchmarks are unmetered.
+    /// host may select a budget; live Core ML playback defaults to unmetered bursts.
     public func setCPUBudgetFraction(_ fraction: Double?) { cpuBudgetFraction = fraction }
     public func previewChunks(_ text: String, voiceID: String,
                               chunking: PocketTTSChunkingOptions = .init(),
@@ -75,6 +84,7 @@ public actor PocketTTSCoreMLEngine {
                     try PocketTTSResourceChecks.checkpoint("operation-start", backend: "coreml-cpu", samplerSteps: samplerSteps, observer: resourceObserver)
                     let budget = PocketCPUWorkBudget.backgroundBudget(cpu: placement == .cpu || placement == .cpuANE, fraction: cpuBudgetFraction)
                     let m = try load(voice.language)
+                    m.timings = [:]
                     let flow = try m.flow(samplerSteps)
                     let prompt = try m.voice(name)
                     let chunks = try m.chunks(text, options: chunking, role: role)
@@ -151,6 +161,7 @@ public actor PocketTTSCoreMLEngine {
             loaded = try autoreleasepool {
                 try Loaded(language: language, assets: assets, models: models, placement: placement)
             }
+            loaded?.collectTimings = collectTimings
         }
         return loaded!
     }
@@ -202,6 +213,26 @@ public actor PocketTTSCoreMLEngine {
         let configuration: MLModelConfiguration
         let bos: [Float]
         var flows: [Int: MLModel] = [:]
+        var collectTimings = false
+        var timings: [String: StageTiming] = [:]
+        private func predict(_ model: MLModel, _ inputs: [String: Any]) throws -> any MLFeatureProvider {
+            try model.prediction(from: MLDictionaryFeatureProvider(dictionary: inputs))
+        }
+        private func measure<T>(_ name: String, _ body: () throws -> T) rethrows -> T {
+            guard collectTimings else { return try body() }
+            func cpu() -> Double {
+                var usage = rusage(); getrusage(RUSAGE_SELF, &usage)
+                return Double(usage.ru_utime.tv_sec + usage.ru_stime.tv_sec)
+                    + Double(usage.ru_utime.tv_usec + usage.ru_stime.tv_usec) / 1_000_000
+            }
+            let start = ProcessInfo.processInfo.systemUptime, startedCPU = cpu()
+            defer {
+                var row = timings[name] ?? StageTiming()
+                row.calls += 1; row.wallSeconds += ProcessInfo.processInfo.systemUptime - start
+                row.cpuSeconds += cpu() - startedCPU; timings[name] = row
+            }
+            return try body()
+        }
         init(language: String, assets: URL, models: URL?, placement: Placement) throws {
             self.language = language; root = assets.appendingPathComponent(language); modelRoot = models?.appendingPathComponent(language) ?? PocketTTSCoreMLAssets.modelDirectory(in: assets, language: language)
             config = try PocketTTSModelConfig.load(from: root.appendingPathComponent("config.json"))
@@ -235,7 +266,7 @@ public actor PocketTTSCoreMLEngine {
             flows[steps] = value; return value
         }
         func sample(_ model: MLModel, steps: Int, condition: [Float], noise: [Float]) throws -> [Float] {
-            try autoreleasepool {
+            try measure("flow") { try autoreleasepool {
                 let condition = try PocketTTSCoreMLEngine.floats(condition, shape: [1,1024])
                 var latent = try PocketTTSCoreMLEngine.floats(noise, shape: [1,32])
                 for index in 0..<([4, 8].contains(steps) ? 1 : steps) {
@@ -246,11 +277,11 @@ public actor PocketTTSCoreMLEngine {
                         inputs["t"] = try PocketTTSCoreMLEngine.floats([Float(Double(index + 1) / Double(steps))], shape: [1,1])
                         inputs["steps"] = try PocketTTSCoreMLEngine.floats([Float(steps)], shape: [1])
                     }
-                    let output = try model.prediction(from: MLDictionaryFeatureProvider(dictionary: inputs))
+                    let output = try predict(model, inputs)
                     latent = try PocketTTSCoreMLEngine.output(output, "latent")
                 }
                 return PocketTTSCoreMLEngine.values(latent)
-            }
+            } }
         }
         func chunks(_ text: String, options: PocketTTSChunkingOptions, role: PocketTTSPassageRole) throws -> [PocketTTSTextChunk] {
             try PocketTTSPassageChunker.plan(text, language: language, role: role, options: options,
@@ -276,15 +307,15 @@ public actor PocketTTSCoreMLEngine {
             }
         }
         func transform(_ model: MLModel, value: MLMultiArray, cache: inout [MLMultiArray]) throws -> (MLMultiArray, Float) {
-            try autoreleasepool {
+            try measure(model === textModel ? "text" : "latent") { try autoreleasepool {
             try Task.checkCancellation()
             guard cache.count == 12, cache[0].shape[2].intValue <= 4096, value.shape[1].intValue <= 512 else { throw Failure.cacheLimit }
             var input: [String: Any] = ["value": value, "position": try PocketTTSCoreMLEngine.floats([Float(cache[0].shape[2].intValue)], shape: [1])]
             for i in 0..<12 { input["cache\(i)"] = cache[i] }
-            let out = try model.prediction(from: MLDictionaryFeatureProvider(dictionary: input))
+            let out = try predict(model, input)
             cache = try (0..<12).map { try PocketTTSCoreMLEngine.output(out, "next\($0)") }
             return (try PocketTTSCoreMLEngine.output(out, "hidden"), try PocketTTSCoreMLEngine.output(out, "eos")[0].floatValue)
-            }
+            } }
         }
         func emptyMimiState() throws -> [String: MLMultiArray] {
             var result: [String: MLMultiArray] = [:]
@@ -295,13 +326,13 @@ public actor PocketTTSCoreMLEngine {
             return result
         }
         func decode(_ latent: [Float], state: inout [String: MLMultiArray]) throws -> [Float] {
-            try autoreleasepool {
+            try measure("mimi") { try autoreleasepool {
             try Task.checkCancellation()
             var input = state; input["latent"] = try PocketTTSCoreMLEngine.floats(latent, shape: [1,32])
-            let out = try mimiModel.prediction(from: MLDictionaryFeatureProvider(dictionary: input))
+            let out = try predict(mimiModel, input)
             for name in state.keys { state[name] = try PocketTTSCoreMLEngine.output(out, "next_\(name)") }
             return PocketTTSCoreMLEngine.values(try PocketTTSCoreMLEngine.output(out, "audio"))
-            }
+            } }
         }
     }
 }

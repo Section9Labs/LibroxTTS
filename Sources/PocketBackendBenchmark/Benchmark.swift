@@ -72,6 +72,7 @@ public enum PocketBackendBenchmark {
         let mlx = PocketTTSEngine(directory: assets, backend: request.backend == "mlx-cpu" ? .cpu : .gpu)
         let core = PocketTTSCoreMLEngine(directory: assets, modelsDirectory: models,
             placement: request.backend == "coreml-cpu" ? .cpu : request.backend == "coreml-ane" ? .cpuANE : request.backend == "coreml-all" ? .all : .cpuGPU)
+        await core.setTimingCollection(true)
         let chunking = PocketTTSChunkingOptions.carefulReading
         let loadStart = ProcessInfo.processInfo.systemUptime
         let chunks = try await isMLX
@@ -95,6 +96,10 @@ public enum PocketBackendBenchmark {
                     chunking: chunking, samplerSteps: request.steps, deliveryStyle: request.style, receive: capture.append)
             }
             let elapsed = ProcessInfo.processInfo.systemUptime - capture.start
+            if !isMLX {
+                let timings = await core.stageTimings
+                try encoder.encode(timings).write(to: output.appendingPathComponent("stages-\(iteration).json"), options: .atomic)
+            }
             let duration = Double(capture.samples.count) / 24_000
             let row = Row(iteration: iteration, coldGeneration: iteration == 0, renderSeconds: elapsed,
                 firstAudioSeconds: capture.first ?? elapsed, audioSeconds: duration, realTimeFactor: duration / elapsed,

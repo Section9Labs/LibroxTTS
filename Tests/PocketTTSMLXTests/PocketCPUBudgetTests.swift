@@ -2,8 +2,8 @@ import Foundation
 import Testing
 @testable import PocketTTSMLX
 
-// Host-selectable CPU budget (Librox design §8): playback in the background
-// keeps the watchdog-safe default; a charging processing task may run unmetered.
+// Explicit CPU pacing remains available independently of playback scheduling.
+// No budget value guarantees exemption from the OS's resource policies.
 
 @Test func defaultBudgetIsHalfACore() {
     #expect(PocketCPUWorkBudget.defaultFraction == 0.5)
@@ -17,7 +17,7 @@ import Testing
     #expect(PocketCPUWorkBudget.make(cpu: true, fraction: 0.5, watchdogPlatform: false) == nil)
 }
 
-@Test func fractionIsClampedToSafeRange() {
+@Test func fractionIsClampedToSupportedRange() {
     #expect(PocketCPUWorkBudget.make(cpu: true, fraction: 2, watchdogPlatform: true)?.fraction == 0.8)
     #expect(PocketCPUWorkBudget.make(cpu: true, fraction: 0.01, watchdogPlatform: true)?.fraction == 0.1)
 }

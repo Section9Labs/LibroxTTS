@@ -123,17 +123,20 @@ public actor NarrationRenderer {
         #endif
     }
 
-    /// Host-selected CPU budget for Max `.background` renders (design §8):
-    /// nil = unmetered (charging processing task), otherwise a fraction of one
-    /// core (default 0.5, clamped 0.1…0.8). Applies to the loaded and any
-    /// later-loaded Max engine.
+    /// Optional CPU pacing for Max background renders. `nil` adds no artificial
+    /// delays; a number meters process CPU time as a fraction of one core
+    /// (clamped 0.1…0.8). iOS resource policies always apply.
+    /// Core ML defaults to nil: live playback should bound queued work with
+    /// `NarrationPlaybackBufferPolicy`, then rest between full-speed renders.
+    /// MLX retains its legacy 0.5 default. An explicit choice persists across
+    /// unload/reload. Foreground Core ML always runs without pacing.
     public func setCPUBudget(fraction: Double?) async {
         await acquire(); defer { release() }
         cpuBudgetFraction = fraction
         await pocket?.setCPUBudgetFraction(fraction)
         await pocketCoreML?.setCPUBudgetFraction(executionContext == .foreground ? nil : fraction)
     }
-    private var cpuBudgetFraction: Double? = 0.5
+    private var cpuBudgetFraction: Double? = PocketTTSBackend.platform == .coreML ? nil : 0.5
 
     public func load(_ selection: NarrationModel, directory: URL,
                      executionContext: ExecutionContext = .background, repositoryID: String? = nil) async throws {
@@ -207,6 +210,41 @@ public actor NarrationRenderer {
         kokoro = engine
         current = selection; currentDirectory = directory; currentRepositoryID = repositoryID
         logger.notice("Narration model load completed in \(Date().timeIntervalSince(started), privacy: .public) seconds")
+    }
+
+    /// Streams Max's unchanged 24 kHz mono PCM frames as they become available.
+    /// The synchronous callback runs on the engine actor, not the main actor.
+    /// A host may apply cancellable backpressure there while real audio plays;
+    /// never synchronously wait for this method on the main/audio callback thread.
+    /// This preserves continuation across a long planned unit. A partial stream
+    /// is not a completed cache entry: commit prepared audio only after success.
+    public func renderPocketFrames(_ unit: BookNarrationUnit,
+                                   receive: @escaping @Sendable ([Float]) throws -> Void) async throws {
+        await acquire(); defer { release() }
+        try Task.checkCancellation()
+        guard current == .pocket else { throw RenderError.unavailable("Load Max before streaming its audio.") }
+        if pocketCoreML == nil { try validateGPUAuthorization(executionContext) }
+        let sampling = unit.pocketSampling ?? .init()
+        try sampling.validate()
+        do {
+            if let pocketCoreML {
+                try await pocketCoreML.renderFrames(unit.synthesisText, voiceID: unit.voiceID,
+                    temperature: sampling.temperature, chunking: unit.pocketChunking ?? .init(),
+                    role: unit.role == .dialogue ? .dialogue : .narration, samplerSteps: sampling.samplerSteps,
+                    deliveryStyle: unit.pocketDeliveryStyle ?? .original, receive: receive)
+            } else if let pocket {
+                try await pocket.renderFrames(unit.synthesisText, voiceID: unit.voiceID,
+                    temperature: sampling.temperature, chunking: unit.pocketChunking ?? .init(),
+                    role: unit.role == .dialogue ? .dialogue : .narration, samplerSteps: sampling.samplerSteps,
+                    deliveryStyle: unit.pocketDeliveryStyle ?? .original, receive: receive)
+            } else { throw RenderError.invalidAudio }
+        } catch let error as PocketTTSResourceError {
+            try Task.checkCancellation()
+            switch error {
+            case .memory: throw RenderError.memory
+            case .thermal: throw RenderError.thermal
+            }
+        }
     }
 
     public func render(_ unit: BookNarrationUnit, delivery: NarrationDeliveryOptions = .init()) async throws -> [Float] {

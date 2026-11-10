@@ -1,0 +1,53 @@
+{
+  "allWarmUnitsFasterThanPlayback": true,
+  "complete": true,
+  "elapsedSeconds": 600.0583294166718,
+  "finalBufferSeconds": 16.442127585,
+  "lockedObserved": true,
+  "passed": true,
+  "playedSeconds": 600.069384311,
+  "policy": {
+    "artificialCPUBudget": "none",
+    "highWaterSeconds": 30,
+    "lowWaterSeconds": 12
+  },
+  "processCPUSeconds": 337.620399,
+  "quality": {
+    "chunking": "carefulReading",
+    "samplerSteps": 4,
+    "style": "Calm",
+    "temperature": 0.3,
+    "voice": "Caro Davy"
+  },
+  "stalls": 0,
+  "backgroundUnits": 27,
+  "backgroundMedianRTFx": 4.821498319246559,
+  "backgroundMinRTFx": 3.33093576184192,
+  "backgroundMaxRTFx": 5.150087909363781,
+  "foregroundWarmRTFx": [
+    4.268526558516611,
+    3.6381586941430313
+  ],
+  "averageProcessCPUCoreFraction": 0.5626459669815888,
+  "generationWallSeconds": 127.615959583316,
+  "generatedAudioSeconds": 600.8,
+  "bufferRange": [
+    6.454642993,
+    47.861651972999994
+  ],
+  "thermalStates": [
+    0
+  ],
+  "lockedObservations": 592,
+  "observations": 601,
+  "device": "iPhone 17 Pro Max (Tachikoma)",
+  "operatingSystem": "iOS 27.2",
+  "playbackRate": 1,
+  "connectedByUSB": true,
+  "debuggerAttached": false,
+  "backend": "Core ML CPU, FP32 original weights",
+  "sdk": "NarrationPipeline + NarrationRenderer",
+  "probe": "Examples/MaxCoreMLProbe/Sources/BufferedPlaybackProbe.swift",
+  "qualificationScope": "Repeated English Caro Davy/Calm passage; 3 foreground renders and 600 seconds of real background playback; not the Librox reader or an all-device/battery qualification.",
+  "probeBudget": "Explicit setCPUBudget(fraction: nil); inline 12/30-second unit hysteresis. The subsequent SDK default and reusable policy implement those same choices. The progressive facade was validated separately on Mac and compiled for iOS."
+}

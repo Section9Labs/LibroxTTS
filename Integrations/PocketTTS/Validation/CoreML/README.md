@@ -1,3 +1,8 @@
+> **0.6.1 follow-up:** the full SDK completed ten minutes of locked playback
+> with bounded unmetered generation: 4.82× median, 3.33× minimum, zero underruns,
+> normal thermals. [Method, complete results and limits](BUFFERED-PLAYBACK.md).
+> The measurements below describe the earlier direct-backend comparison.
+
 # Max Core ML measurements — 2026-11-10
 
 The iPhone completed CPU-only generation while locked and playing real narration

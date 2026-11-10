@@ -12,6 +12,7 @@ import AVFoundation
 struct ProbeView: View {
     @Environment(\.scenePhase) private var phase
     @State private var status = "Ready"
+    @State private var didAutoRun = false
     @State private var job: Task<Void, Never>?
     @State private var player: AVQueuePlayer?
     var body: some View {
@@ -19,7 +20,7 @@ struct ProbeView: View {
             Text("Max Core ML benchmark").font(.title)
             Text(status).textSelection(.enabled)
             Button("Run") { run() }.disabled(job != nil)
-        }.padding().task { if CommandLine.arguments.contains("--run") { run() } }
+        }.padding().task { if CommandLine.arguments.contains("--run") && !didAutoRun { didAutoRun = true; run() } }
         .onChange(of: phase) { _, phase in
             if phase != .active && !CommandLine.arguments.contains("--background") { job?.cancel() }
             UIApplication.shared.isIdleTimerDisabled = phase == .active && job != nil
@@ -34,6 +35,14 @@ struct ProbeView: View {
             let base = Bundle.main.resourceURL!.appendingPathComponent("Assets")
             let output = URL.documentsDirectory.appendingPathComponent(name)
             do {
+                if args.contains("--buffered") {
+                    status = "Measuring foreground; then lock when requested."
+                    try await BufferedPlaybackProbe(output: output).run(bundle: base)
+                    status = "Buffered playback test finished"
+                    UIApplication.shared.isIdleTimerDisabled = false
+                    job = nil
+                    return
+                }
                 if args.contains("--installation") {
                     status = "Preparing Core ML-only installation…"
                     try await InstallationProbe.run(bundle: base, output: output)
