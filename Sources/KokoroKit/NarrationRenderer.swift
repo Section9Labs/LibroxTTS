@@ -84,6 +84,26 @@ public actor NarrationRenderer {
         await acquire(); defer { release() }
         await unloadHeld()
     }
+
+    /// The Max language whose model is in memory, or nil.
+    public var loadedPocketLanguage: String? {
+        get async {
+            if let pocketCoreML { return await pocketCoreML.loadedLanguage }
+            return await pocket?.loadedLanguage
+        }
+    }
+
+    /// Removes one Max language, serialized with rendering: waits for any
+    /// in-flight render, releases that language's model if it is loaded, then
+    /// deletes its files. Other languages, and a loaded other language, stay.
+    /// A later render of the removed language fails with `invalidAssets`.
+    @discardableResult
+    public func uninstallPocketLanguage(_ language: String, in directory: URL) async throws -> Int64 {
+        await acquire(); defer { release() }
+        if let pocket, await pocket.loadedLanguage == language { await pocket.unload() }
+        if let pocketCoreML, await pocketCoreML.loadedLanguage == language { await pocketCoreML.unload() }
+        return try NarrationAssets.uninstallPocketLanguage(language, in: directory)
+    }
     private func unloadHeld() async {
         await pocket?.unload(); pocket = nil
         await pocketCoreML?.unload(); pocketCoreML = nil
@@ -102,6 +122,18 @@ public actor NarrationRenderer {
         }
         #endif
     }
+
+    /// Host-selected CPU budget for Max `.background` renders (design §8):
+    /// nil = unmetered (charging processing task), otherwise a fraction of one
+    /// core (default 0.5, clamped 0.1…0.8). Applies to the loaded and any
+    /// later-loaded Max engine.
+    public func setCPUBudget(fraction: Double?) async {
+        await acquire(); defer { release() }
+        cpuBudgetFraction = fraction
+        await pocket?.setCPUBudgetFraction(fraction)
+        await pocketCoreML?.setCPUBudgetFraction(executionContext == .foreground ? nil : fraction)
+    }
+    private var cpuBudgetFraction: Double? = 0.5
 
     public func load(_ selection: NarrationModel, directory: URL,
                      executionContext: ExecutionContext = .background, repositoryID: String? = nil) async throws {
@@ -123,6 +155,9 @@ public actor NarrationRenderer {
             if selection == .pocket, let pocket {
                 await pocket.setBackend(executionContext == .background ? .cpu : .gpu)
             }
+            if selection == .pocket, let pocketCoreML {
+                await pocketCoreML.setCPUBudgetFraction(executionContext == .foreground ? nil : cpuBudgetFraction)
+            }
             if selection == .plus, plusBackend != backend, let plus {
                 do { try await plus.setBackend(backend); plusBackend = backend }
                 catch { await unloadHeld(); throw error }
@@ -136,9 +171,11 @@ public actor NarrationRenderer {
             if PocketTTSBackend.platform == .coreML {
                 pocketCoreML = PocketTTSCoreMLEngine(directory: directory, placement: .cpu)
                 await pocketCoreML?.setResourceObserver(maxResourceObserver)
+                await pocketCoreML?.setCPUBudgetFraction(executionContext == .foreground ? nil : cpuBudgetFraction)
             } else {
                 pocket = PocketTTSEngine(directory: directory, backend: executionContext == .background ? .cpu : .gpu)
                 await pocket?.setResourceObserver(maxResourceObserver)
+                await pocket?.setCPUBudgetFraction(cpuBudgetFraction)
             }
             current = selection; currentDirectory = directory; currentRepositoryID = repositoryID
             return

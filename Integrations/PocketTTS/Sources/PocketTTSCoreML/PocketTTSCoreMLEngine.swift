@@ -29,6 +29,11 @@ public actor PocketTTSCoreMLEngine {
     }
     public func setRandomSeed(_ value: UInt64) { seed = value; random = nil }
     public func unload() { loaded = nil; random = nil }
+    public var loadedLanguage: String? { loaded?.language }
+    private var cpuBudgetFraction: Double?
+    /// Paces execution without changing any model or sampling settings. The
+    /// host facade applies its background budget; direct benchmarks are unmetered.
+    public func setCPUBudgetFraction(_ fraction: Double?) { cpuBudgetFraction = fraction }
     public func previewChunks(_ text: String, voiceID: String,
                               chunking: PocketTTSChunkingOptions = .init(),
                               role: PocketTTSPassageRole = .narration) throws -> [PocketTTSTextChunk] {
@@ -68,6 +73,7 @@ public actor PocketTTSCoreMLEngine {
                 defer { if let random { eval(random) }; Memory.clearCache() }
                 do {
                     try PocketTTSResourceChecks.checkpoint("operation-start", backend: "coreml-cpu", samplerSteps: samplerSteps, observer: resourceObserver)
+                    let budget = PocketCPUWorkBudget.backgroundBudget(cpu: placement == .cpu || placement == .cpuANE, fraction: cpuBudgetFraction)
                     let m = try load(voice.language)
                     let flow = try m.flow(samplerSteps)
                     let prompt = try m.voice(name)
@@ -123,6 +129,7 @@ public actor PocketTTSCoreMLEngine {
                             guard total <= 24_000 * 300 else { throw PocketTTSError.textTooLong }
                             try Task.checkCancellation()
                             try receive(pcm)
+                            try budget?.checkpoint()
                             current.append(next); input = next
                         }
                         guard complete else { throw Failure.generationLimit(tokens: tokens.count, frames: cap) }

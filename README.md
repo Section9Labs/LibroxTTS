@@ -23,7 +23,7 @@ trials cover both backends; iPhone and production app acceptance remain pending.
 Add the versioned Swift package:
 
 ```swift
-.package(url: "https://github.com/Section9Labs/LibroxTTS.git", exact: "0.4.0")
+.package(url: "https://github.com/Section9Labs/LibroxTTS.git", exact: "0.5.0")
 ```
 
 Products include `LibroxTTS` (host-facing synthesis/install API), `LibroxCTNative` (Core ML CT runtime), `KokoroCatalog` (Kokoro voices/assets), and `KokoroPronunciation` (Kokoro text to model phonemes). The shared runtime depends on MLX Swift 0.32.3. Swift 6.3 or newer, **iOS/Catalyst 18+ or macOS 15+** are required. Apple system language facilities are required, so Linux is not supported.

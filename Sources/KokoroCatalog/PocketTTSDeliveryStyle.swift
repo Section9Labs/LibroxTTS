@@ -8,9 +8,6 @@ public enum PocketTTSDeliveryStyle: String, CaseIterable, Codable, Hashable, Sen
     case anger, confused, enthused, excited, frustrated, shout, tired
 
     public var name: String { rawValue.capitalized }
-    /// Conservative style-only status. Use the catalog's voice-specific status
-    /// in the app: acceptance applies to a speaker/language/performance, not a mood.
-    public var isPreview: Bool { self != .original }
     public var cacheIdentity: String {
         self == .original ? "original" : PocketTTSDeliveryCatalog.identity + ":" + rawValue
     }
@@ -24,10 +21,17 @@ public enum PocketTTSDeliveryCatalog {
     public static let identity = "pocket-delivery-voicezero-490cfbee-v1"
     public static let referenceVoiceNames = ["bill_boerst", "caro_davy", "peter_yearsley", "stuart_bell"]
 
-    /// The English Caro/Calm book scene was accepted for default narration.
-    /// This does not qualify every Calm voice or every language by association.
-    public static func isPreview(voiceID: String, style: PocketTTSDeliveryStyle) -> Bool {
-        style != .original && !(voiceID == "pocket-caro_davy-en-v1" && style == .calm)
+    /// Whether this voice has exported delivery styles. Only the reference
+    /// speakers do (in every language); every other voice is Original only.
+    public static func offersStyles(voiceID: String) -> Bool {
+        PocketTTSCatalog.voice(id: voiceID).map { referenceVoiceNames.contains($0.name) } ?? false
+    }
+
+    /// The style a voice actually reads with: the requested style when the voice
+    /// offers styles, otherwise Original. A saved style is never lost, so it
+    /// applies again when the reader returns to a voice that has it.
+    public static func resolvedStyle(_ style: PocketTTSDeliveryStyle, voiceID: String) -> PocketTTSDeliveryStyle {
+        offersStyles(voiceID: voiceID) ? style : .original
     }
 
     /// Base language pack and selected narrator performance, including credits.

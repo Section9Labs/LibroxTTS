@@ -1,5 +1,43 @@
 # Changelog
 
+## 0.5.0 — 2026-11-09
+
+- **Original-only voices read Original instead of failing.** Only Bill Boerst,
+  Caro Davy, Peter Yearsley and Stuart Bell have delivery styles; the other 19
+  Max voices are Original only. `PocketTTSBookDelivery.style(for:)` and
+  `applying(to:)` now resolve each unit's style against the voice that speaks
+  it, so a book saved with Calm (narrator or character) on an Original-only
+  voice plans and renders in Original rather than throwing `unsupportedVoice`.
+  New `PocketTTSDeliveryCatalog.offersStyles(voiceID:)` and
+  `resolvedStyle(_:voiceID:)`. Explicit single-style APIs
+  (`manifest(voiceID:style:)`, engine `deliveryStyle:`) still reject them.
+- **Breaking:** the preview status is removed —
+  `PocketTTSDeliveryStyle.isPreview` and
+  `PocketTTSDeliveryCatalog.isPreview(voiceID:style:)` no longer exist. Every
+  published style is a regular choice.
+- Model bytes, manifests and cache identities are unchanged.
+
+## 0.4.2 — 2026-11-09
+
+- Per-language Max uninstall. `NarrationAssets.uninstallPocketLanguage(_:in:)`
+  removes one language's base pack, voices and delivery styles (`<language>/`)
+  and returns the bytes freed; other languages and host receipts are untouched,
+  and a second call frees 0. `NarrationRenderer.uninstallPocketLanguage(_:in:)`
+  does the same serialized with rendering and releases that language's model
+  first if it is loaded. Also `installedPocketBytes(language:in:)`,
+  `installedPocketLanguages(in:)`, `NarrationRenderer.loadedPocketLanguage` and
+  `PocketTTSEngine.loadedLanguage`. Model bytes and cache identities are unchanged.
+
+## 0.4.1 — 2026-11-09
+
+- Host-selectable CPU budget for background Max renders:
+  `NarrationRenderer.setCPUBudget(fraction:)` /
+  `PocketTTSEngine.setCPUBudgetFraction(_:)`. `nil` is unmetered (for a
+  charging `BGProcessingTask`, where iOS lifts CPU limits); other values are a
+  fraction of one core clamped to 0.1…0.8. The default stays 0.5 for every
+  caller that doesn't opt in. Model bytes, sampling and cache identities are
+  unchanged.
+
 ## 0.4.0 — 2026-11-08
 
 - Stable Max tier using native Swift MLX Pocket TTS alongside Basic and Plus.
