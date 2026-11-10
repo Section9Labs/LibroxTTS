@@ -23,3 +23,8 @@ Benchmarks/Narration/results/
 Benchmarks/Narration/Device/Info.plist
 
 Examples/CTDeviceProbe/Info.plist
+
+.coreml-tools/
+.coreml-results/
+Examples/MaxCoreMLProbe/Assets/
+Examples/MaxCoreMLProbe/Info.plist

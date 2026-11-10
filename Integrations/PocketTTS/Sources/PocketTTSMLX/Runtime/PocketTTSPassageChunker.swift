@@ -13,8 +13,8 @@ public struct PocketTTSTextChunk: Sendable, Equatable {
 
 /// Structural heuristics, not emotion or speaker inference. The book planner
 /// supplies one speaker turn at a time. Paragraphs always reset continuation.
-enum PocketTTSPassageChunker {
-    static func plan(_ text: String, language: String, role: PocketTTSPassageRole,
+public enum PocketTTSPassageChunker {
+    public static func plan(_ text: String, language: String, role: PocketTTSPassageRole,
                      options: PocketTTSChunkingOptions,
                      prepare: (String) throws -> String,
                      tokenCount: (String) -> Int) throws -> [PocketTTSTextChunk] {

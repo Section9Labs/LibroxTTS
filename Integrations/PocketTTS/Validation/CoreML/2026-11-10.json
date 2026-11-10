@@ -1,0 +1,1461 @@
+{
+  "date": "2026-11-10",
+  "baseCommit": "cd969c6",
+  "quality": {
+    "weights": "a7056f505a4a8ca72d8b5fb1440071d6f1a35739",
+    "precision": "float32",
+    "steps": 4,
+    "temperature": 0.3,
+    "englishVoice": "caro_davy__calm",
+    "chunking": "carefulReading",
+    "seed": 42
+  },
+  "runs": {
+    "mac/coreml": {
+      "summary": {
+        "medianWarmRTFx": 5.777861357526397,
+        "minWarmRTFx": 5.701329821776038,
+        "medianWarmFirstAudioSeconds": 0.02730150002753362,
+        "renderedAudioSeconds": 89.28,
+        "renderSeconds": 15.595495666726492,
+        "peakSampledApplicationFootprintBytes": 1265109752
+      },
+      "receipt": {
+        "chunks": [
+          "She rested her hand against the door. For a moment, she could almost hear his voice again.",
+          "It was the small things she remembered: the way he folded the newspaper, the sound of his keys on the table, and the cup he always left beside the window.",
+          "She waited. Nobody came."
+        ],
+        "complete": true,
+        "loadSeconds": 0.8099243750330061,
+        "machine": "arm64",
+        "operatingSystem": "Version 27.0.1 (Build 26A434)",
+        "request": {
+          "backend": "coreml",
+          "language": "en",
+          "repetitions": 3,
+          "seed": 42,
+          "steps": 4,
+          "style": "calm",
+          "temperature": 0.3,
+          "text": "She rested her hand against the door. For a moment, she could almost hear his voice again. It was the small things she remembered: the way he folded the newspaper, the sound of his keys on the table, and the cup he always left beside the window. She waited. Nobody came.",
+          "voiceID": "pocket-caro_davy-en-v1"
+        },
+        "rows": [
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": true,
+            "firstAudioSeconds": 0.17455420829355717,
+            "iteration": 0,
+            "peakPhysicalFootprintBytes": 931564112,
+            "realTimeFactor": 5.559529984321577,
+            "renderSeconds": 4.014727875008248,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.027251041668932885,
+            "iteration": 1,
+            "peakPhysicalFootprintBytes": 1039387240,
+            "realTimeFactor": 5.869250416510975,
+            "renderSeconds": 3.8028706250479445,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.02730150002753362,
+            "iteration": 2,
+            "peakPhysicalFootprintBytes": 1151453920,
+            "realTimeFactor": 5.777861357526397,
+            "renderSeconds": 3.863021041674074,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.029117166704963893,
+            "iteration": 3,
+            "peakPhysicalFootprintBytes": 1265109752,
+            "realTimeFactor": 5.701329821776038,
+            "renderSeconds": 3.9148761249962263,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          }
+        ],
+        "runtime": "pocket-coreml-28770c06-v1:fp32:tanh:quality4:adaptive:warm12:eos6",
+        "tokenCounts": [
+          24,
+          45,
+          8
+        ]
+      },
+      "audioSHA256": {
+        "trial-0.wav": "e1da21b96c98ac4b4ab61d1afcd6c99c5e3e921d479d7aacfaaa3c745fd5e986",
+        "trial-1.wav": "e1da21b96c98ac4b4ab61d1afcd6c99c5e3e921d479d7aacfaaa3c745fd5e986",
+        "trial-2.wav": "e1da21b96c98ac4b4ab61d1afcd6c99c5e3e921d479d7aacfaaa3c745fd5e986",
+        "trial-3.wav": "e1da21b96c98ac4b4ab61d1afcd6c99c5e3e921d479d7aacfaaa3c745fd5e986"
+      }
+    },
+    "mac/coreml-cpu": {
+      "summary": {
+        "medianWarmRTFx": 5.886990357923248,
+        "minWarmRTFx": 5.838198335195718,
+        "medianWarmFirstAudioSeconds": 0.03179508331231773,
+        "renderedAudioSeconds": 89.28,
+        "renderSeconds": 15.19014570832951,
+        "peakSampledApplicationFootprintBytes": 638077112
+      },
+      "receipt": {
+        "chunks": [
+          "She rested her hand against the door. For a moment, she could almost hear his voice again.",
+          "It was the small things she remembered: the way he folded the newspaper, the sound of his keys on the table, and the cup he always left beside the window.",
+          "She waited. Nobody came."
+        ],
+        "complete": true,
+        "loadSeconds": 0.7683416249928996,
+        "machine": "arm64",
+        "operatingSystem": "Version 27.0.1 (Build 26A434)",
+        "request": {
+          "backend": "coreml-cpu",
+          "language": "en",
+          "repetitions": 3,
+          "seed": 42,
+          "steps": 4,
+          "style": "calm",
+          "temperature": 0.3,
+          "text": "She rested her hand against the door. For a moment, she could almost hear his voice again. It was the small things she remembered: the way he folded the newspaper, the sound of his keys on the table, and the cup he always left beside the window. She waited. Nobody came.",
+          "voiceID": "pocket-caro_davy-en-v1"
+        },
+        "rows": [
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": true,
+            "firstAudioSeconds": 0.18437716661719605,
+            "iteration": 0,
+            "peakPhysicalFootprintBytes": 509872168,
+            "realTimeFactor": 5.820101560394458,
+            "renderSeconds": 3.8349846249911934,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.03285483334911987,
+            "iteration": 1,
+            "peakPhysicalFootprintBytes": 553961560,
+            "realTimeFactor": 5.9668728947270235,
+            "renderSeconds": 3.7406528333667666,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.031212750007398427,
+            "iteration": 2,
+            "peakPhysicalFootprintBytes": 595462280,
+            "realTimeFactor": 5.886990357923248,
+            "renderSeconds": 3.791411000012886,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.03179508331231773,
+            "iteration": 3,
+            "peakPhysicalFootprintBytes": 638077112,
+            "realTimeFactor": 5.838198335195718,
+            "renderSeconds": 3.823097249958664,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          }
+        ],
+        "runtime": "pocket-coreml-28770c06-v1:fp32:tanh:quality4:adaptive:warm12:eos6",
+        "tokenCounts": [
+          24,
+          45,
+          8
+        ]
+      },
+      "audioSHA256": {
+        "trial-0.wav": "6e2c1593fbd84b565fc77c9091306e58ff7d90a41fce3997352dc7d677381947",
+        "trial-1.wav": "6e2c1593fbd84b565fc77c9091306e58ff7d90a41fce3997352dc7d677381947",
+        "trial-2.wav": "6e2c1593fbd84b565fc77c9091306e58ff7d90a41fce3997352dc7d677381947",
+        "trial-3.wav": "6e2c1593fbd84b565fc77c9091306e58ff7d90a41fce3997352dc7d677381947"
+      }
+    },
+    "mac/coreml-cpu-endurance": {
+      "summary": {
+        "medianWarmRTFx": 6.018135835717815,
+        "minWarmRTFx": 5.787007966200713,
+        "medianWarmFirstAudioSeconds": 0.030923208338208497,
+        "renderedAudioSeconds": 446.4,
+        "renderSeconds": 75.16469362506177,
+        "peakSampledApplicationFootprintBytes": 969378192
+      },
+      "receipt": {
+        "chunks": [
+          "She rested her hand against the door. For a moment, she could almost hear his voice again.",
+          "It was the small things she remembered: the way he folded the newspaper, the sound of his keys on the table, and the cup he always left beside the window.",
+          "She waited. Nobody came."
+        ],
+        "complete": true,
+        "loadSeconds": 0.49659100000280887,
+        "machine": "arm64",
+        "operatingSystem": "Version 27.0.1 (Build 26A434)",
+        "request": {
+          "backend": "coreml-cpu",
+          "language": "en",
+          "repetitions": 19,
+          "seed": 42,
+          "steps": 4,
+          "style": "calm",
+          "temperature": 0.3,
+          "text": "She rested her hand against the door. For a moment, she could almost hear his voice again. It was the small things she remembered: the way he folded the newspaper, the sound of his keys on the table, and the cup he always left beside the window. She waited. Nobody came.",
+          "voiceID": "pocket-caro_davy-en-v1"
+        },
+        "rows": [
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": true,
+            "firstAudioSeconds": 0.3196155416662805,
+            "iteration": 0,
+            "peakPhysicalFootprintBytes": 517998464,
+            "realTimeFactor": 5.544304898815791,
+            "renderSeconds": 4.025752624962479,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.03031112503958866,
+            "iteration": 1,
+            "peakPhysicalFootprintBytes": 543885376,
+            "realTimeFactor": 6.053126627275531,
+            "renderSeconds": 3.6873505833209492,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.0312734583276324,
+            "iteration": 2,
+            "peakPhysicalFootprintBytes": 567920728,
+            "realTimeFactor": 6.049620917819462,
+            "renderSeconds": 3.6894873750279658,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.032610666705295444,
+            "iteration": 3,
+            "peakPhysicalFootprintBytes": 592005208,
+            "realTimeFactor": 6.035629956922834,
+            "renderSeconds": 3.6980398333398625,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.0306367083103396,
+            "iteration": 4,
+            "peakPhysicalFootprintBytes": 615598192,
+            "realTimeFactor": 6.028984912211117,
+            "renderSeconds": 3.702115749998484,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.030219583364669234,
+            "iteration": 5,
+            "peakPhysicalFootprintBytes": 639125640,
+            "realTimeFactor": 6.026178982292474,
+            "renderSeconds": 3.7038395417039283,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.03067254164488986,
+            "iteration": 6,
+            "peakPhysicalFootprintBytes": 662751392,
+            "realTimeFactor": 6.02541946840601,
+            "renderSeconds": 3.7043064166791737,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.03045149997342378,
+            "iteration": 7,
+            "peakPhysicalFootprintBytes": 686344352,
+            "realTimeFactor": 6.024269072928766,
+            "renderSeconds": 3.7050137916812673,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.03128783334977925,
+            "iteration": 8,
+            "peakPhysicalFootprintBytes": 709986488,
+            "realTimeFactor": 6.018135835717815,
+            "renderSeconds": 3.708789666648954,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.030242666660342366,
+            "iteration": 9,
+            "peakPhysicalFootprintBytes": 733513936,
+            "realTimeFactor": 6.02004659332309,
+            "renderSeconds": 3.707612500002142,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.03203691670205444,
+            "iteration": 10,
+            "peakPhysicalFootprintBytes": 757123280,
+            "realTimeFactor": 5.961581387297016,
+            "renderSeconds": 3.743973041709978,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.03052475000731647,
+            "iteration": 11,
+            "peakPhysicalFootprintBytes": 780699880,
+            "realTimeFactor": 5.976460324042951,
+            "renderSeconds": 3.7346520833089016,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.030624500010162592,
+            "iteration": 12,
+            "peakPhysicalFootprintBytes": 804292864,
+            "realTimeFactor": 5.924580187162574,
+            "renderSeconds": 3.767355541640427,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.030923208338208497,
+            "iteration": 13,
+            "peakPhysicalFootprintBytes": 827853056,
+            "realTimeFactor": 5.913897416052046,
+            "renderSeconds": 3.774160833330825,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.03182362497318536,
+            "iteration": 14,
+            "peakPhysicalFootprintBytes": 851413272,
+            "realTimeFactor": 5.828470616622427,
+            "renderSeconds": 3.8294779999996535,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.03126658336259425,
+            "iteration": 15,
+            "peakPhysicalFootprintBytes": 875039024,
+            "realTimeFactor": 5.869299997872271,
+            "renderSeconds": 3.8028385000070557,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.03287045838078484,
+            "iteration": 16,
+            "peakPhysicalFootprintBytes": 898615624,
+            "realTimeFactor": 5.822460222876358,
+            "renderSeconds": 3.8334310833597556,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.03240974998334423,
+            "iteration": 17,
+            "peakPhysicalFootprintBytes": 922224968,
+            "realTimeFactor": 5.787007966200713,
+            "renderSeconds": 3.8569153749849647,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.031541000003926456,
+            "iteration": 18,
+            "peakPhysicalFootprintBytes": 945752416,
+            "realTimeFactor": 5.857387891266212,
+            "renderSeconds": 3.810572291666176,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.030672791646793485,
+            "iteration": 19,
+            "peakPhysicalFootprintBytes": 969378192,
+            "realTimeFactor": 6.066851498268402,
+            "renderSeconds": 3.6790087916888297,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          }
+        ],
+        "runtime": "pocket-coreml-28770c06-v1:fp32:tanh:quality4:adaptive:warm12:eos6",
+        "tokenCounts": [
+          24,
+          45,
+          8
+        ]
+      },
+      "audioSHA256": {
+        "trial-0.wav": "6e2c1593fbd84b565fc77c9091306e58ff7d90a41fce3997352dc7d677381947",
+        "trial-1.wav": "6e2c1593fbd84b565fc77c9091306e58ff7d90a41fce3997352dc7d677381947",
+        "trial-10.wav": "6e2c1593fbd84b565fc77c9091306e58ff7d90a41fce3997352dc7d677381947",
+        "trial-11.wav": "6e2c1593fbd84b565fc77c9091306e58ff7d90a41fce3997352dc7d677381947",
+        "trial-12.wav": "6e2c1593fbd84b565fc77c9091306e58ff7d90a41fce3997352dc7d677381947",
+        "trial-13.wav": "6e2c1593fbd84b565fc77c9091306e58ff7d90a41fce3997352dc7d677381947",
+        "trial-14.wav": "6e2c1593fbd84b565fc77c9091306e58ff7d90a41fce3997352dc7d677381947",
+        "trial-15.wav": "6e2c1593fbd84b565fc77c9091306e58ff7d90a41fce3997352dc7d677381947",
+        "trial-16.wav": "6e2c1593fbd84b565fc77c9091306e58ff7d90a41fce3997352dc7d677381947",
+        "trial-17.wav": "6e2c1593fbd84b565fc77c9091306e58ff7d90a41fce3997352dc7d677381947",
+        "trial-18.wav": "6e2c1593fbd84b565fc77c9091306e58ff7d90a41fce3997352dc7d677381947",
+        "trial-19.wav": "6e2c1593fbd84b565fc77c9091306e58ff7d90a41fce3997352dc7d677381947",
+        "trial-2.wav": "6e2c1593fbd84b565fc77c9091306e58ff7d90a41fce3997352dc7d677381947",
+        "trial-3.wav": "6e2c1593fbd84b565fc77c9091306e58ff7d90a41fce3997352dc7d677381947",
+        "trial-4.wav": "6e2c1593fbd84b565fc77c9091306e58ff7d90a41fce3997352dc7d677381947",
+        "trial-5.wav": "6e2c1593fbd84b565fc77c9091306e58ff7d90a41fce3997352dc7d677381947",
+        "trial-6.wav": "6e2c1593fbd84b565fc77c9091306e58ff7d90a41fce3997352dc7d677381947",
+        "trial-7.wav": "6e2c1593fbd84b565fc77c9091306e58ff7d90a41fce3997352dc7d677381947",
+        "trial-8.wav": "6e2c1593fbd84b565fc77c9091306e58ff7d90a41fce3997352dc7d677381947",
+        "trial-9.wav": "6e2c1593fbd84b565fc77c9091306e58ff7d90a41fce3997352dc7d677381947"
+      }
+    },
+    "mac/coreml-cpu-es": {
+      "summary": {
+        "medianWarmRTFx": 6.1122169432596145,
+        "minWarmRTFx": 6.096506830830058,
+        "medianWarmFirstAudioSeconds": 0.02398699999321252,
+        "renderedAudioSeconds": 53.12,
+        "renderSeconds": 9.153179624991026,
+        "peakSampledApplicationFootprintBytes": 558237616
+      },
+      "receipt": {
+        "chunks": [
+          "La lluvia había terminado.",
+          "Junto a la ventana, la mujer cerró el libro y escuchó los pasos en el pasillo.",
+          "Por un momento creyó reconocer aquella voz. Luego abrió la puerta. No había nadie."
+        ],
+        "complete": true,
+        "loadSeconds": 0.19902266666758806,
+        "machine": "arm64",
+        "operatingSystem": "Version 27.0.1 (Build 26A434)",
+        "request": {
+          "backend": "coreml-cpu",
+          "language": "es",
+          "repetitions": 3,
+          "seed": 42,
+          "steps": 4,
+          "style": "original",
+          "temperature": 0.3,
+          "text": "La lluvia había terminado. Junto a la ventana, la mujer cerró el libro y escuchó los pasos en el pasillo. Por un momento creyó reconocer aquella voz. Luego abrió la puerta. No había nadie.",
+          "voiceID": "pocket-lola-es-v1"
+        },
+        "rows": [
+          {
+            "audioSeconds": 13.28,
+            "coldGeneration": true,
+            "firstAudioSeconds": 0.5164119999972172,
+            "iteration": 0,
+            "peakPhysicalFootprintBytes": 467306368,
+            "realTimeFactor": 5.025611428518962,
+            "renderSeconds": 2.6424645416554995,
+            "samples": 318720,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 13.28,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.024947916681412607,
+            "iteration": 1,
+            "peakPhysicalFootprintBytes": 499156864,
+            "realTimeFactor": 6.148943098309998,
+            "renderSeconds": 2.159720750001725,
+            "samples": 318720,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 13.28,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.023454374982975423,
+            "iteration": 2,
+            "peakPhysicalFootprintBytes": 528844720,
+            "realTimeFactor": 6.096506830830058,
+            "renderSeconds": 2.1782965833554044,
+            "samples": 318720,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 13.28,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.02398699999321252,
+            "iteration": 3,
+            "peakPhysicalFootprintBytes": 558237616,
+            "realTimeFactor": 6.1122169432596145,
+            "renderSeconds": 2.172697749978397,
+            "samples": 318720,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          }
+        ],
+        "runtime": "pocket-coreml-28770c06-v1:fp32:tanh:quality4:adaptive:warm12:eos6",
+        "tokenCounts": [
+          8,
+          25,
+          21
+        ]
+      },
+      "audioSHA256": {
+        "trial-0.wav": "b9365f801b65cc6091cd5223526324191a29675765ce5fec4b4ef07295f55067",
+        "trial-1.wav": "b9365f801b65cc6091cd5223526324191a29675765ce5fec4b4ef07295f55067",
+        "trial-2.wav": "b9365f801b65cc6091cd5223526324191a29675765ce5fec4b4ef07295f55067",
+        "trial-3.wav": "b9365f801b65cc6091cd5223526324191a29675765ce5fec4b4ef07295f55067"
+      }
+    },
+    "mac/coreml-zero": {
+      "summary": {
+        "medianWarmRTFx": 5.874546264212729,
+        "minWarmRTFx": 5.874546264212729,
+        "medianWarmFirstAudioSeconds": 0.026849749963730574,
+        "renderedAudioSeconds": 47.2,
+        "renderSeconds": 8.86533399997279,
+        "peakSampledApplicationFootprintBytes": 1089407640
+      },
+      "receipt": {
+        "chunks": [
+          "She rested her hand against the door. For a moment, she could almost hear his voice again.",
+          "It was the small things she remembered: the way he folded the newspaper, the sound of his keys on the table, and the cup he always left beside the window.",
+          "She waited. Nobody came."
+        ],
+        "complete": true,
+        "loadSeconds": 1.3640671250177547,
+        "machine": "arm64",
+        "operatingSystem": "Version 27.0.1 (Build 26A434)",
+        "request": {
+          "backend": "coreml",
+          "language": "en",
+          "repetitions": 1,
+          "seed": 42,
+          "steps": 4,
+          "style": "calm",
+          "temperature": 0,
+          "text": "She rested her hand against the door. For a moment, she could almost hear his voice again. It was the small things she remembered: the way he folded the newspaper, the sound of his keys on the table, and the cup he always left beside the window. She waited. Nobody came.",
+          "voiceID": "pocket-caro_davy-en-v1"
+        },
+        "rows": [
+          {
+            "audioSeconds": 23.6,
+            "coldGeneration": true,
+            "firstAudioSeconds": 0.4450430416618474,
+            "iteration": 0,
+            "peakPhysicalFootprintBytes": 978438760,
+            "realTimeFactor": 4.867984330205657,
+            "renderSeconds": 4.848002458340488,
+            "samples": 566400,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 23.6,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.026849749963730574,
+            "iteration": 1,
+            "peakPhysicalFootprintBytes": 1089407640,
+            "realTimeFactor": 5.874546264212729,
+            "renderSeconds": 4.017331541632302,
+            "samples": 566400,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          }
+        ],
+        "runtime": "pocket-coreml-28770c06-v1:fp32:tanh:quality4:adaptive:warm12:eos6",
+        "tokenCounts": [
+          24,
+          45,
+          8
+        ]
+      },
+      "audioSHA256": {
+        "trial-0.wav": "65db741b72b306f9075a62719fc9ae637c72bdcfbd1fa7c52dc844b22699aab6",
+        "trial-1.wav": "65db741b72b306f9075a62719fc9ae637c72bdcfbd1fa7c52dc844b22699aab6"
+      }
+    },
+    "mac/mlx": {
+      "summary": {
+        "medianWarmRTFx": 10.910550270713607,
+        "minWarmRTFx": 10.830133317607391,
+        "medianWarmFirstAudioSeconds": 0.017906958353705704,
+        "renderedAudioSeconds": 89.28,
+        "renderSeconds": 8.218601541651879,
+        "peakSampledApplicationFootprintBytes": 1411303008
+      },
+      "receipt": {
+        "chunks": [
+          "She rested her hand against the door. For a moment, she could almost hear his voice again.",
+          "It was the small things she remembered: the way he folded the newspaper, the sound of his keys on the table, and the cup he always left beside the window.",
+          "She waited. Nobody came."
+        ],
+        "complete": true,
+        "loadSeconds": 0.3037781249731779,
+        "machine": "arm64",
+        "operatingSystem": "Version 27.0.1 (Build 26A434)",
+        "request": {
+          "backend": "mlx",
+          "language": "en",
+          "repetitions": 3,
+          "seed": 42,
+          "steps": 4,
+          "style": "calm",
+          "temperature": 0.3,
+          "text": "She rested her hand against the door. For a moment, she could almost hear his voice again. It was the small things she remembered: the way he folded the newspaper, the sound of his keys on the table, and the cup he always left beside the window. She waited. Nobody came.",
+          "voiceID": "pocket-caro_davy-en-v1"
+        },
+        "rows": [
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": true,
+            "firstAudioSeconds": 0.03080433333525434,
+            "iteration": 0,
+            "peakPhysicalFootprintBytes": 1385989704,
+            "realTimeFactor": 10.750649533577949,
+            "renderSeconds": 2.076153624977451,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.017906958353705704,
+            "iteration": 1,
+            "peakPhysicalFootprintBytes": 1401816672,
+            "realTimeFactor": 10.963721294176146,
+            "renderSeconds": 2.035805125022307,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.01795816665980965,
+            "iteration": 2,
+            "peakPhysicalFootprintBytes": 1408075360,
+            "realTimeFactor": 10.830133317607391,
+            "renderSeconds": 2.0609164583147503,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.017645833315327764,
+            "iteration": 3,
+            "peakPhysicalFootprintBytes": 1411303008,
+            "realTimeFactor": 10.910550270713607,
+            "renderSeconds": 2.0457263333373703,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          }
+        ],
+        "runtime": "pocket-mlx-28770c06-v3:quality4:adaptive:warm12:eos6:fp32",
+        "tokenCounts": [
+          24,
+          45,
+          8
+        ]
+      },
+      "audioSHA256": {
+        "trial-0.wav": "0893e75db576daff23749e7a193a7c149e13225115fb8b65c2e4f30775e38695",
+        "trial-1.wav": "0893e75db576daff23749e7a193a7c149e13225115fb8b65c2e4f30775e38695",
+        "trial-2.wav": "0893e75db576daff23749e7a193a7c149e13225115fb8b65c2e4f30775e38695",
+        "trial-3.wav": "0893e75db576daff23749e7a193a7c149e13225115fb8b65c2e4f30775e38695"
+      }
+    },
+    "mac/mlx-es": {
+      "summary": {
+        "medianWarmRTFx": 11.031739719485602,
+        "minWarmRTFx": 10.972838231647017,
+        "medianWarmFirstAudioSeconds": 0.01342329167528078,
+        "renderedAudioSeconds": 53.12,
+        "renderSeconds": 4.879446625011042,
+        "peakSampledApplicationFootprintBytes": 1382172328
+      },
+      "receipt": {
+        "chunks": [
+          "La lluvia había terminado.",
+          "Junto a la ventana, la mujer cerró el libro y escuchó los pasos en el pasillo.",
+          "Por un momento creyó reconocer aquella voz. Luego abrió la puerta. No había nadie."
+        ],
+        "complete": true,
+        "loadSeconds": 0.35592070838902146,
+        "machine": "arm64",
+        "operatingSystem": "Version 27.0.1 (Build 26A434)",
+        "request": {
+          "backend": "mlx",
+          "language": "es",
+          "repetitions": 3,
+          "seed": 42,
+          "steps": 4,
+          "style": "original",
+          "temperature": 0.3,
+          "text": "La lluvia había terminado. Junto a la ventana, la mujer cerró el libro y escuchó los pasos en el pasillo. Por un momento creyó reconocer aquella voz. Luego abrió la puerta. No había nadie.",
+          "voiceID": "pocket-lola-es-v1"
+        },
+        "rows": [
+          {
+            "audioSeconds": 13.28,
+            "coldGeneration": true,
+            "firstAudioSeconds": 0.10217858332907781,
+            "iteration": 0,
+            "peakPhysicalFootprintBytes": 1364248208,
+            "realTimeFactor": 10.319997303397622,
+            "renderSeconds": 1.2868220416712575,
+            "samples": 318720,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 13.28,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.013045125000644475,
+            "iteration": 1,
+            "peakPhysicalFootprintBytes": 1368049320,
+            "realTimeFactor": 11.267948216251781,
+            "renderSeconds": 1.1785641667083837,
+            "samples": 318720,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 13.28,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.01342329167528078,
+            "iteration": 2,
+            "peakPhysicalFootprintBytes": 1363445416,
+            "realTimeFactor": 10.972838231647017,
+            "renderSeconds": 1.2102611666778103,
+            "samples": 318720,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 13.28,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.015675666625611484,
+            "iteration": 3,
+            "peakPhysicalFootprintBytes": 1382172328,
+            "realTimeFactor": 11.031739719485602,
+            "renderSeconds": 1.2037992499535903,
+            "samples": 318720,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          }
+        ],
+        "runtime": "pocket-mlx-28770c06-v3:quality4:adaptive:warm12:eos6:fp32",
+        "tokenCounts": [
+          8,
+          25,
+          21
+        ]
+      },
+      "audioSHA256": {
+        "trial-0.wav": "6fbf8945403839388a34197d6048daa2d5238cd62c467067522e6a2ec0f1b98d",
+        "trial-1.wav": "6fbf8945403839388a34197d6048daa2d5238cd62c467067522e6a2ec0f1b98d",
+        "trial-2.wav": "6fbf8945403839388a34197d6048daa2d5238cd62c467067522e6a2ec0f1b98d",
+        "trial-3.wav": "6fbf8945403839388a34197d6048daa2d5238cd62c467067522e6a2ec0f1b98d"
+      }
+    },
+    "mac/mlx-zero": {
+      "summary": {
+        "medianWarmRTFx": 10.741324740049013,
+        "minWarmRTFx": 10.741324740049013,
+        "medianWarmFirstAudioSeconds": 0.017099374963436276,
+        "renderedAudioSeconds": 47.2,
+        "renderSeconds": 6.983517333283089,
+        "peakSampledApplicationFootprintBytes": 1403176592
+      },
+      "receipt": {
+        "chunks": [
+          "She rested her hand against the door. For a moment, she could almost hear his voice again.",
+          "It was the small things she remembered: the way he folded the newspaper, the sound of his keys on the table, and the cup he always left beside the window.",
+          "She waited. Nobody came."
+        ],
+        "complete": true,
+        "loadSeconds": 0.4292190833366476,
+        "machine": "arm64",
+        "operatingSystem": "Version 27.0.1 (Build 26A434)",
+        "request": {
+          "backend": "mlx",
+          "language": "en",
+          "repetitions": 1,
+          "seed": 42,
+          "steps": 4,
+          "style": "calm",
+          "temperature": 0,
+          "text": "She rested her hand against the door. For a moment, she could almost hear his voice again. It was the small things she remembered: the way he folded the newspaper, the sound of his keys on the table, and the cup he always left beside the window. She waited. Nobody came.",
+          "voiceID": "pocket-caro_davy-en-v1"
+        },
+        "rows": [
+          {
+            "audioSeconds": 23.6,
+            "coldGeneration": true,
+            "firstAudioSeconds": 2.342108916665893,
+            "iteration": 0,
+            "peakPhysicalFootprintBytes": 1392903776,
+            "realTimeFactor": 4.930641525747914,
+            "renderSeconds": 4.786395416653249,
+            "samples": 566400,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 23.6,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.017099374963436276,
+            "iteration": 1,
+            "peakPhysicalFootprintBytes": 1403176592,
+            "realTimeFactor": 10.741324740049013,
+            "renderSeconds": 2.1971219166298397,
+            "samples": 566400,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          }
+        ],
+        "runtime": "pocket-mlx-28770c06-v3:quality4:adaptive:warm12:eos6:fp32",
+        "tokenCounts": [
+          24,
+          45,
+          8
+        ]
+      },
+      "audioSHA256": {
+        "trial-0.wav": "75b33c8ee47dd7135dd0b8a35524066715c29716eaa187bc975cf89b996bb482",
+        "trial-1.wav": "75b33c8ee47dd7135dd0b8a35524066715c29716eaa187bc975cf89b996bb482"
+      }
+    },
+    "iphone/coreml-cpu": {
+      "summary": {
+        "medianWarmRTFx": 4.586383656559194,
+        "minWarmRTFx": 4.493096657478676,
+        "medianWarmFirstAudioSeconds": 0.046337375009898096,
+        "renderedAudioSeconds": 66.96000000000001,
+        "renderSeconds": 14.569953374913894,
+        "peakSampledApplicationFootprintBytes": 605489832
+      },
+      "receipt": {
+        "chunks": [
+          "She rested her hand against the door. For a moment, she could almost hear his voice again.",
+          "It was the small things she remembered: the way he folded the newspaper, the sound of his keys on the table, and the cup he always left beside the window.",
+          "She waited. Nobody came."
+        ],
+        "complete": true,
+        "loadSeconds": 1.5704097499838099,
+        "machine": "iPhone18,2",
+        "operatingSystem": "Version 27.2 (Build 24B119)",
+        "request": {
+          "backend": "coreml-cpu",
+          "language": "en",
+          "repetitions": 2,
+          "seed": 42,
+          "steps": 4,
+          "style": "calm",
+          "temperature": 0.3,
+          "text": "She rested her hand against the door. For a moment, she could almost hear his voice again. It was the small things she remembered: the way he folded the newspaper, the sound of his keys on the table, and the cup he always left beside the window. She waited. Nobody came.",
+          "voiceID": "pocket-caro_davy-en-v1"
+        },
+        "rows": [
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": true,
+            "firstAudioSeconds": 0.2334330417215824,
+            "iteration": 0,
+            "peakPhysicalFootprintBytes": 500796000,
+            "realTimeFactor": 4.618472908752775,
+            "renderSeconds": 4.832766250008717,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.03937474999111146,
+            "iteration": 1,
+            "peakPhysicalFootprintBytes": 551553680,
+            "realTimeFactor": 4.679670655639713,
+            "renderSeconds": 4.769566416624002,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.053300000028684735,
+            "iteration": 2,
+            "peakPhysicalFootprintBytes": 605489832,
+            "realTimeFactor": 4.493096657478676,
+            "renderSeconds": 4.967620708281174,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          }
+        ],
+        "runtime": "pocket-coreml-28770c06-v1:fp32:tanh:quality4:adaptive:warm12:eos6",
+        "tokenCounts": [
+          24,
+          45,
+          8
+        ]
+      },
+      "audioSHA256": {
+        "trial-0.wav": "0194fd846b3cd544970028898607312203286c508ef2e0db66886b18b4427ae9",
+        "trial-1.wav": "0194fd846b3cd544970028898607312203286c508ef2e0db66886b18b4427ae9",
+        "trial-2.wav": "0194fd846b3cd544970028898607312203286c508ef2e0db66886b18b4427ae9"
+      }
+    },
+    "iphone/coreml-cpu-background": {
+      "summary": {
+        "medianWarmRTFx": 3.7224573388325877,
+        "minWarmRTFx": 3.07269471534323,
+        "medianWarmFirstAudioSeconds": 0.04852816660422832,
+        "renderedAudioSeconds": 446.4,
+        "renderSeconds": 121.24780708306935,
+        "peakSampledApplicationFootprintBytes": 485165616
+      },
+      "receipt": {
+        "chunks": [
+          "She rested her hand against the door. For a moment, she could almost hear his voice again.",
+          "It was the small things she remembered: the way he folded the newspaper, the sound of his keys on the table, and the cup he always left beside the window.",
+          "She waited. Nobody came."
+        ],
+        "complete": true,
+        "loadSeconds": 1.595411124988459,
+        "machine": "iPhone18,2",
+        "operatingSystem": "Version 27.2 (Build 24B119)",
+        "request": {
+          "backend": "coreml-cpu",
+          "language": "en",
+          "repetitions": 19,
+          "seed": 42,
+          "steps": 4,
+          "style": "calm",
+          "temperature": 0.3,
+          "text": "She rested her hand against the door. For a moment, she could almost hear his voice again. It was the small things she remembered: the way he folded the newspaper, the sound of his keys on the table, and the cup he always left beside the window. She waited. Nobody came.",
+          "voiceID": "pocket-caro_davy-en-v1"
+        },
+        "rows": [
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": true,
+            "firstAudioSeconds": 0.21610075002536178,
+            "iteration": 0,
+            "peakPhysicalFootprintBytes": 485165616,
+            "realTimeFactor": 4.3028923247200686,
+            "renderSeconds": 5.187208583345637,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.04563220834825188,
+            "iteration": 1,
+            "peakPhysicalFootprintBytes": 414845512,
+            "realTimeFactor": 4.815195739421024,
+            "renderSeconds": 4.6353255833964795,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.04032837494742125,
+            "iteration": 2,
+            "peakPhysicalFootprintBytes": 101403088,
+            "realTimeFactor": 4.4908487638483505,
+            "renderSeconds": 4.970107250032015,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.04215899994596839,
+            "iteration": 3,
+            "peakPhysicalFootprintBytes": 102238624,
+            "realTimeFactor": 4.3942906574671685,
+            "renderSeconds": 5.079318083357066,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.043673791573382914,
+            "iteration": 4,
+            "peakPhysicalFootprintBytes": 99813792,
+            "realTimeFactor": 4.29924818782344,
+            "renderSeconds": 5.191605374915525,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.044803333352319896,
+            "iteration": 5,
+            "peakPhysicalFootprintBytes": 102353312,
+            "realTimeFactor": 3.812992750005903,
+            "renderSeconds": 5.853669666685164,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.04896300006657839,
+            "iteration": 6,
+            "peakPhysicalFootprintBytes": 100944288,
+            "realTimeFactor": 3.7282088686717074,
+            "renderSeconds": 5.986789041664451,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.04818054160568863,
+            "iteration": 7,
+            "peakPhysicalFootprintBytes": 101026208,
+            "realTimeFactor": 3.0941696747133496,
+            "renderSeconds": 7.2135669166455045,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.05721500003710389,
+            "iteration": 8,
+            "peakPhysicalFootprintBytes": 100714912,
+            "realTimeFactor": 3.6277496026036657,
+            "renderSeconds": 6.152574583422393,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.04791662492789328,
+            "iteration": 9,
+            "peakPhysicalFootprintBytes": 100829600,
+            "realTimeFactor": 3.795203351319693,
+            "renderSeconds": 5.881107791559771,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.04718012490775436,
+            "iteration": 10,
+            "peakPhysicalFootprintBytes": 100796832,
+            "realTimeFactor": 3.7920726328395866,
+            "renderSeconds": 5.885963208274916,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.04852816660422832,
+            "iteration": 11,
+            "peakPhysicalFootprintBytes": 100895136,
+            "realTimeFactor": 3.7783397701282073,
+            "renderSeconds": 5.907356499927118,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.04855812503956258,
+            "iteration": 12,
+            "peakPhysicalFootprintBytes": 100731296,
+            "realTimeFactor": 3.7224573388325877,
+            "renderSeconds": 5.996039166697301,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.04833045834675431,
+            "iteration": 13,
+            "peakPhysicalFootprintBytes": 100321696,
+            "realTimeFactor": 3.07269471534323,
+            "renderSeconds": 7.263982291682623,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.057437041657976806,
+            "iteration": 14,
+            "peakPhysicalFootprintBytes": 100878752,
+            "realTimeFactor": 3.285817021844227,
+            "renderSeconds": 6.792831083294004,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.06391579157207161,
+            "iteration": 15,
+            "peakPhysicalFootprintBytes": 100764064,
+            "realTimeFactor": 3.2224554130106378,
+            "renderSeconds": 6.926395291578956,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.0534722083248198,
+            "iteration": 16,
+            "peakPhysicalFootprintBytes": 100927904,
+            "realTimeFactor": 3.1991022256788826,
+            "renderSeconds": 6.976957416627556,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.050927249947562814,
+            "iteration": 17,
+            "peakPhysicalFootprintBytes": 101009824,
+            "realTimeFactor": 3.5620148460276178,
+            "renderSeconds": 6.266116500017233,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.05219179159030318,
+            "iteration": 18,
+            "peakPhysicalFootprintBytes": 101091744,
+            "realTimeFactor": 3.400171077464084,
+            "renderSeconds": 6.564375583315268,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.05697529169265181,
+            "iteration": 19,
+            "peakPhysicalFootprintBytes": 100878752,
+            "realTimeFactor": 3.4251425154368893,
+            "renderSeconds": 6.516517166630365,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          }
+        ],
+        "runtime": "pocket-coreml-28770c06-v1:fp32:tanh:quality4:adaptive:warm12:eos6",
+        "tokenCounts": [
+          24,
+          45,
+          8
+        ]
+      },
+      "audioSHA256": {
+        "trial-0.wav": "0194fd846b3cd544970028898607312203286c508ef2e0db66886b18b4427ae9",
+        "trial-1.wav": "0194fd846b3cd544970028898607312203286c508ef2e0db66886b18b4427ae9",
+        "trial-10.wav": "0194fd846b3cd544970028898607312203286c508ef2e0db66886b18b4427ae9",
+        "trial-11.wav": "0194fd846b3cd544970028898607312203286c508ef2e0db66886b18b4427ae9",
+        "trial-12.wav": "0194fd846b3cd544970028898607312203286c508ef2e0db66886b18b4427ae9",
+        "trial-13.wav": "0194fd846b3cd544970028898607312203286c508ef2e0db66886b18b4427ae9",
+        "trial-14.wav": "0194fd846b3cd544970028898607312203286c508ef2e0db66886b18b4427ae9",
+        "trial-15.wav": "0194fd846b3cd544970028898607312203286c508ef2e0db66886b18b4427ae9",
+        "trial-16.wav": "0194fd846b3cd544970028898607312203286c508ef2e0db66886b18b4427ae9",
+        "trial-17.wav": "0194fd846b3cd544970028898607312203286c508ef2e0db66886b18b4427ae9",
+        "trial-18.wav": "0194fd846b3cd544970028898607312203286c508ef2e0db66886b18b4427ae9",
+        "trial-19.wav": "0194fd846b3cd544970028898607312203286c508ef2e0db66886b18b4427ae9",
+        "trial-2.wav": "0194fd846b3cd544970028898607312203286c508ef2e0db66886b18b4427ae9",
+        "trial-3.wav": "0194fd846b3cd544970028898607312203286c508ef2e0db66886b18b4427ae9",
+        "trial-4.wav": "0194fd846b3cd544970028898607312203286c508ef2e0db66886b18b4427ae9",
+        "trial-5.wav": "0194fd846b3cd544970028898607312203286c508ef2e0db66886b18b4427ae9",
+        "trial-6.wav": "0194fd846b3cd544970028898607312203286c508ef2e0db66886b18b4427ae9",
+        "trial-7.wav": "0194fd846b3cd544970028898607312203286c508ef2e0db66886b18b4427ae9",
+        "trial-8.wav": "0194fd846b3cd544970028898607312203286c508ef2e0db66886b18b4427ae9",
+        "trial-9.wav": "0194fd846b3cd544970028898607312203286c508ef2e0db66886b18b4427ae9"
+      }
+    },
+    "iphone/mlx": {
+      "summary": {
+        "medianWarmRTFx": 5.732016235112786,
+        "minWarmRTFx": 5.704958924388989,
+        "medianWarmFirstAudioSeconds": 0.025268666562624276,
+        "renderedAudioSeconds": 89.28,
+        "renderSeconds": 21.455256458371878,
+        "peakSampledApplicationFootprintBytes": 1134840032
+      },
+      "receipt": {
+        "chunks": [
+          "She rested her hand against the door. For a moment, she could almost hear his voice again.",
+          "It was the small things she remembered: the way he folded the newspaper, the sound of his keys on the table, and the cup he always left beside the window.",
+          "She waited. Nobody came."
+        ],
+        "complete": true,
+        "loadSeconds": 0.9664338333532214,
+        "machine": "iPhone18,2",
+        "operatingSystem": "Version 27.2 (Build 24B119)",
+        "request": {
+          "backend": "mlx",
+          "language": "en",
+          "repetitions": 3,
+          "seed": 42,
+          "steps": 4,
+          "style": "calm",
+          "temperature": 0.3,
+          "text": "She rested her hand against the door. For a moment, she could almost hear his voice again. It was the small things she remembered: the way he folded the newspaper, the sound of his keys on the table, and the cup he always left beside the window. She waited. Nobody came.",
+          "voiceID": "pocket-caro_davy-en-v1"
+        },
+        "rows": [
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": true,
+            "firstAudioSeconds": 4.657655541668646,
+            "iteration": 0,
+            "peakPhysicalFootprintBytes": 1110837448,
+            "realTimeFactor": 2.2879813944905565,
+            "renderSeconds": 9.755324083380401,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.025268666562624276,
+            "iteration": 1,
+            "peakPhysicalFootprintBytes": 1129646304,
+            "realTimeFactor": 5.704958924388989,
+            "renderSeconds": 3.912385749979876,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.025618541636504233,
+            "iteration": 2,
+            "peakPhysicalFootprintBytes": 1134840032,
+            "realTimeFactor": 5.732441625874622,
+            "renderSeconds": 3.893628833349794,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.32,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.024609125102870166,
+            "iteration": 3,
+            "peakPhysicalFootprintBytes": 1131383008,
+            "realTimeFactor": 5.732016235112786,
+            "renderSeconds": 3.8939177916618064,
+            "samples": 535680,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          }
+        ],
+        "runtime": "pocket-mlx-28770c06-v3:quality4:adaptive:warm12:eos6:fp32",
+        "tokenCounts": [
+          24,
+          45,
+          8
+        ]
+      },
+      "audioSHA256": {
+        "trial-0.wav": "44b874ca9ec97fd80f60ebbbb27bb68d55ca0d5c1086643392b9dda8f55b4f52",
+        "trial-1.wav": "44b874ca9ec97fd80f60ebbbb27bb68d55ca0d5c1086643392b9dda8f55b4f52",
+        "trial-2.wav": "44b874ca9ec97fd80f60ebbbb27bb68d55ca0d5c1086643392b9dda8f55b4f52",
+        "trial-3.wav": "44b874ca9ec97fd80f60ebbbb27bb68d55ca0d5c1086643392b9dda8f55b4f52"
+      }
+    }
+  },
+  "backgroundEvidence": {
+    "generatingInBackground": {
+      "applicationState": 2,
+      "playbackRate": 1,
+      "playbackSecondsInCurrentItem": 4.470391962,
+      "protectedDataAvailable": true,
+      "remainingQueueItems": 8,
+      "stage": "generatingInBackground",
+      "timestamp": 1794348757.308502
+    },
+    "completedInBackground": {
+      "applicationState": 2,
+      "playbackRate": 1,
+      "playbackSecondsInCurrentItem": 9.434774941,
+      "protectedDataAvailable": false,
+      "remainingQueueItems": 23,
+      "stage": "completedInBackground",
+      "timestamp": 1794348880.265493
+    },
+    "lockState": {
+      "passcodeRequired": true,
+      "unlockedSinceBoot": true
+    }
+  },
+  "pcmParity": {
+    "zero-pcm-parity.json": {
+      "samplesMLX": 566400,
+      "samplesCoreML": 566400,
+      "maxError": 0.000554921105504036,
+      "rmse": 1.2977180034306918e-05,
+      "cosine": 0.9999999174605466
+    },
+    "seed42-pcm-parity.json": {
+      "samplesMLX": 535680,
+      "samplesCoreML": 535680,
+      "maxError": 0.004828423261642456,
+      "rmse": 8.41586186668665e-05,
+      "cosine": 0.9999973794191916
+    }
+  },
+  "asrScreen": [
+    {
+      "language": "en",
+      "path": ".coreml-results/mac/coreml-cpu/trial-1.wav",
+      "transcript": " she rested her hand against the door for a moment she could almost hear his voice again it was the small things she remembered the way he folded the newspaper the sound of his keys on the table and the cup he always left beside the window she waited nobody came"
+    },
+    {
+      "language": "es",
+      "path": ".coreml-results/mac/coreml-cpu-es/trial-1.wav",
+      "transcript": " la lluvia había terminado junto a la ventana la mujer cerró el libro y escuchó los pasos en el pasillo por un momento creyó reconocer aquella voz luego abrió la puerta no había nadie"
+    }
+  ],
+  "limitations": [
+    "One M3 Ultra Mac and one iPhone 17 Pro Max (iOS 27.2), connected to the Mac by USB.",
+    "Background run used real audio playback; no background GPU or continued-processing entitlement.",
+    "No silent background preparation, battery-discharge, unplugged endurance, other-device or human listening qualification.",
+    "Core ML compute-unit allowances do not prove Neural Engine placement; this float32 baseline is CPU-oriented.",
+    "Application footprint snapshots exclude memory in system services and are not total model memory.",
+    "Mac application footprint grew during twenty repeated generations; long-session allocation retention needs investigation before production integration.",
+    "The final source additionally blocks long teacher-forced prefixes into <=512-token calls. Benchmark passages fit one such call; no acoustic settings changed."
+  ]
+}

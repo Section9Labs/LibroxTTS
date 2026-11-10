@@ -1,0 +1,6 @@
+version = 1
+name = "Max Core ML experiment"
+[[actions]]
+name = "Run"
+icon = "run"
+command = "./script/build_and_run.sh"

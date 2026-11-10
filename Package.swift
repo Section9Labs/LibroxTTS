@@ -5,6 +5,9 @@ let package = Package(
     name: "LibroxTTS",
     platforms: [.macOS(.v15), .iOS(.v18), .macCatalyst(.v18)],
     products: [
+        .library(name: "PocketTTSCoreML", targets: ["PocketTTSCoreML"]),
+        .library(name: "PocketBackendBenchmark", targets: ["PocketBackendBenchmark"]),
+        .executable(name: "pocket-backend-benchmark", targets: ["PocketBackendBenchmarkCLI"]),
         .library(name: "PocketTTSMLX", targets: ["PocketTTSMLX"]),
         .executable(name: "pocket-tts-probe", targets: ["PocketTTSProbe"]),
         .library(name: "LibroxCTNative", targets: ["LibroxCTNative"]),
@@ -25,6 +28,10 @@ let package = Package(
     ],
     dependencies: [.package(url: "https://github.com/ml-explore/mlx-swift.git", exact: "0.32.3")],
     targets: [
+        .target(name: "PocketTTSCoreML", dependencies: ["PocketTTSMLX", "KokoroCatalog", .product(name: "MLX", package: "mlx-swift"), .product(name: "MLXRandom", package: "mlx-swift")], path: "Integrations/PocketTTS/Sources/PocketTTSCoreML"),
+        .target(name: "PocketBackendBenchmark", dependencies: ["PocketTTSCoreML", "PocketTTSMLX", "KokoroNarration"]),
+        .executableTarget(name: "PocketBackendBenchmarkCLI", dependencies: ["PocketBackendBenchmark"]),
+        .testTarget(name: "PocketTTSCoreMLTests", dependencies: ["PocketTTSCoreML", "PocketTTSMLX"]),
         .target(name: "PocketTTSMLX", dependencies: ["KokoroCatalog", .product(name: "MLX", package: "mlx-swift"), .product(name: "MLXNN", package: "mlx-swift"), .product(name: "MLXFast", package: "mlx-swift"), .product(name: "MLXRandom", package: "mlx-swift")], path: "Integrations/PocketTTS/Sources/PocketTTSMLX"),
         .executableTarget(name: "PocketTTSProbe", dependencies: ["LibroxTTS", "PocketTTSMLX", "KokoroPronunciation"]),
         .testTarget(name: "PocketTTSMLXTests", dependencies: ["PocketTTSMLX", "LibroxTTS"]),

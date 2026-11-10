@@ -1,0 +1,1158 @@
+{
+  "en": {
+    "manifest": {
+      "schema": 1,
+      "snapshot": "a7056f505a4a8ca72d8b5fb1440071d6f1a35739",
+      "weightsSHA256": "4c56cbd171c63e8a26ea61f5d48b8a0cd8f3c51f4652c0ab9a19bfcced8c931d",
+      "precision": "float32",
+      "gelu": "tanh",
+      "sampleRate": 24000,
+      "mimiCacheCapacity": 512,
+      "stages": {
+        "text": {
+          "errors": {
+            "hidden": 2.995133399963379e-06,
+            "eos": 2.2649765014648438e-06,
+            "next0": 5.4836273193359375e-06,
+            "next1": 3.5762786865234375e-07,
+            "next2": 5.245208740234375e-06,
+            "next3": 3.8743019104003906e-07,
+            "next4": 4.76837158203125e-06,
+            "next5": 5.364418029785156e-07,
+            "next6": 4.5299530029296875e-06,
+            "next7": 9.387731552124023e-07,
+            "next8": 3.814697265625e-06,
+            "next9": 1.0132789611816406e-06,
+            "next10": 3.814697265625e-06,
+            "next11": 1.3709068298339844e-06
+          },
+          "inputs": {
+            "value": [
+              1,
+              4
+            ],
+            "position": [
+              1
+            ],
+            "cache0": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache1": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache2": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache3": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache4": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache5": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache6": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache7": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache8": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache9": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache10": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache11": [
+              1,
+              16,
+              8,
+              64
+            ]
+          },
+          "outputs": [
+            "hidden",
+            "eos",
+            "next0",
+            "next1",
+            "next2",
+            "next3",
+            "next4",
+            "next5",
+            "next6",
+            "next7",
+            "next8",
+            "next9",
+            "next10",
+            "next11"
+          ]
+        },
+        "latent": {
+          "errors": {
+            "hidden": 1.8477439880371094e-06,
+            "eos": 1.430511474609375e-06,
+            "next0": 5.7220458984375e-06,
+            "next1": 7.152557373046875e-07,
+            "next2": 4.291534423828125e-06,
+            "next3": 4.76837158203125e-07,
+            "next4": 4.5299530029296875e-06,
+            "next5": 6.556510925292969e-07,
+            "next6": 3.337860107421875e-06,
+            "next7": 8.046627044677734e-07,
+            "next8": 4.0531158447265625e-06,
+            "next9": 1.1026859283447266e-06,
+            "next10": 3.814697265625e-06,
+            "next11": 1.2516975402832031e-06
+          },
+          "inputs": {
+            "value": [
+              1,
+              4,
+              32
+            ],
+            "position": [
+              1
+            ],
+            "cache0": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache1": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache2": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache3": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache4": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache5": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache6": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache7": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache8": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache9": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache10": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache11": [
+              1,
+              16,
+              8,
+              64
+            ]
+          },
+          "outputs": [
+            "hidden",
+            "eos",
+            "next0",
+            "next1",
+            "next2",
+            "next3",
+            "next4",
+            "next5",
+            "next6",
+            "next7",
+            "next8",
+            "next9",
+            "next10",
+            "next11"
+          ]
+        },
+        "flow4": {
+          "errors": {
+            "latent": 2.980232238769531e-07
+          },
+          "inputs": {
+            "condition": [
+              1,
+              1024
+            ],
+            "noise": [
+              1,
+              32
+            ]
+          },
+          "outputs": [
+            "latent"
+          ]
+        },
+        "flow8": {
+          "errors": {
+            "latent": 3.5762786865234375e-07
+          },
+          "inputs": {
+            "condition": [
+              1,
+              1024
+            ],
+            "noise": [
+              1,
+              32
+            ]
+          },
+          "outputs": [
+            "latent"
+          ]
+        },
+        "mimi": {
+          "errors": {
+            "audio": 7.525086402893066e-07,
+            "next_upsample_partial": 2.384185791015625e-07,
+            "next_attn0_cache": 1.430511474609375e-06,
+            "next_attn0_offset": 0.0,
+            "next_attn1_cache": 2.86102294921875e-06,
+            "next_attn1_offset": 0.0,
+            "next_conv0_prev": 2.0265579223632812e-06,
+            "next_convtr0_partial": 1.2874603271484375e-05,
+            "next_res0_conv0_prev": 4.0531158447265625e-06,
+            "next_convtr1_partial": 4.470348358154297e-06,
+            "next_res1_conv0_prev": 4.306435585021973e-06,
+            "next_convtr2_partial": 4.112720489501953e-06,
+            "next_res2_conv0_prev": 4.76837158203125e-06,
+            "next_conv_final_prev": 4.76837158203125e-06
+          },
+          "inputs": {
+            "latent": [
+              1,
+              32
+            ],
+            "upsample_partial": [
+              1,
+              512,
+              16
+            ],
+            "attn0_cache": [
+              2,
+              1,
+              512,
+              8,
+              64
+            ],
+            "attn0_offset": [
+              1
+            ],
+            "attn1_cache": [
+              2,
+              1,
+              512,
+              8,
+              64
+            ],
+            "attn1_offset": [
+              1
+            ],
+            "conv0_prev": [
+              1,
+              512,
+              6
+            ],
+            "convtr0_partial": [
+              1,
+              256,
+              6
+            ],
+            "res0_conv0_prev": [
+              1,
+              256,
+              2
+            ],
+            "convtr1_partial": [
+              1,
+              128,
+              5
+            ],
+            "res1_conv0_prev": [
+              1,
+              128,
+              2
+            ],
+            "convtr2_partial": [
+              1,
+              64,
+              4
+            ],
+            "res2_conv0_prev": [
+              1,
+              64,
+              2
+            ],
+            "conv_final_prev": [
+              1,
+              64,
+              2
+            ]
+          },
+          "outputs": [
+            "audio",
+            "next_upsample_partial",
+            "next_attn0_cache",
+            "next_attn0_offset",
+            "next_attn1_cache",
+            "next_attn1_offset",
+            "next_conv0_prev",
+            "next_convtr0_partial",
+            "next_res0_conv0_prev",
+            "next_convtr1_partial",
+            "next_res1_conv0_prev",
+            "next_convtr2_partial",
+            "next_res2_conv0_prev",
+            "next_conv_final_prev"
+          ]
+        }
+      }
+    },
+    "independentParity": {
+      "transformer": [
+        {
+          "kind": "text",
+          "tokens": 17,
+          "hiddenMaxError": 2.9802322387695312e-06
+        },
+        {
+          "kind": "latent",
+          "tokens": 1,
+          "hiddenMaxError": 9.685754776000977e-07
+        },
+        {
+          "kind": "latent",
+          "tokens": 1,
+          "hiddenMaxError": 9.238719940185547e-07
+        },
+        {
+          "kind": "latent",
+          "tokens": 1,
+          "hiddenMaxError": 1.1026859283447266e-06
+        },
+        {
+          "kind": "latent",
+          "tokens": 1,
+          "hiddenMaxError": 7.152557373046875e-07
+        },
+        {
+          "kind": "latent",
+          "tokens": 1,
+          "hiddenMaxError": 5.960464477539062e-07
+        },
+        {
+          "kind": "latent",
+          "tokens": 1,
+          "hiddenMaxError": 5.960464477539062e-07
+        },
+        {
+          "kind": "latent",
+          "tokens": 1,
+          "hiddenMaxError": 5.662441253662109e-07
+        },
+        {
+          "kind": "latent",
+          "tokens": 1,
+          "hiddenMaxError": 6.854534149169922e-07
+        },
+        {
+          "kind": "latent",
+          "tokens": 1,
+          "hiddenMaxError": 7.022172212600708e-07
+        },
+        {
+          "kind": "latent",
+          "tokens": 1,
+          "hiddenMaxError": 5.960464477539062e-07
+        },
+        {
+          "kind": "latent",
+          "tokens": 1,
+          "hiddenMaxError": 5.960464477539062e-07
+        },
+        {
+          "kind": "latent",
+          "tokens": 1,
+          "hiddenMaxError": 7.748603820800781e-07
+        },
+        {
+          "kind": "latent",
+          "tokens": 43,
+          "hiddenMaxError": 1.989305019378662e-06
+        },
+        {
+          "kind": "text",
+          "tokens": 7,
+          "hiddenMaxError": 2.1457672119140625e-06
+        },
+        {
+          "kind": "latent",
+          "tokens": 1,
+          "hiddenMaxError": 8.493661880493164e-07
+        }
+      ],
+      "mimiFrames": 70,
+      "mimiMaxPCMError": 1.627020537853241e-06,
+      "passed": true
+    },
+    "compiledFiles": {
+      "bos.bin": {
+        "sha256": "993398e25df91902674eff02af42bf0a99eddfe5d6bc064d083484360974ce19",
+        "bytes": 128
+      },
+      "mimi.mlmodelc/metadata.json": {
+        "sha256": "eaac965ff8c46a0a5c1241f11bb7d5ad396d8ee4384727087c2fbc083833da1c",
+        "bytes": 10480
+      },
+      "mimi.mlmodelc/model.mil": {
+        "sha256": "322af952440e3703aa3ddaa945c813253ff6d961c6ff45fb29663a2977fac74d",
+        "bytes": 94727
+      },
+      "mimi.mlmodelc/coremldata.bin": {
+        "sha256": "141e709c74bc1264fd9e9c9ec934272a1feead00a9cb8b0ac0bab5b253537eb0",
+        "bytes": 1247
+      },
+      "text.mlmodelc/metadata.json": {
+        "sha256": "b20a0551f198d7dd56fee0e9e5e2980f9d5d396f2004dfdc31d69ba71c881961",
+        "bytes": 11357
+      },
+      "text.mlmodelc/model.mil": {
+        "sha256": "c2370c621a2a073198e1cc23a4e3bd42944bfc4b38f5a2d7bf4537c1c2f46d86",
+        "bytes": 106947
+      },
+      "text.mlmodelc/coremldata.bin": {
+        "sha256": "63a15da567a77a321931e8b4f21376450b888050c25c5c14085861b9758289f0",
+        "bytes": 1261
+      },
+      "latent.mlmodelc/metadata.json": {
+        "sha256": "9856cd8ba6c314ee6e4834a8f10ca07c558ee6de33a0821f2b814c2c985491f2",
+        "bytes": 11357
+      },
+      "latent.mlmodelc/model.mil": {
+        "sha256": "d035d9850e4bfee709a0b58429b2b6ec65da240897dcf3f4b0543ecf97223712",
+        "bytes": 106009
+      },
+      "latent.mlmodelc/coremldata.bin": {
+        "sha256": "aba895a8bc2b5a6c4cdbf7e95b5e843739ed7962a7f270cef3acb5089170f8a4",
+        "bytes": 1268
+      },
+      "flow4.mlmodelc/metadata.json": {
+        "sha256": "2a6afb984d22f800375ed2468332e21d03f6609e8206a11364ba7eb5a3635501",
+        "bytes": 2119
+      },
+      "flow4.mlmodelc/model.mil": {
+        "sha256": "50b39fb4b11366eb2c5978d93e4d4ed526488f65bb4ff1f1c3b506388e7a383f",
+        "bytes": 128532
+      },
+      "flow4.mlmodelc/coremldata.bin": {
+        "sha256": "5ec7d03069c26d786bb0ee542c8b4b1f43c4f9bb39f3281039a16d89217ee2ea",
+        "bytes": 394
+      },
+      "flow8.mlmodelc/metadata.json": {
+        "sha256": "a990c81c6cae6e2f5671cf7c31e97e9f6f2284818d3295bbcfe509e997f50171",
+        "bytes": 2122
+      },
+      "flow8.mlmodelc/model.mil": {
+        "sha256": "8aae7b9031628508e5fd1aa88bc5d31c8f6e2c7c8fa365ef379b825805f60e98",
+        "bytes": 243491
+      },
+      "flow8.mlmodelc/coremldata.bin": {
+        "sha256": "bee8a06d17a254fec7396439ae3b024b85bf4dcb31c52ffe11d5ecd0c24615d4",
+        "bytes": 394
+      },
+      "flow8.mlmodelc/weights/weight.bin": {
+        "sha256": "7a2b928dd6d5ad6daf071958cd3a7cb090f72da7ae5ba4e38be906866fb8e561",
+        "bytes": 38020160
+      },
+      "flow8.mlmodelc/analytics/coremldata.bin": {
+        "sha256": "304062de3d3d02e8e2be5ea67a1fa13a619eb1438e195dbc20d029e97f473e21",
+        "bytes": 243
+      },
+      "flow4.mlmodelc/weights/weight.bin": {
+        "sha256": "136159096addd20320c87564dbfaf924f631d51fe4e9a049826680ae63e6b1de",
+        "bytes": 38003264
+      },
+      "flow4.mlmodelc/analytics/coremldata.bin": {
+        "sha256": "7bc95c6fd76baec87bdd2de2c60ed95505b21f2ba97f6dd2a19457f380ec6e75",
+        "bytes": 243
+      },
+      "latent.mlmodelc/weights/weight.bin": {
+        "sha256": "ba5b627b617d2a8e15d21c72f9b5199cc6917ef57a6c7118791594740da26423",
+        "bytes": 302268096
+      },
+      "latent.mlmodelc/analytics/coremldata.bin": {
+        "sha256": "4b030eb19f3f395bbee26bf5e17285cf48eb79dd6d4e2b525bcd22645e2aaf0e",
+        "bytes": 243
+      },
+      "text.mlmodelc/weights/weight.bin": {
+        "sha256": "cdc0f8b1112b137b92c001e4926517f4ba85f3196151e84c809fd398295f6edf",
+        "bytes": 318525120
+      },
+      "text.mlmodelc/analytics/coremldata.bin": {
+        "sha256": "14d3b0513ccd26e3686ab148951af845cf3fdf5227e7ffc16bf68b5439e980ff",
+        "bytes": 243
+      },
+      "mimi.mlmodelc/weights/weight.bin": {
+        "sha256": "71056bcda439a7ebc421f4cf4903a5d3bcb266e8a2aa4282bc96a8d1937c88c8",
+        "bytes": 42294912
+      },
+      "mimi.mlmodelc/analytics/coremldata.bin": {
+        "sha256": "26222e227241d219cad7b5837cd2be17b1d0ef166fdd165ddeead762fdd53183",
+        "bytes": 243
+      }
+    }
+  },
+  "es": {
+    "manifest": {
+      "schema": 1,
+      "snapshot": "a7056f505a4a8ca72d8b5fb1440071d6f1a35739",
+      "weightsSHA256": "c4988ff376692f2ab1e85b17350755b08f16e49c0b5f0de8b271efa9abd71de7",
+      "precision": "float32",
+      "gelu": "tanh",
+      "sampleRate": 24000,
+      "mimiCacheCapacity": 512,
+      "stages": {
+        "text": {
+          "errors": {
+            "hidden": 2.3245811462402344e-06,
+            "eos": 1.430511474609375e-06,
+            "next0": 5.7220458984375e-06,
+            "next1": 2.980232238769531e-07,
+            "next2": 2.384185791015625e-06,
+            "next3": 6.556510925292969e-07,
+            "next4": 4.291534423828125e-06,
+            "next5": 8.344650268554688e-07,
+            "next6": 3.814697265625e-06,
+            "next7": 1.9073486328125e-06,
+            "next8": 3.337860107421875e-06,
+            "next9": 1.7881393432617188e-06,
+            "next10": 3.337860107421875e-06,
+            "next11": 1.9669532775878906e-06
+          },
+          "inputs": {
+            "value": [
+              1,
+              4
+            ],
+            "position": [
+              1
+            ],
+            "cache0": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache1": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache2": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache3": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache4": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache5": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache6": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache7": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache8": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache9": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache10": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache11": [
+              1,
+              16,
+              8,
+              64
+            ]
+          },
+          "outputs": [
+            "hidden",
+            "eos",
+            "next0",
+            "next1",
+            "next2",
+            "next3",
+            "next4",
+            "next5",
+            "next6",
+            "next7",
+            "next8",
+            "next9",
+            "next10",
+            "next11"
+          ]
+        },
+        "latent": {
+          "errors": {
+            "hidden": 1.9073486328125e-06,
+            "eos": 1.430511474609375e-06,
+            "next0": 4.76837158203125e-06,
+            "next1": 7.152557373046875e-07,
+            "next2": 2.6226043701171875e-06,
+            "next3": 5.960464477539062e-07,
+            "next4": 2.384185791015625e-06,
+            "next5": 1.0132789611816406e-06,
+            "next6": 3.5762786865234375e-06,
+            "next7": 1.4901161193847656e-06,
+            "next8": 4.0531158447265625e-06,
+            "next9": 1.7285346984863281e-06,
+            "next10": 4.291534423828125e-06,
+            "next11": 1.735985279083252e-06
+          },
+          "inputs": {
+            "value": [
+              1,
+              4,
+              32
+            ],
+            "position": [
+              1
+            ],
+            "cache0": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache1": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache2": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache3": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache4": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache5": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache6": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache7": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache8": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache9": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache10": [
+              1,
+              16,
+              8,
+              64
+            ],
+            "cache11": [
+              1,
+              16,
+              8,
+              64
+            ]
+          },
+          "outputs": [
+            "hidden",
+            "eos",
+            "next0",
+            "next1",
+            "next2",
+            "next3",
+            "next4",
+            "next5",
+            "next6",
+            "next7",
+            "next8",
+            "next9",
+            "next10",
+            "next11"
+          ]
+        },
+        "flow4": {
+          "errors": {
+            "latent": 2.384185791015625e-07
+          },
+          "inputs": {
+            "condition": [
+              1,
+              1024
+            ],
+            "noise": [
+              1,
+              32
+            ]
+          },
+          "outputs": [
+            "latent"
+          ]
+        },
+        "flow8": {
+          "errors": {
+            "latent": 3.5762786865234375e-07
+          },
+          "inputs": {
+            "condition": [
+              1,
+              1024
+            ],
+            "noise": [
+              1,
+              32
+            ]
+          },
+          "outputs": [
+            "latent"
+          ]
+        },
+        "mimi": {
+          "errors": {
+            "audio": 2.2351741790771484e-07,
+            "next_upsample_partial": 5.960464477539063e-08,
+            "next_attn0_cache": 1.9073486328125e-06,
+            "next_attn0_offset": 0.0,
+            "next_attn1_cache": 4.291534423828125e-06,
+            "next_attn1_offset": 0.0,
+            "next_conv0_prev": 2.0265579223632812e-06,
+            "next_convtr0_partial": 1.0013580322265625e-05,
+            "next_res0_conv0_prev": 4.76837158203125e-06,
+            "next_convtr1_partial": 2.6226043701171875e-06,
+            "next_res1_conv0_prev": 9.47713851928711e-06,
+            "next_convtr2_partial": 9.775161743164062e-06,
+            "next_res2_conv0_prev": 1.3828277587890625e-05,
+            "next_conv_final_prev": 1.3828277587890625e-05
+          },
+          "inputs": {
+            "latent": [
+              1,
+              32
+            ],
+            "upsample_partial": [
+              1,
+              512,
+              16
+            ],
+            "attn0_cache": [
+              2,
+              1,
+              512,
+              8,
+              64
+            ],
+            "attn0_offset": [
+              1
+            ],
+            "attn1_cache": [
+              2,
+              1,
+              512,
+              8,
+              64
+            ],
+            "attn1_offset": [
+              1
+            ],
+            "conv0_prev": [
+              1,
+              512,
+              6
+            ],
+            "convtr0_partial": [
+              1,
+              256,
+              6
+            ],
+            "res0_conv0_prev": [
+              1,
+              256,
+              2
+            ],
+            "convtr1_partial": [
+              1,
+              128,
+              5
+            ],
+            "res1_conv0_prev": [
+              1,
+              128,
+              2
+            ],
+            "convtr2_partial": [
+              1,
+              64,
+              4
+            ],
+            "res2_conv0_prev": [
+              1,
+              64,
+              2
+            ],
+            "conv_final_prev": [
+              1,
+              64,
+              2
+            ]
+          },
+          "outputs": [
+            "audio",
+            "next_upsample_partial",
+            "next_attn0_cache",
+            "next_attn0_offset",
+            "next_attn1_cache",
+            "next_attn1_offset",
+            "next_conv0_prev",
+            "next_convtr0_partial",
+            "next_res0_conv0_prev",
+            "next_convtr1_partial",
+            "next_res1_conv0_prev",
+            "next_convtr2_partial",
+            "next_res2_conv0_prev",
+            "next_conv_final_prev"
+          ]
+        }
+      }
+    },
+    "independentParity": {
+      "transformer": [
+        {
+          "kind": "text",
+          "tokens": 17,
+          "hiddenMaxError": 2.9206275939941406e-06
+        },
+        {
+          "kind": "latent",
+          "tokens": 1,
+          "hiddenMaxError": 1.043081283569336e-06
+        },
+        {
+          "kind": "latent",
+          "tokens": 1,
+          "hiddenMaxError": 1.1920928955078125e-06
+        },
+        {
+          "kind": "latent",
+          "tokens": 1,
+          "hiddenMaxError": 9.5367431640625e-07
+        },
+        {
+          "kind": "latent",
+          "tokens": 1,
+          "hiddenMaxError": 1.1324882507324219e-06
+        },
+        {
+          "kind": "latent",
+          "tokens": 1,
+          "hiddenMaxError": 8.67992639541626e-07
+        },
+        {
+          "kind": "latent",
+          "tokens": 1,
+          "hiddenMaxError": 9.5367431640625e-07
+        },
+        {
+          "kind": "latent",
+          "tokens": 1,
+          "hiddenMaxError": 9.834766387939453e-07
+        },
+        {
+          "kind": "latent",
+          "tokens": 1,
+          "hiddenMaxError": 1.1026859283447266e-06
+        },
+        {
+          "kind": "latent",
+          "tokens": 1,
+          "hiddenMaxError": 9.5367431640625e-07
+        },
+        {
+          "kind": "latent",
+          "tokens": 1,
+          "hiddenMaxError": 8.493661880493164e-07
+        },
+        {
+          "kind": "latent",
+          "tokens": 1,
+          "hiddenMaxError": 9.5367431640625e-07
+        },
+        {
+          "kind": "latent",
+          "tokens": 1,
+          "hiddenMaxError": 8.195638656616211e-07
+        },
+        {
+          "kind": "latent",
+          "tokens": 43,
+          "hiddenMaxError": 3.814697265625e-06
+        },
+        {
+          "kind": "text",
+          "tokens": 7,
+          "hiddenMaxError": 2.7418136596679688e-06
+        },
+        {
+          "kind": "latent",
+          "tokens": 1,
+          "hiddenMaxError": 1.2516975402832031e-06
+        }
+      ],
+      "mimiFrames": 70,
+      "mimiMaxPCMError": 6.556510925292969e-07,
+      "passed": true
+    },
+    "compiledFiles": {
+      "bos.bin": {
+        "sha256": "cccf314c649b15cd5408c04dfd1c574e9ee05a963ccfc0ff2bfc9dd1d720bd3d",
+        "bytes": 128
+      },
+      "mimi.mlmodelc/metadata.json": {
+        "sha256": "eaac965ff8c46a0a5c1241f11bb7d5ad396d8ee4384727087c2fbc083833da1c",
+        "bytes": 10480
+      },
+      "mimi.mlmodelc/model.mil": {
+        "sha256": "322af952440e3703aa3ddaa945c813253ff6d961c6ff45fb29663a2977fac74d",
+        "bytes": 94727
+      },
+      "mimi.mlmodelc/coremldata.bin": {
+        "sha256": "8372b67c8c670f62a1d580357ca7f1ccc2eecf6e30fad0e6bd9e5cae99675145",
+        "bytes": 1247
+      },
+      "text.mlmodelc/metadata.json": {
+        "sha256": "b20a0551f198d7dd56fee0e9e5e2980f9d5d396f2004dfdc31d69ba71c881961",
+        "bytes": 11357
+      },
+      "text.mlmodelc/model.mil": {
+        "sha256": "23018ef89dd5717ddd8a5483cc6de3ee513f245c06fa024e17fccdc1def6d182",
+        "bytes": 106947
+      },
+      "text.mlmodelc/coremldata.bin": {
+        "sha256": "c0653157cc5920094650cfdc100145a6eff508d4536ffd2a70be1ba3c1b2a2d4",
+        "bytes": 1261
+      },
+      "latent.mlmodelc/metadata.json": {
+        "sha256": "9856cd8ba6c314ee6e4834a8f10ca07c558ee6de33a0821f2b814c2c985491f2",
+        "bytes": 11357
+      },
+      "latent.mlmodelc/model.mil": {
+        "sha256": "ac39c3bc5892a72c8eab2ba0119acb2373b9b9c96d49a619097cc1b5bdaead80",
+        "bytes": 106009
+      },
+      "latent.mlmodelc/coremldata.bin": {
+        "sha256": "181d1a1e134ac47ee1c4ef68e3e970d230e7f6a18a53b95fa91e8fee3d2a140b",
+        "bytes": 1268
+      },
+      "flow4.mlmodelc/metadata.json": {
+        "sha256": "2a6afb984d22f800375ed2468332e21d03f6609e8206a11364ba7eb5a3635501",
+        "bytes": 2119
+      },
+      "flow4.mlmodelc/model.mil": {
+        "sha256": "50b39fb4b11366eb2c5978d93e4d4ed526488f65bb4ff1f1c3b506388e7a383f",
+        "bytes": 128532
+      },
+      "flow4.mlmodelc/coremldata.bin": {
+        "sha256": "dc88911efdd2cc19cc4380d4095c57891e1a17f3e78a10b5ffaeb1fb872282e0",
+        "bytes": 394
+      },
+      "flow8.mlmodelc/metadata.json": {
+        "sha256": "a990c81c6cae6e2f5671cf7c31e97e9f6f2284818d3295bbcfe509e997f50171",
+        "bytes": 2122
+      },
+      "flow8.mlmodelc/model.mil": {
+        "sha256": "8aae7b9031628508e5fd1aa88bc5d31c8f6e2c7c8fa365ef379b825805f60e98",
+        "bytes": 243491
+      },
+      "flow8.mlmodelc/coremldata.bin": {
+        "sha256": "3cec9975cdc96e7a8e036e24af901ece1e893038a86379e32eb8aa4f3bfed287",
+        "bytes": 394
+      },
+      "flow8.mlmodelc/weights/weight.bin": {
+        "sha256": "d1d8fd23e58670d485d487652e0ca3996da68aee806356a38f8ad0f5a145aa00",
+        "bytes": 38020160
+      },
+      "flow8.mlmodelc/analytics/coremldata.bin": {
+        "sha256": "fc4fc651e571939e51c0fdc0e04dbf85871591c02f63a08aa0be6611cb015b2c",
+        "bytes": 243
+      },
+      "flow4.mlmodelc/weights/weight.bin": {
+        "sha256": "904cea4736db04df4815d081a3726890ebce9cc3c85a81d183e5286958f33848",
+        "bytes": 38003264
+      },
+      "flow4.mlmodelc/analytics/coremldata.bin": {
+        "sha256": "1ec0c04cd02100723830472c0fe2afccd9ef7022d3665457d0cd1ee2087a55a1",
+        "bytes": 243
+      },
+      "latent.mlmodelc/weights/weight.bin": {
+        "sha256": "1c3cd5bdfd18e011dd8bf77c99bf72dd13cd47e0659d8f619c024b136c3abfce",
+        "bytes": 302268096
+      },
+      "latent.mlmodelc/analytics/coremldata.bin": {
+        "sha256": "4152145fcf50838d8044f2f3b0f483003ad151bf9215f07b69af4b794d172527",
+        "bytes": 243
+      },
+      "text.mlmodelc/weights/weight.bin": {
+        "sha256": "1799e608a1fa20d5f4c4ce859243118a501b767b2ce0b41cf8ddfdd123ea3c01",
+        "bytes": 318525120
+      },
+      "text.mlmodelc/analytics/coremldata.bin": {
+        "sha256": "4b64e48db7d28029b63c1ae7e6fda116406321aba7a9befdfe1bc6924e7d014d",
+        "bytes": 243
+      },
+      "mimi.mlmodelc/weights/weight.bin": {
+        "sha256": "190d9ac819dedb3a42371a09b823d6d9c4af2316d770ffc3fb11e0d00e5e6da3",
+        "bytes": 42294912
+      },
+      "mimi.mlmodelc/analytics/coremldata.bin": {
+        "sha256": "278f799a5e6251266adc03e5e62a050944a1720e092c2292af2400e97373d606",
+        "bytes": 243
+      }
+    }
+  }
+}
