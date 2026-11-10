@@ -50,7 +50,10 @@ public enum PocketTTSCatalog {
             files: manifests.flatMap(\.files), installedFiles: manifests.flatMap(\.installedFiles))
     }
     public static func validate(in directory: URL, language: String) throws {
-        for file in try manifest(language: language).installedFiles {
+        try validate(manifest(language: language), in: directory)
+    }
+    public static func validate(_ manifest: AssetManifest, in directory: URL) throws {
+        for file in manifest.installedFiles {
             try Task.checkCancellation()
             let url = directory.appendingPathComponent(file.path)
             guard (try url.resourceValues(forKeys: [.fileSizeKey])).fileSize == Int(file.size) else { throw CocoaError(.fileReadCorruptFile) }

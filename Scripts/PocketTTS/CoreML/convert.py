@@ -61,6 +61,13 @@ class Flow(torch.nn.Module):
             z = z + self.net(condition, s, t, z) / self.steps
         return z
 
+class FlowStep(torch.nn.Module):
+    """Same Euler update for explicitly selected non-default sampler counts."""
+    def __init__(self, flow):
+        super().__init__(); self.net = flow.flow_net
+    def forward(self, condition, noise, s, t, steps):
+        return noise + self.net(condition, s, t, noise) / steps
+
 class Mimi(torch.nn.Module):
     """Exclude unchanged/empty states from Core ML's external interface."""
     def __init__(self, model):
@@ -79,7 +86,7 @@ def sha(path):
 
 def main():
     p=argparse.ArgumentParser(); p.add_argument('--assets',type=pathlib.Path,required=True); p.add_argument('--output',type=pathlib.Path,required=True)
-    p.add_argument('--language',default='en'); p.add_argument('--stages',nargs='+',default=['text','latent','flow4','flow8','mimi']); a=p.parse_args()
+    p.add_argument('--language',default='en'); p.add_argument('--stages',nargs='+',default=['text','latent','flow4','flow8','flowstep','mimi']); a=p.parse_args()
     root=a.assets/a.language; out=a.output/a.language; out.mkdir(parents=True,exist_ok=True)
     cfg=json.loads((root/'config.json').read_text()); assert cfg['snapshot_revision']==SNAPSHOT
     catalog=pathlib.Path(__file__).resolve().parents[3]/'Sources/KokoroCatalog/PocketTTS'/f'{a.language}.json'
@@ -109,6 +116,10 @@ def main():
             inputs += [ct.TensorType(name='position',shape=(1,),dtype=np.float32)]
             inputs += [ct.TensorType(name=f'cache{i}',shape=(1,16,past,64),dtype=np.float32) for i in range(12)]
             names=['hidden','eos']+[f'next{i}' for i in range(12)]
+        elif stage == 'flowstep':
+            wrapper=FlowStep(model.flow_lm).eval()
+            examples=(torch.randn(1,1024),torch.randn(1,32),torch.tensor([[0.0]]),torch.tensor([[1/3]]),torch.tensor([3.0]))
+            inputs=[ct.TensorType(name=n,shape=tuple(t.shape),dtype=np.float32) for n,t in zip(['condition','noise','s','t','steps'],examples)]; names=['latent']
         elif stage.startswith('flow'):
             wrapper=Flow(model.flow_lm,int(stage[4:])).eval(); examples=(torch.randn(1,1024),torch.randn(1,32))
             inputs=[ct.TensorType(name=n,shape=tuple(t.shape),dtype=np.float32) for n,t in zip(['condition','noise'],examples)];names=['latent']

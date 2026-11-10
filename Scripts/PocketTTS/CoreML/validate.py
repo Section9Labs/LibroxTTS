@@ -5,6 +5,7 @@ import coremltools as ct
 import numpy as np
 import torch
 from pocket_tts import TTSModel
+from pocket_tts.models.flow_lm import lsd_decode
 from pocket_tts.modules.stateful_module import init_states, increment_steps
 
 def main():
@@ -40,6 +41,19 @@ def main():
             errors.append(dict(kind=kind,tokens=T,hiddenMaxError=error))
             print(errors[-1], {n:float(np.max(np.abs(v-running[n]))) for n,v in cache_feed().items()}, flush=True)
             assert error<2e-4,errors[-1]
+        # Exercise every supported sampler against Kyutai's original integrator.
+        step_model=ct.models.MLModel(str(root/'flowstep.mlpackage'),compute_units=ct.ComputeUnit.CPU_ONLY)
+        sampler_errors=[]
+        condition=torch.randn(1,1024); noise=torch.randn(1,32)
+        for steps in range(1,9):
+            ref=lsd_decode(lambda s,t,z: m.flow_lm.flow_net(condition,s,t,z),noise,steps)
+            z=noise.numpy().copy()
+            for i in range(steps):
+                z=step_model.predict(dict(condition=condition.numpy(),noise=z,
+                    s=np.array([[i/steps]],np.float32),t=np.array([[(i+1)/steps]],np.float32),steps=np.array([steps],np.float32)))['latent']
+            error=float(np.max(np.abs(ref.numpy()-z)))
+            assert error<2e-4,(steps,error)
+            sampler_errors.append(dict(steps=steps,maxError=error))
         # Native, unpatched Mimi reference: full cache vs converted ring cache.
         mimi=ct.models.MLModel(str(root/'mimi.mlpackage'),compute_units=ct.ComputeUnit.CPU_ONLY)
         refstate=init_states(m.mimi,1,2048)
@@ -54,6 +68,6 @@ def main():
             error=float(np.max(np.abs(ref.numpy()-got['audio'])))
             pcm_error=max(error,pcm_error)
             assert error<2e-4,(frame,error)
-    report=dict(transformer=errors,mimiFrames=70,mimiMaxPCMError=pcm_error,passed=True)
+    report=dict(samplers=sampler_errors,transformer=errors,mimiFrames=70,mimiMaxPCMError=pcm_error,passed=True)
     (root/'independent-parity.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))
 if __name__=='__main__':main()

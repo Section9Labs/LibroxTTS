@@ -22,7 +22,7 @@ public enum PocketTTSError: LocalizedError {
 /// Foreground and granted background work may use GPU; other background work uses CPU.
 /// Backend changes retire all model and RNG state before creating new operations.
 public actor PocketTTSEngine {
-    public static let runtimeIdentity = "pocket-mlx-28770c06-v3:quality4:adaptive:warm12:eos6:fp32"
+    public static let runtimeIdentity = PocketTTSBackend.mlx.runtimeIdentity
     public enum Backend: String, Codable, Sendable { case gpu, cpu }
     public private(set) var backend: Backend
     private var randomState: MLXRandom.RandomState?

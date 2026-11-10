@@ -1,0 +1,248 @@
+{
+  "repository": "Section9Labs/LibroxTTS",
+  "revision": "pocket-tts-coreml-2026-11-10-v1",
+  "files": [
+    {
+      "path": "fr/coreml/bos.bin",
+      "size": 128,
+      "sha256": "e5e2df4cfc1c389e629ab5fd641d8922529d186950b8045de6b5469cbe9ceeec",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--bos.bin"
+    },
+    {
+      "path": "fr/coreml/flow4.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "size": 127619,
+      "sha256": "b2a62c6b1c8cbae4249568a9535c4df120aac811e02d1faccec39e21c07abf8f",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--flow4.mlpackage--Data--com.apple.CoreML--model.mlmodel"
+    },
+    {
+      "path": "fr/coreml/flow4.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "size": 38003264,
+      "sha256": "6fc23b4a90bc621709b8523625f2139107fe1ca0bc3bc0c19cf6bbb9ea273233",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--flow4.mlpackage--Data--com.apple.CoreML--weights--weight.bin"
+    },
+    {
+      "path": "fr/coreml/flow4.mlpackage/Manifest.json",
+      "size": 617,
+      "sha256": "a590a6b78a5acfe2c3f68434d4ad17a884143d63112b71727714bab200ed3461",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--flow4.mlpackage--Manifest.json"
+    },
+    {
+      "path": "fr/coreml/flow8.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "size": 245014,
+      "sha256": "6bf2d795077439f919fb699e2c87f113ff9aab6599ff930055da0894a8ac539d",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--flow8.mlpackage--Data--com.apple.CoreML--model.mlmodel"
+    },
+    {
+      "path": "fr/coreml/flow8.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "size": 38020160,
+      "sha256": "7d19a11cacac18a00facab767c44f4ee858a2f153910868ec70567d56e592f3b",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--flow8.mlpackage--Data--com.apple.CoreML--weights--weight.bin"
+    },
+    {
+      "path": "fr/coreml/flow8.mlpackage/Manifest.json",
+      "size": 617,
+      "sha256": "2122786b0d7868ab696c6a8fb08fb425207e8bfc011e146584dd2172d5d72eeb",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--flow8.mlpackage--Manifest.json"
+    },
+    {
+      "path": "fr/coreml/flowstep.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "size": 42526,
+      "sha256": "50f64587dc931b9659d341f2fd28a45b828c848b340a615fb6798049b9bd2a2f",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--flowstep.mlpackage--Data--com.apple.CoreML--model.mlmodel"
+    },
+    {
+      "path": "fr/coreml/flowstep.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "size": 39039872,
+      "sha256": "dc9a8efc6570de8a579a15ad55af1f2515262b04a6f8cf66f955b9d074548cd6",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--flowstep.mlpackage--Data--com.apple.CoreML--weights--weight.bin"
+    },
+    {
+      "path": "fr/coreml/flowstep.mlpackage/Manifest.json",
+      "size": 617,
+      "sha256": "11f620afa52e0f3cfc908348c5143937ef94d75552d0ccbeb91af7e282811360",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--flowstep.mlpackage--Manifest.json"
+    },
+    {
+      "path": "fr/coreml/latent.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "size": 100634,
+      "sha256": "1a4415e7e70b66a9fde4232a53d9c393616772b9efa321938524a8eb96f40df4",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--latent.mlpackage--Data--com.apple.CoreML--model.mlmodel"
+    },
+    {
+      "path": "fr/coreml/latent.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "size": 302268096,
+      "sha256": "21a9cb9912caa82e2fd785bd6cb463fcc5b517989a80c11219de6d8c153d7984",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--latent.mlpackage--Data--com.apple.CoreML--weights--weight.bin"
+    },
+    {
+      "path": "fr/coreml/latent.mlpackage/Manifest.json",
+      "size": 617,
+      "sha256": "39140af4644c0b331973673894374de93dc14c7e905cb07d7c6af8c8c8dfe9df",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--latent.mlpackage--Manifest.json"
+    },
+    {
+      "path": "fr/coreml/manifest.json",
+      "size": 7586,
+      "sha256": "3a1899e00cbdd814a77337690f9d911f9e758655e3eeaae5dc432a0388c06939",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--manifest.json"
+    },
+    {
+      "path": "fr/coreml/mimi.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "size": 91968,
+      "sha256": "8425204d0e610ead9a1f8019d4708f38590141c744d109b44b93a175c5e4ad96",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--mimi.mlpackage--Data--com.apple.CoreML--model.mlmodel"
+    },
+    {
+      "path": "fr/coreml/mimi.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "size": 42294912,
+      "sha256": "7dc464f64799ad0db7ed311bf88f77e6b5e62e99a5d9576bbc8eadcaafbd2be1",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--mimi.mlpackage--Data--com.apple.CoreML--weights--weight.bin"
+    },
+    {
+      "path": "fr/coreml/mimi.mlpackage/Manifest.json",
+      "size": 617,
+      "sha256": "d7aba7e296f147b83b4f2e0a6accd9ab40d64500cae0a8202427c733a45bd288",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--mimi.mlpackage--Manifest.json"
+    },
+    {
+      "path": "fr/coreml/text.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "size": 101601,
+      "sha256": "2a7a4460823667a061cd24305c9cbc7641d07bedfb0eb9efa7a4ddf5bb256022",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--text.mlpackage--Data--com.apple.CoreML--model.mlmodel"
+    },
+    {
+      "path": "fr/coreml/text.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "size": 318525120,
+      "sha256": "d33ca60318214b33188e10464f48ed40fae04cfeb73c0dd6c6723458c54c7c68",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--text.mlpackage--Data--com.apple.CoreML--weights--weight.bin"
+    },
+    {
+      "path": "fr/coreml/text.mlpackage/Manifest.json",
+      "size": 617,
+      "sha256": "af590dd41d2e97e42d518c3eb463989e441ad3814018b5e58ecf616c62faeb33",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--text.mlpackage--Manifest.json"
+    }
+  ],
+  "installedFiles": [
+    {
+      "path": "fr/coreml/bos.bin",
+      "size": 128,
+      "sha256": "e5e2df4cfc1c389e629ab5fd641d8922529d186950b8045de6b5469cbe9ceeec",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--bos.bin"
+    },
+    {
+      "path": "fr/coreml/flow4.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "size": 127619,
+      "sha256": "b2a62c6b1c8cbae4249568a9535c4df120aac811e02d1faccec39e21c07abf8f",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--flow4.mlpackage--Data--com.apple.CoreML--model.mlmodel"
+    },
+    {
+      "path": "fr/coreml/flow4.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "size": 38003264,
+      "sha256": "6fc23b4a90bc621709b8523625f2139107fe1ca0bc3bc0c19cf6bbb9ea273233",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--flow4.mlpackage--Data--com.apple.CoreML--weights--weight.bin"
+    },
+    {
+      "path": "fr/coreml/flow4.mlpackage/Manifest.json",
+      "size": 617,
+      "sha256": "a590a6b78a5acfe2c3f68434d4ad17a884143d63112b71727714bab200ed3461",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--flow4.mlpackage--Manifest.json"
+    },
+    {
+      "path": "fr/coreml/flow8.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "size": 245014,
+      "sha256": "6bf2d795077439f919fb699e2c87f113ff9aab6599ff930055da0894a8ac539d",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--flow8.mlpackage--Data--com.apple.CoreML--model.mlmodel"
+    },
+    {
+      "path": "fr/coreml/flow8.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "size": 38020160,
+      "sha256": "7d19a11cacac18a00facab767c44f4ee858a2f153910868ec70567d56e592f3b",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--flow8.mlpackage--Data--com.apple.CoreML--weights--weight.bin"
+    },
+    {
+      "path": "fr/coreml/flow8.mlpackage/Manifest.json",
+      "size": 617,
+      "sha256": "2122786b0d7868ab696c6a8fb08fb425207e8bfc011e146584dd2172d5d72eeb",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--flow8.mlpackage--Manifest.json"
+    },
+    {
+      "path": "fr/coreml/flowstep.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "size": 42526,
+      "sha256": "50f64587dc931b9659d341f2fd28a45b828c848b340a615fb6798049b9bd2a2f",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--flowstep.mlpackage--Data--com.apple.CoreML--model.mlmodel"
+    },
+    {
+      "path": "fr/coreml/flowstep.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "size": 39039872,
+      "sha256": "dc9a8efc6570de8a579a15ad55af1f2515262b04a6f8cf66f955b9d074548cd6",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--flowstep.mlpackage--Data--com.apple.CoreML--weights--weight.bin"
+    },
+    {
+      "path": "fr/coreml/flowstep.mlpackage/Manifest.json",
+      "size": 617,
+      "sha256": "11f620afa52e0f3cfc908348c5143937ef94d75552d0ccbeb91af7e282811360",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--flowstep.mlpackage--Manifest.json"
+    },
+    {
+      "path": "fr/coreml/latent.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "size": 100634,
+      "sha256": "1a4415e7e70b66a9fde4232a53d9c393616772b9efa321938524a8eb96f40df4",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--latent.mlpackage--Data--com.apple.CoreML--model.mlmodel"
+    },
+    {
+      "path": "fr/coreml/latent.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "size": 302268096,
+      "sha256": "21a9cb9912caa82e2fd785bd6cb463fcc5b517989a80c11219de6d8c153d7984",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--latent.mlpackage--Data--com.apple.CoreML--weights--weight.bin"
+    },
+    {
+      "path": "fr/coreml/latent.mlpackage/Manifest.json",
+      "size": 617,
+      "sha256": "39140af4644c0b331973673894374de93dc14c7e905cb07d7c6af8c8c8dfe9df",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--latent.mlpackage--Manifest.json"
+    },
+    {
+      "path": "fr/coreml/manifest.json",
+      "size": 7586,
+      "sha256": "3a1899e00cbdd814a77337690f9d911f9e758655e3eeaae5dc432a0388c06939",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--manifest.json"
+    },
+    {
+      "path": "fr/coreml/mimi.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "size": 91968,
+      "sha256": "8425204d0e610ead9a1f8019d4708f38590141c744d109b44b93a175c5e4ad96",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--mimi.mlpackage--Data--com.apple.CoreML--model.mlmodel"
+    },
+    {
+      "path": "fr/coreml/mimi.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "size": 42294912,
+      "sha256": "7dc464f64799ad0db7ed311bf88f77e6b5e62e99a5d9576bbc8eadcaafbd2be1",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--mimi.mlpackage--Data--com.apple.CoreML--weights--weight.bin"
+    },
+    {
+      "path": "fr/coreml/mimi.mlpackage/Manifest.json",
+      "size": 617,
+      "sha256": "d7aba7e296f147b83b4f2e0a6accd9ab40d64500cae0a8202427c733a45bd288",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--mimi.mlpackage--Manifest.json"
+    },
+    {
+      "path": "fr/coreml/text.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "size": 101601,
+      "sha256": "2a7a4460823667a061cd24305c9cbc7641d07bedfb0eb9efa7a4ddf5bb256022",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--text.mlpackage--Data--com.apple.CoreML--model.mlmodel"
+    },
+    {
+      "path": "fr/coreml/text.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "size": 318525120,
+      "sha256": "d33ca60318214b33188e10464f48ed40fae04cfeb73c0dd6c6723458c54c7c68",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--text.mlpackage--Data--com.apple.CoreML--weights--weight.bin"
+    },
+    {
+      "path": "fr/coreml/text.mlpackage/Manifest.json",
+      "size": 617,
+      "sha256": "af590dd41d2e97e42d518c3eb463989e441ad3814018b5e58ecf616c62faeb33",
+      "sourceURL": "https://github.com/Section9Labs/LibroxTTS/releases/download/pocket-tts-coreml-2026-11-10-v1/fr--coreml--text.mlpackage--Manifest.json"
+    }
+  ]
+}

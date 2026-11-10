@@ -72,3 +72,5 @@ Reproduction and API notes: [COREML.md](../../COREML.md).
 
 Local WAVs and raw device receipts remain under `.coreml-results/`; compiled
 models remain under `.coreml-tools/models/`. Both are intentionally untracked.
+
+Follow-up: [platform routing and separate assets](ASSET-SEPARATION.md).

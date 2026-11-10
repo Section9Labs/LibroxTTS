@@ -10,18 +10,22 @@ import MLXRandom
 /// for reading existing safetensors and the unchanged seeded noise generator.
 /// All transformer, flow and Mimi neural inference runs through Core ML.
 public actor PocketTTSCoreMLEngine {
-    public static let runtimeIdentity = "pocket-coreml-28770c06-v1:fp32:tanh:quality4:adaptive:warm12:eos6"
+    public static let runtimeIdentity = PocketTTSBackend.coreML.runtimeIdentity
     public enum Placement: String, Codable, Sendable { case cpu, cpuGPU, cpuANE, all }
     public struct Output: Sendable { public let samples: [Float]; public let sampleRate: Int }
     public enum Failure: Error { case incompatibleModel, unsupportedSampler(Int), cacheLimit, invalidShape, missingOutput(String), generationLimit(tokens: Int, frames: Int) }
     private let assets: URL
-    private let models: URL
+    private let models: URL?
     private let placement: Placement
     private var loaded: Loaded?
-    private var seed: UInt64 = 42
+    private var seed: UInt64?
     private var random: MLXRandom.RandomState?
-    public init(directory: URL, modelsDirectory: URL, placement: Placement = .cpuGPU) {
+    public init(directory: URL, modelsDirectory: URL? = nil, placement: Placement = .cpu) {
         assets = directory; models = modelsDirectory; self.placement = placement
+    }
+    private var resourceObserver: (@Sendable (PocketTTSResourceSnapshot) -> Void)?
+    public func setResourceObserver(_ observer: (@Sendable (PocketTTSResourceSnapshot) -> Void)?) {
+        resourceObserver = observer
     }
     public func setRandomSeed(_ value: UInt64) { seed = value; random = nil }
     public func unload() { loaded = nil; random = nil }
@@ -54,15 +58,16 @@ public actor PocketTTSCoreMLEngine {
                         receive: ([Float]) throws -> Void) throws {
         try chunking.validate()
         try PocketTTSSamplingOptions(temperature: temperature, samplerSteps: samplerSteps).validate()
-        guard [4, 8].contains(samplerSteps) else { throw Failure.unsupportedSampler(samplerSteps) }
+        guard (1...8).contains(samplerSteps) else { throw Failure.unsupportedSampler(samplerSteps) }
         guard let voice = PocketTTSCatalog.voice(id: voiceID) else { throw PocketTTSError.invalidVoice }
         try PocketTTSDeliveryCatalog.validate(deliveryStyle, voiceID: voiceID, in: assets)
         let name = try PocketTTSDeliveryCatalog.stateName(voiceID: voiceID, style: deliveryStyle)
         try Device.withDefaultDevice(.cpu) {
-            if random == nil { random = MLXRandom.RandomState(seed: seed) }
+            if random == nil { random = seed.map(MLXRandom.RandomState.init(seed:)) ?? MLXRandom.RandomState() }
             try withRandomState(random!) {
                 defer { if let random { eval(random) }; Memory.clearCache() }
                 do {
+                    try PocketTTSResourceChecks.checkpoint("operation-start", backend: "coreml-cpu", samplerSteps: samplerSteps, observer: resourceObserver)
                     let m = try load(voice.language)
                     let flow = try m.flow(samplerSteps)
                     let prompt = try m.voice(name)
@@ -102,16 +107,11 @@ public actor PocketTTSCoreMLEngine {
                         let cap = min(1500, Int(ceil((Double(tokens.count) / 3 + 2) * m.config.mimi.frameRate)))
                         var complete = false
                         for step in 0..<cap {
-                            try Task.checkCancellation()
+                            try PocketTTSResourceChecks.checkpoint("frame", backend: "coreml-" + placement.rawValue, samplerSteps: samplerSteps, frameIndex: step, observer: resourceObserver)
                             let result = try m.transform(m.latentModel, value: Self.floats(input, shape: [1, 1, 32]), cache: &cache)
                             var noise = MLXRandom.normal([1, 32]) * Float(sqrt(temperature))
                             if let clamp = m.config.noiseClamp { noise = MLX.minimum(MLX.maximum(noise, -clamp), clamp) }
-                            let next: [Float] = try autoreleasepool {
-                            let predicted = try flow.prediction(from: MLDictionaryFeatureProvider(dictionary: [
-                                "condition": Self.floats(Self.values(result.0), shape: [1, 1024]),
-                                "noise": Self.floats(noise.asArray(Float.self), shape: [1, 32])]))
-                            return Self.values(try Self.output(predicted, "latent"))
-                            }
+                            let next = try m.sample(flow, steps: samplerSteps, condition: Self.values(result.0), noise: noise.asArray(Float.self))
                             if eosStep == nil && step >= 6 && result.1 > m.config.eosThreshold { eosStep = step }
                             if let eosStep, step >= eosStep + (m.config.framesAfterEOS ?? tail + 2) { complete = true; break }
                             var pcm = try m.decode(next, state: &mimiState)
@@ -136,7 +136,11 @@ public actor PocketTTSCoreMLEngine {
     private func load(_ language: String) throws -> Loaded {
         if loaded?.language != language {
             loaded = nil
-            try PocketTTSCatalog.validate(in: assets, language: language)
+            if models == nil {
+                try PocketTTSCoreMLAssets.validate(in: assets, language: language)
+            } else {
+                try PocketTTSCatalog.validate(PocketTTSCoreMLCatalog.sharedManifest(language: language), in: assets)
+            }
             loaded = try Loaded(language: language, assets: assets, models: models, placement: placement)
         }
         return loaded!
@@ -185,11 +189,12 @@ public actor PocketTTSCoreMLEngine {
         let tokenizer: PocketTTSSentencePieceTokenizer
         let textModel: MLModel, latentModel: MLModel, mimiModel: MLModel
         let modelRoot: URL
+        let compiledRoot: URL
         let configuration: MLModelConfiguration
         let bos: [Float]
         var flows: [Int: MLModel] = [:]
-        init(language: String, assets: URL, models: URL, placement: Placement) throws {
-            self.language = language; root = assets.appendingPathComponent(language); modelRoot = models.appendingPathComponent(language)
+        init(language: String, assets: URL, models: URL?, placement: Placement) throws {
+            self.language = language; root = assets.appendingPathComponent(language); modelRoot = models?.appendingPathComponent(language) ?? PocketTTSCoreMLAssets.modelDirectory(in: assets, language: language)
             config = try PocketTTSModelConfig.load(from: root.appendingPathComponent("config.json"))
             tokenizer = try PocketTTSSentencePieceTokenizer(nBins: config.flowLM.lookupTable.nBins, modelFolder: root, tokenizerPath: config.tokenizerName)
             let manifest = try JSONSerialization.jsonObject(with: Data(contentsOf: modelRoot.appendingPathComponent("manifest.json"))) as? [String: Any]
@@ -204,18 +209,37 @@ public actor PocketTTSCoreMLEngine {
             case .cpuANE: configuration.computeUnits = .cpuAndNeuralEngine
             case .all: configuration.computeUnits = .all
             }
-            textModel = try MLModel(contentsOf: modelRoot.appendingPathComponent("text.mlmodelc"), configuration: configuration)
-            latentModel = try MLModel(contentsOf: modelRoot.appendingPathComponent("latent.mlmodelc"), configuration: configuration)
+            compiledRoot = models == nil ? modelRoot.appendingPathComponent("compiled") : modelRoot
+            textModel = try MLModel(contentsOf: compiledRoot.appendingPathComponent("text.mlmodelc"), configuration: configuration)
+            latentModel = try MLModel(contentsOf: compiledRoot.appendingPathComponent("latent.mlmodelc"), configuration: configuration)
             let mimiConfig = MLModelConfiguration(); mimiConfig.computeUnits = .cpuOnly
-            mimiModel = try MLModel(contentsOf: modelRoot.appendingPathComponent("mimi.mlmodelc"), configuration: mimiConfig)
+            mimiModel = try MLModel(contentsOf: compiledRoot.appendingPathComponent("mimi.mlmodelc"), configuration: mimiConfig)
             let data = try Data(contentsOf: modelRoot.appendingPathComponent("bos.bin"))
             bos = data.withUnsafeBytes { Array($0.bindMemory(to: Float.self)) }
             guard bos.count == 32 else { throw Failure.invalidShape }
         }
         func flow(_ steps: Int) throws -> MLModel {
             if let value = flows[steps] { return value }
-            let value = try MLModel(contentsOf: modelRoot.appendingPathComponent("flow\(steps).mlmodelc"), configuration: configuration)
+            let value = try MLModel(contentsOf: compiledRoot.appendingPathComponent(([4, 8].contains(steps) ? "flow\(steps)" : "flowstep") + ".mlmodelc"), configuration: configuration)
             flows[steps] = value; return value
+        }
+        func sample(_ model: MLModel, steps: Int, condition: [Float], noise: [Float]) throws -> [Float] {
+            try autoreleasepool {
+                let condition = try PocketTTSCoreMLEngine.floats(condition, shape: [1,1024])
+                var latent = try PocketTTSCoreMLEngine.floats(noise, shape: [1,32])
+                for index in 0..<([4, 8].contains(steps) ? 1 : steps) {
+                    try Task.checkCancellation()
+                    var inputs: [String: Any] = ["condition": condition, "noise": latent]
+                    if ![4, 8].contains(steps) {
+                        inputs["s"] = try PocketTTSCoreMLEngine.floats([Float(Double(index) / Double(steps))], shape: [1,1])
+                        inputs["t"] = try PocketTTSCoreMLEngine.floats([Float(Double(index + 1) / Double(steps))], shape: [1,1])
+                        inputs["steps"] = try PocketTTSCoreMLEngine.floats([Float(steps)], shape: [1])
+                    }
+                    let output = try model.prediction(from: MLDictionaryFeatureProvider(dictionary: inputs))
+                    latent = try PocketTTSCoreMLEngine.output(output, "latent")
+                }
+                return PocketTTSCoreMLEngine.values(latent)
+            }
         }
         func chunks(_ text: String, options: PocketTTSChunkingOptions, role: PocketTTSPassageRole) throws -> [PocketTTSTextChunk] {
             try PocketTTSPassageChunker.plan(text, language: language, role: role, options: options,

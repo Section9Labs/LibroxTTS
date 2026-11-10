@@ -106,3 +106,13 @@ struct PocketTTSResourceMonitor {
                      uptime: ProcessInfo.processInfo.systemUptime)
     }
 }
+
+/// Shared admission checks for acoustic backends; this does not load a model.
+public enum PocketTTSResourceChecks {
+    public static func checkpoint(_ phase: String, backend: String, samplerSteps: Int?,
+                                  frameIndex: Int? = nil,
+                                  observer: (@Sendable (PocketTTSResourceSnapshot) -> Void)? = nil) throws {
+        try PocketTTSResourceMonitor(backend: backend, samplerSteps: samplerSteps,
+                                     frameIndex: frameIndex, observe: observer).checkpoint(phase)
+    }
+}

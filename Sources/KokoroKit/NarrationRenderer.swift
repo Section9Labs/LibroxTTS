@@ -1,4 +1,5 @@
 import PocketTTSMLX
+import PocketTTSCoreML
 import Foundation
 import Darwin
 import KokoroAudio
@@ -39,8 +40,10 @@ public actor NarrationRenderer {
         await acquire(); defer { release() }
         maxResourceObserver = observer
         await pocket?.setResourceObserver(observer)
+        await pocketCoreML?.setResourceObserver(observer)
     }
     private var pocket: PocketTTSEngine?
+    private var pocketCoreML: PocketTTSCoreMLEngine?
     private var plus: CTEngine?
     private var plusBackend: CTEngine.Backend?
     private var leased = false
@@ -83,6 +86,7 @@ public actor NarrationRenderer {
     }
     private func unloadHeld() async {
         await pocket?.unload(); pocket = nil
+        await pocketCoreML?.unload(); pocketCoreML = nil
         await plus?.unload(); plus = nil
         plusBackend = nil
         await kokoro?.unload()
@@ -103,7 +107,9 @@ public actor NarrationRenderer {
                      executionContext: ExecutionContext = .background, repositoryID: String? = nil) async throws {
         await acquire(); defer { release() }
         try Task.checkCancellation()
-        try validateGPUAuthorization(executionContext)
+        if selection != .pocket || PocketTTSBackend.platform != .coreML {
+            try validateGPUAuthorization(executionContext)
+        }
         guard selection.isEnabled else {
             throw RenderError.unavailable("Choose Basic, Plus, Max or System voices in Listening settings.")
         }
@@ -127,8 +133,13 @@ public actor NarrationRenderer {
         await unloadHeld()
         self.executionContext = executionContext
         if selection == .pocket {
-            pocket = PocketTTSEngine(directory: directory, backend: executionContext == .background ? .cpu : .gpu)
-            await pocket?.setResourceObserver(maxResourceObserver)
+            if PocketTTSBackend.platform == .coreML {
+                pocketCoreML = PocketTTSCoreMLEngine(directory: directory, placement: .cpu)
+                await pocketCoreML?.setResourceObserver(maxResourceObserver)
+            } else {
+                pocket = PocketTTSEngine(directory: directory, backend: executionContext == .background ? .cpu : .gpu)
+                await pocket?.setResourceObserver(maxResourceObserver)
+            }
             current = selection; currentDirectory = directory; currentRepositoryID = repositoryID
             return
         }
@@ -164,7 +175,25 @@ public actor NarrationRenderer {
     public func render(_ unit: BookNarrationUnit, delivery: NarrationDeliveryOptions = .init()) async throws -> [Float] {
         await acquire(); defer { release() }
         try Task.checkCancellation()
-        try validateGPUAuthorization(executionContext)
+        if current != .pocket || PocketTTSBackend.platform != .coreML {
+            try validateGPUAuthorization(executionContext)
+        }
+        if let pocketCoreML {
+            let sampling = unit.pocketSampling ?? .init()
+            try sampling.validate()
+            do {
+                return try await pocketCoreML.synthesize(unit.synthesisText, voiceID: unit.voiceID,
+                temperature: sampling.temperature, chunking: unit.pocketChunking ?? .init(),
+                role: unit.role == .dialogue ? .dialogue : .narration, samplerSteps: sampling.samplerSteps,
+                deliveryStyle: unit.pocketDeliveryStyle ?? .original).samples
+            } catch let error as PocketTTSResourceError {
+                try Task.checkCancellation()
+                switch error {
+                case .memory: throw RenderError.memory
+                case .thermal: throw RenderError.thermal
+                }
+            }
+        }
         if let pocket {
             let sampling = unit.pocketSampling ?? .init()
             try sampling.validate()

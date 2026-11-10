@@ -34,6 +34,14 @@ struct ProbeView: View {
             let base = Bundle.main.resourceURL!.appendingPathComponent("Assets")
             let output = URL.documentsDirectory.appendingPathComponent(name)
             do {
+                if args.contains("--installation") {
+                    status = "Preparing Core ML-only installation…"
+                    try await InstallationProbe.run(bundle: base, output: output)
+                    status = "Core ML-only installation passed"
+                    UIApplication.shared.isIdleTimerDisabled = false
+                    job = nil
+                    return
+                }
                 let request = try JSONDecoder().decode(PocketBackendBenchmark.Request.self,
                     from: Data(contentsOf: base.appendingPathComponent("requests/\(name).json")))
                 if args.contains("--background") {

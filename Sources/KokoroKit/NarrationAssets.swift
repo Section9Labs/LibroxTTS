@@ -1,4 +1,5 @@
 import PocketTTSMLX
+import PocketTTSCoreML
 import CoreML
 import CryptoKit
 import Foundation
@@ -10,7 +11,7 @@ import KokoroNarration
 public enum NarrationAssets {
     public static func repositoryID(_ model: NarrationModel) -> String {
         switch model {
-        case .pocket: PocketTTSCatalog.identity
+        case .pocket: PocketTTSBackend.platform.repositoryID
         case .compact: "mrbrutti/librox@kokoro-coreml-2026-10-15"
         case .kokoroDesktop: "narration-kokoroDesktop"
         case .plus: CTApprovedExpression.isDownloadPublished ? CTApprovedExpression.installationIdentity : CTAssets.coreMLIdentity
@@ -27,7 +28,7 @@ public enum NarrationAssets {
     /// Older playback is explicit and restricted to that installation's voices.
     /// A retained CT F1 installation is never relabelled as the ten-style DK bank.
     public static func supportedNativeStyles(repositoryID: String) -> [String] {
-        if repositoryID == PocketTTSCatalog.identity { return PocketTTSCatalog.voiceNames }
+        if [PocketTTSCatalog.identity, PocketTTSCoreMLCatalog.identity].contains(repositoryID) { return PocketTTSCatalog.voiceNames }
         return [CTAssets.identity, CTApprovedExpression.installationIdentity].contains(repositoryID)
             ? CTAssets.styles : repositoryID == CTAssets.releasedIdentity ? ["F1"] : []
     }
@@ -36,7 +37,10 @@ public enum NarrationAssets {
     public static func estimatedDownloadSize(_ model: NarrationModel, reusing repositoryID: String?,
                                              targetRepositoryID: String? = nil) throws -> Int64 {
         let current = try manifest(model, repositoryID: targetRepositoryID)
-        guard let repositoryID, let previous = try? manifest(model, repositoryID: repositoryID) else { return current.downloadSize }
+        guard let repositoryID else { return current.downloadSize }
+        let reusable = model == .pocket && repositoryID == PocketTTSCatalog.identity
+            ? try? PocketTTSCatalog.manifest() : try? manifest(model, repositoryID: repositoryID)
+        guard let previous = reusable else { return current.downloadSize }
         let old = Set(previous.installedFiles.map { contentKey($0) })
         return current.files.reduce(0) { total, file in
             total + (old.contains(contentKey(file)) ? 0 : file.size)
@@ -47,7 +51,7 @@ public enum NarrationAssets {
             throw CTError.invalidAssets("unsupported installation")
         }
         switch model {
-        case .pocket: return try PocketTTSCatalog.manifest(language: language)
+        case .pocket: return try PocketTTSBackend.platform.manifest(language: language)
         case .compact: return try .bundled()
         case .kokoroDesktop:
             guard let url = Bundle.module.url(forResource: "NarrationBasic", withExtension: "json") else { throw CTError.invalidAssets("Basic manifest") }
@@ -84,7 +88,7 @@ public enum NarrationAssets {
     }
     public static func isDownloadPublished(_ model: NarrationModel, repositoryID: String? = nil) -> Bool {
         let selected = repositoryID ?? Self.repositoryID(model)
-        if model == .pocket && !PocketTTSCatalog.isDownloadPublished { return false }
+        if model == .pocket && !PocketTTSBackend.platform.isDownloadPublished { return false }
         guard model.isEnabled, compatibleRepositoryIDs(model).contains(selected) else { return false }
         if selected == CTApprovedExpression.installationIdentity {
             return CTApprovedExpression.isDownloadPublished
@@ -96,13 +100,14 @@ public enum NarrationAssets {
     public static func preparationIdentity(_ model: NarrationModel, repositoryID: String? = nil) -> String {
         let selected = repositoryID ?? Self.repositoryID(model)
         let expression = selected == CTApprovedExpression.installationIdentity ? ":" + CTApprovedExpression.identity : ""
-        return model == .pocket ? selected + ":" + PocketTTSEngine.runtimeIdentity : model == .plus ? selected + ":" + CTEngine.runtimeIdentity + ":gpu-specializations-1" + expression
+        return model == .pocket ? selected + ":" + PocketTTSBackend.platform.runtimeIdentity : model == .plus ? selected + ":" + CTEngine.runtimeIdentity + ":gpu-specializations-1" + expression
             : selected + ":prepared-1"
     }
     /// Known older installations are read-only reuse candidates, not evidence
     /// that an old model can render every voice in the current catalog.
     public static func previousRepositoryIDs(_ model: NarrationModel) -> [String] {
-        model == .plus ? [CTAssets.identity, "librox-plus-dk-coreml-v1", CTAssets.releasedIdentity] : []
+        model == .pocket && PocketTTSBackend.platform == .coreML ? [PocketTTSCatalog.identity]
+            : model == .plus ? [CTAssets.identity, "librox-plus-dk-coreml-v1", CTAssets.releasedIdentity] : []
     }
 
     /// Seed a private staging directory using current manifest hashes. Never
@@ -178,6 +183,7 @@ public enum NarrationAssets {
 
     public static func downloadPocketNarratorPreset(to directory: URL, language: String,
                                                     progress: (@Sendable (Double) -> Void)? = nil) async throws {
+        guard isDownloadPublished(.pocket) else { throw CTError.invalidAssets("unavailable model") }
         try await downloadFiles(manifestPocketNarratorPreset(language: language), to: directory, progress: progress)
         try preparePocketNarratorPreset(in: directory, language: language)
     }
@@ -210,7 +216,7 @@ public enum NarrationAssets {
         guard let voice = PocketTTSCatalog.voice(id: voiceID) else {
             throw PocketTTSDeliveryCatalog.DeliveryError.unsupportedVoice
         }
-        try PocketTTSCatalog.validate(in: directory, language: voice.language)
+        try prepare(directory, model: .pocket, language: voice.language)
         try validate(directory, manifest: PocketTTSDeliveryCatalog.manifest(voiceID: voiceID, style: style))
         try configureForPlayback(directory)
     }
@@ -218,7 +224,7 @@ public enum NarrationAssets {
     /// Background URLSession hosts use PocketTTSDeliveryCatalog.manifest and then
     /// call this after installation. This also applies background-readable protection.
     public static func preparePocketDeliveryStyles(in directory: URL, language: String) throws {
-        try PocketTTSCatalog.validate(in: directory, language: language)
+        try prepare(directory, model: .pocket, language: language)
         try PocketTTSDeliveryCatalog.validate(in: directory, language: language)
         try configureForPlayback(directory)
     }
@@ -252,10 +258,24 @@ public enum NarrationAssets {
     /// Fast receipt/UI check. Loading separately verifies every pinned hash.
     public static func isPrepared(_ directory: URL, model: NarrationModel, repositoryID: String? = nil, language: String? = nil) -> Bool {
         guard let manifest = try? manifest(model, repositoryID: repositoryID, language: language), manifest.isPresent(in: directory) else { return false }
+        if model == .pocket, PocketTTSBackend.platform == .coreML {
+            return (language.map { [$0] } ?? PocketTTSCatalog.languages).allSatisfy {
+                PocketTTSCoreMLAssets.isPrepared(in: directory, language: $0)
+            }
+        }
         return model != .kokoroDesktop || FileManager.default.fileExists(
             atPath: directory.appendingPathComponent("frontend-fp32.mlmodelc").path)
     }
     public static func prepare(_ directory: URL, model: NarrationModel, repositoryID: String? = nil, language: String? = nil) throws {
+        if model == .pocket, PocketTTSBackend.platform == .coreML {
+            // Reject an old MLX receipt before compiling or accepting assets.
+            _ = try manifest(model, repositoryID: repositoryID, language: language)
+            for code in language.map({ [$0] }) ?? PocketTTSCatalog.languages {
+                try PocketTTSCoreMLAssets.prepare(in: directory, language: code)
+            }
+            try configureForPlayback(directory)
+            return
+        }
         if model == .plus {
             // Pay the common generator functions' hardware specialization cost
             // while the install UI is preparing the voice, before the first Play.

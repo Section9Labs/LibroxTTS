@@ -11,6 +11,17 @@ final class ContractTests: XCTestCase {
         let array = try MLMultiArray(dataPointer: memory, shape: [2,2], dataType: .float32, strides: [4,1], deallocator: { $0.assumingMemoryBound(to: Float.self).deallocate() })
         XCTAssertEqual(PocketTTSCoreMLEngine.values(array), [1,2,3,4])
     }
+    func testPreparationPathsResolveDirectoryAliases() throws {
+        let root = URL.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let actual = root.appendingPathComponent("actual"), alias = root.appendingPathComponent("longer-directory-alias")
+        try FileManager.default.createDirectory(at: actual.appendingPathComponent("text.mlmodelc"), withIntermediateDirectories: true)
+        let file = actual.appendingPathComponent("text.mlmodelc/weights.bin")
+        try Data([1, 2, 3]).write(to: file)
+        try FileManager.default.createSymbolicLink(at: alias, withDestinationURL: actual)
+        XCTAssertEqual(try PocketTTSCoreMLAssets.relativePath(file, in: alias), "text.mlmodelc/weights.bin")
+        XCTAssertThrowsError(try PocketTTSCoreMLAssets.relativePath(root.appendingPathComponent("outside"), in: alias))
+    }
     func testMalformedTensorShapeFails() {
         XCTAssertThrowsError(try PocketTTSCoreMLEngine.floats([1,2], shape: [1,3]))
     }

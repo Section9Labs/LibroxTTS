@@ -1,0 +1,1011 @@
+{
+  "date": "2026-11-10",
+  "backendPolicy": {
+    "iOS": "coreML CPU",
+    "macOS": "MLX",
+    "macCatalyst": "MLX"
+  },
+  "sourceStorage": "Original BF16 tensors evaluated as FP32 in both backends; no new quantization or fine-tuning",
+  "quality": {
+    "defaultVoice": "caro_davy",
+    "defaultStyle": "calm",
+    "temperature": 0.3,
+    "samplerSteps": 4,
+    "supportedSamplerSteps": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "chunking": "carefulReading"
+  },
+  "languages": [
+    {
+      "language": "en",
+      "originalSnapshot": "a7056f505a4a8ca72d8b5fb1440071d6f1a35739",
+      "weightsSHA256": "4c56cbd171c63e8a26ea61f5d48b8a0cd8f3c51f4652c0ab9a19bfcced8c931d",
+      "sharedBytes": 140579244,
+      "coreMLGraphBytes": 778872200,
+      "mlxPackBytes": 359608440,
+      "originalWeightsInCoreMLPack": false,
+      "parity": {
+        "samplers": [
+          {
+            "steps": 1,
+            "maxError": 1.3113021850585938e-06
+          },
+          {
+            "steps": 2,
+            "maxError": 1.1324882507324219e-06
+          },
+          {
+            "steps": 3,
+            "maxError": 9.5367431640625e-07
+          },
+          {
+            "steps": 4,
+            "maxError": 8.344650268554688e-07
+          },
+          {
+            "steps": 5,
+            "maxError": 1.0728836059570312e-06
+          },
+          {
+            "steps": 6,
+            "maxError": 1.1324882507324219e-06
+          },
+          {
+            "steps": 7,
+            "maxError": 1.0132789611816406e-06
+          },
+          {
+            "steps": 8,
+            "maxError": 1.1920928955078125e-06
+          }
+        ],
+        "transformer": [
+          {
+            "kind": "text",
+            "tokens": 17,
+            "hiddenMaxError": 2.9802322387695312e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 9.685754776000977e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 9.238719940185547e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 1.1026859283447266e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 7.152557373046875e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 5.960464477539062e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 5.960464477539062e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 5.662441253662109e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 6.854534149169922e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 7.022172212600708e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 5.960464477539062e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 5.960464477539062e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 7.748603820800781e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 43,
+            "hiddenMaxError": 1.989305019378662e-06
+          },
+          {
+            "kind": "text",
+            "tokens": 7,
+            "hiddenMaxError": 2.1457672119140625e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 8.493661880493164e-07
+          }
+        ],
+        "mimiFrames": 70,
+        "mimiMaxPCMError": 1.560896635055542e-06,
+        "passed": true
+      }
+    },
+    {
+      "language": "fr",
+      "originalSnapshot": "a7056f505a4a8ca72d8b5fb1440071d6f1a35739",
+      "weightsSHA256": "56366cfed6c25bfcd3bf4c61e66e06efaf52e78a5d06e1dcade1c588495bc699",
+      "sharedBytes": 140580792,
+      "coreMLGraphBytes": 778872202,
+      "mlxPackBytes": 359609988,
+      "originalWeightsInCoreMLPack": false,
+      "parity": {
+        "samplers": [
+          {
+            "steps": 1,
+            "maxError": 2.86102294921875e-06
+          },
+          {
+            "steps": 2,
+            "maxError": 1.6987323760986328e-06
+          },
+          {
+            "steps": 3,
+            "maxError": 1.5497207641601562e-06
+          },
+          {
+            "steps": 4,
+            "maxError": 1.2516975402832031e-06
+          },
+          {
+            "steps": 5,
+            "maxError": 1.3709068298339844e-06
+          },
+          {
+            "steps": 6,
+            "maxError": 1.430511474609375e-06
+          },
+          {
+            "steps": 7,
+            "maxError": 1.430511474609375e-06
+          },
+          {
+            "steps": 8,
+            "maxError": 1.519918441772461e-06
+          }
+        ],
+        "transformer": [
+          {
+            "kind": "text",
+            "tokens": 17,
+            "hiddenMaxError": 2.592802047729492e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 7.152557373046875e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 7.748603820800781e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 8.344650268554688e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 8.344650268554688e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 8.642673492431641e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 8.344650268554688e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 8.940696716308594e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 5.960464477539062e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 8.344650268554688e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 8.046627044677734e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 5.364418029785156e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 5.140900611877441e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 43,
+            "hiddenMaxError": 2.9802322387695312e-06
+          },
+          {
+            "kind": "text",
+            "tokens": 7,
+            "hiddenMaxError": 2.9802322387695312e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 8.344650268554688e-07
+          }
+        ],
+        "mimiFrames": 70,
+        "mimiMaxPCMError": 1.4454126358032227e-06,
+        "passed": true
+      }
+    },
+    {
+      "language": "de",
+      "originalSnapshot": "a7056f505a4a8ca72d8b5fb1440071d6f1a35739",
+      "weightsSHA256": "9fe42605604832349e3f495177bde56b77ae8fee73b2ed4b63236092ccde7621",
+      "sharedBytes": 140580357,
+      "coreMLGraphBytes": 778872180,
+      "mlxPackBytes": 359609553,
+      "originalWeightsInCoreMLPack": false,
+      "parity": {
+        "samplers": [
+          {
+            "steps": 1,
+            "maxError": 1.9073486328125e-06
+          },
+          {
+            "steps": 2,
+            "maxError": 1.0728836059570312e-06
+          },
+          {
+            "steps": 3,
+            "maxError": 1.1920928955078125e-06
+          },
+          {
+            "steps": 4,
+            "maxError": 1.5497207641601562e-06
+          },
+          {
+            "steps": 5,
+            "maxError": 1.3113021850585938e-06
+          },
+          {
+            "steps": 6,
+            "maxError": 1.1324882507324219e-06
+          },
+          {
+            "steps": 7,
+            "maxError": 1.1920928955078125e-06
+          },
+          {
+            "steps": 8,
+            "maxError": 1.1324882507324219e-06
+          }
+        ],
+        "transformer": [
+          {
+            "kind": "text",
+            "tokens": 17,
+            "hiddenMaxError": 3.159046173095703e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 9.238719940185547e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 1.043081283569336e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 9.834766387939453e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 1.6987323760986328e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 6.854534149169922e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 7.152557373046875e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 7.450580596923828e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 9.5367431640625e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 6.258487701416016e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 7.748603820800781e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 6.109476089477539e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 7.152557373046875e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 43,
+            "hiddenMaxError": 2.1979212760925293e-06
+          },
+          {
+            "kind": "text",
+            "tokens": 7,
+            "hiddenMaxError": 6.67572021484375e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 1.430511474609375e-06
+          }
+        ],
+        "mimiFrames": 70,
+        "mimiMaxPCMError": 8.381903171539307e-07,
+        "passed": true
+      }
+    },
+    {
+      "language": "pt",
+      "originalSnapshot": "a7056f505a4a8ca72d8b5fb1440071d6f1a35739",
+      "weightsSHA256": "28e20f32515ba8bd0eaec69671f11f8921414fcdc375aa072fa09f46cc1057c5",
+      "sharedBytes": 140581372,
+      "coreMLGraphBytes": 778872188,
+      "mlxPackBytes": 359610568,
+      "originalWeightsInCoreMLPack": false,
+      "parity": {
+        "samplers": [
+          {
+            "steps": 1,
+            "maxError": 9.5367431640625e-07
+          },
+          {
+            "steps": 2,
+            "maxError": 7.748603820800781e-07
+          },
+          {
+            "steps": 3,
+            "maxError": 6.705522537231445e-07
+          },
+          {
+            "steps": 4,
+            "maxError": 7.152557373046875e-07
+          },
+          {
+            "steps": 5,
+            "maxError": 7.152557373046875e-07
+          },
+          {
+            "steps": 6,
+            "maxError": 7.152557373046875e-07
+          },
+          {
+            "steps": 7,
+            "maxError": 7.301568984985352e-07
+          },
+          {
+            "steps": 8,
+            "maxError": 9.5367431640625e-07
+          }
+        ],
+        "transformer": [
+          {
+            "kind": "text",
+            "tokens": 17,
+            "hiddenMaxError": 4.5299530029296875e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 1.3113021850585938e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 1.430511474609375e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 1.1473894119262695e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 1.3709068298339844e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 1.1920928955078125e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 8.940696716308594e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 1.4826655387878418e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 1.7881393432617188e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 1.341104507446289e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 1.0728836059570312e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 1.1920928955078125e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 1.1883676052093506e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 43,
+            "hiddenMaxError": 6.198883056640625e-06
+          },
+          {
+            "kind": "text",
+            "tokens": 7,
+            "hiddenMaxError": 4.827976226806641e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 2.682209014892578e-06
+          }
+        ],
+        "mimiFrames": 70,
+        "mimiMaxPCMError": 6.277114152908325e-07,
+        "passed": true
+      }
+    },
+    {
+      "language": "it",
+      "originalSnapshot": "a7056f505a4a8ca72d8b5fb1440071d6f1a35739",
+      "weightsSHA256": "16365c43eaabee9b222cd414d6a48f0976b4800a21fe5d55253f645eff7eeb1f",
+      "sharedBytes": 140580935,
+      "coreMLGraphBytes": 778872207,
+      "mlxPackBytes": 359610131,
+      "originalWeightsInCoreMLPack": false,
+      "parity": {
+        "samplers": [
+          {
+            "steps": 1,
+            "maxError": 8.344650268554688e-07
+          },
+          {
+            "steps": 2,
+            "maxError": 1.1920928955078125e-06
+          },
+          {
+            "steps": 3,
+            "maxError": 8.344650268554688e-07
+          },
+          {
+            "steps": 4,
+            "maxError": 1.0058283805847168e-06
+          },
+          {
+            "steps": 5,
+            "maxError": 8.344650268554688e-07
+          },
+          {
+            "steps": 6,
+            "maxError": 1.043081283569336e-06
+          },
+          {
+            "steps": 7,
+            "maxError": 8.344650268554688e-07
+          },
+          {
+            "steps": 8,
+            "maxError": 9.5367431640625e-07
+          }
+        ],
+        "transformer": [
+          {
+            "kind": "text",
+            "tokens": 17,
+            "hiddenMaxError": 3.814697265625e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 1.4901161193847656e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 1.5497207641601562e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 1.3709068298339844e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 1.2516975402832031e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 1.1920928955078125e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 1.1920928955078125e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 1.3113021850585938e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 1.6689300537109375e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 9.5367431640625e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 1.043081283569336e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 9.5367431640625e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 9.5367431640625e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 43,
+            "hiddenMaxError": 2.9802322387695312e-06
+          },
+          {
+            "kind": "text",
+            "tokens": 7,
+            "hiddenMaxError": 4.0531158447265625e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 1.6689300537109375e-06
+          }
+        ],
+        "mimiFrames": 70,
+        "mimiMaxPCMError": 9.909272193908691e-07,
+        "passed": true
+      }
+    },
+    {
+      "language": "es",
+      "originalSnapshot": "a7056f505a4a8ca72d8b5fb1440071d6f1a35739",
+      "weightsSHA256": "c4988ff376692f2ab1e85b17350755b08f16e49c0b5f0de8b271efa9abd71de7",
+      "sharedBytes": 140580987,
+      "coreMLGraphBytes": 778872201,
+      "mlxPackBytes": 359610183,
+      "originalWeightsInCoreMLPack": false,
+      "parity": {
+        "samplers": [
+          {
+            "steps": 1,
+            "maxError": 1.6689300537109375e-06
+          },
+          {
+            "steps": 2,
+            "maxError": 8.940696716308594e-07
+          },
+          {
+            "steps": 3,
+            "maxError": 1.6689300537109375e-06
+          },
+          {
+            "steps": 4,
+            "maxError": 1.2516975402832031e-06
+          },
+          {
+            "steps": 5,
+            "maxError": 7.748603820800781e-07
+          },
+          {
+            "steps": 6,
+            "maxError": 1.1622905731201172e-06
+          },
+          {
+            "steps": 7,
+            "maxError": 7.748603820800781e-07
+          },
+          {
+            "steps": 8,
+            "maxError": 8.940696716308594e-07
+          }
+        ],
+        "transformer": [
+          {
+            "kind": "text",
+            "tokens": 17,
+            "hiddenMaxError": 2.9206275939941406e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 1.043081283569336e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 1.1920928955078125e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 9.5367431640625e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 1.1324882507324219e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 8.67992639541626e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 9.5367431640625e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 9.834766387939453e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 1.1026859283447266e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 9.5367431640625e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 8.493661880493164e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 9.5367431640625e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 8.195638656616211e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 43,
+            "hiddenMaxError": 3.814697265625e-06
+          },
+          {
+            "kind": "text",
+            "tokens": 7,
+            "hiddenMaxError": 2.7418136596679688e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 1.2516975402832031e-06
+          }
+        ],
+        "mimiFrames": 70,
+        "mimiMaxPCMError": 4.0978193283081055e-07,
+        "passed": true
+      }
+    },
+    {
+      "language": "nl",
+      "originalSnapshot": "a7056f505a4a8ca72d8b5fb1440071d6f1a35739",
+      "weightsSHA256": "59b5c3249ab05e8b5fcb0a296e9b0cb0c0a20da5e1fd28c04bb90b2175612aeb",
+      "sharedBytes": 140579549,
+      "coreMLGraphBytes": 778872201,
+      "mlxPackBytes": 359608745,
+      "originalWeightsInCoreMLPack": false,
+      "parity": {
+        "samplers": [
+          {
+            "steps": 1,
+            "maxError": 1.1920928955078125e-06
+          },
+          {
+            "steps": 2,
+            "maxError": 1.1473894119262695e-06
+          },
+          {
+            "steps": 3,
+            "maxError": 1.385807991027832e-06
+          },
+          {
+            "steps": 4,
+            "maxError": 1.8104910850524902e-06
+          },
+          {
+            "steps": 5,
+            "maxError": 1.2665987014770508e-06
+          },
+          {
+            "steps": 6,
+            "maxError": 1.341104507446289e-06
+          },
+          {
+            "steps": 7,
+            "maxError": 1.4901161193847656e-06
+          },
+          {
+            "steps": 8,
+            "maxError": 1.6838312149047852e-06
+          }
+        ],
+        "transformer": [
+          {
+            "kind": "text",
+            "tokens": 17,
+            "hiddenMaxError": 3.159046173095703e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 1.0728836059570312e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 1.0728836059570312e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 9.5367431640625e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 9.834766387939453e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 8.046627044677734e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 6.593763828277588e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 7.748603820800781e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 8.158385753631592e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 6.258487701416016e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 7.003545761108398e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 6.556510925292969e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 7.152557373046875e-07
+          },
+          {
+            "kind": "latent",
+            "tokens": 43,
+            "hiddenMaxError": 2.9653310775756836e-06
+          },
+          {
+            "kind": "text",
+            "tokens": 7,
+            "hiddenMaxError": 3.635883331298828e-06
+          },
+          {
+            "kind": "latent",
+            "tokens": 1,
+            "hiddenMaxError": 9.5367431640625e-07
+          }
+        ],
+        "mimiFrames": 70,
+        "mimiMaxPCMError": 3.501772880554199e-07,
+        "passed": true
+      }
+    }
+  ],
+  "hostedAssets": {
+    "release": "https://github.com/Section9Labs/LibroxTTS/releases/tag/pocket-delivery-voicezero-490cfbee-v1",
+    "isDraft": false,
+    "languages": [
+      {
+        "language": "en",
+        "originalVoices": 23,
+        "styledVoices": 4,
+        "stylesPerVoice": 13,
+        "styleStates": 52,
+        "hostedFiles": 57,
+        "hostedDigestMismatches": []
+      },
+      {
+        "language": "fr",
+        "originalVoices": 23,
+        "styledVoices": 4,
+        "stylesPerVoice": 13,
+        "styleStates": 52,
+        "hostedFiles": 57,
+        "hostedDigestMismatches": []
+      },
+      {
+        "language": "de",
+        "originalVoices": 23,
+        "styledVoices": 4,
+        "stylesPerVoice": 13,
+        "styleStates": 52,
+        "hostedFiles": 57,
+        "hostedDigestMismatches": []
+      },
+      {
+        "language": "pt",
+        "originalVoices": 23,
+        "styledVoices": 4,
+        "stylesPerVoice": 13,
+        "styleStates": 52,
+        "hostedFiles": 57,
+        "hostedDigestMismatches": []
+      },
+      {
+        "language": "it",
+        "originalVoices": 23,
+        "styledVoices": 4,
+        "stylesPerVoice": 13,
+        "styleStates": 52,
+        "hostedFiles": 57,
+        "hostedDigestMismatches": []
+      },
+      {
+        "language": "es",
+        "originalVoices": 23,
+        "styledVoices": 4,
+        "stylesPerVoice": 13,
+        "styleStates": 52,
+        "hostedFiles": 57,
+        "hostedDigestMismatches": []
+      },
+      {
+        "language": "nl",
+        "originalVoices": 23,
+        "styledVoices": 4,
+        "stylesPerVoice": 13,
+        "styleStates": 52,
+        "hostedFiles": 57,
+        "hostedDigestMismatches": []
+      }
+    ],
+    "baseRelease": "https://github.com/Section9Labs/LibroxTTS/releases/tag/pocket-tts-mlx-2026-11-07-v2",
+    "baseFilesVerified": 203
+  },
+  "coreMLAssetsPublished": false,
+  "sdkReleased": false
+}

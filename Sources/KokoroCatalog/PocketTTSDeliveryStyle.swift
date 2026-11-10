@@ -31,9 +31,9 @@ public enum PocketTTSDeliveryCatalog {
     }
 
     /// Base language pack and selected narrator performance, including credits.
-    public static func narratorManifest(voiceID: String, style: PocketTTSDeliveryStyle) throws -> AssetManifest {
+    public static func narratorManifest(voiceID: String, style: PocketTTSDeliveryStyle, backend: PocketTTSBackend = .platform) throws -> AssetManifest {
         guard let voice = PocketTTSCatalog.voice(id: voiceID) else { throw DeliveryError.unsupportedVoice }
-        let base = try PocketTTSCatalog.manifest(language: voice.language)
+        let base = try backend.manifest(language: voice.language)
         guard style != .original else { return base }
         let performance = try manifest(voiceID: voiceID, style: style)
         return AssetManifest(repository: base.repository, revision: base.revision + ":" + performance.revision,
@@ -72,9 +72,9 @@ public enum PocketTTSDeliveryCatalog {
     }
 
     /// A single performance plus provenance, avoiding a whole-language download.
-    public static func manifest(voiceID: String, style: PocketTTSDeliveryStyle) throws -> AssetManifest {
+    public static func manifest(voiceID: String, style: PocketTTSDeliveryStyle, backend: PocketTTSBackend = .platform) throws -> AssetManifest {
         let name = try stateName(voiceID: voiceID, style: style)
-        guard style != .original else { return try PocketTTSCatalog.manifest(language: PocketTTSCatalog.voice(id: voiceID)!.language) }
+        guard style != .original else { return try backend.manifest(language: PocketTTSCatalog.voice(id: voiceID)!.language) }
         let voice = PocketTTSCatalog.voice(id: voiceID)!
         let full = try manifest(language: voice.language)
         let path = "\(voice.language)/embeddings/\(name).safetensors"

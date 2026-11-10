@@ -1,21 +1,26 @@
 # Experimental Max Core ML backend
 
-This isolated backend is based on SDK commit `cd969c6` (Max 0.4.0). It does not
-change the production renderer, MLX backend, download catalog, or saved book
-settings. Import `PocketTTSCoreML` and instantiate `PocketTTSCoreMLEngine`
-explicitly. The experiment is not a released SDK or app update.
+This isolated backend is based on SDK commit `cd969c6` (Max 0.4.0). The SDK now
+selects Core ML CPU on iPhone/iPad and MLX on macOS/Mac Catalyst. Saved book
+quality and delivery settings are unchanged. This worktree is not a released
+SDK or app update. See [asset separation](Validation/CoreML/ASSET-SEPARATION.md)
+for manifests, preparation, migration and release status.
 
 The source weights remain Kyutai snapshot
 `a7056f505a4a8ca72d8b5fb1440071d6f1a35739`. The exporter verifies the SDK's
 SHA-256 manifest before loading them. English and Spanish packs were converted
-locally; compiled models and audio are excluded from Git.
+locally initially; all seven packs now pass numerical conversion checks.
+Model binaries and audio are excluded from Git.
 
 ## Preserved behavior
 
-- Original float32 weights and compute, tanh GELU, tokenizer and voice KV states.
+- Original tensor values, float32 compute, tanh GELU, tokenizer and voice KV states.
+  The original BF16 storage is expanded to FP32, as in the existing MLX runtime;
+  no new quantization or fine-tuning is applied.
 - Caro Davy / Calm, temperature 0.3, four sampler steps, careful-reading phrasing
-  for the English acceptance profile. Eight steps are an explicit alternative;
-  unsupported sampler counts fail without a lower-quality retry.
+  for the English acceptance profile. All existing sampler counts 1–8 remain supported; four/eight use the
+  benchmarked fused graphs and other counts use the same Euler update graph.
+  Unsupported values fail without a lower-quality retry.
 - The shared token-aware chunker and text preparation; paragraph resets;
   previous-chunk text and latent teacher forcing; twelve-frame Mimi warm-up;
   minimum six generated frames before EOS; configured tail and first-frame fade.
@@ -28,8 +33,8 @@ wrapping. An explicit position input avoids a shape-derived position problem
 detected by recursive validation. The Mimi decoder uses its original sliding
 attention context with a 512-position ring and float32 streaming state.
 
-All neural inference is Core ML. The package still depends on `PocketTTSMLX`
-for the shared tokenizer/configuration/chunker and uses MLX **on CPU only** to
+All neural inference in the iOS Max path is Core ML. The package still depends on `PocketTTSMLX`
+for the shared tokenizer/configuration/chunker/resource checks and uses MLX **on CPU only** to
 read existing safetensors voice states and generate the same seeded noise.
 It does not initialize an MLX acoustic model. Removing that packaging dependency
 would be separate work; this is not an MLX-free binary.
