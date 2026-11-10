@@ -1006,7 +1006,10 @@
     "baseRelease": "https://github.com/Section9Labs/LibroxTTS/releases/tag/pocket-tts-mlx-2026-11-07-v2",
     "baseFilesVerified": 203
   },
-  "coreMLAssetsPublished": false,
+  "coreMLAssetsPublished": true,
   "sdkReleased": false,
-  "physicalInstallationValidation": "installation-device-2026-11-10.json"
+  "physicalInstallationValidation": "installation-device-2026-11-10.json",
+  "coreMLAssetRelease": "https://github.com/Section9Labs/LibroxTTS/releases/tag/pocket-tts-coreml-2026-11-10-v1",
+  "sdkReleaseVersion": "0.6.0",
+  "sdkReleasedNote": "This validation receipt predates the SDK tag; consult the release receipt for publication status."
 }

@@ -6,17 +6,17 @@ Offline speech synthesis and book narration for iPhone, iPad and Mac. **Librox P
 
 ## Max — powered by Pocket TTS
 
-Version 0.4.0 offers Max, powered by the pinned Kyutai Pocket TTS, as a native
-Swift MLX option alongside Basic and Plus: 23 preset voices across English,
-French, German, Portuguese, Italian, Spanish and Dutch, with streaming 24 kHz
-PCM and chunk-continuation narration. Downloads use pinned GitHub release assets
-with SHA-256 verification; each language is optional. See the
-[Pocket TTS integration](Integrations/PocketTTS/README.md) for SDK APIs, provenance,
-reading behavior and validation. Max is available across supported iPhones, iPads
-and Apple silicon Macs without a tested-device allowlist. Max supports background CPU generation on iOS 18+ and prefers granted background
-GPU execution on iOS 26+. See the [stable integration guide](docs/UPGRADE-0.4.0.md)
-for the required host lifecycle, entitlement and fallback wiring. Physical M4 iPad
-trials cover both backends; iPhone and production app acceptance remain pending.
+Version **0.6.0** runs Max through Core ML CPU on iPhone/iPad and MLX on
+macOS/Mac Catalyst. Each device downloads only its backend's acoustic pack;
+tokenizers, voices and delivery states remain shared, hash-pinned assets.
+All seven languages and the exact Max model/quality settings are retained.
+
+Use the [0.6.0 app implementation prompt](docs/UPGRADE-0.6.0.md) for per-language
+migration, on-device compilation, background lifecycle and prepared-audio cache
+identities. Core ML installation/routing passed on a physical iPhone 17 Pro Max;
+prior locked/background audio generation was faster than playback. App-level
+endurance and battery qualification remain separate. See the
+[measurements and limitations](Integrations/PocketTTS/Validation/CoreML/README.md).
 
 ## Install
 
@@ -32,7 +32,11 @@ Products include `LibroxTTS` (host-facing synthesis/install API), `LibroxCTNativ
 
 See [the narrator integration API](docs/book-planning.md), [casting rules](docs/story-narrator.md), and [enhancement API and validation limits](docs/audio-enhancement.md). The optional, separately imported `QwenANE` product retains the Qwen renderer work; its existence does not establish device eligibility or sustained background performance. The shared LibroxTTS product now links the Pocket TTS MLX runtime; KokoroCatalog, KokoroPronunciation and KokoroNarration remain independent of MLX. Rejected model auditions are not app dependencies.
 
-Version **0.4.0** is the stable SDK release. New Max books default to **Caro Davy / Calm**, Careful reading, temperature 0.3 and four sampler steps, matching the accepted English book scene. Saved books keep their choices. Optional delivery styles support per-book narration and per-character assignments; other performances and languages remain previews. Read the [complete app integration prompt](docs/UPGRADE-0.4.0.md) for downloads, background GPU/CPU routing, advanced controls, cache migration and credits. Base weights remain reusable; the default Calm reference downloads separately with verified credits. This SDK release does not publish or certify the Librox app.
+Version **0.6.0** preserves the new-book default **Caro Davy / Calm**, Careful
+reading, temperature 0.3 and four sampler steps. Saved choices and supported
+sampler counts 1–8 remain unchanged. It also includes the 0.4.1–0.5.0 CPU-budget,
+per-language uninstall and Original-only voice/style APIs. This SDK release does
+not publish the Librox app. [Complete app integration prompt](docs/UPGRADE-0.6.0.md).
 
 ## Speak with Plus
 

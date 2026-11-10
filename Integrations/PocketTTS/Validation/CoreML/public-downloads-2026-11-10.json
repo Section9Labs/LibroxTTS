@@ -1,0 +1,849 @@
+{
+  "tag": "pocket-tts-coreml-2026-11-10-v1",
+  "publicDownloadVerified": true,
+  "fileCount": 140,
+  "totalBytes": 5452105379,
+  "seconds": 69.18990087509155,
+  "files": [
+    {
+      "path": "de/coreml/bos.bin",
+      "bytes": 128,
+      "sha256": "b9e701db2cbd29339ad03417e18a765a33960829151d02fd40af32e63cceed67",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "de/coreml/flow4.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 127619,
+      "sha256": "a1fbfe4c7643d686dcace6382ca4ad5e1e4a799afa4762bd76f54ff27c1d54c2",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "de/coreml/flow4.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 38003264,
+      "sha256": "d8e89d5149b4ccff69705fb15c4f59cf8f0f643970e5e66240fbddf191bf39ae",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "de/coreml/flow4.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "61f306dac74b21d9c3ab7ef82a21bf7f24927d519fe6094af5422905710e2c3c",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "de/coreml/flow8.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 245014,
+      "sha256": "8ac7771621e3780fdcae5547666182a8ac105b1f76c0f90817d3b63f2527286d",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "de/coreml/flow8.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 38020160,
+      "sha256": "d82e2f9640585ab16b7475faa6686eee85ec7dda9c63761028235e3ef49e5f54",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "de/coreml/flow8.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "e9d85d3acdeb771f5227b1813b47b93847e5c1653bf6bc6251b332b68d71df7e",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "de/coreml/flowstep.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 42526,
+      "sha256": "7f7d7e3928610a0ccbe1ce58fa30673aec08f6281a772735e2b3fab36de856e4",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "de/coreml/flowstep.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 39039872,
+      "sha256": "354117d07aafa3f74d77cc3e8e1b71cef4621409ab70b7e97ead850fbf61cea4",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "de/coreml/flowstep.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "e877954ab3114e43ec4bf5a6e1756b597ce0679d91eed4d0ebd6fdd69aaa84e2",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "de/coreml/latent.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 100634,
+      "sha256": "811c78e59a428e618cb4814d69713ce1c81857819b964f81eaaf020c453aa372",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "de/coreml/latent.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 302268096,
+      "sha256": "6ae478478910d58b4e28c70da899a84906f7c977d0dfecc8cfd3b89006a66c37",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "de/coreml/latent.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "2628c351d94c5f17767f0a1b0b78064d5c6b6ad157f2dc4ceddd98190d8a415a",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "de/coreml/manifest.json",
+      "bytes": 7564,
+      "sha256": "e5a60d69a995c6cfa1519bd1398a495e650924f22776fd401bedd3adbae70a86",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "de/coreml/mimi.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 91968,
+      "sha256": "87d34f614007588af5496d63e12c4cd022d1ebe46b69f533bf6ac774474eb74c",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "de/coreml/mimi.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 42294912,
+      "sha256": "d246d3fcc5fc15ae83cf5c32a1ffe557959326e108741d72d90d5b2a06c22fd4",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "de/coreml/mimi.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "05220b7c2e7a47ec4bdb426975ff4e38a7e598eb0148369178dfef29167d3410",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "de/coreml/text.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 101601,
+      "sha256": "f672e97f6d20c453e127834dde3bb3a00acb0a9ef725e8d2ab90397b2d49f65f",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "de/coreml/text.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 318525120,
+      "sha256": "51a69ff98888721b4d0093e8432d5ef117aa03c4d14d9e8ed72dfcfd30d16b52",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "de/coreml/text.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "40a437cb2126b2c2daad01d74776325b65b37ab1a40f19ab60bae9473464fad5",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "en/coreml/bos.bin",
+      "bytes": 128,
+      "sha256": "993398e25df91902674eff02af42bf0a99eddfe5d6bc064d083484360974ce19",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "en/coreml/flow4.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 127619,
+      "sha256": "ddb48b7af462e927fe37eaf5884e0d85033d16c321bb8ea5f8d84280ab29693a",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "en/coreml/flow4.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 38003264,
+      "sha256": "136159096addd20320c87564dbfaf924f631d51fe4e9a049826680ae63e6b1de",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "en/coreml/flow4.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "ebbcf5aff6afd3ee70ee4397777dd7d8c03217436092aad4ebd0d78932d9b770",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "en/coreml/flow8.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 245014,
+      "sha256": "9857947bbe8c6f2287c071cd162ad1519fc934556fbf7f29cf8eafee39ae4893",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "en/coreml/flow8.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 38020160,
+      "sha256": "7a2b928dd6d5ad6daf071958cd3a7cb090f72da7ae5ba4e38be906866fb8e561",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "en/coreml/flow8.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "ce397ce72489fd49da6e7dfabb627b85cb17ab809cf8d73579b8ac687a6aad87",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "en/coreml/flowstep.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 42526,
+      "sha256": "40bbdcd35fa3d89a1321d7ad77a6c44f56afc6a92a20ce6066133effa4bd73ee",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "en/coreml/flowstep.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 39039872,
+      "sha256": "1ee68f89e5e026aa8b3fe06a96c85f6148051857f12d04663a7cba9671e394ff",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "en/coreml/flowstep.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "eca45426e8914d5201b25a9fc2709d3f68251b36d6396be61bd7d30d5fd76df1",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "en/coreml/latent.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 100634,
+      "sha256": "9d6935e93cb52415ff6adbea09b5e6b4eda07eb40c8cfeb0b53ff5189071cd8b",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "en/coreml/latent.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 302268096,
+      "sha256": "ba5b627b617d2a8e15d21c72f9b5199cc6917ef57a6c7118791594740da26423",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "en/coreml/latent.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "d10a6466b1eb0d2c6c5aa0b694f05632607f2c180bebd1062c5c9ff2c64cbcd7",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "en/coreml/manifest.json",
+      "bytes": 7578,
+      "sha256": "158337d273e78d1545ae21444bb5542d7fa70dfd66b5e161c09fd1ca3c720a2f",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "en/coreml/mimi.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 91974,
+      "sha256": "ca649ea272237c87b9f328bffc0c3d33f8d06c078155d6845610475695cae7af",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "en/coreml/mimi.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 42294912,
+      "sha256": "71056bcda439a7ebc421f4cf4903a5d3bcb266e8a2aa4282bc96a8d1937c88c8",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "en/coreml/mimi.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "3e53511078459be8b9283365f5de1cffb943dd6d9e35263242e4ba0c63db6a7d",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "en/coreml/text.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 101601,
+      "sha256": "1026f18222ebc038f636c951af482be09f6ed2f2b391f49f4b4fbee8573e68ef",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "en/coreml/text.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 318525120,
+      "sha256": "cdc0f8b1112b137b92c001e4926517f4ba85f3196151e84c809fd398295f6edf",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "en/coreml/text.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "304b7dd8b52bf428be0833e63fe184a0304076fde687cb65cae1166857e8af67",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "es/coreml/bos.bin",
+      "bytes": 128,
+      "sha256": "cccf314c649b15cd5408c04dfd1c574e9ee05a963ccfc0ff2bfc9dd1d720bd3d",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "es/coreml/flow4.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 127619,
+      "sha256": "6d4ed6703f8a2946773cd7a7f84ac0f7d4caf90bda182195d54f6c60cde67cd4",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "es/coreml/flow4.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 38003264,
+      "sha256": "904cea4736db04df4815d081a3726890ebce9cc3c85a81d183e5286958f33848",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "es/coreml/flow4.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "ec3f62f979c74168935703da3730ec1a409d61059fac6f37008a401d138396ca",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "es/coreml/flow8.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 245014,
+      "sha256": "08e06411434309c8e2cdbec8f4e8dbcd89091b8806276cc77eb07fa4e8a49d3e",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "es/coreml/flow8.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 38020160,
+      "sha256": "d1d8fd23e58670d485d487652e0ca3996da68aee806356a38f8ad0f5a145aa00",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "es/coreml/flow8.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "1c29cd2cdcae3a7972257c496bfd7769d993431b23507ca28d5e661f6e3a5643",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "es/coreml/flowstep.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 42526,
+      "sha256": "9f310bb4b23fb5462e72c8fc479f4d75bda275053522d5366afa15df331d3938",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "es/coreml/flowstep.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 39039872,
+      "sha256": "e3255e175e34c5b74416cd3766d5f2f2da19d76da5b556ddc26c1af56036dfc5",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "es/coreml/flowstep.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "ff1d1d6d6e7288c933ba33791fb69df29c8a9b016884bbb9ab4292b449ac9afe",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "es/coreml/latent.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 100634,
+      "sha256": "22fc43e8d829be91a5eb53fbc27e550b9f14030b139cd8eb64b88ad748bb6434",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "es/coreml/latent.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 302268096,
+      "sha256": "1c3cd5bdfd18e011dd8bf77c99bf72dd13cd47e0659d8f619c024b136c3abfce",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "es/coreml/latent.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "d3720bbd8c9a7977442be173e73b601a747c093c73dd747a18b08094a36bea32",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "es/coreml/manifest.json",
+      "bytes": 7579,
+      "sha256": "1e4ba66f69485ce554d1f9c4f2db55c9c60bdeb8203517902630ae70896deff4",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "es/coreml/mimi.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 91974,
+      "sha256": "2b4375132450f5cee6b68d07e532ccf446b82217c66898bebafad1b39a91de56",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "es/coreml/mimi.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 42294912,
+      "sha256": "190d9ac819dedb3a42371a09b823d6d9c4af2316d770ffc3fb11e0d00e5e6da3",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "es/coreml/mimi.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "eb1945c062971c0b3b950b2c674cfd8cb62338c3883a3d9362e9437204c61708",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "es/coreml/text.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 101601,
+      "sha256": "4549d065f903d8f30835c5ab80cdb068f6e4e92189ffe2c71089097666552fd4",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "es/coreml/text.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 318525120,
+      "sha256": "1799e608a1fa20d5f4c4ce859243118a501b767b2ce0b41cf8ddfdd123ea3c01",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "es/coreml/text.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "90db78a4c0c88e7e2064169ea0da936f615031139347cfacba6841678ea499a3",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "fr/coreml/bos.bin",
+      "bytes": 128,
+      "sha256": "e5e2df4cfc1c389e629ab5fd641d8922529d186950b8045de6b5469cbe9ceeec",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "fr/coreml/flow4.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 127619,
+      "sha256": "b2a62c6b1c8cbae4249568a9535c4df120aac811e02d1faccec39e21c07abf8f",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "fr/coreml/flow4.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 38003264,
+      "sha256": "6fc23b4a90bc621709b8523625f2139107fe1ca0bc3bc0c19cf6bbb9ea273233",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "fr/coreml/flow4.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "a590a6b78a5acfe2c3f68434d4ad17a884143d63112b71727714bab200ed3461",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "fr/coreml/flow8.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 245014,
+      "sha256": "6bf2d795077439f919fb699e2c87f113ff9aab6599ff930055da0894a8ac539d",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "fr/coreml/flow8.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 38020160,
+      "sha256": "7d19a11cacac18a00facab767c44f4ee858a2f153910868ec70567d56e592f3b",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "fr/coreml/flow8.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "2122786b0d7868ab696c6a8fb08fb425207e8bfc011e146584dd2172d5d72eeb",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "fr/coreml/flowstep.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 42526,
+      "sha256": "50f64587dc931b9659d341f2fd28a45b828c848b340a615fb6798049b9bd2a2f",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "fr/coreml/flowstep.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 39039872,
+      "sha256": "dc9a8efc6570de8a579a15ad55af1f2515262b04a6f8cf66f955b9d074548cd6",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "fr/coreml/flowstep.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "11f620afa52e0f3cfc908348c5143937ef94d75552d0ccbeb91af7e282811360",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "fr/coreml/latent.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 100634,
+      "sha256": "1a4415e7e70b66a9fde4232a53d9c393616772b9efa321938524a8eb96f40df4",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "fr/coreml/latent.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 302268096,
+      "sha256": "21a9cb9912caa82e2fd785bd6cb463fcc5b517989a80c11219de6d8c153d7984",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "fr/coreml/latent.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "39140af4644c0b331973673894374de93dc14c7e905cb07d7c6af8c8c8dfe9df",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "fr/coreml/manifest.json",
+      "bytes": 7586,
+      "sha256": "3a1899e00cbdd814a77337690f9d911f9e758655e3eeaae5dc432a0388c06939",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "fr/coreml/mimi.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 91968,
+      "sha256": "8425204d0e610ead9a1f8019d4708f38590141c744d109b44b93a175c5e4ad96",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "fr/coreml/mimi.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 42294912,
+      "sha256": "7dc464f64799ad0db7ed311bf88f77e6b5e62e99a5d9576bbc8eadcaafbd2be1",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "fr/coreml/mimi.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "d7aba7e296f147b83b4f2e0a6accd9ab40d64500cae0a8202427c733a45bd288",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "fr/coreml/text.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 101601,
+      "sha256": "2a7a4460823667a061cd24305c9cbc7641d07bedfb0eb9efa7a4ddf5bb256022",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "fr/coreml/text.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 318525120,
+      "sha256": "d33ca60318214b33188e10464f48ed40fae04cfeb73c0dd6c6723458c54c7c68",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "fr/coreml/text.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "af590dd41d2e97e42d518c3eb463989e441ad3814018b5e58ecf616c62faeb33",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "it/coreml/bos.bin",
+      "bytes": 128,
+      "sha256": "b79a5d59b0633d7f5bb8cb8d42663f410c14a59149084e09158c6cb8a59f6d72",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "it/coreml/flow4.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 127619,
+      "sha256": "aa51451395c7a9955f23bd3684d6f6aaa5356dc0cafe9f87a36633ce5759c166",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "it/coreml/flow4.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 38003264,
+      "sha256": "cf6f0dcf622117030c740d7d1264fe12a5950d4484ee4c95c99e266af0294474",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "it/coreml/flow4.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "5a3bfca06b942ad34ccbf597f46e025acd19be2bfae7016e83811fc270aac8b0",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "it/coreml/flow8.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 245014,
+      "sha256": "c91feaf1c8948640afce814470e28f3488d64179c1c77003c2c12a786da62729",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "it/coreml/flow8.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 38020160,
+      "sha256": "f3513f619fd2e50b836bc0d0d73d5c55941cc5d798f9953a0f7b2e8cd60454b2",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "it/coreml/flow8.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "44fdeff2aa10493ed2d3ff079e65d96a10dd5204ff540593ab5de335b17e9a81",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "it/coreml/flowstep.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 42526,
+      "sha256": "522f4ae7e9f53b651f792ceb060fc04e34f24fd78a0abdae9ba72e347a826e7f",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "it/coreml/flowstep.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 39039872,
+      "sha256": "c8e2d34332c7f140b6a4319837ebe07c4009a9c23e46d7b867570fe58d7d6c4b",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "it/coreml/flowstep.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "e32b7252b97e5f254fbc1f3ee38dce0e4c534c06c4a1e41dea7ab65df630cec3",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "it/coreml/latent.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 100634,
+      "sha256": "1b9be578b259d9125e213a9ba68ac3b9ac3b2bdce6f37054697d50e6771d75fe",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "it/coreml/latent.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 302268096,
+      "sha256": "178af0fb10205c836ebfd3f086ca1a61617e610a21fce946ed0fb0f4d0704085",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "it/coreml/latent.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "da8361869df51d0f724a18b34363f547b5b77094931d4a620a84e84299900927",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "it/coreml/manifest.json",
+      "bytes": 7591,
+      "sha256": "8f3f16cb96878a1c00397f68019f1f05bbca52496061996a6277a37154967feb",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "it/coreml/mimi.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 91968,
+      "sha256": "6915aa9a81669320c7fd26c6132e778e5f886636b1c96aff3fe65dc7f6cfcaa0",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "it/coreml/mimi.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 42294912,
+      "sha256": "7f4a9ba9e970ae9f02847181b235cf5b010a400f059bcc2670c3dc45e855925c",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "it/coreml/mimi.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "bbc04fb5ced16cfc961f5578fd78c7a45d6809253a8e0e3d27bb98ebdeacbd50",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "it/coreml/text.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 101601,
+      "sha256": "a41de997353eeae24c28b4ee8f530484e64677482c1be3b853bd24bc37c88696",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "it/coreml/text.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 318525120,
+      "sha256": "899502301f715aac9bd76a3c0fc9cf4b57f3c97a1f2fef86c0e5d8ae92f55e56",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "it/coreml/text.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "159725e98cf6f6c449e51b760afd7723bfd4abd094c77195ddbdc7ab0fcac52e",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "nl/coreml/bos.bin",
+      "bytes": 128,
+      "sha256": "c8c483d3fa04db1f427af312335402bec75bf9786795464e1bc5f5918fa5882c",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "nl/coreml/flow4.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 127619,
+      "sha256": "0f57d076bf5593554b95b8c090787d3097a71050e4d7a95bc31f30692a9c412a",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "nl/coreml/flow4.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 38003264,
+      "sha256": "cad0361d0894520e3583c2abd4c08e2c483bf55bcdb0232fe9f7beb91053e8a2",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "nl/coreml/flow4.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "168b41492af7b71e16d712c6179bd240fc7496f98cc2d5da314fa8da8c38db97",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "nl/coreml/flow8.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 245014,
+      "sha256": "20088473e207ad1e3c5364f13404b11d88385708d1efe514d04f78e27ae82c50",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "nl/coreml/flow8.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 38020160,
+      "sha256": "3f694689aff0d31bd47a2eac0698395195db407ef856dac301ef03b0cff8c417",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "nl/coreml/flow8.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "da387851bb77370ecfe0a3453b42ad125f226111e7c5081d5983bc422ea397e4",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "nl/coreml/flowstep.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 42526,
+      "sha256": "38bba5cbda7d27a747e956d0f1bf2dab12bf5f704c81c51957960b6124f15a3b",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "nl/coreml/flowstep.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 39039872,
+      "sha256": "e7e43baf205b5534bfab33cc1cdb8c13ae7be0f3e7c07ba939ea78e892da4a7b",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "nl/coreml/flowstep.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "7bb4ac6b855b7c3acd99ce52208faeb44c05edebcfffaf439b30eec6fc352898",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "nl/coreml/latent.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 100634,
+      "sha256": "b3cc98bb77c6a737465ee08ad1c5ef11b2480115923025dab02150d3e6ea76e2",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "nl/coreml/latent.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 302268096,
+      "sha256": "bd35f2cd3d14886c57ce3ee434fed05337194a7095e1d72b0c9f5a29a21fe0da",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "nl/coreml/latent.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "f93f85fd384ae7658bdb5b6699fbdc6238e57749d76a168c7d25aa5cba124125",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "nl/coreml/manifest.json",
+      "bytes": 7585,
+      "sha256": "343a27331901a691503cfd69de5ab5650a14d2ed0e9c81eee7d11b54ceefeb41",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "nl/coreml/mimi.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 91968,
+      "sha256": "2b4a9d587552fcc49a2932675e0e0913fc452d8bd16c37e4aa20f7199ddea1cb",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "nl/coreml/mimi.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 42294912,
+      "sha256": "2c630d555c2fa846f009ed7adf0e2643564f5d9651c46ad270a80c3418a701e4",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "nl/coreml/mimi.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "28d9151a721ebf775cf6b8ad7bd58522fe344c5e648ba8101cfe3144af24d6f8",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "nl/coreml/text.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 101601,
+      "sha256": "2ebd95e41cae080e48d0ed0c0c16a859446ab4c699f504b18e23bd27cf1a6354",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "nl/coreml/text.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 318525120,
+      "sha256": "520110cab1d56e069e9856c5e67530ea9b3a6618392f94a1e8589ed41e9d34e6",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "nl/coreml/text.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "1228f73c1146fdf3ac3218c890a63b2064aa28d2df19b86946d7b11d5f4cd708",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "pt/coreml/bos.bin",
+      "bytes": 128,
+      "sha256": "f01afe8eaa937fcf46a78d78a8de7c3792b1a177da3f2053d31e4cefe829c581",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "pt/coreml/flow4.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 127619,
+      "sha256": "f02b80ab2174cf47159b8d85ae7a19d968fecfff7b30aa7ebce340bb183bc056",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "pt/coreml/flow4.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 38003264,
+      "sha256": "2ab47a0c7a2620066139ea6f9bf01d73d111d05824cfe33418a5e3ae866a1274",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "pt/coreml/flow4.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "168583d6ade70a98a8a351ca81183cf60e4d78cde24730a71b79953f62ee056c",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "pt/coreml/flow8.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 245014,
+      "sha256": "51879c6aa2a1c6ba7d5e365203d51c7e716634e43214d586b585b5caf2dec2a3",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "pt/coreml/flow8.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 38020160,
+      "sha256": "1ae6b533e730b5f87747c1e6cc7081a9cf8ce21e3722123b0349115bb77bb13e",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "pt/coreml/flow8.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "40064ec4892645c487e1f7cebda8c3d41da7ed11bb7b44c06aab84509d4c80d6",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "pt/coreml/flowstep.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 42526,
+      "sha256": "a160f64261781a03a53e3d6c39cd837559bbc8a085f819b5d286b0e92e3c36bf",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "pt/coreml/flowstep.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 39039872,
+      "sha256": "c4634d52915d26e453124405f78bacdabdc3f16fe9499e3dbb50fe0eb94af930",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "pt/coreml/flowstep.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "ea79b6a03601650bde29032ca21d7f273788718ee8c80ae5a10f506dd3f44807",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "pt/coreml/latent.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 100634,
+      "sha256": "22f07c44439de8f62c06e40a6c8906be6e46650b781ce5e42fefe18a1097dfa7",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "pt/coreml/latent.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 302268096,
+      "sha256": "741de82b5989b8a1dd4ec2d01e48828c50174bf4cd6bc1dda8543f571b9e167d",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "pt/coreml/latent.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "018b71d2d8ab8061f14b07d4e4e5d982809850f80bf4f401ad0cb937157d679b",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "pt/coreml/manifest.json",
+      "bytes": 7572,
+      "sha256": "a6b3a44bec2d20a0f4d8982b1aece162515e65aee055fd504cbe784047f0c677",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "pt/coreml/mimi.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 91968,
+      "sha256": "afdce1d50a2b6e1afee01ab539aaddd16a88a9ca51a2618395edc0bfc3bb2949",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "pt/coreml/mimi.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 42294912,
+      "sha256": "e4b813bb7bf479632d1ca2766e3f89b707a1c8c3120bec0585c86d1bdbdd535d",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "pt/coreml/mimi.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "e184f9dd729555d1a35614a72e55eb8a5c2575b20bb5271466bc7079d41ffa67",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "pt/coreml/text.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 101601,
+      "sha256": "6c62cc192c90c02bad403ee5ffeb1dde2b5e2111cdcdc93268650263464c2fbc",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "pt/coreml/text.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 318525120,
+      "sha256": "b8203bacfdc93f4af1530d90944deee2053c4c62c79c6357fc6de5a25ffef807",
+      "publicDownloadVerified": true
+    },
+    {
+      "path": "pt/coreml/text.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "a5c3109fc9cb8aa98f14c69b1e6d6696fa5607a636d83243586a957a5622ed54",
+      "publicDownloadVerified": true
+    }
+  ]
+}

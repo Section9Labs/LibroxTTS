@@ -58,10 +58,25 @@ enum InstallationProbe {
             modes.append(["context": label, "sampleCount": actual.count, "matchesDirectCoreML": true,
                           "seconds": ProcessInfo.processInfo.systemUptime - start])
         }
+        guard await renderer.loadedPocketLanguage == "en" else { throw CocoaError(.fileReadCorruptFile) }
+        await renderer.setCPUBudget(fraction: nil)
+        let unmetered = try await renderer.render(unit)
+        guard unmetered == expected else { throw CocoaError(.fileReadCorruptFile) }
+        let sentinel = installation.appendingPathComponent("es/other-language-sentinel")
+        try FileManager.default.createDirectory(at: sentinel.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try Data("preserve-other-language".utf8).write(to: sentinel)
+        let freed = try await renderer.uninstallPocketLanguage("en", in: installation)
+        guard freed > 0, await renderer.loadedPocketLanguage == nil,
+              FileManager.default.fileExists(atPath: sentinel.path),
+              !FileManager.default.fileExists(atPath: installation.appendingPathComponent("en").path) else {
+            throw CocoaError(.fileReadCorruptFile)
+        }
         await renderer.unload(); await direct.unload()
         let report: [String: Any] = ["passed": true, "backend": PocketTTSBackend.platform.rawValue,
             "repositoryID": NarrationAssets.repositoryID(.pocket), "runtimeIdentity": NarrationModel.pocket.deliveryIdentity,
             "originalWeightsPresent": false, "prepareSeconds": prepareSeconds, "routes": modes,
+            "backgroundCPUBudget": 0.5, "explicitUnmeteredOutputMatches": true,
+            "loadedLanguageUninstallPassed": true, "otherLanguagePreserved": true, "uninstalledBytes": freed,
             "note": "Execution-context routing test; application remains foreground during this test."]
         try JSONSerialization.data(withJSONObject: report, options: [.prettyPrinted, .sortedKeys])
             .write(to: output.appendingPathComponent("installation-report.json"), options: .atomic)

@@ -1,3 +1,8 @@
+> SDK 0.6.0 selects Core ML on iPhone/iPad and MLX on Mac/Catalyst.
+> Follow the [0.6.0 app handoff](../../docs/UPGRADE-0.6.0.md) for current downloads,
+> preparation, migration, CPU pacing and style APIs. Historical MLX measurements
+> below remain scoped to that backend.
+
 # Max (Pocket TTS) in LibroxTTS
 
 Max is an additional, explicitly selected narration tier above Plus, powered by

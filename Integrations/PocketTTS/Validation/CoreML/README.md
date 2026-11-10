@@ -74,3 +74,8 @@ Local WAVs and raw device receipts remain under `.coreml-results/`; compiled
 models remain under `.coreml-tools/models/`. Both are intentionally untracked.
 
 Follow-up: [platform routing and separate assets](ASSET-SEPARATION.md).
+
+The 0.6.0 SDK preserves the newer host CPU budget: its 0.5-budget iPhone routing
+probe generated 3.36 seconds in 7.13 seconds (~0.47×), whereas the throughput
+table above measures the direct unmetered backend. See the
+[release probe](release-060-device.json) and app handoff for pacing and buffering.

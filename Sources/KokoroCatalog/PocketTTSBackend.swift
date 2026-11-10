@@ -38,8 +38,8 @@ public enum PocketTTSBackend: String, Codable, Sendable {
 /// The original model.safetensors is never part of a Core ML installation.
 public enum PocketTTSCoreMLCatalog {
     public static let identity = "pocket-tts-coreml-2026-11-10-v1"
-    // Enable only after the immutable assets have been uploaded and verified.
-    public static let isDownloadPublished = false
+    // Immutable release assets were uploaded and their SHA-256 digests verified.
+    public static let isDownloadPublished = true
     public static let stages = ["text", "latent", "flow4", "flow8", "flowstep", "mimi"]
 
     public static func sharedManifest(language: String) throws -> AssetManifest {

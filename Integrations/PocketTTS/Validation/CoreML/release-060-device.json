@@ -1,0 +1,45 @@
+{
+  "backend": "coreML",
+  "backgroundCPUBudget": 0.5,
+  "explicitUnmeteredOutputMatches": true,
+  "loadedLanguageUninstallPassed": true,
+  "note": "Execution-context routing test; application remains foreground during this test.",
+  "originalWeightsPresent": false,
+  "otherLanguagePreserved": true,
+  "passed": true,
+  "prepareSeconds": 1.1264652500394732,
+  "repositoryID": "pocket-tts-coreml-2026-11-10-v1",
+  "routes": [
+    {
+      "context": "foreground",
+      "matchesDirectCoreML": true,
+      "sampleCount": 80640,
+      "seconds": 1.339727958315052
+    },
+    {
+      "context": "background",
+      "matchesDirectCoreML": true,
+      "sampleCount": 80640,
+      "seconds": 7.13362637499813
+    },
+    {
+      "context": "backgroundGPU",
+      "matchesDirectCoreML": true,
+      "sampleCount": 80640,
+      "seconds": 7.816506958333775
+    }
+  ],
+  "runtimeIdentity": "pocket-coreml-28770c06-v1:fp32:tanh:quality4:adaptive:warm12:eos6",
+  "uninstalledBytes": 1703587811,
+  "device": "iPhone 17 Pro Max",
+  "operatingSystem": "iOS 27.2",
+  "fixture": {
+    "text": "She waited. Nobody came.",
+    "temperature": 0,
+    "voice": "Caro Davy",
+    "style": "Calm",
+    "samplerSteps": 4,
+    "audioSeconds": 3.36
+  },
+  "scope": "Execution-context routing while the app is foreground; not a fresh locked/background endurance test."
+}

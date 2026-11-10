@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.6.0 — 2026-11-10
+
+- Max uses Core ML CPU on iPhone/iPad and retains MLX on Mac/Catalyst.
+- Seven separately downloadable Core ML language packs; no MLX acoustic
+  checkpoint in iOS downloads. Existing tokenizer, voices, styles and credits
+  retain their hashes and immutable URLs. Original model and quality unchanged.
+- Device compilation, backend-specific install/audio identities and verified
+  reuse from old iPhone MLX installs. Mac model downloads remain unchanged.
+- Preserve 0.4.1–0.5.0 CPU-budget, language-uninstall and style APIs; Core ML
+  participates in background pacing and serialized language unload/uninstall.
+- Fix iOS receipt paths and bound asset-verification memory; physical iPhone
+  installation/routing and Core ML numerical checks passed.
+- [App implementation prompt](docs/UPGRADE-0.6.0.md), model provenance and
+  validation receipts included. SDK/assets release only; no app shipment.
+
 ## 0.5.0 — 2026-11-09
 
 - **Original-only voices read Original instead of failing.** Only Bill Boerst,

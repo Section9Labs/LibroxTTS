@@ -127,7 +127,13 @@ final class AssetRoutingTests: XCTestCase {
             let b = try await reference.synthesize("She waited. Nobody came.", voiceID: "pocket-caro_davy-en-v1", temperature: 0.3, chunking: .carefulReading, samplerSteps: steps, deliveryStyle: .calm)
             XCTAssertEqual(a.samples, b.samples, "Changed output for sampler \(steps)")
         }
+        let loaded = await isolated.loadedLanguage
+        XCTAssertEqual(loaded, "en")
+        await isolated.setCPUBudgetFraction(0.5)
+        await isolated.setCPUBudgetFraction(nil)
         await isolated.unload(); await reference.unload()
+        let unloaded = await isolated.loadedLanguage
+        XCTAssertNil(unloaded)
         // A damaged prepared graph must not be accepted as ready or playable.
         let receipt = root.appendingPathComponent("en/coreml/compiled/receipt.json")
         let saved = try Data(contentsOf: receipt)

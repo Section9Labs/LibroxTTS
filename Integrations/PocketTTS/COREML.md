@@ -2,8 +2,8 @@
 
 This isolated backend is based on SDK commit `cd969c6` (Max 0.4.0). The SDK now
 selects Core ML CPU on iPhone/iPad and MLX on macOS/Mac Catalyst. Saved book
-quality and delivery settings are unchanged. This worktree is not a released
-SDK or app update. See [asset separation](Validation/CoreML/ASSET-SEPARATION.md)
+quality and delivery settings are unchanged. The platform integration is distributed in SDK 0.6.0; it does not release
+the Librox app. See [asset separation](Validation/CoreML/ASSET-SEPARATION.md)
 for manifests, preparation, migration and release status.
 
 The source weights remain Kyutai snapshot

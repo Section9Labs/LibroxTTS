@@ -24,8 +24,9 @@ were checked against GitHub release asset sizes and SHA-256 digests on November
 10. No hosted files were missing or mismatched. Missing style files in the local
 benchmark directory were simply not downloaded there. This is an availability
 and integrity audit, not human listening qualification of every voice/style.
-Only English Caro/Calm retains its existing non-preview acceptance; other style
-preview status is unchanged.
+The release retains the 0.5.0 API: published styles are regular choices and
+preview-status APIs are removed. English Caro/Calm has prior listening acceptance;
+that does not establish human listening acceptance for every other performance.
 
 See [asset-separation.json](asset-separation.json) for per-language conversion,
 sampler checks and the hosted coverage receipt.
@@ -118,10 +119,24 @@ then checks foreground/background/backgroundGPU *context routing* against direct
 Core ML output. The app remains foreground for this routing test; it does not
 claim a fresh background lifecycle test.
 
-**Assets are staged locally, not published; the SDK/app is not released.**
-`PocketTTSCoreMLCatalog.isDownloadPublished` deliberately remains false until
-hosting is verified. No unavailable URLs are advertised as downloadable. The
-immutable publication helper can use `--manifest-pattern 'coreml-*.json'`,
-`--tag pocket-tts-coreml-2026-11-10-v1`, and this worktree's staged pack root.
-After hosted digest verification, enable the publication flag and integrate the
-SDK into the app. No release/tag/upload was performed as part of this change.
+**Core ML assets are published** in the immutable
+[pocket-tts-coreml-2026-11-10-v1 release](https://github.com/Section9Labs/LibroxTTS/releases/tag/pocket-tts-coreml-2026-11-10-v1).
+All 140 graph/metadata asset digests were verified before enabling downloads.
+The 0.6.0 SDK includes the platform policy, plus the 0.4.1–0.5.0 CPU-budget,
+language-uninstall and style APIs. App integration and app distribution remain
+separate. Use the [0.6.0 app implementation prompt](../../../../docs/UPGRADE-0.6.0.md).
+
+The host facade applies the existing 0.5 CPU budget to background Core ML work;
+foreground is unmetered, and an explicit host `nil` budget remains supported.
+The original 3.72× background benchmark used the direct, unmetered engine.
+Pacing does not alter the model, temperature, sampler steps or audio identity.
+
+The 0.6.0 release probe also verified the current CPU-budget and language-uninstall
+APIs on the phone: [release device receipt](release-060-device.json). At the
+retained 0.5 budget, its 3.36-second fixture took 7.13 seconds to generate, about
+0.47× real time. The app was foreground; this is a CPU-pacing measurement, not a
+new background endurance result. App buffering/preparation must account for this;
+the earlier unmetered 3.72× result cannot be promised under that limiter.
+Public download checks fetched all 140 files (5,452,105,379 bytes) without
+authentication and matched every expected hash:
+[public-download receipt](public-downloads-2026-11-10.json).
