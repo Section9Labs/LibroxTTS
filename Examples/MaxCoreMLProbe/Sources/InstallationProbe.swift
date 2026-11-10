@@ -1,4 +1,5 @@
 import Foundation
+import Darwin
 import CryptoKit
 import LibroxTTS
 import PocketTTSCoreML
@@ -36,6 +37,15 @@ enum InstallationProbe {
         let expected = try await direct.synthesize(unit.synthesisText, voiceID: unit.voiceID, temperature: 0,
             chunking: unit.pocketChunking ?? .init(), role: .narration,
             samplerSteps: unit.pocketSampling?.samplerSteps ?? 4, deliveryStyle: .calm).samples
+        // Only one acoustic model is resident in the production path. Retain
+        // the reference PCM, not a second model, while checking SDK routing.
+        await direct.unload()
+        print("INSTALL available after reference unload: \(os_proc_available_memory())")
+        await renderer.setMaxResourceObserver { snapshot in
+            if snapshot.phase == "operation-start" || snapshot.frameIndex == 0 {
+                print("INSTALL resource \(snapshot.phase) available \(snapshot.availableBytes ?? 0) footprint \(snapshot.footprintBytes)")
+            }
+        }
         var modes: [[String: Any]] = []
         for (label, mode) in [("foreground", NarrationRenderer.ExecutionContext.foreground), ("background", .background), ("backgroundGPU", .backgroundGPU)] {
             print("INSTALL render \(label)")

@@ -1,5 +1,7 @@
 import XCTest
 import Foundation
+import CryptoKit
+import Darwin
 import KokoroCatalog
 import KokoroNarration
 import LibroxTTS
@@ -69,6 +71,43 @@ final class AssetRoutingTests: XCTestCase {
         try Data("bad".utf8).write(to: old.appendingPathComponent(config.path))
         let empty = root.appendingPathComponent("empty")
         XCTAssertTrue(try NarrationAssets.reuseVerifiedFiles(manifest: core, from: [old], into: empty).isEmpty)
+    }
+
+    func testValidationDoesNotRetainWholeFileInAutoreleasePool() throws {
+        let root = URL.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let file = root.appendingPathComponent("weights.bin")
+        FileManager.default.createFile(atPath: file.path, contents: nil)
+        let handle = try FileHandle(forWritingTo: file)
+        let block = Data(repeating: 7, count: 1_048_576)
+        var hash = SHA256()
+        for _ in 0..<192 { try handle.write(contentsOf: block); hash.update(data: block) }
+        try handle.close()
+        let sha = hash.finalize().map { String(format: "%02x", $0) }.joined()
+        let entry: [String: Any] = ["path": "weights.bin", "size": 192 * 1_048_576, "sha256": sha]
+        let manifest = try JSONDecoder().decode(AssetManifest.self, from: JSONSerialization.data(withJSONObject:
+            ["repository": "test", "revision": "test", "files": [entry], "installedFiles": [entry]]))
+        func footprint() -> UInt64 {
+            var info = task_vm_info_data_t()
+            var count = mach_msg_type_number_t(MemoryLayout<task_vm_info_data_t>.size / MemoryLayout<integer_t>.size)
+            let status = withUnsafeMutablePointer(to: &info) {
+                $0.withMemoryRebound(to: integer_t.self, capacity: Int(count)) {
+                    task_info(mach_task_self_, task_flavor_t(TASK_VM_INFO), $0, &count)
+                }
+            }
+            XCTAssertEqual(status, KERN_SUCCESS)
+            return info.phys_footprint
+        }
+        try autoreleasepool {
+            let before = footprint()
+            try PocketTTSCatalog.validate(manifest, in: root)
+            XCTAssertTrue(try NarrationAssets.matches(file, size: 192 * 1_048_576, sha256: sha))
+            let after = footprint()
+            // Measured before the outer pool drains: two complete hash passes
+            // must not retain 384 MB of temporary NSData buffers.
+            XCTAssertLessThan(after, before + 64 * 1_048_576)
+        }
     }
 
     func testRealCoreMLOnlyPackMatchesBenchmarkLayout() async throws {

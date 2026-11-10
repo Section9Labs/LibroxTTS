@@ -59,7 +59,14 @@ public enum PocketTTSCatalog {
             guard (try url.resourceValues(forKeys: [.fileSizeKey])).fileSize == Int(file.size) else { throw CocoaError(.fileReadCorruptFile) }
             let handle = try FileHandle(forReadingFrom: url); defer { try? handle.close() }
             var hash = SHA256()
-            while let data = try handle.read(upToCount: 1_048_576), !data.isEmpty { try Task.checkCancellation(); hash.update(data: data) }
+            // FileHandle may return autoreleased NSData. Drain each block so a
+            // multi-gigabyte pack never accumulates an entire validation read.
+            while try autoreleasepool(invoking: {
+                try Task.checkCancellation()
+                guard let data = try handle.read(upToCount: 1_048_576), !data.isEmpty else { return false }
+                hash.update(data: data)
+                return true
+            }) {}
             guard hash.finalize().map({ String(format: "%02x", $0) }).joined() == file.sha256 else { throw CocoaError(.fileReadCorruptFile) }
         }
     }

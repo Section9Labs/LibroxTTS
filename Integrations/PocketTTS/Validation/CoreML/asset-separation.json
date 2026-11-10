@@ -1007,5 +1007,6 @@
     "baseFilesVerified": 203
   },
   "coreMLAssetsPublished": false,
-  "sdkReleased": false
+  "sdkReleased": false,
+  "physicalInstallationValidation": "installation-device-2026-11-10.json"
 }

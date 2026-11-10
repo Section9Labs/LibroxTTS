@@ -141,7 +141,9 @@ public actor PocketTTSCoreMLEngine {
             } else {
                 try PocketTTSCatalog.validate(PocketTTSCoreMLCatalog.sharedManifest(language: language), in: assets)
             }
-            loaded = try Loaded(language: language, assets: assets, models: models, placement: placement)
+            loaded = try autoreleasepool {
+                try Loaded(language: language, assets: assets, models: models, placement: placement)
+            }
         }
         return loaded!
     }
@@ -220,7 +222,9 @@ public actor PocketTTSCoreMLEngine {
         }
         func flow(_ steps: Int) throws -> MLModel {
             if let value = flows[steps] { return value }
-            let value = try MLModel(contentsOf: compiledRoot.appendingPathComponent(([4, 8].contains(steps) ? "flow\(steps)" : "flowstep") + ".mlmodelc"), configuration: configuration)
+            let value = try autoreleasepool {
+                try MLModel(contentsOf: compiledRoot.appendingPathComponent(([4, 8].contains(steps) ? "flow\(steps)" : "flowstep") + ".mlmodelc"), configuration: configuration)
+            }
             flows[steps] = value; return value
         }
         func sample(_ model: MLModel, steps: Int, condition: [Float], noise: [Float]) throws -> [Float] {

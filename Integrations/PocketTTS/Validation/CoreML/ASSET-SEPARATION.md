@@ -74,10 +74,21 @@ the MLX code dependency is independent of downloading a second model.
 - A real Core ML-only installation, with no `model.safetensors`, compiled and
   rendered identical samples to the benchmark layout at 4, 8 and 3 steps.
 - Catalog/routing, immutable shared assets, narrator manifests, verified reuse,
-  malformed receipt rejection and tensor contracts passed (8 XCTest cases, including the iOS directory-alias regression).
+  malformed receipt rejection and tensor contracts passed (9 XCTest cases, including directory-alias and bounded-hashing regressions).
 - The existing 45 Pocket tests passed, including Mac MLX lifecycle tests.
-- Signed Release iPhone build succeeded. Physical installation-route evidence
-  is recorded separately when the probe completes.
+- Signed Release iPhone build/install succeeded. On the physical iPhone 17 Pro
+  Max, the Core ML-only pack compiled and passed public SDK routing checks for
+  foreground, background and backgroundGPU contexts, all using CPU. Each result
+  was byte-identical to direct Core ML output (80,640 samples at temperature zero
+  for deterministic comparison). The application stayed foreground during this
+  routing check. [Device receipt](installation-device-2026-11-10.json).
+- Physical testing exposed two installation issues, now corrected: iOS `/var`
+  aliases produced invalid relative receipt paths, and Foundation file reads
+  retained large temporary buffers during hashing. Canonical relative paths and
+  per-block autorelease pools address these without relaxing hash validation or
+  the memory guard. The failed comparison reached roughly 3.52 GB app footprint;
+  corrected recorded checkpoints were about 59–140 MB across two complete runs.
+  These figures exclude Core ML services and are not total model memory.
 
 The earlier two-minute locked/background benchmark remains evidence for the
 acoustic computation, not a new endurance qualification of this packaging

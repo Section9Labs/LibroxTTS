@@ -307,9 +307,12 @@ public enum NarrationAssets {
         guard (try? url.resourceValues(forKeys: [.fileSizeKey]))?.fileSize == Int(size) else { return false }
         let handle = try FileHandle(forReadingFrom: url); defer { try? handle.close() }
         var digest = SHA256()
-        while let data = try handle.read(upToCount: 1_048_576), !data.isEmpty {
-            try Task.checkCancellation(); digest.update(data: data)
-        }
+        while try autoreleasepool(invoking: {
+            try Task.checkCancellation()
+            guard let data = try handle.read(upToCount: 1_048_576), !data.isEmpty else { return false }
+            digest.update(data: data)
+            return true
+        }) {}
         return digest.finalize().map { String(format: "%02x", $0) }.joined() == sha256
     }
     private static func configureForPlayback(_ directory: URL) throws {

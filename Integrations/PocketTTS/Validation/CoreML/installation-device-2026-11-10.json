@@ -1,0 +1,107 @@
+{
+  "date": "2026-11-10",
+  "device": "iPhone 17 Pro Max",
+  "operatingSystem": "iOS 27.2",
+  "report": {
+    "backend": "coreML",
+    "note": "Execution-context routing test; application remains foreground during this test.",
+    "originalWeightsPresent": false,
+    "passed": true,
+    "prepareSeconds": 1.0600657915929332,
+    "repositoryID": "pocket-tts-coreml-2026-11-10-v1",
+    "routes": [
+      {
+        "context": "foreground",
+        "matchesDirectCoreML": true,
+        "sampleCount": 80640,
+        "seconds": 1.2795621666591614
+      },
+      {
+        "context": "background",
+        "matchesDirectCoreML": true,
+        "sampleCount": 80640,
+        "seconds": 0.6393442916451022
+      },
+      {
+        "context": "backgroundGPU",
+        "matchesDirectCoreML": true,
+        "sampleCount": 80640,
+        "seconds": 0.6526070000836626
+      }
+    ],
+    "runtimeIdentity": "pocket-coreml-28770c06-v1:fp32:tanh:quality4:adaptive:warm12:eos6"
+  },
+  "comparison": {
+    "temperature": 0,
+    "samplerSteps": 4,
+    "voice": "Caro Davy",
+    "style": "Calm",
+    "sampleRate": 24000,
+    "bitIdenticalToDirectCoreML": true
+  },
+  "resourceSamples": [
+    {
+      "phase": "operation-start",
+      "availableBytes": 3462674616,
+      "appFootprintBytes": 77317960
+    },
+    {
+      "phase": "frame",
+      "availableBytes": 3441391440,
+      "appFootprintBytes": 98601136
+    },
+    {
+      "phase": "operation-start",
+      "availableBytes": 3425302208,
+      "appFootprintBytes": 114690368
+    },
+    {
+      "phase": "frame",
+      "availableBytes": 3408410304,
+      "appFootprintBytes": 131582272
+    },
+    {
+      "phase": "operation-start",
+      "availableBytes": 3414652608,
+      "appFootprintBytes": 125339968
+    },
+    {
+      "phase": "frame",
+      "availableBytes": 3399841472,
+      "appFootprintBytes": 140151104
+    },
+    {
+      "phase": "operation-start",
+      "availableBytes": 3481450680,
+      "appFootprintBytes": 58541896
+    },
+    {
+      "phase": "frame",
+      "availableBytes": 3473373032,
+      "appFootprintBytes": 66619544
+    },
+    {
+      "phase": "operation-start",
+      "availableBytes": 3447928536,
+      "appFootprintBytes": 92064040
+    },
+    {
+      "phase": "frame",
+      "availableBytes": 3433215704,
+      "appFootprintBytes": 106776872
+    },
+    {
+      "phase": "operation-start",
+      "availableBytes": 3445323480,
+      "appFootprintBytes": 94669096
+    },
+    {
+      "phase": "frame",
+      "availableBytes": 3430594240,
+      "appFootprintBytes": 109398336
+    }
+  ],
+  "memoryScope": "Sampled application footprint, excluding Core ML service allocations; not total model memory or instrumented peak.",
+  "fix": "Bound FileHandle hashing reads with per-block autorelease pools; normalize iOS /var directory aliases in preparation receipts.",
+  "lifecycleScope": "Foreground installation and execution-context routing; no new screen-off/background lifecycle claim."
+}

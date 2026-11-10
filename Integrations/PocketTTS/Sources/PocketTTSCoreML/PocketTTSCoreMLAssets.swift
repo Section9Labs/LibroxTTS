@@ -21,10 +21,12 @@ public enum PocketTTSCoreMLAssets {
         let stream = try FileHandle(forReadingFrom: url)
         defer { try? stream.close() }
         var hash = SHA256()
-        while let data = try stream.read(upToCount: 1_048_576), !data.isEmpty {
+        while try autoreleasepool(invoking: {
             try Task.checkCancellation()
+            guard let data = try stream.read(upToCount: 1_048_576), !data.isEmpty else { return false }
             hash.update(data: data)
-        }
+            return true
+        }) {}
         return hash.finalize().map { String(format: "%02x", $0) }.joined()
     }
     private static func sourceDigest(_ language: String) throws -> String {
