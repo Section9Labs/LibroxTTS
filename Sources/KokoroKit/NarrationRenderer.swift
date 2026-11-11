@@ -46,8 +46,7 @@ public actor NarrationRenderer {
     private var pocketCoreML: PocketTTSCoreMLEngine?
     private var plus: CTEngine?
     private var plusBackend: CTEngine.Backend?
-    private var leased = false
-    private var waiters: [CheckedContinuation<Void, Never>] = []
+    private let admission: NarrationAdmission
     private var kokoro: KokoroEngine?
     private var current: NarrationModel?
     private var currentDirectory: URL?
@@ -60,6 +59,7 @@ public actor NarrationRenderer {
 
     /// Host-facing initializer: storage and bundled resources, with no model graph knowledge.
     public init(storageRoot: URL, resources: Bundle, expressionDirectory: URL? = nil) {
+        admission = NarrationAdmission()
         compactDirectory = storageRoot.appendingPathComponent(
             NarrationAssets.repositoryID(.compact).replacingOccurrences(of: "/", with: "_"), isDirectory: true)
         harmonicSource = resources.url(forResource: "NarrationSource", withExtension: "mlmodelc")
@@ -68,18 +68,20 @@ public actor NarrationRenderer {
 
     public init(compactDirectory: URL, harmonicSource: URL?,
                 contextStyleDiagnostic: CTContextStyleDiagnostic.Configuration? = nil) {
+        admission = NarrationAdmission()
         self.compactDirectory = compactDirectory
         self.harmonicSource = harmonicSource
         self.contextStyleDiagnostic = contextStyleDiagnostic
     }
 
-    private func acquire() async {
-        if leased { await withCheckedContinuation { waiters.append($0) } }
-        else { leased = true }
+    init(compactDirectory: URL, admission: NarrationAdmission) {
+        self.compactDirectory = compactDirectory
+        self.admission = admission
+        harmonicSource = nil
+        contextStyleDiagnostic = nil
     }
-    private func release() {
-        if waiters.isEmpty { leased = false } else { waiters.removeFirst().resume() }
-    }
+    private func acquire() async { await admission.acquire() }
+    private func release() { admission.release() }
     public func unload() async {
         await acquire(); defer { release() }
         await unloadHeld()
@@ -140,7 +142,7 @@ public actor NarrationRenderer {
 
     public func load(_ selection: NarrationModel, directory: URL,
                      executionContext: ExecutionContext = .background, repositoryID: String? = nil) async throws {
-        await acquire(); defer { release() }
+        try await admission.acquireCancellable(); defer { release() }
         try Task.checkCancellation()
         if selection != .pocket || PocketTTSBackend.platform != .coreML {
             try validateGPUAuthorization(executionContext)
@@ -221,7 +223,7 @@ public actor NarrationRenderer {
     public func renderPocketFrames(_ unit: BookNarrationUnit,
                                    onTextChunk: @Sendable (PocketTTSChunkProgress) throws -> Void = { _ in },
                                    receive: @escaping @Sendable ([Float]) throws -> Void) async throws {
-        await acquire(); defer { release() }
+        try await admission.acquireCancellable(); defer { release() }
         try Task.checkCancellation()
         guard current == .pocket else { throw RenderError.unavailable("Load Max before streaming its audio.") }
         if pocketCoreML == nil { try validateGPUAuthorization(executionContext) }
@@ -249,7 +251,7 @@ public actor NarrationRenderer {
     }
 
     public func render(_ unit: BookNarrationUnit, delivery: NarrationDeliveryOptions = .init()) async throws -> [Float] {
-        await acquire(); defer { release() }
+        try await admission.acquireCancellable(); defer { release() }
         try Task.checkCancellation()
         if current != .pocket || PocketTTSBackend.platform != .coreML {
             try validateGPUAuthorization(executionContext)
@@ -346,7 +348,7 @@ public actor NarrationRenderer {
     /// model, voice and delivery as render(); does not silently split a comparison.
     public func renderNativeDiagnostic(_ unit: BookNarrationUnit, initialNoise: CTTensor? = nil,
                                        delivery: NarrationDeliveryOptions = .init(), captureTrace: Bool = true) async throws -> NativeDiagnostic {
-        await acquire(); defer { release() }
+        try await admission.acquireCancellable(); defer { release() }
         try Task.checkCancellation()
         guard let plus, let voice = NarrationModel.plus.nativeVoices.first(where: { $0.id == unit.voiceID }) else {
             throw RenderError.invalidAudio
