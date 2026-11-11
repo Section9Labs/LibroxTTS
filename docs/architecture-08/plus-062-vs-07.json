@@ -1,0 +1,1000 @@
+{
+  "order": [
+    "baseline",
+    "candidate",
+    "candidate",
+    "baseline",
+    "baseline",
+    "candidate",
+    "candidate",
+    "baseline"
+  ],
+  "summary": {
+    "en": {
+      "processMedians": {
+        "baseline": [
+          0.41042074997676536,
+          0.4362222916679457,
+          0.4330458125041332,
+          0.42796460416866466
+        ],
+        "candidate": [
+          0.44862700000521727,
+          0.4428639374964405,
+          0.45055877082631923,
+          0.46799020835896954
+        ]
+      },
+      "speedup": 0.957544530399502
+    },
+    "es": {
+      "processMedians": {
+        "baseline": [
+          0.5876018541748635,
+          0.5892917916353326,
+          0.598838562524179,
+          0.553254354163073
+        ],
+        "candidate": [
+          0.5613035625137854,
+          0.5886790416552685,
+          0.5782071458233986,
+          0.565495833317982
+        ]
+      },
+      "speedup": 1.029020355174499
+    }
+  },
+  "exactPCM": true,
+  "runs": [
+    {
+      "index": 0,
+      "revision": "baseline",
+      "rows": [
+        {
+          "graphs": {
+            "duration_predictor": 0.0012209415435791016,
+            "text_encoder": 0.002892017364501953,
+            "text_encoder_early": 0.0038520097732543945,
+            "vector_estimator": 0.34707069396972656,
+            "vocoder": 0.023859024047851562
+          },
+          "language": "en",
+          "samples": 76800,
+          "seconds": 0.37984704168047756,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+          "trial": 0
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.001139998435974121,
+            "text_encoder": 0.0021970272064208984,
+            "text_encoder_early": 0.003780961036682129,
+            "vector_estimator": 0.3622208833694458,
+            "vocoder": 0.01906001567840576
+          },
+          "language": "en",
+          "samples": 76800,
+          "seconds": 0.3891242083045654,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+          "trial": 1
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0006769895553588867,
+            "text_encoder": 0.0021730661392211914,
+            "text_encoder_early": 0.0022230148315429688,
+            "vector_estimator": 0.39497804641723633,
+            "vocoder": 0.030745983123779297
+          },
+          "language": "en",
+          "samples": 76800,
+          "seconds": 0.43171729164896533,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+          "trial": 2
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0014429092407226562,
+            "text_encoder": 0.0032399892807006836,
+            "text_encoder_early": 0.004431962966918945,
+            "vector_estimator": 0.41286003589630127,
+            "vocoder": 0.026383042335510254
+          },
+          "language": "en",
+          "samples": 76800,
+          "seconds": 0.4493868332938291,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+          "trial": 3
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.001587986946105957,
+            "text_encoder": 0.0033110380172729492,
+            "text_encoder_early": 0.0061190128326416016,
+            "vector_estimator": 0.5452820062637329,
+            "vocoder": 0.02847898006439209
+          },
+          "language": "es",
+          "samples": 104448,
+          "seconds": 0.5858050833339803,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+          "trial": 0
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0007240772247314453,
+            "text_encoder": 0.003058910369873047,
+            "text_encoder_early": 0.0028079748153686523,
+            "vector_estimator": 0.5464130640029907,
+            "vocoder": 0.03686201572418213
+          },
+          "language": "es",
+          "samples": 104448,
+          "seconds": 0.5907615833566524,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+          "trial": 1
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0008490085601806641,
+            "text_encoder": 0.003010988235473633,
+            "text_encoder_early": 0.003986954689025879,
+            "vector_estimator": 0.5416560173034668,
+            "vocoder": 0.03905010223388672
+          },
+          "language": "es",
+          "samples": 104448,
+          "seconds": 0.5893986250157468,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+          "trial": 2
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.000758051872253418,
+            "text_encoder": 0.002919912338256836,
+            "text_encoder_early": 0.0030509233474731445,
+            "vector_estimator": 0.5340652465820312,
+            "vocoder": 0.03745400905609131
+          },
+          "language": "es",
+          "samples": 104448,
+          "seconds": 0.5791295417002402,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+          "trial": 3
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "revision": "candidate",
+      "rows": [
+        {
+          "graphs": {
+            "duration_predictor": 0.000823974609375,
+            "text_encoder": 0.0023360252380371094,
+            "text_encoder_early": 0.002212047576904297,
+            "vector_estimator": 0.44847869873046875,
+            "vocoder": 0.021547913551330566
+          },
+          "language": "en",
+          "samples": 76800,
+          "seconds": 0.47657645837171003,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+          "trial": 0
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0012569427490234375,
+            "text_encoder": 0.003498077392578125,
+            "text_encoder_early": 0.006466984748840332,
+            "vector_estimator": 0.37783098220825195,
+            "vocoder": 0.03064596652984619
+          },
+          "language": "en",
+          "samples": 76800,
+          "seconds": 0.4206775416387245,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+          "trial": 1
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0012450218200683594,
+            "text_encoder": 0.005738973617553711,
+            "text_encoder_early": 0.005548000335693359,
+            "vector_estimator": 0.4932880401611328,
+            "vocoder": 0.034947991371154785
+          },
+          "language": "en",
+          "samples": 76800,
+          "seconds": 0.5421692083473317,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+          "trial": 2
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0008540153503417969,
+            "text_encoder": 0.0029000043869018555,
+            "text_encoder_early": 0.0027539730072021484,
+            "vector_estimator": 0.3816949129104614,
+            "vocoder": 0.024735093116760254
+          },
+          "language": "en",
+          "samples": 76800,
+          "seconds": 0.4138342500082217,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+          "trial": 3
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0007430315017700195,
+            "text_encoder": 0.002812027931213379,
+            "text_encoder_early": 0.00283205509185791,
+            "vector_estimator": 0.5451638698577881,
+            "vocoder": 0.04662191867828369
+          },
+          "language": "es",
+          "samples": 104448,
+          "seconds": 0.598997125052847,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+          "trial": 0
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0014880895614624023,
+            "text_encoder": 0.006672978401184082,
+            "text_encoder_early": 0.006575942039489746,
+            "vector_estimator": 0.44751012325286865,
+            "vocoder": 0.038680076599121094
+          },
+          "language": "es",
+          "samples": 104448,
+          "seconds": 0.5022095416788943,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+          "trial": 1
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.001392960548400879,
+            "text_encoder": 0.006977081298828125,
+            "text_encoder_early": 0.007302999496459961,
+            "vector_estimator": 0.5079936981201172,
+            "vocoder": 0.036103010177612305
+          },
+          "language": "es",
+          "samples": 104448,
+          "seconds": 0.5608075833297335,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+          "trial": 2
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0007839202880859375,
+            "text_encoder": 0.003158092498779297,
+            "text_encoder_early": 0.0027600526809692383,
+            "vector_estimator": 0.5271329879760742,
+            "vocoder": 0.02712106704711914
+          },
+          "language": "es",
+          "samples": 104448,
+          "seconds": 0.5617995416978374,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+          "trial": 3
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "revision": "candidate",
+      "rows": [
+        {
+          "graphs": {
+            "duration_predictor": 0.0007349252700805664,
+            "text_encoder": 0.002599954605102539,
+            "text_encoder_early": 0.0026199817657470703,
+            "vector_estimator": 0.4225519895553589,
+            "vocoder": 0.02120494842529297
+          },
+          "language": "en",
+          "samples": 76800,
+          "seconds": 0.45040991669520736,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+          "trial": 0
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0012729167938232422,
+            "text_encoder": 0.0032150745391845703,
+            "text_encoder_early": 0.002968907356262207,
+            "vector_estimator": 0.42159104347229004,
+            "vocoder": 0.03214395046234131
+          },
+          "language": "en",
+          "samples": 76800,
+          "seconds": 0.46214199997484684,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+          "trial": 1
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0009500980377197266,
+            "text_encoder": 0.0022089481353759766,
+            "text_encoder_early": 0.002429962158203125,
+            "vector_estimator": 0.4009993076324463,
+            "vocoder": 0.02783799171447754
+          },
+          "language": "en",
+          "samples": 76800,
+          "seconds": 0.4351792083471082,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+          "trial": 2
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0007319450378417969,
+            "text_encoder": 0.0025260448455810547,
+            "text_encoder_early": 0.0022890567779541016,
+            "vector_estimator": 0.40553081035614014,
+            "vocoder": 0.023550987243652344
+          },
+          "language": "en",
+          "samples": 76800,
+          "seconds": 0.4353179582976736,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+          "trial": 3
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.001340031623840332,
+            "text_encoder": 0.003430008888244629,
+            "text_encoder_early": 0.0033990144729614258,
+            "vector_estimator": 0.5262490510940552,
+            "vocoder": 0.02550804615020752
+          },
+          "language": "es",
+          "samples": 104448,
+          "seconds": 0.5608124167192727,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+          "trial": 0
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0014759302139282227,
+            "text_encoder": 0.0029969215393066406,
+            "text_encoder_early": 0.0034600496292114258,
+            "vector_estimator": 0.5766083002090454,
+            "vocoder": 0.04332399368286133
+          },
+          "language": "es",
+          "samples": 104448,
+          "seconds": 0.6291483750101179,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+          "trial": 1
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0014390945434570312,
+            "text_encoder": 0.007542014122009277,
+            "text_encoder_early": 0.006785035133361816,
+            "vector_estimator": 0.5361769199371338,
+            "vocoder": 0.05337107181549072
+          },
+          "language": "es",
+          "samples": 104448,
+          "seconds": 0.6068830833537504,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+          "trial": 2
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0010379552841186523,
+            "text_encoder": 0.003201007843017578,
+            "text_encoder_early": 0.0033020973205566406,
+            "vector_estimator": 0.5330290794372559,
+            "vocoder": 0.02900099754333496
+          },
+          "language": "es",
+          "samples": 104448,
+          "seconds": 0.5704749999567866,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+          "trial": 3
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "revision": "baseline",
+      "rows": [
+        {
+          "graphs": {
+            "duration_predictor": 0.0007079839706420898,
+            "text_encoder": 0.003715991973876953,
+            "text_encoder_early": 0.0022430419921875,
+            "vector_estimator": 0.36976003646850586,
+            "vocoder": 0.020527005195617676
+          },
+          "language": "en",
+          "samples": 76800,
+          "seconds": 0.3977184583200142,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+          "trial": 0
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0011969804763793945,
+            "text_encoder": 0.002672910690307617,
+            "text_encoder_early": 0.0026760101318359375,
+            "vector_estimator": 0.3984330892562866,
+            "vocoder": 0.0290219783782959
+          },
+          "language": "en",
+          "samples": 76800,
+          "seconds": 0.43496520834742114,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+          "trial": 1
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0011739730834960938,
+            "text_encoder": 0.0025429725646972656,
+            "text_encoder_early": 0.006474971771240234,
+            "vector_estimator": 0.4018319845199585,
+            "vocoder": 0.02556002140045166
+          },
+          "language": "en",
+          "samples": 76800,
+          "seconds": 0.43831454165047035,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+          "trial": 2
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.001334071159362793,
+            "text_encoder": 0.0027229785919189453,
+            "text_encoder_early": 0.0033289194107055664,
+            "vector_estimator": 0.4079627990722656,
+            "vocoder": 0.021129965782165527
+          },
+          "language": "en",
+          "samples": 76800,
+          "seconds": 0.4374793749884702,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+          "trial": 3
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0009130239486694336,
+            "text_encoder": 0.003452897071838379,
+            "text_encoder_early": 0.002830028533935547,
+            "vector_estimator": 0.5750879049301147,
+            "vocoder": 0.030009984970092773
+          },
+          "language": "es",
+          "samples": 104448,
+          "seconds": 0.6132446666597389,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+          "trial": 0
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0008530616760253906,
+            "text_encoder": 0.002959012985229492,
+            "text_encoder_early": 0.002920985221862793,
+            "vector_estimator": 0.5214619636535645,
+            "vocoder": 0.03364300727844238
+          },
+          "language": "es",
+          "samples": 104448,
+          "seconds": 0.5629365833592601,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+          "trial": 1
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0013489723205566406,
+            "text_encoder": 0.003371000289916992,
+            "text_encoder_early": 0.00560605525970459,
+            "vector_estimator": 0.5131570100784302,
+            "vocoder": 0.04871392250061035
+          },
+          "language": "es",
+          "samples": 104448,
+          "seconds": 0.5733289166237228,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+          "trial": 2
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0013860464096069336,
+            "text_encoder": 0.006802916526794434,
+            "text_encoder_early": 0.007120013236999512,
+            "vector_estimator": 0.5419391393661499,
+            "vocoder": 0.046450018882751465
+          },
+          "language": "es",
+          "samples": 104448,
+          "seconds": 0.6052546666469425,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+          "trial": 3
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "revision": "baseline",
+      "rows": [
+        {
+          "graphs": {
+            "duration_predictor": 0.0013140439987182617,
+            "text_encoder": 0.00233304500579834,
+            "text_encoder_early": 0.0033949613571166992,
+            "vector_estimator": 0.3844912052154541,
+            "vocoder": 0.022711992263793945
+          },
+          "language": "en",
+          "samples": 76800,
+          "seconds": 0.41505966667318717,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+          "trial": 0
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0010449886322021484,
+            "text_encoder": 0.0023380517959594727,
+            "text_encoder_early": 0.002250075340270996,
+            "vector_estimator": 0.4338299036026001,
+            "vocoder": 0.03350400924682617
+          },
+          "language": "en",
+          "samples": 76800,
+          "seconds": 0.4740097083267756,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+          "trial": 1
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0012279748916625977,
+            "text_encoder": 0.002328038215637207,
+            "text_encoder_early": 0.004865050315856934,
+            "vector_estimator": 0.3312267065048218,
+            "vocoder": 0.028424978256225586
+          },
+          "language": "en",
+          "samples": 76800,
+          "seconds": 0.36903079168405384,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+          "trial": 2
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0011419057846069336,
+            "text_encoder": 0.005003094673156738,
+            "text_encoder_early": 0.0056819915771484375,
+            "vector_estimator": 0.417171835899353,
+            "vocoder": 0.021134018898010254
+          },
+          "language": "en",
+          "samples": 76800,
+          "seconds": 0.45103195833507925,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+          "trial": 3
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0007380247116088867,
+            "text_encoder": 0.0030269622802734375,
+            "text_encoder_early": 0.003059983253479004,
+            "vector_estimator": 0.5547769069671631,
+            "vocoder": 0.03466391563415527
+          },
+          "language": "es",
+          "samples": 104448,
+          "seconds": 0.597149666689802,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+          "trial": 0
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.001042008399963379,
+            "text_encoder": 0.0030100345611572266,
+            "text_encoder_early": 0.003527045249938965,
+            "vector_estimator": 0.5153911113739014,
+            "vocoder": 0.023733019828796387
+          },
+          "language": "es",
+          "samples": 104448,
+          "seconds": 0.5477529999916442,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+          "trial": 1
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0008189678192138672,
+            "text_encoder": 0.003103017807006836,
+            "text_encoder_early": 0.0030279159545898438,
+            "vector_estimator": 0.5637431144714355,
+            "vocoder": 0.03220510482788086
+          },
+          "language": "es",
+          "samples": 104448,
+          "seconds": 0.6038800416281447,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+          "trial": 2
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0013489723205566406,
+            "text_encoder": 0.0036079883575439453,
+            "text_encoder_early": 0.0062400102615356445,
+            "vector_estimator": 0.5496420860290527,
+            "vocoder": 0.03878903388977051
+          },
+          "language": "es",
+          "samples": 104448,
+          "seconds": 0.600527458358556,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+          "trial": 3
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "revision": "candidate",
+      "rows": [
+        {
+          "graphs": {
+            "duration_predictor": 0.0011860132217407227,
+            "text_encoder": 0.004822969436645508,
+            "text_encoder_early": 0.005263924598693848,
+            "vector_estimator": 0.42958617210388184,
+            "vocoder": 0.029003024101257324
+          },
+          "language": "en",
+          "samples": 76800,
+          "seconds": 0.4706868749926798,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+          "trial": 0
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0006330013275146484,
+            "text_encoder": 0.0030059814453125,
+            "text_encoder_early": 0.002525925636291504,
+            "vector_estimator": 0.3992682695388794,
+            "vocoder": 0.024266958236694336
+          },
+          "language": "en",
+          "samples": 76800,
+          "seconds": 0.43043066665995866,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+          "trial": 1
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0007150173187255859,
+            "text_encoder": 0.002192974090576172,
+            "text_encoder_early": 0.0022259950637817383,
+            "vector_estimator": 0.38796699047088623,
+            "vocoder": 0.022024989128112793
+          },
+          "language": "en",
+          "samples": 76800,
+          "seconds": 0.4159175416571088,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+          "trial": 2
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0008070468902587891,
+            "text_encoder": 0.0037360191345214844,
+            "text_encoder_early": 0.0021599531173706055,
+            "vector_estimator": 0.4563361406326294,
+            "vocoder": 0.023499011993408203
+          },
+          "language": "en",
+          "samples": 76800,
+          "seconds": 0.48729874996934086,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+          "trial": 3
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0013300180435180664,
+            "text_encoder": 0.004171013832092285,
+            "text_encoder_early": 0.004091978073120117,
+            "vector_estimator": 0.4992380142211914,
+            "vocoder": 0.03529000282287598
+          },
+          "language": "es",
+          "samples": 104448,
+          "seconds": 0.5452431250014342,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+          "trial": 0
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0013170242309570312,
+            "text_encoder": 0.0034040212631225586,
+            "text_encoder_early": 0.003679037094116211,
+            "vector_estimator": 0.5312989950180054,
+            "vocoder": 0.03484499454498291
+          },
+          "language": "es",
+          "samples": 104448,
+          "seconds": 0.5754097916651517,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+          "trial": 1
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0008580684661865234,
+            "text_encoder": 0.0032999515533447266,
+            "text_encoder_early": 0.0033860206604003906,
+            "vector_estimator": 0.5340120792388916,
+            "vocoder": 0.03852200508117676
+          },
+          "language": "es",
+          "samples": 104448,
+          "seconds": 0.5810044999816455,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+          "trial": 2
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.001495957374572754,
+            "text_encoder": 0.00639498233795166,
+            "text_encoder_early": 0.006541013717651367,
+            "vector_estimator": 0.5656849145889282,
+            "vocoder": 0.03624594211578369
+          },
+          "language": "es",
+          "samples": 104448,
+          "seconds": 0.6176456249668263,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+          "trial": 3
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "revision": "candidate",
+      "rows": [
+        {
+          "graphs": {
+            "duration_predictor": 0.0012359619140625,
+            "text_encoder": 0.0038709640502929688,
+            "text_encoder_early": 0.0058029890060424805,
+            "vector_estimator": 0.4720360040664673,
+            "vocoder": 0.030087947845458984
+          },
+          "language": "en",
+          "samples": 76800,
+          "seconds": 0.5139941666857339,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+          "trial": 0
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0012400150299072266,
+            "text_encoder": 0.005145907402038574,
+            "text_encoder_early": 0.00583493709564209,
+            "vector_estimator": 0.43111133575439453,
+            "vocoder": 0.02374100685119629
+          },
+          "language": "en",
+          "samples": 76800,
+          "seconds": 0.46800108335446566,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+          "trial": 1
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0006899833679199219,
+            "text_encoder": 0.002169966697692871,
+            "text_encoder_early": 0.0021190643310546875,
+            "vector_estimator": 0.41036295890808105,
+            "vocoder": 0.02495598793029785
+          },
+          "language": "en",
+          "samples": 76800,
+          "seconds": 0.441110625048168,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+          "trial": 2
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0016798973083496094,
+            "text_encoder": 0.005175113677978516,
+            "text_encoder_early": 0.005532026290893555,
+            "vector_estimator": 0.41236627101898193,
+            "vocoder": 0.042207956314086914
+          },
+          "language": "en",
+          "samples": 76800,
+          "seconds": 0.4679793333634734,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+          "trial": 3
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.001580953598022461,
+            "text_encoder": 0.006999015808105469,
+            "text_encoder_early": 0.00766301155090332,
+            "vector_estimator": 0.4996708631515503,
+            "vocoder": 0.027190089225769043
+          },
+          "language": "es",
+          "samples": 104448,
+          "seconds": 0.5443513333448209,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+          "trial": 0
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0013630390167236328,
+            "text_encoder": 0.0029979944229125977,
+            "text_encoder_early": 0.006672024726867676,
+            "vector_estimator": 0.5696948766708374,
+            "vocoder": 0.038496971130371094
+          },
+          "language": "es",
+          "samples": 104448,
+          "seconds": 0.6201115833246149,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+          "trial": 1
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.000908970832824707,
+            "text_encoder": 0.0032089948654174805,
+            "text_encoder_early": 0.0028580427169799805,
+            "vector_estimator": 0.5144138336181641,
+            "vocoder": 0.04445993900299072
+          },
+          "language": "es",
+          "samples": 104448,
+          "seconds": 0.5668791249627247,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+          "trial": 2
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0012350082397460938,
+            "text_encoder": 0.003126978874206543,
+            "text_encoder_early": 0.0031679868698120117,
+            "vector_estimator": 0.5263040065765381,
+            "vocoder": 0.029388070106506348
+          },
+          "language": "es",
+          "samples": 104448,
+          "seconds": 0.5641125416732393,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+          "trial": 3
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "revision": "baseline",
+      "rows": [
+        {
+          "graphs": {
+            "duration_predictor": 0.0006510019302368164,
+            "text_encoder": 0.0025440454483032227,
+            "text_encoder_early": 0.0024139881134033203,
+            "vector_estimator": 0.3272097110748291,
+            "vocoder": 0.03911399841308594
+          },
+          "language": "en",
+          "samples": 76800,
+          "seconds": 0.3726506666862406,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+          "trial": 0
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0007119178771972656,
+            "text_encoder": 0.002312898635864258,
+            "text_encoder_early": 0.0025510787963867188,
+            "vector_estimator": 0.39889001846313477,
+            "vocoder": 0.018717050552368164
+          },
+          "language": "en",
+          "samples": 76800,
+          "seconds": 0.4238991666934453,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+          "trial": 1
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0006409883499145508,
+            "text_encoder": 0.002299070358276367,
+            "text_encoder_early": 0.0025960206985473633,
+            "vector_estimator": 0.43575799465179443,
+            "vocoder": 0.024033069610595703
+          },
+          "language": "en",
+          "samples": 76800,
+          "seconds": 0.4661442916840315,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+          "trial": 2
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0006580352783203125,
+            "text_encoder": 0.0022449493408203125,
+            "text_encoder_early": 0.0022810697555541992,
+            "vector_estimator": 0.39721786975860596,
+            "vocoder": 0.028742074966430664
+          },
+          "language": "en",
+          "samples": 76800,
+          "seconds": 0.43203004164388403,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+          "trial": 3
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.001242995262145996,
+            "text_encoder": 0.002817988395690918,
+            "text_encoder_early": 0.003036975860595703,
+            "vector_estimator": 0.47430717945098877,
+            "vocoder": 0.04456007480621338
+          },
+          "language": "es",
+          "samples": 104448,
+          "seconds": 0.5272168749943376,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+          "trial": 0
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0016750097274780273,
+            "text_encoder": 0.003370046615600586,
+            "text_encoder_early": 0.0032529830932617188,
+            "vector_estimator": 0.512138843536377,
+            "vocoder": 0.026403069496154785
+          },
+          "language": "es",
+          "samples": 104448,
+          "seconds": 0.5478268750011921,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+          "trial": 1
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0007599592208862305,
+            "text_encoder": 0.003304004669189453,
+            "text_encoder_early": 0.003016948699951172,
+            "vector_estimator": 0.5684109926223755,
+            "vocoder": 0.03429901599884033
+          },
+          "language": "es",
+          "samples": 104448,
+          "seconds": 0.6108058749814518,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+          "trial": 2
+        },
+        {
+          "graphs": {
+            "duration_predictor": 0.0008150339126586914,
+            "text_encoder": 0.0030279159545898438,
+            "text_encoder_early": 0.003072023391723633,
+            "vector_estimator": 0.5216107368469238,
+            "vocoder": 0.02929103374481201
+          },
+          "language": "es",
+          "samples": 104448,
+          "seconds": 0.5586818333249539,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+          "trial": 3
+        }
+      ]
+    }
+  ],
+  "scope": "Direct Plus CPU synthesis, en/es, two warmups and four trials per language per process",
+  "limitations": [
+    "Shared Mac; no device/energy/RSS qualification",
+    "Source-compiled CT modules using identical flags and unchanged catalog objects"
+  ]
+}
