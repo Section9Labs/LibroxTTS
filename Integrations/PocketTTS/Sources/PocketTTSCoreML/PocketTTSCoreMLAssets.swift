@@ -39,6 +39,9 @@ public enum PocketTTSCoreMLAssets {
     }
     private static func receipt(in directory: URL, language: String) throws -> (Receipt, URL) {
         let root = modelDirectory(in: directory, language: language).appendingPathComponent("compiled")
+        return (try receipt(at: root, language: language), root)
+    }
+    private static func receipt(at root: URL, language: String) throws -> Receipt {
         let value = try JSONDecoder().decode(Receipt.self, from: Data(contentsOf: root.appendingPathComponent("receipt.json")))
         guard value.identity == PocketTTSCoreMLCatalog.identity,
               value.sourceDigest == (try sourceDigest(language)),
@@ -48,7 +51,7 @@ public enum PocketTTSCoreMLAssets {
               value.files.allSatisfy({ !$0.path.hasPrefix("/") && !$0.path.split(separator: "/").contains("..") }) else {
             throw CocoaError(.fileReadCorruptFile)
         }
-        return (value, root)
+        return value
     }
     public static func isPrepared(in directory: URL, language: String) -> Bool {
         guard let (receipt, root) = try? receipt(in: directory, language: language) else { return false }
@@ -58,7 +61,10 @@ public enum PocketTTSCoreMLAssets {
     }
     public static func validate(in directory: URL, language: String) throws {
         try PocketTTSCatalog.validate(PocketTTSCoreMLCatalog.manifest(language: language), in: directory)
-        let (receipt, root) = try receipt(in: directory, language: language)
+        try validateCompiled(at: modelDirectory(in: directory, language: language).appendingPathComponent("compiled"), language: language)
+    }
+    private static func validateCompiled(at root: URL, language: String) throws {
+        let receipt = try receipt(at: root, language: language)
         for file in receipt.files {
             guard try digest(root.appendingPathComponent(file.path)) == file.sha256 else { throw CocoaError(.fileReadCorruptFile) }
         }
@@ -75,9 +81,10 @@ public enum PocketTTSCoreMLAssets {
     }
     public static func prepare(in directory: URL, language: String) throws {
         try PocketTTSCatalog.validate(PocketTTSCoreMLCatalog.manifest(language: language), in: directory)
-        if isPrepared(in: directory, language: language), (try? validate(in: directory, language: language)) != nil { return }
         try Task.checkCancellation()
         let root = modelDirectory(in: directory, language: language)
+        let transaction = PreparedModelTransaction(root: root)
+        if try transaction.recover(validate: { try validateCompiled(at: $0, language: language) }) { return }
         let fm = FileManager.default
         let staging = root.appendingPathComponent("compile-" + UUID().uuidString)
         try fm.createDirectory(at: staging, withIntermediateDirectories: true)
@@ -103,15 +110,9 @@ public enum PocketTTSCoreMLAssets {
                                   operatingSystem: ProcessInfo.processInfo.operatingSystemVersionString, files: files.sorted { $0.path < $1.path })
         try JSONEncoder().encode(receipt).write(to: staging.appendingPathComponent("receipt.json"), options: .atomic)
         try Task.checkCancellation()
-        let destination = root.appendingPathComponent("compiled")
-        let backup = root.appendingPathComponent("previous-" + UUID().uuidString)
-        let hadPrevious = fm.fileExists(atPath: destination.path)
-        if hadPrevious { try fm.moveItem(at: destination, to: backup) }
-        do { try fm.moveItem(at: staging, to: destination) }
-        catch {
-            if hadPrevious { try? fm.moveItem(at: backup, to: destination) }
-            throw error
-        }
-        if hadPrevious { try? fm.removeItem(at: backup) }
+        // Payloads have just been hashed; check the receipt structure before
+        // publication without reading all compiled weights a second time.
+        _ = try Self.receipt(at: staging, language: language)
+        try transaction.publishValidated(staging)
     }
 }
