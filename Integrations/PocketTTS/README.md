@@ -1,5 +1,5 @@
-> SDK 0.6.1 selects Core ML on iPhone/iPad and MLX on Mac/Catalyst.
-> Follow the [0.6.1 app handoff](../../docs/UPGRADE-0.6.1.md) for current downloads,
+> SDK 0.6.2 selects Core ML on iPhone/iPad and MLX on Mac/Catalyst.
+> Follow the [0.6.2 app handoff](../../docs/UPGRADE-0.6.2.md) for current downloads,
 > preparation, migration, CPU pacing and style APIs. Historical MLX measurements
 > below remain scoped to that backend.
 

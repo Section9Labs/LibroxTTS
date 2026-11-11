@@ -6,25 +6,32 @@ Offline speech synthesis and book narration for iPhone, iPad and Mac. **Librox P
 
 ## Max — powered by Pocket TTS
 
-Version **0.6.1** runs Max through Core ML CPU on iPhone/iPad and MLX on
+Version **0.6.2** runs Max through Core ML CPU on iPhone/iPad and MLX on
 macOS/Mac Catalyst. Each device downloads only its backend's acoustic pack;
 tokenizers, voices and delivery states remain shared, hash-pinned assets.
 All seven languages and the exact Max model/quality settings are retained.
 
-Use the [0.6.1 app implementation prompt](docs/UPGRADE-0.6.1.md) for per-language
+Use the [0.6.2 app implementation prompt](docs/UPGRADE-0.6.2.md) for per-language
 migration, on-device compilation, background lifecycle and prepared-audio cache
-identities. Core ML installation/routing passed on a physical iPhone 17 Pro Max;
-Core ML live generation now uses no artificial CPU pacing, with a reusable
-buffer policy and progressive frame API for bounded playback. App-level
-endurance and battery qualification remain separate. See the
+identities. Version 0.6.1 previously passed Core ML installation/routing on a
+physical iPhone 17 Pro Max. Live generation retains full-speed execution, a
+reusable buffer policy and progressive frame API. This changed chunking revision
+still needs fresh device/endurance qualification. See the
 [measurements and limitations](Integrations/PocketTTS/Validation/CoreML/README.md).
+
+Version **0.6.2** preserves continuous clause punctuation and exposes completed
+text-chunk sample ranges through `onTextChunk`. Drive progress from played audio;
+these ranges are not word alignment. The new chunking cache revision invalidates
+old prepared audio without changing model downloads. The approved Spanish
+recording covers one listening case; physical-device and broader listening
+qualification remain open. See the [0.6.2 handoff](docs/UPGRADE-0.6.2.md).
 
 ## Install
 
 Add the versioned Swift package:
 
 ```swift
-.package(url: "https://github.com/Section9Labs/LibroxTTS.git", exact: "0.6.1")
+.package(url: "https://github.com/Section9Labs/LibroxTTS.git", exact: "0.6.2")
 ```
 
 Products include `LibroxTTS` (host-facing synthesis/install API), `LibroxCTNative` (Core ML CT runtime), `KokoroCatalog` (Kokoro voices/assets), and `KokoroPronunciation` (Kokoro text to model phonemes). The shared runtime depends on MLX Swift 0.32.3. Swift 6.3 or newer, **iOS/Catalyst 18+ or macOS 15+** are required. Apple system language facilities are required, so Linux is not supported.
@@ -33,11 +40,11 @@ Products include `LibroxTTS` (host-facing synthesis/install API), `LibroxCTNativ
 
 See [the narrator integration API](docs/book-planning.md), [casting rules](docs/story-narrator.md), and [enhancement API and validation limits](docs/audio-enhancement.md). The optional, separately imported `QwenANE` product retains the Qwen renderer work; its existence does not establish device eligibility or sustained background performance. The shared LibroxTTS product now links the Pocket TTS MLX runtime; KokoroCatalog, KokoroPronunciation and KokoroNarration remain independent of MLX. Rejected model auditions are not app dependencies.
 
-Version **0.6.1** preserves the new-book default **Caro Davy / Calm**, Careful
+Version **0.6.2** preserves the new-book default **Caro Davy / Calm**, Careful
 reading, temperature 0.3 and four sampler steps. Saved choices and supported
 sampler counts 1–8 remain unchanged. It also includes the 0.4.1–0.5.0 CPU-budget,
 per-language uninstall and Original-only voice/style APIs. This SDK release does
-not publish the Librox app. [Complete app integration prompt](docs/UPGRADE-0.6.1.md).
+not publish the Librox app. [Complete app integration prompt](docs/UPGRADE-0.6.2.md).
 
 ## Speak with Plus
 

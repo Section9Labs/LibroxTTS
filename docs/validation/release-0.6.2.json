@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-11",
+  "approvedCommit": "56393f12bcb33a51b78327a2d4b8ece75d2f4ea8",
+  "sourceBranch": "fix/audio-led-chunk-progress",
+  "previousRelease": "v0.6.1",
+  "release": "v0.6.2",
+  "implementationUnchangedFromApprovedCommit": true,
+  "listeningAcceptance": {
+    "reviewer": "Matt",
+    "scope": "Spanish Core ML Caro Davy / Calm at normal speed, seed 42; continuity and word completeness",
+    "recordingSHA256": "a248784cbb01155be1ab2f3e03a81d5e8edf655e06cfff6c39b1990d8fe2884f",
+    "broaderListeningAccepted": false
+  },
+  "platformRouting": {
+    "iPhone_iPad": "Core ML CPU",
+    "Mac_Catalyst": "MLX"
+  },
+  "modelAssetsChanged": false,
+  "chunkingRevision": "pocket-continuous-clauses-2",
+  "requiredAppCacheAction": "Use renderIdentity(for:) to invalidate earlier prepared audio without deleting model downloads.",
+  "physicalDeviceRerunPerformed": false,
+  "remainingGaps": [
+    "Remaining listening coverage: other seeds/backends/English and actual app/device behavior; Spanish seed-42 continuity and word completeness accepted by Matt",
+    "Physical iPhone listening lifecycle Task 8; normal/custom rate, open book/Listening follow, manual navigation, route/calls, lock/background/chapter/book transitions",
+    "Intrachunk text position is approximate; cached audio has full-duration proportional progress; changed spoken words can reject source matching",
+    "Mac MLX sustained throughput under controlled load and physical iPhone thermal/background qualification",
+    "Other languages and long unpunctuated inputs are not covered by these auditions"
+  ],
+  "validation": {
+    "approvedCommitCI": "https://github.com/Section9Labs/LibroxTTS/actions/runs/43063007750",
+    "approvedCommitCIResult": "success",
+    "debug": {
+      "result": "passed",
+      "logSHA256": "4892b05905798de8a67409bdf25dff484bdcd50ad0be6c9dab9374d851cc5add",
+      "realSpanishTests": 3,
+      "otherOptInSkips": true
+    },
+    "release": {
+      "result": "passed",
+      "logSHA256": "cd5f0ee1a334be2a4a893145403e1878ebbc32766138e3f57ba7ce06811f8501",
+      "realSpanishTests": 3,
+      "otherOptInSkips": true
+    },
+    "realSpanishChecks": [
+      "Core ML and MLX preserve punctuation/case and agree on chunk plans",
+      "Callbacks cover accepted PCM and do not change same-seed samples",
+      "Cancelled receiver cannot announce an unfinished chunk"
+    ],
+    "pythonCompileall": "passed"
+  }
+}

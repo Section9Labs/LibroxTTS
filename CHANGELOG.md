@@ -1,6 +1,29 @@
 # Changelog
 
-## 0.6.0 — 2026-11-10
+## 0.6.2 — 2026-11-11
+
+- Integrate approved commit `56393f12bcb33a51b78327a2d4b8ece75d2f4ea8` without runtime changes.
+- Preserve clause punctuation and continuation case in adaptive Max synthesis;
+  choose natural clause boundaries near the target without creating tiny fragments.
+- Add optional `onTextChunk` callbacks to Core ML, MLX and the public renderer.
+  Completed chunks report prepared input text and cumulative 24 kHz PCM ranges.
+  Progress is tied to played samples, not generation time; this is not word alignment.
+- Change prepared-audio chunking identity to `pocket-continuous-clauses-2`.
+  Model assets, platform routing, voices/styles and sampling settings are unchanged.
+- Matt accepted the tested Spanish recording. Physical-device, sustained throughput
+  and broader listening coverage remain documented gaps, not inferred passes.
+- [App integration handoff](docs/UPGRADE-0.6.2.md). SDK release only.
+
+## 0.6.1 — 2026-11-10
+
+- Replace the held 0.6.0 candidate's default iOS Max CPU pacing with full-speed
+  generation and a reusable bounded playback-buffer policy. Retain explicit budgets.
+- Expose progressive Max frames through `NarrationRenderer.renderPocketFrames`.
+- Ten-minute locked playback passed on one iPhone 17 Pro Max under the tested
+  settings. This is historical qualification of 0.6.1, not every later revision.
+- [App implementation prompt](docs/UPGRADE-0.6.1.md); Mac MLX and model assets unchanged.
+
+## 0.6.0 candidate — 2026-11-10 (superseded by 0.6.1)
 
 - Max uses Core ML CPU on iPhone/iPad and retains MLX on Mac/Catalyst.
 - Seven separately downloadable Core ML language packs; no MLX acoustic
