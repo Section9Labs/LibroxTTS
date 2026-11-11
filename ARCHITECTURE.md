@@ -76,6 +76,12 @@ model. Generic sampler counts share `flowstep`; 4 and 8 retain their specialized
 graphs. Failed loads do not enter the cache. Retiring the language retires all
 three models; preview warming and per-render voice-state loading are unchanged.
 
+The Core ML transformer-to-flow bridge validates Float32 and element count,
+then uses compatible arrays directly or a read-only shape view that retains its
+source array. Strided outputs retain the logical-order copying fallback. The
+view lives only through synchronous flow prediction inside the existing
+autorelease pool; mutable attention/Mimi state and emitted PCM are never pooled.
+
 ## Contracts beyond Swift signatures
 
 - The source plan retains original UTF-16 ranges; synthesis text may differ.

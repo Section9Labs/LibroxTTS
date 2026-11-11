@@ -130,7 +130,7 @@ public actor PocketTTSCoreMLEngine {
                             let result = try m.transform(m.latentModel, value: Self.floats(input, shape: [1, 1, 32]), cache: &cache)
                             var noise = MLXRandom.normal([1, 32]) * Float(sqrt(temperature))
                             if let clamp = m.config.noiseClamp { noise = MLX.minimum(MLX.maximum(noise, -clamp), clamp) }
-                            let next = try m.sample(flow, steps: samplerSteps, condition: Self.values(result.0), noise: noise.asArray(Float.self))
+                            let next = try m.sample(flow, steps: samplerSteps, condition: result.0, noise: noise.asArray(Float.self))
                             if eosStep == nil && step >= 6 && result.1 > m.config.eosThreshold { eosStep = step }
                             if let eosStep, step >= eosStep + (m.config.framesAfterEOS ?? tail + 2) { complete = true; break }
                             var pcm = try m.decode(next, state: &mimiState)
@@ -270,9 +270,9 @@ public actor PocketTTSCoreMLEngine {
                 }
             }
         }
-        func sample(_ model: MLModel, steps: Int, condition: [Float], noise: [Float]) throws -> [Float] {
+        func sample(_ model: MLModel, steps: Int, condition: MLMultiArray, noise: [Float]) throws -> [Float] {
             try measure("flow") { try autoreleasepool {
-                let condition = try PocketTTSCoreMLEngine.floats(condition, shape: [1,1024])
+                let condition = try PocketTTSCoreMLEngine.flowCondition(condition)
                 var latent = try PocketTTSCoreMLEngine.floats(noise, shape: [1,32])
                 for index in 0..<([4, 8].contains(steps) ? 1 : steps) {
                     try Task.checkCancellation()

@@ -52,3 +52,22 @@ switches and release on retirement. The exact-audio gate exercises the actual
 models across the same settings. Text-only preview separation and voice prompt
 caching remain deferred: both have additional warming/ownership semantics that
 this change intentionally preserves.
+
+## Tensor transport
+
+Max's contiguous `[1,1,1024]` transformer output now becomes a retained, read-only
+`[1,1024]` view for flow. Already-compatible arrays pass through directly;
+strided outputs still copy in logical order. No attention cache, decoder state,
+RNG draw, sampler operation or caller-owned PCM is modified or pooled.
+
+The ordinary path avoids two 4,096-byte payload copies per flow invocation.
+This is an exact payload calculation, not a peak-memory measurement. Tests cover
+backing-storage identity, ownership across autorelease-pool drainage, release,
+negative zero, two padded/strided layouts and malformed type/count rejection.
+All 32 initial real-model PCM/event comparisons matched the baseline exactly.
+The first lifetime test checked release before the Objective-C autorelease pool
+drained; it was corrected to exercise and assert ownership across pool boundaries.
+
+`FlowConditionTests.testTransportMicrobenchmark` compares the former round trip
+with the new bridge, with alternating order over five warmed 20,000-call runs.
+It is opt-in and has no timing threshold; it measures host transport only.
