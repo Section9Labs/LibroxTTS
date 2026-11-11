@@ -1,0 +1,221 @@
+{
+  "date": "2026-11-11",
+  "sourceCommit": "3f53a393bb7784ae861f8d0ac076bca00a202b6c",
+  "branch": "codex/0.8-reliability-performance",
+  "base": "dee2b49",
+  "contractBaseline": "f75bacfbdc86c0c6dd81f0fb11cb9bcd160e49dd",
+  "environment": {
+    "machine": "Mac15,14",
+    "os": "macOS 27.0.1 (26A434)",
+    "swift": "Apple Swift 6.4.2 (swiftlang-6.4.2.1.9)",
+    "architecture": "arm64"
+  },
+  "checks": [
+    {
+      "name": "Debug suite",
+      "command": "swift test",
+      "exitCode": 0,
+      "log": "/tmp/libroxtts-08-debug-final.log",
+      "logSHA256": "782cccc3262f4ce2e7955b61462644213f761f8f5ed34198b894c4ff620d11d3",
+      "runnerSummaries": [
+        "Build complete! (31.17 sec)",
+        "Executed 10 tests, with 2 tests skipped and 0 failures (0 unexpected) in 0.028 (0.029) seconds",
+        "Executed 6 tests, with 0 failures (0 unexpected) in 0.005 (0.005) seconds",
+        "Executed 5 tests, with 4 tests skipped and 0 failures (0 unexpected) in 0.001 (0.001) seconds",
+        "Executed 4 tests, with 2 tests skipped and 0 failures (0 unexpected) in 0.001 (0.001) seconds",
+        "Executed 3 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds",
+        "Executed 29 tests, with 9 tests skipped and 0 failures (0 unexpected) in 0.041 (0.045) seconds",
+        "Executed 29 tests, with 9 tests skipped and 0 failures (0 unexpected) in 0.041 (0.058) seconds",
+        "Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.011) seconds",
+        "Executed 5 tests, with 2 tests skipped and 0 failures (0 unexpected) in 0.384 (0.386) seconds",
+        "Executed 3 tests, with 3 tests skipped and 0 failures (0 unexpected) in 0.002 (0.002) seconds",
+        "Executed 4 tests, with 1 test skipped and 0 failures (0 unexpected) in 0.004 (0.005) seconds",
+        "Executed 5 tests, with 1 test skipped and 0 failures (0 unexpected) in 0.002 (0.003) seconds",
+        "Executed 3 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds",
+        "Executed 7 tests, with 1 test skipped and 0 failures (0 unexpected) in 0.054 (0.055) seconds",
+        "Executed 2 tests, with 2 tests skipped and 0 failures (0 unexpected) in 0.001 (0.001) seconds",
+        "Executed 29 tests, with 10 tests skipped and 0 failures (0 unexpected) in 0.448 (0.453) seconds",
+        "Executed 29 tests, with 10 tests skipped and 0 failures (0 unexpected) in 0.448 (0.455) seconds",
+        "Executed 3 tests, with 0 failures (0 unexpected) in 0.040 (0.041) seconds",
+        "Executed 4 tests, with 0 failures (0 unexpected) in 0.001 (0.002) seconds",
+        "Executed 7 tests, with 0 failures (0 unexpected) in 0.042 (0.043) seconds",
+        "Executed 7 tests, with 0 failures (0 unexpected) in 0.042 (0.046) seconds",
+        "Executed 9 tests, with 0 failures (0 unexpected) in 0.083 (0.085) seconds",
+        "Executed 8 tests, with 0 failures (0 unexpected) in 0.009 (0.010) seconds",
+        "Executed 17 tests, with 0 failures (0 unexpected) in 0.092 (0.094) seconds",
+        "Executed 17 tests, with 0 failures (0 unexpected) in 0.092 (0.096) seconds",
+        "Executed 4 tests, with 0 failures (0 unexpected) in 8.591 (8.592) seconds",
+        "Executed 4 tests, with 0 failures (0 unexpected) in 2.799 (2.799) seconds",
+        "Executed 8 tests, with 0 failures (0 unexpected) in 11.390 (11.392) seconds",
+        "Executed 8 tests, with 0 failures (0 unexpected) in 11.390 (11.394) seconds",
+        "Executed 7 tests, with 0 failures (0 unexpected) in 0.033 (0.034) seconds",
+        "Executed 2 tests, with 2 tests skipped and 0 failures (0 unexpected) in 0.001 (0.002) seconds",
+        "Executed 4 tests, with 0 failures (0 unexpected) in 0.006 (0.007) seconds",
+        "Executed 13 tests, with 2 tests skipped and 0 failures (0 unexpected) in 0.041 (0.043) seconds",
+        "Executed 13 tests, with 2 tests skipped and 0 failures (0 unexpected) in 0.041 (0.044) seconds",
+        "Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds",
+        "\udbc4\udc5b  Test run with 0 tests in 0 suites passed after 0.001 seconds.",
+        "\udbc4\udc5b  Test run with 64 tests in 1 suite passed after 0.353 seconds.",
+        "\udbc4\udc5b  Test run with 31 tests in 0 suites passed after 0.157 seconds.",
+        "\udbc4\udc5b  Test run with 198 tests in 19 suites passed after 22.757 seconds.",
+        "\udbc4\udc5b  Test run with 186 tests in 7 suites passed after 11.860 seconds.",
+        "\udbc4\udc5b  Test run with 43 tests in 1 suite passed after 2.698 seconds.",
+        "\udbc4\udc5b  Test run with 23 tests in 3 suites passed after 6.856 seconds.",
+        "\udbc4\udc5b  Test run with 14 tests in 0 suites passed after 0.092 seconds."
+      ]
+    },
+    {
+      "name": "Release suite with real assets",
+      "command": "swift test -c release (LIBROX_07 and LIBROX_08 audio/asset variables enabled; see README)",
+      "exitCode": 0,
+      "log": "/tmp/libroxtts-08-release-verified.log",
+      "logSHA256": "4ed249b6c2c00bcda6fd5b8b0ec6d60fac6c0a7f9b54e61c431f224b003d0125",
+      "runnerSummaries": [
+        "Build complete! (23.00 sec)",
+        "Executed 10 tests, with 2 tests skipped and 0 failures (0 unexpected) in 0.003 (0.004) seconds",
+        "Executed 6 tests, with 0 failures (0 unexpected) in 0.004 (0.004) seconds",
+        "Executed 5 tests, with 4 tests skipped and 0 failures (0 unexpected) in 0.005 (0.006) seconds",
+        "Executed 4 tests, with 2 tests skipped and 0 failures (0 unexpected) in 0.002 (0.002) seconds",
+        "Executed 3 tests, with 0 failures (0 unexpected) in 0.004 (0.004) seconds",
+        "Executed 29 tests, with 9 tests skipped and 0 failures (0 unexpected) in 0.020 (0.024) seconds",
+        "Executed 29 tests, with 9 tests skipped and 0 failures (0 unexpected) in 0.020 (0.036) seconds",
+        "Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.004) seconds",
+        "Executed 5 tests, with 2 tests skipped and 0 failures (0 unexpected) in 0.586 (0.589) seconds",
+        "Executed 3 tests, with 3 tests skipped and 0 failures (0 unexpected) in 0.031 (0.031) seconds",
+        "Executed 4 tests, with 1 test skipped and 0 failures (0 unexpected) in 0.019 (0.020) seconds",
+        "Executed 5 tests, with 1 test skipped and 0 failures (0 unexpected) in 0.001 (0.001) seconds",
+        "Executed 3 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds",
+        "Executed 7 tests, with 0 failures (0 unexpected) in 5.001 (5.002) seconds",
+        "Executed 2 tests, with 0 failures (0 unexpected) in 26.803 (26.803) seconds",
+        "Executed 29 tests, with 7 tests skipped and 0 failures (0 unexpected) in 32.441 (32.447) seconds",
+        "Executed 29 tests, with 7 tests skipped and 0 failures (0 unexpected) in 32.441 (32.452) seconds",
+        "Executed 3 tests, with 0 failures (0 unexpected) in 0.036 (0.037) seconds",
+        "Executed 4 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds",
+        "Executed 7 tests, with 0 failures (0 unexpected) in 0.038 (0.039) seconds",
+        "Executed 7 tests, with 0 failures (0 unexpected) in 0.038 (0.040) seconds",
+        "Executed 9 tests, with 0 failures (0 unexpected) in 0.069 (0.070) seconds",
+        "Executed 8 tests, with 0 failures (0 unexpected) in 0.008 (0.009) seconds",
+        "Executed 17 tests, with 0 failures (0 unexpected) in 0.076 (0.078) seconds",
+        "Executed 17 tests, with 0 failures (0 unexpected) in 0.076 (0.080) seconds",
+        "Executed 4 tests, with 0 failures (0 unexpected) in 4.547 (4.548) seconds",
+        "Executed 4 tests, with 0 failures (0 unexpected) in 2.061 (2.061) seconds",
+        "Executed 8 tests, with 0 failures (0 unexpected) in 6.608 (6.610) seconds",
+        "Executed 8 tests, with 0 failures (0 unexpected) in 6.608 (6.611) seconds",
+        "Executed 7 tests, with 0 failures (0 unexpected) in 0.031 (0.032) seconds",
+        "Executed 2 tests, with 0 failures (0 unexpected) in 51.330 (51.330) seconds",
+        "Executed 4 tests, with 0 failures (0 unexpected) in 0.005 (0.006) seconds",
+        "Executed 13 tests, with 0 failures (0 unexpected) in 51.366 (51.368) seconds",
+        "Executed 13 tests, with 0 failures (0 unexpected) in 51.366 (51.369) seconds",
+        "Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds",
+        "Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds",
+        "\udbc4\udc5b  Test run with 0 tests in 0 suites passed after 0.001 seconds.",
+        "\udbc4\udc5b  Test run with 64 tests in 1 suite passed after 0.300 seconds.",
+        "\udbc4\udc5b  Test run with 31 tests in 0 suites passed after 0.023 seconds.",
+        "\udbc4\udc5b  Test run with 198 tests in 19 suites passed after 5.662 seconds.",
+        "\udbc4\udc5b  Test run with 186 tests in 7 suites passed after 4.818 seconds.",
+        "\udbc4\udc5b  Test run with 43 tests in 1 suite passed after 1.482 seconds.",
+        "\udbc4\udc5b  Test run with 23 tests in 3 suites passed after 0.046 seconds.",
+        "\udbc4\udc5b  Test run with 14 tests in 0 suites passed after 0.045 seconds."
+      ]
+    },
+    {
+      "name": "macOS public symbol extraction",
+      "command": "swift package dump-symbol-graph --minimum-access-level public --skip-synthesized-members",
+      "exitCode": 0,
+      "log": "/tmp/libroxtts-08-symbols.log",
+      "logSHA256": "5cc46290be64835ce65f6b32ecf6cac314a955e83b1e71f799d2a4a473d729a6",
+      "runnerSummaries": [
+        "Build complete! (9.58 sec)"
+      ]
+    },
+    {
+      "name": "Public declaration comparison",
+      "command": "python3 Scripts/check-public-api.py",
+      "exitCode": 0,
+      "log": "/tmp/libroxtts-08-api.log",
+      "logSHA256": "814afb9c7ced52f18a43fc3377bf73c3ba867eca56e597f048e3b586a8a58446",
+      "runnerSummaries": [
+        "2802 baseline entries; 2802 current; 0 missing, 0 added, 0 changed"
+      ]
+    },
+    {
+      "name": "Generic iOS Release client",
+      "command": "xcodebuild -project Examples/KokoroDemo/KokoroDemo.xcodeproj -scheme KokoroDemo -configuration Release -destination generic/platform=iOS -derivedDataPath /tmp/libroxtts-08-ios-build CODE_SIGNING_ALLOWED=NO build",
+      "exitCode": 0,
+      "log": "/tmp/libroxtts-08-ios.log",
+      "logSHA256": "d4f3db054c78108d5a4805c96f8696e29c2faf0b6757d04e681e7d32672eea09",
+      "runnerSummaries": [
+        "** BUILD SUCCEEDED **"
+      ]
+    },
+    {
+      "name": "Generic Catalyst Release client",
+      "command": "xcodebuild -project Examples/KokoroDemo/KokoroDemo.xcodeproj -scheme KokoroDemo -configuration Release -destination generic/platform=macOS,variant=Mac Catalyst -derivedDataPath /tmp/libroxtts-08-catalyst-build CODE_SIGNING_ALLOWED=NO build",
+      "exitCode": 0,
+      "log": "/tmp/libroxtts-08-catalyst.log",
+      "logSHA256": "62472e8bec69d631c4f036cc0cae6530505e76fc16d05b6267a98ed17530f2ab",
+      "runnerSummaries": [
+        "** BUILD SUCCEEDED **"
+      ]
+    },
+    {
+      "name": "Isolated MLX experiment",
+      "command": "swift test -c release --skip-build --filter release08InferenceProfileAndCacheExperiment (experiment env enabled)",
+      "exitCode": 0,
+      "log": "/tmp/libroxtts-08-inference-final.log",
+      "logSHA256": "7b1c764a03a2346732f9b7cffd24d131c2f179d48d63ce6e09805762f3cd6a8c",
+      "runnerSummaries": [
+        "\udbc4\udc5b  Test run with 1 test in 0 suites passed after 256.082 seconds."
+      ]
+    },
+    {
+      "name": "Planning ABBA",
+      "command": "Scripts/benchmark-08-planning.py baseline candidate --output docs/architecture-08/planning-abba.json",
+      "exitCode": 0,
+      "log": "/tmp/libroxtts-08-planning-abba.log",
+      "logSHA256": "6f68341c505cd44aaab7edb2759e368c71ac3f1afe9ac537dbfacd1612074819",
+      "runnerSummaries": []
+    },
+    {
+      "name": "Short planning control ABBA",
+      "command": "Scripts/benchmark-08-planning.py short-baseline short-candidate --output docs/architecture-08/planning-short-abba.json --scope ...",
+      "exitCode": 0,
+      "log": "/tmp/libroxtts-08-planning-short.log",
+      "logSHA256": "1edf814c19a751ad0afb8c7fe4ac3bb075bf9e07e0b3f35b4f2a0c230353fd76",
+      "runnerSummaries": []
+    },
+    {
+      "name": "Exact audio comparison",
+      "command": "Scripts/compare-07-audio.py frozen-062 candidate --output docs/architecture-08/audio-comparison.json",
+      "exitCode": 0,
+      "log": "/tmp/libroxtts-08-audio-compare.log",
+      "logSHA256": "3da48e67fbf27735d999db552dd4ff0d9e5b6c8253fe722f038a95b4c55f0645",
+      "runnerSummaries": []
+    }
+  ],
+  "exactAudio": {
+    "trials": 32,
+    "float32Samples": 2047104,
+    "pcm": true,
+    "chunkEvents": true
+  },
+  "artifactSHA256": {
+    "audio-comparison.json": "e1a42c801fc53bded0dc5339e3c670b631186d898612d3dc7d77365b77037ad9",
+    "inference-experiment.json": "5e94fbc7c0554111097554f0a2419abbb877dde2449845bac310e86d01036227",
+    "planning-abba.json": "dedb3276ea32644d4233229b1685efe64de5a3fbbb13c05943780e0558437a14",
+    "planning-short-abba.json": "74f80f77e6236809887722a5081ac49022c7f8ce2104d7705a78e330d710e1d6",
+    "plus-062-vs-07.json": "5c9943807a2165fbd8b46b4f9a07cdc886eb385bc8e9ad1df687f797eaa397da"
+  },
+  "investigations": [
+    "Initial MLX facade test compared cold loading against reseeded warm inference. Corrected to compare matching residency states; no RNG/runtime change.",
+    "Stopped an initial cache benchmark with per-layer synchronization; final experiment materializes six layers once per frame. Only completed results are reported."
+  ],
+  "limitations": [
+    "Physical-device, thermal/energy, broader listening and minimum Swift 6.3 toolchain qualification remain open.",
+    "API inventory is macOS public declarations, not binary ABI certification; iOS/Catalyst checks are builds, not runtime acceptance.",
+    "Exact baseline Core ML/Plus audio covers English and Spanish; MLX facade/profile covers English CPU/GPU. Basic/Qwen and other-language real-model suites were not enabled.",
+    "Performance observations are from a shared workstation. Planning workload is synthetic; no general inference speedup is claimed.",
+    "Capacity-cache prototype remains test-only; full continuation/trim/reset and end-to-end candidate equivalence were not established.",
+    "Recovery tests simulate interrupted states/failures under existing host serialization; no power-loss durability or concurrent installation guarantee."
+  ]
+}

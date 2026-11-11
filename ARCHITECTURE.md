@@ -57,6 +57,13 @@ recursive numeric readings remain safe. Mutable formatters remain invocation-loc
 Digit-free text skips numeric productions, retaining Italian's lexical hour
 correction. Rule order, prefix-scan decisions and cache identities remain unchanged.
 
+Long plain-text source units can use `PlainNarrationBudget`: per-plan NFC/NFKD
+scalar prefix sums keyed by original UTF-16 grapheme boundaries. The normalizer
+owns the conservative eligibility rules; contextual rewrites, custom lexicons
+and unsupported scripts abstain. Construction is deferred until a source unit
+exceeds its budget. The planner still selects the first failing prefix in the
+same order, then performs full normalization for the final synthesis text.
+
 | Path | Execution | Stateful resources | Output |
 |---|---|---|---|
 | Basic | `KokoroEngine` actor; synchronous Core ML calls | One current voice pack, frontend, bounded decoder | Complete 24 kHz mono Float32 PCM |
@@ -76,6 +83,12 @@ can cancel while queued; settings, unload and uninstall join their predecessors.
 Queue cancellation never releases active ownership. `NarrationSession` pairs one
 loaded identity with exactly one engine. Max dispatch has an internal production
 adapter and a controlled test actor; the public engine products are unchanged.
+
+Core ML asset preparation recovers verified canonical, previous or completed
+staging generations before compiling. Host serialization remains required.
+`PreparedModelTransaction` owns recoverable publication and cleanup; receipts
+retain source/OS identity checks and full byte hashes. Plus compiler locks are
+exclusive per cache key, with a shared legacy lock excluding older SDK writers.
 
 Each loaded Core ML language owns `PocketFlowModels`. Placement and source root
 are fixed for that owner, so the graph name uniquely identifies each resident
@@ -109,7 +122,11 @@ ordinary synthesis returns the same validated PCM without the extra Data copy.
 Full Debug and Release suites pass. English/Spanish Core ML Plus/Max fixtures
 match 0.6.2 PCM and completed chunk events exactly across 32 recordings. Generic
 iOS and Catalyst Release builds pass. The macOS public-symbol comparison reports
-zero changes and includes reexports; it is not binary-ABI certification.
+zero changes across 2,802 entries and includes reexports; it is not binary-ABI
+certification. Real renderer parity also passes for cold/warm English MLX CPU/GPU
+renders and streaming, and Core ML cancellation/recovery.
 Physical-device, other-language audio, minimum-toolchain, thermal/energy and
-broader listening qualification remain open. Planning speedups are measured;
-render-throughput measurements remain mixed. See the implementation report.
+broader listening qualification remain open. Long plain-text planning speedups
+are measured; short warmed controls are effectively unchanged. A capacity-cache
+experiment is retained only in tests: no production inference replacement or
+general render-throughput speedup is claimed. See the 0.8 implementation report.

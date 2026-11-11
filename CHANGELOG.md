@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.8.0 — Unreleased
+
+- Cancel queued throwing renderer requests promptly while preserving joined
+  cleanup, FIFO ownership and synchronous streaming backpressure.
+- Bind loaded model identity and lifetime to one internal renderer session,
+  with controlled lifecycle tests and real backend parity checks.
+- Recover fully verified Core ML generations after interrupted publication;
+  permit independent Plus compiler keys and cancellation while waiting for locks.
+- Count eligible plain-text prefixes once for long source plans, preserving
+  normalization, split decisions, UTF-16 ranges and audio/cache identities.
+- Add paired planning/inference measurements and an isolated MLX cache experiment.
+  Keep production inference unchanged; no cache replacement is adopted without
+  end-to-end equivalence and performance proof.
+- Public signatures, models, voices, styles and sampler defaults remain unchanged.
+  Measurements and qualification limits: [implementation report](docs/implementation-08.md).
+
 ## 0.7.0 — Unreleased
 
 - Add frozen 0.6.2 planning/settings contracts, a public API comparison gate and
