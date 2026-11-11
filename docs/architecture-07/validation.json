@@ -1,0 +1,72 @@
+{
+  "baseline": "f75bacfbdc86c0c6dd81f0fb11cb9bcd160e49dd",
+  "date": "2026-11-11",
+  "swift": "Apple Swift version 6.4.2 (swiftlang-6.4.2.1.9 clang-2100.4.1.1)\nTarget: arm64-apple-macosx27.0.0",
+  "os": "ProductName:\t\tmacOS\nProductVersion:\t\t27.0.1\nBuildVersion:\t\t26A434",
+  "hardwareModel": "Mac15,14",
+  "logs": {
+    "debug-tests": {
+      "exitCode": 0,
+      "logSHA256": "4da6bd02d978386e4b42829743cccd89c2d2c09741397aa8594d78242cc4a4b9",
+      "logPath": "/tmp/libroxtts-07-debug-tests.log",
+      "summaries": [
+        "Test Suite 'All tests' passed at 2026-11-11 09:30:41.733.",
+        "Test Suite 'All tests' passed at 2026-11-11 09:30:42.373.",
+        "Test Suite 'All tests' passed at 2026-11-11 09:30:43.342.",
+        "Test Suite 'All tests' passed at 2026-11-11 09:30:43.590.",
+        "Test Suite 'All tests' passed at 2026-11-11 09:30:43.943.",
+        "Test Suite 'All tests' passed at 2026-11-11 09:30:44.256.",
+        "Test Suite 'All tests' passed at 2026-11-11 09:30:44.899.",
+        "Test Suite 'All tests' passed at 2026-11-11 09:30:45.117.",
+        "Test Suite 'All tests' passed at 2026-11-11 09:30:45.750.",
+        "\udbc4\udc5b  Test run with 0 tests in 0 suites passed after 0.001 seconds.",
+        "\udbc4\udc5b  Test run with 63 tests in 1 suite passed after 0.308 seconds.",
+        "\udbc4\udc5b  Test run with 0 tests in 0 suites passed after 0.001 seconds.",
+        "\udbc4\udc5b  Test run with 31 tests in 0 suites passed after 0.113 seconds.",
+        "\udbc4\udc5b  Test run with 198 tests in 19 suites passed after 23.607 seconds.",
+        "\udbc4\udc5b  Test run with 186 tests in 7 suites passed after 11.449 seconds.",
+        "\udbc4\udc5b  Test run with 43 tests in 1 suite passed after 2.484 seconds.",
+        "\udbc4\udc5b  Test run with 23 tests in 3 suites passed after 6.830 seconds.",
+        "\udbc4\udc5b  Test run with 14 tests in 0 suites passed after 0.396 seconds."
+      ]
+    },
+    "release-tests": {
+      "exitCode": 0,
+      "logSHA256": "3b2a470dcdb6cf9f072f3ed80d006b8430885466583c3c8ebb1f8f9adabac7b2",
+      "logPath": "/tmp/libroxtts-07-release-tests.log",
+      "summaries": [
+        "Test Suite 'All tests' passed at 2026-11-11 09:33:18.571.",
+        "Test Suite 'All tests' passed at 2026-11-11 09:33:18.993.",
+        "Test Suite 'All tests' passed at 2026-11-11 09:33:19.733.",
+        "Test Suite 'All tests' passed at 2026-11-11 09:33:19.966.",
+        "Test Suite 'All tests' passed at 2026-11-11 09:33:20.290.",
+        "Test Suite 'All tests' passed at 2026-11-11 09:33:20.563.",
+        "Test Suite 'All tests' passed at 2026-11-11 09:33:20.984.",
+        "Test Suite 'All tests' passed at 2026-11-11 09:33:21.187.",
+        "Test Suite 'All tests' passed at 2026-11-11 09:33:21.610.",
+        "\udbc4\udc5b  Test run with 0 tests in 0 suites passed after 0.001 seconds.",
+        "\udbc4\udc5b  Test run with 63 tests in 1 suite passed after 0.230 seconds.",
+        "\udbc4\udc5b  Test run with 0 tests in 0 suites passed after 0.001 seconds.",
+        "\udbc4\udc5b  Test run with 31 tests in 0 suites passed after 0.023 seconds.",
+        "\udbc4\udc5b  Test run with 198 tests in 19 suites passed after 5.424 seconds.",
+        "\udbc4\udc5b  Test run with 186 tests in 7 suites passed after 4.064 seconds.",
+        "\udbc4\udc5b  Test run with 43 tests in 1 suite passed after 1.519 seconds.",
+        "\udbc4\udc5b  Test run with 23 tests in 3 suites passed after 0.045 seconds.",
+        "\udbc4\udc5b  Test run with 14 tests in 0 suites passed after 0.354 seconds."
+      ]
+    },
+    "symbols": {
+      "exitCode": 0,
+      "logSHA256": "e8935dd2e8b63e1914ac77b9e019d81c157a1c91015cc0d1582958b8a2d83bb7",
+      "logPath": "/tmp/libroxtts-07-symbols.log",
+      "summaries": [
+        "Files written to /Users/matt/Code/swift/librox-tts-07-review/.build/out/symbolgraph"
+      ]
+    }
+  },
+  "modelAssetsProvidedToTests": false,
+  "physicalDeviceTests": false,
+  "listeningTests": false,
+  "runtimeSourceChanged": false,
+  "releasePerformanceQualification": false
+}

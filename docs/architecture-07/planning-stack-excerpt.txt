@@ -1,0 +1,48 @@
+Analysis of sampling libroxtts-07-planning-release (pid 2859) every 1 millisecond
+Process:         libroxtts-07-planning-release [2859]
+Path:            /private/tmp/libroxtts-07-planning-release
+Load Address:    0x100a24000
+Identifier:      libroxtts-07-planning-release
+Version:         0
+Code Type:       ARM64
+Platform:        macOS
+Parent Process:  codex [60747]
+Target Type:     live task
+
+Date/Time:       2026-11-11 09:35:52.765 -0800
+Launch Time:     2026-11-11 09:34:04.070 -0800
+OS Version:      macOS 27.0.1 (26A434)
+Report Version:  7
+Analysis Tool:   /usr/bin/sample
+
+Physical footprint:         291.8M
+Physical footprint (peak):  291.8M
+Idle exit:                  untracked
+----
+
+Call graph:
+    395 Thread_35032603   DispatchQueue_1: com.apple.main-thread  (serial)
+    + 395 start  (in dyld) + 6688  [0x18222be80]
+    +   395 main  (in libroxtts-07-planning-release) + 916  [0x100a2591c]
+    +     395 static TextNativeNarrationPlanner.plan(_:voiceID:lexicon:model:pocketChunking:)  (in libroxtts-07-planning-release) + 32  [0x100a6e230]  /<compiler-generated>:0
+    +       346 specialized static TextNativeNarrationPlanner.plan(_:voiceID:lexicon:model:pocketChunking:)  (in libroxtts-07-planning-release) + 1744  [0x100a6ee34]  TextNativeNarrationPlanner.swift:76
+    +       ! 346 SpokenTextLexicon.text(_:language:)  (in libroxtts-07-planning-release) + 268  [0x100ac6350]  SpokenTextLexicon.swift:94
+    +       !   188 specialized static TextNormalizer.normalize(_:language:)  (in libroxtts-07-planning-release) + 160  [0x100ad5e60]  TextNormalizer.swift:8
+    +       !   : 47 static StructuredNumbers.expand(_:language:)  (in libroxtts-07-planning-release) + 2580  [0x100acf5b4]  StructuredNumbers.swift:122
+    +       !   : | 46 static NumberReadings.countedNouns(_:language:)  (in libroxtts-07-planning-release) + 244  [0x100aa357c]  NumberReadings.swift:49
+    +       !   : | + 46 @nonobjc NSRegularExpression.init(pattern:options:)  (in libroxtts-07-planning-release) + 92  [0x100a30b94]  /<compiler-generated>:0
+    +       !   : | +   46 -[NSRegularExpression initWithPattern:options:error:]  (in Foundation) + 308  [0x183dc01d4]
+    +       !   : | +     46 uregex_open  (in libicucore.A.dylib) + 324  [0x1864984d8]
+    +       !   : | +       46 icu::RegexPattern::compile(UText*, unsigned int, UParseError&, UErrorCode&)  (in libicucore.A.dylib) + 468  [0x1864989c0]
+    +       !   : | +         40 icu::RegexCompile::compile(UText*, UParseError&, UErrorCode&)  (in libicucore.A.dylib) + 380  [0x18649d0c4]
+    +       !   : | +         ! 25 icu::RegexCompile::doParseActions(int)  (in libicucore.A.dylib) + 5216  [0x18649ed30]
+    +       !   : | +         ! : 25 icu::RegexCompile::scanProp()  (in libicucore.A.dylib) + 244  [0x1864c3fac]
+    +       !   : | +         ! :   25 icu::RegexCompile::createSetForProperty(icu::UnicodeString const&, signed char)  (in libicucore.A.dylib) + 364  [0x1864c4164]
+    +       !   : | +         ! :     25 icu::UnicodeSet::applyPattern(icu::UnicodeString const&, unsigned int, icu::SymbolTable const*, UErrorCode&)  (in libicucore.A.dylib) + 100  [0x1864c4c5c]
+    +       !   : | +         ! :       25 icu::UnicodeSet::applyPattern(icu::UnicodeString const&, icu::ParsePosition&, unsigned int, icu::SymbolTable const*, UErrorCode&)  (in libicucore.A.dylib) + 272  [0x1864c4de0]
+    +       !   : | +         ! :         25 icu::UnicodeSet::applyPattern(icu::RuleCharacterIterator&, icu::SymbolTable const*, icu::UnicodeString&, unsigned int, icu::UnicodeSet& (icu::UnicodeSet::*)(int), int, UErrorCode&)  (in libicucore.A.dylib) + 504  [0x186499464]
+    +       !   : | +         ! :           25 icu::UnicodeSet::applyPropertyPattern(icu::RuleCharacterIterator&, icu::UnicodeString&, UErrorCode&)  (in libicucore.A.dylib) + 200  [0x18649ad68]
+    +       !   : | +         ! :             25 icu::UnicodeSet::applyPropertyPattern(icu::UnicodeString const&, icu::ParsePosition&, UErrorCode&)  (in libicucore.A.dylib) + 1000  [0x18649b1d0]
+    +       !   : | +         ! :               25 icu::UnicodeSet::applyPropertyAlias(icu::UnicodeString const&, icu::UnicodeString const&, UErrorCode&)  (in libicucore.A.dylib) + 688  [0x18649b6d8]
+
+[Excerpt ends; full local sample: /tmp/libroxtts-07-planner-sample.txt]

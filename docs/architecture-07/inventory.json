@@ -1,0 +1,549 @@
+{
+  "baseline": "f75bacfbdc86c0c6dd81f0fb11cb9bcd160e49dd",
+  "products": [
+    {
+      "name": "PocketTTSCoreML",
+      "targets": [
+        "PocketTTSCoreML"
+      ],
+      "type": {
+        "library": [
+          "automatic"
+        ]
+      }
+    },
+    {
+      "name": "PocketBackendBenchmark",
+      "targets": [
+        "PocketBackendBenchmark"
+      ],
+      "type": {
+        "library": [
+          "automatic"
+        ]
+      }
+    },
+    {
+      "name": "pocket-backend-benchmark",
+      "targets": [
+        "PocketBackendBenchmarkCLI"
+      ],
+      "type": {
+        "executable": null
+      }
+    },
+    {
+      "name": "PocketTTSMLX",
+      "targets": [
+        "PocketTTSMLX"
+      ],
+      "type": {
+        "library": [
+          "automatic"
+        ]
+      }
+    },
+    {
+      "name": "pocket-tts-probe",
+      "targets": [
+        "PocketTTSProbe"
+      ],
+      "type": {
+        "executable": null
+      }
+    },
+    {
+      "name": "LibroxCTNative",
+      "targets": [
+        "LibroxCTNative"
+      ],
+      "type": {
+        "library": [
+          "automatic"
+        ]
+      }
+    },
+    {
+      "name": "ct-install-probe",
+      "targets": [
+        "CTInstallProbe"
+      ],
+      "type": {
+        "executable": null
+      }
+    },
+    {
+      "name": "narration-pipeline-probe",
+      "targets": [
+        "NarrationPipelineProbe"
+      ],
+      "type": {
+        "executable": null
+      }
+    },
+    {
+      "name": "QwenANE",
+      "targets": [
+        "QwenANE"
+      ],
+      "type": {
+        "library": [
+          "automatic"
+        ]
+      }
+    },
+    {
+      "name": "LibroxTTS",
+      "targets": [
+        "LibroxTTS"
+      ],
+      "type": {
+        "library": [
+          "automatic"
+        ]
+      }
+    },
+    {
+      "name": "KokoroCatalog",
+      "targets": [
+        "KokoroCatalog"
+      ],
+      "type": {
+        "library": [
+          "automatic"
+        ]
+      }
+    },
+    {
+      "name": "KokoroPronunciation",
+      "targets": [
+        "KokoroPronunciation"
+      ],
+      "type": {
+        "library": [
+          "automatic"
+        ]
+      }
+    },
+    {
+      "name": "KokoroAudio",
+      "targets": [
+        "KokoroAudio"
+      ],
+      "type": {
+        "library": [
+          "automatic"
+        ]
+      }
+    },
+    {
+      "name": "KokoroNarration",
+      "targets": [
+        "KokoroNarration"
+      ],
+      "type": {
+        "library": [
+          "automatic"
+        ]
+      }
+    },
+    {
+      "name": "kokoro-probe",
+      "targets": [
+        "KokoroProbe"
+      ],
+      "type": {
+        "executable": null
+      }
+    },
+    {
+      "name": "pronunciation-probe",
+      "targets": [
+        "PronunciationProbe"
+      ],
+      "type": {
+        "executable": null
+      }
+    },
+    {
+      "name": "pronunciation-audio",
+      "targets": [
+        "PronunciationAudioProbe"
+      ],
+      "type": {
+        "executable": null
+      }
+    },
+    {
+      "name": "narration-comparison",
+      "targets": [
+        "NarrationComparisonProbe"
+      ],
+      "type": {
+        "executable": null
+      }
+    },
+    {
+      "name": "narrator-timing",
+      "targets": [
+        "NarratorTimingProbe"
+      ],
+      "type": {
+        "executable": null
+      }
+    },
+    {
+      "name": "narrator-mood",
+      "targets": [
+        "NarratorMoodProbe"
+      ],
+      "type": {
+        "executable": null
+      }
+    }
+  ],
+  "targets": [
+    {
+      "name": "QwenANETests",
+      "type": "test",
+      "dependencies": [
+        "QwenANE"
+      ],
+      "productDependencies": [],
+      "swiftFiles": 7,
+      "swiftLines": 508
+    },
+    {
+      "name": "QwenANE",
+      "type": "library",
+      "dependencies": [],
+      "productDependencies": [],
+      "swiftFiles": 19,
+      "swiftLines": 3164
+    },
+    {
+      "name": "PronunciationProbe",
+      "type": "executable",
+      "dependencies": [
+        "KokoroPronunciation"
+      ],
+      "productDependencies": [],
+      "swiftFiles": 1,
+      "swiftLines": 39
+    },
+    {
+      "name": "PronunciationEnglish",
+      "type": "library",
+      "dependencies": [],
+      "productDependencies": [],
+      "swiftFiles": 4,
+      "swiftLines": 1809
+    },
+    {
+      "name": "PronunciationAudioProbe",
+      "type": "executable",
+      "dependencies": [
+        "LibroxTTS",
+        "KokoroAudio"
+      ],
+      "productDependencies": [],
+      "swiftFiles": 1,
+      "swiftLines": 102
+    },
+    {
+      "name": "PocketTTSProbe",
+      "type": "executable",
+      "dependencies": [
+        "LibroxTTS",
+        "PocketTTSMLX",
+        "KokoroPronunciation"
+      ],
+      "productDependencies": [],
+      "swiftFiles": 1,
+      "swiftLines": 146
+    },
+    {
+      "name": "PocketTTSMLXTests",
+      "type": "test",
+      "dependencies": [
+        "PocketTTSMLX",
+        "LibroxTTS"
+      ],
+      "productDependencies": [],
+      "swiftFiles": 13,
+      "swiftLines": 1366
+    },
+    {
+      "name": "PocketTTSMLX",
+      "type": "library",
+      "dependencies": [
+        "KokoroCatalog"
+      ],
+      "productDependencies": [
+        "MLX",
+        "MLXNN",
+        "MLXFast",
+        "MLXRandom"
+      ],
+      "swiftFiles": 19,
+      "swiftLines": 4253
+    },
+    {
+      "name": "PocketTTSCoreMLTests",
+      "type": "test",
+      "dependencies": [
+        "PocketTTSCoreML",
+        "PocketTTSMLX",
+        "LibroxTTS"
+      ],
+      "productDependencies": [],
+      "swiftFiles": 3,
+      "swiftLines": 316
+    },
+    {
+      "name": "PocketTTSCoreML",
+      "type": "library",
+      "dependencies": [
+        "PocketTTSMLX",
+        "KokoroCatalog"
+      ],
+      "productDependencies": [
+        "MLX",
+        "MLXRandom"
+      ],
+      "swiftFiles": 2,
+      "swiftLines": 460
+    },
+    {
+      "name": "PocketBackendBenchmarkCLI",
+      "type": "executable",
+      "dependencies": [
+        "PocketBackendBenchmark"
+      ],
+      "productDependencies": [],
+      "swiftFiles": 1,
+      "swiftLines": 15
+    },
+    {
+      "name": "PocketBackendBenchmark",
+      "type": "library",
+      "dependencies": [
+        "PocketTTSCoreML",
+        "PocketTTSMLX",
+        "KokoroNarration"
+      ],
+      "productDependencies": [],
+      "swiftFiles": 1,
+      "swiftLines": 146
+    },
+    {
+      "name": "NarratorTimingProbe",
+      "type": "executable",
+      "dependencies": [
+        "LibroxTTS",
+        "KokoroNarration",
+        "KokoroAudio",
+        "KokoroPronunciation"
+      ],
+      "productDependencies": [],
+      "swiftFiles": 1,
+      "swiftLines": 345
+    },
+    {
+      "name": "NarratorMoodProbe",
+      "type": "executable",
+      "dependencies": [
+        "LibroxTTS",
+        "KokoroNarration",
+        "KokoroAudio",
+        "KokoroPronunciation"
+      ],
+      "productDependencies": [],
+      "swiftFiles": 1,
+      "swiftLines": 153
+    },
+    {
+      "name": "NarrationPipelineProbe",
+      "type": "executable",
+      "dependencies": [
+        "LibroxTTS",
+        "LibroxCTNative",
+        "KokoroCatalog"
+      ],
+      "productDependencies": [],
+      "swiftFiles": 6,
+      "swiftLines": 789
+    },
+    {
+      "name": "NarrationComparisonProbe",
+      "type": "executable",
+      "dependencies": [
+        "LibroxTTS",
+        "KokoroNarration",
+        "KokoroAudio",
+        "KokoroPronunciation"
+      ],
+      "productDependencies": [],
+      "swiftFiles": 1,
+      "swiftLines": 188
+    },
+    {
+      "name": "LibroxTTS",
+      "type": "library",
+      "dependencies": [
+        "KokoroCatalog",
+        "CZlib",
+        "KokoroPronunciation",
+        "KokoroNarration",
+        "KokoroAudio",
+        "LibroxCTNative",
+        "PocketTTSMLX",
+        "PocketTTSCoreML"
+      ],
+      "productDependencies": [],
+      "swiftFiles": 22,
+      "swiftLines": 3371
+    },
+    {
+      "name": "LibroxCTNativeTests",
+      "type": "test",
+      "dependencies": [
+        "LibroxCTNative"
+      ],
+      "productDependencies": [],
+      "swiftFiles": 12,
+      "swiftLines": 511
+    },
+    {
+      "name": "LibroxCTNative",
+      "type": "library",
+      "dependencies": [
+        "KokoroCatalog"
+      ],
+      "productDependencies": [],
+      "swiftFiles": 20,
+      "swiftLines": 1833
+    },
+    {
+      "name": "KokoroPronunciationTests",
+      "type": "test",
+      "dependencies": [
+        "KokoroPronunciation"
+      ],
+      "productDependencies": [],
+      "swiftFiles": 26,
+      "swiftLines": 2756
+    },
+    {
+      "name": "KokoroPronunciation",
+      "type": "library",
+      "dependencies": [
+        "PronunciationEnglish"
+      ],
+      "productDependencies": [],
+      "swiftFiles": 23,
+      "swiftLines": 3792
+    },
+    {
+      "name": "KokoroProbe",
+      "type": "executable",
+      "dependencies": [
+        "LibroxTTS"
+      ],
+      "productDependencies": [],
+      "swiftFiles": 1,
+      "swiftLines": 90
+    },
+    {
+      "name": "KokoroNarrationTests",
+      "type": "test",
+      "dependencies": [
+        "KokoroNarration"
+      ],
+      "productDependencies": [],
+      "swiftFiles": 31,
+      "swiftLines": 2819
+    },
+    {
+      "name": "KokoroNarration",
+      "type": "library",
+      "dependencies": [
+        "KokoroCatalog",
+        "KokoroPronunciation",
+        "LibroxCTNative"
+      ],
+      "productDependencies": [],
+      "swiftFiles": 26,
+      "swiftLines": 3239
+    },
+    {
+      "name": "KokoroKitTests",
+      "type": "test",
+      "dependencies": [
+        "LibroxTTS",
+        "KokoroCatalog",
+        "KokoroPronunciation"
+      ],
+      "productDependencies": [],
+      "swiftFiles": 15,
+      "swiftLines": 1177
+    },
+    {
+      "name": "KokoroCatalog",
+      "type": "library",
+      "dependencies": [],
+      "productDependencies": [],
+      "swiftFiles": 10,
+      "swiftLines": 617
+    },
+    {
+      "name": "KokoroAudioTests",
+      "type": "test",
+      "dependencies": [
+        "KokoroAudio"
+      ],
+      "productDependencies": [],
+      "swiftFiles": 3,
+      "swiftLines": 341
+    },
+    {
+      "name": "KokoroAudio",
+      "type": "library",
+      "dependencies": [],
+      "productDependencies": [],
+      "swiftFiles": 3,
+      "swiftLines": 478
+    },
+    {
+      "name": "CZlib",
+      "type": "system-target",
+      "dependencies": [],
+      "productDependencies": [],
+      "swiftFiles": 0,
+      "swiftLines": 0
+    },
+    {
+      "name": "CTIntegrationTests",
+      "type": "test",
+      "dependencies": [
+        "LibroxTTS",
+        "KokoroNarration",
+        "LibroxCTNative"
+      ],
+      "productDependencies": [],
+      "swiftFiles": 5,
+      "swiftLines": 303
+    },
+    {
+      "name": "CTInstallProbe",
+      "type": "executable",
+      "dependencies": [
+        "LibroxTTS",
+        "LibroxCTNative"
+      ],
+      "productDependencies": [],
+      "swiftFiles": 1,
+      "swiftLines": 58
+    }
+  ]
+}
