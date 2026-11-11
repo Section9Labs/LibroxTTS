@@ -38,6 +38,10 @@ enum TextReplacement {
 /// Interpret canonical Roman notation only in a numeric context. In particular,
 /// the English pronoun I and ordinary words such as MIX are not global numbers.
 enum RomanNumerals {
+    static let labels: [PronunciationLanguage: String] = [
+        .english:"chapter|book|volume|part|act|scene", .spanish:"capítulo|capitulo|libro|tomo|volumen|parte|siglo|acto|escena",
+        .french:"chapitre|livre|tome|volume|partie|acte|scène", .italian:"capitolo|libro|tomo|volume|parte|atto|scena",
+        .portuguese:"capítulo|capitulo|livro|tomo|volume|parte|século|ato|cena", .hindi:"अध्याय|भाग|खंड"]
     static func value(_ text: String) -> Int? {
         let value = text.uppercased()
         guard !value.isEmpty, value.count <= 15,
@@ -56,10 +60,7 @@ enum RomanNumerals {
         // Only compatibility-normalize the Unicode Roman numeral block.
         var text = input.unicodeScalars.map { (0x2160...0x217F).contains($0.value)
             ? String($0).precomposedStringWithCompatibilityMapping : String($0) }.joined()
-        let labels: [PronunciationLanguage: String] = [
-            .english:"chapter|book|volume|part|act|scene", .spanish:"capítulo|capitulo|libro|tomo|volumen|parte|siglo|acto|escena",
-            .french:"chapitre|livre|tome|volume|partie|acte|scène", .italian:"capitolo|libro|tomo|volume|parte|atto|scena",
-            .portuguese:"capítulo|capitulo|livro|tomo|volume|parte|século|ato|cena", .hindi:"अध्याय|भाग|खंड"]
+
         if let labels = labels[language] {
             text = TextReplacement.replace(text, "(?i)(?<![\\p{L}\\p{M}])((?:" + labels + #")[ \t]+)([IVXLCDM]+)(?![\p{L}\p{M}\d])"#) { g in
                 guard let number = value(g[2]) else { return g[0] }

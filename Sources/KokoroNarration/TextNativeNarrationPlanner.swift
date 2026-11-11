@@ -20,8 +20,12 @@ public enum TextNativeNarrationPlanner {
         }
         if model == .pocket { try pocketChunking.validate() }
         let source = text as NSString
+        var plainBudget: PlainNarrationBudget?
+        var checkedPlainBudget = false
         func spoken(_ range: NSRange) -> String { lexicon.text(source.substring(with: range), language: voice.language) }
         func fits(_ range: NSRange, allowEmptyPrefix: Bool = false) -> Bool {
+            if let result = plainBudget?.fits(range, model: model, maximum: pocketChunking.maximumUnitScalars,
+                                              allowEmptyPrefix: allowEmptyPrefix) { return result }
             if model == .pocket {
                 // The source planner preserves speaker/paragraph boundaries; the
                 // renderer applies sentence-aware budgets with the real tokenizer.
@@ -67,10 +71,15 @@ public enum TextNativeNarrationPlanner {
                     if model == .pocket, pocketChunking.grouping == .keepTogether {
                         throw PlanningError.unbreakableText
                     }
+                    if !checkedPlainBudget {
+                        plainBudget = PlainNarrationBudget(text, language: voice.language, lexicon: lexicon)
+                        checkedPlainBudget = true
+                    }
                     // Grow by grapheme clusters; never split a surrogate pair,
                     // combining sequence, or hang while scanning CJK text.
                     var cursor = start, lastBreak = start
                     while cursor < end {
+                        try Task.checkCancellation()
                         let cluster = source.rangeOfComposedCharacterSequence(at: cursor)
                         let next = NSMaxRange(cluster)
                         guard fits(NSRange(location: start, length: next - start), allowEmptyPrefix: true) else { break }

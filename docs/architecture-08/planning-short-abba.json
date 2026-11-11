@@ -1,0 +1,187 @@
+{
+  "exactPlanFingerprints": true,
+  "order": "ABBA",
+  "runs": [
+    {
+      "revision": "baseline",
+      "rows": [
+        {
+          "inputScalars": 128,
+          "medianSeconds": 0.0006379166734404862,
+          "model": "ctPlusV1",
+          "planSHA256": "eb65a944596400de053f2226ef5f55be19fd477b09b9cb1bf8ea5e4da9be4165",
+          "units": 1
+        },
+        {
+          "inputScalars": 256,
+          "medianSeconds": 0.0008547083707526326,
+          "model": "ctPlusV1",
+          "planSHA256": "85c13aeb02412d49679201760eb94a3697aa3dedb87c607fd678fd893c21e907",
+          "units": 1
+        },
+        {
+          "inputScalars": 512,
+          "medianSeconds": 0.0010629583266563714,
+          "model": "pocketTTSV1",
+          "planSHA256": "deded72c08d0310235257df6062b4f33c5335d02510b6480c436927e20adef1b",
+          "units": 1
+        },
+        {
+          "inputScalars": 2048,
+          "medianSeconds": 0.00296587502816692,
+          "model": "pocketTTSV1",
+          "planSHA256": "ba0cca50d9cc0004c4e1f475886a3302ac1aa2e206e840d1cfbc586be819733a",
+          "units": 1
+        }
+      ]
+    },
+    {
+      "revision": "candidate",
+      "rows": [
+        {
+          "inputScalars": 128,
+          "medianSeconds": 0.0006375000230036676,
+          "model": "ctPlusV1",
+          "planSHA256": "eb65a944596400de053f2226ef5f55be19fd477b09b9cb1bf8ea5e4da9be4165",
+          "units": 1
+        },
+        {
+          "inputScalars": 256,
+          "medianSeconds": 0.0008601250010542572,
+          "model": "ctPlusV1",
+          "planSHA256": "85c13aeb02412d49679201760eb94a3697aa3dedb87c607fd678fd893c21e907",
+          "units": 1
+        },
+        {
+          "inputScalars": 512,
+          "medianSeconds": 0.0010869166580960155,
+          "model": "pocketTTSV1",
+          "planSHA256": "deded72c08d0310235257df6062b4f33c5335d02510b6480c436927e20adef1b",
+          "units": 1
+        },
+        {
+          "inputScalars": 2048,
+          "medianSeconds": 0.002934208372607827,
+          "model": "pocketTTSV1",
+          "planSHA256": "ba0cca50d9cc0004c4e1f475886a3302ac1aa2e206e840d1cfbc586be819733a",
+          "units": 1
+        }
+      ]
+    },
+    {
+      "revision": "candidate",
+      "rows": [
+        {
+          "inputScalars": 128,
+          "medianSeconds": 0.0006342916749417782,
+          "model": "ctPlusV1",
+          "planSHA256": "eb65a944596400de053f2226ef5f55be19fd477b09b9cb1bf8ea5e4da9be4165",
+          "units": 1
+        },
+        {
+          "inputScalars": 256,
+          "medianSeconds": 0.0008904166170395911,
+          "model": "ctPlusV1",
+          "planSHA256": "85c13aeb02412d49679201760eb94a3697aa3dedb87c607fd678fd893c21e907",
+          "units": 1
+        },
+        {
+          "inputScalars": 512,
+          "medianSeconds": 0.0010780000011436641,
+          "model": "pocketTTSV1",
+          "planSHA256": "deded72c08d0310235257df6062b4f33c5335d02510b6480c436927e20adef1b",
+          "units": 1
+        },
+        {
+          "inputScalars": 2048,
+          "medianSeconds": 0.002973916649352759,
+          "model": "pocketTTSV1",
+          "planSHA256": "ba0cca50d9cc0004c4e1f475886a3302ac1aa2e206e840d1cfbc586be819733a",
+          "units": 1
+        }
+      ]
+    },
+    {
+      "revision": "baseline",
+      "rows": [
+        {
+          "inputScalars": 128,
+          "medianSeconds": 0.0006342916749417782,
+          "model": "ctPlusV1",
+          "planSHA256": "eb65a944596400de053f2226ef5f55be19fd477b09b9cb1bf8ea5e4da9be4165",
+          "units": 1
+        },
+        {
+          "inputScalars": 256,
+          "medianSeconds": 0.0008347500115633011,
+          "model": "ctPlusV1",
+          "planSHA256": "85c13aeb02412d49679201760eb94a3697aa3dedb87c607fd678fd893c21e907",
+          "units": 1
+        },
+        {
+          "inputScalars": 512,
+          "medianSeconds": 0.0010906249517574906,
+          "model": "pocketTTSV1",
+          "planSHA256": "deded72c08d0310235257df6062b4f33c5335d02510b6480c436927e20adef1b",
+          "units": 1
+        },
+        {
+          "inputScalars": 2048,
+          "medianSeconds": 0.0029205416794866323,
+          "model": "pocketTTSV1",
+          "planSHA256": "ba0cca50d9cc0004c4e1f475886a3302ac1aa2e206e840d1cfbc586be819733a",
+          "units": 1
+        }
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "model": "ctPlusV1",
+      "inputScalars": 128,
+      "units": 1,
+      "planSHA256": "eb65a944596400de053f2226ef5f55be19fd477b09b9cb1bf8ea5e4da9be4165",
+      "baselineSeconds": 0.0006361041741911322,
+      "candidateSeconds": 0.0006358958489727229,
+      "speedup": 1.0003276090239397
+    },
+    {
+      "model": "ctPlusV1",
+      "inputScalars": 256,
+      "units": 1,
+      "planSHA256": "85c13aeb02412d49679201760eb94a3697aa3dedb87c607fd678fd893c21e907",
+      "baselineSeconds": 0.0008447291911579669,
+      "candidateSeconds": 0.0008752708090469241,
+      "speedup": 0.9651060933675901
+    },
+    {
+      "model": "pocketTTSV1",
+      "inputScalars": 512,
+      "units": 1,
+      "planSHA256": "deded72c08d0310235257df6062b4f33c5335d02510b6480c436927e20adef1b",
+      "baselineSeconds": 0.001076791639206931,
+      "candidateSeconds": 0.0010824583296198398,
+      "speedup": 0.9947649805467348
+    },
+    {
+      "model": "pocketTTSV1",
+      "inputScalars": 2048,
+      "units": 1,
+      "planSHA256": "ba0cca50d9cc0004c4e1f475886a3302ac1aa2e206e840d1cfbc586be819733a",
+      "baselineSeconds": 0.002943208353826776,
+      "candidateSeconds": 0.002954062510980293,
+      "speedup": 0.9963256846755368
+    }
+  ],
+  "machine": "arm64",
+  "os": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+  "binarySHA256": {
+    "baseline": "4178b1a7f56fea82ba7b47f3f4489dee9d22bab481c7bd39515a05888256e128",
+    "candidate": "adbf7a4eea318c6f21c199ee00b49ae0d48d3c97022af7e2e67eec6e9a155e23"
+  },
+  "scope": "Already-fitting Spanish source units; ten warmups and fifty samples per case per process; ABBA",
+  "limitations": [
+    "Synthetic long-sentence workload on a shared Mac; not a representative book or device benchmark",
+    "Fingerprints cover ranges, voice IDs and synthesis text; separate differential tests compare complete plans"
+  ]
+}
