@@ -37,3 +37,18 @@ see the final confirmation measurements when assessing the gain.
 
 Raw evidence: [baseline](architecture-07/planning-release.json),
 [candidate](architecture-07/planning-candidate-release.json).
+
+## Model residency
+
+`PocketFlowModels` keys by compiled graph name inside a loaded-language owner.
+Counts 1, 2, 3, 5, 6 and 7 reuse `flowstep`; 4 and 8 retain specialized graphs.
+All eight counts therefore load at most three flow objects instead of eight,
+eliminating five redundant loads when a session visits every sampler count.
+These are exact loader/object counts, not an inferred RSS percentage. Placement,
+asset validation and language retirement remain owned by the existing engine.
+
+Loader tests verify graph identity, retries after failure, reuse after sampler
+switches and release on retirement. The exact-audio gate exercises the actual
+models across the same settings. Text-only preview separation and voice prompt
+caching remain deferred: both have additional warming/ownership semantics that
+this change intentionally preserves.

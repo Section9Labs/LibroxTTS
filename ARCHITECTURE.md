@@ -60,7 +60,7 @@ correction. Rule order, prefix-scan decisions and cache identities remain unchan
 |---|---|---|---|
 | Basic | `KokoroEngine` actor; synchronous Core ML calls | One current voice pack, frontend, bounded decoder | Complete 24 kHz mono Float32 PCM |
 | Plus | `CTEngine` actor; synchronous Core ML calls | Text graphs, active generator specialization, vocoder, voice features | Complete 44.1 kHz mono Float32 PCM |
-| Max iPhone/iPad | `PocketTTSCoreMLEngine` actor, Core ML CPU | Language models, per-step flow dictionary, RNG, invocation caches | 24 kHz PCM; synchronous throwing 1,920-sample frame callback |
+| Max iPhone/iPad | `PocketTTSCoreMLEngine` actor, Core ML CPU | Language models, three flow graphs keyed by graph identity, RNG, invocation caches | 24 kHz PCM; synchronous throwing 1,920-sample frame callback |
 | Max Mac/Catalyst | `PocketTTSEngine` actor, MLX; execution-context selection | One language model, per-engine RNG, streaming Mimi and attention state | 24 kHz PCM; synchronous throwing frame callback |
 | Qwen | Synchronous `NSLock`-serialized engine; optional serial vocoder queue | Prompt caches, ANE talker state, bounded voice priming cache | Complete PCM and optional asynchronous-queue chunk delivery |
 | Pronunciation/DSP | Synchronous, caller-owned mutable instances | Language resources/taggers or FFT/history buffers | Phonemes/diagnostics or processed PCM |
@@ -69,6 +69,12 @@ The renderer lease matters because actors are reentrant at `await`. Removing it
 without a replacement could allow unload or voice selection to interleave with
 an active render. Max callbacks execute on the engine actor, provide backpressure,
 and may throw. They must not be converted into unbounded fire-and-forget work.
+
+Each loaded Core ML language owns `PocketFlowModels`. Placement and source root
+are fixed for that owner, so the graph name uniquely identifies each resident
+model. Generic sampler counts share `flowstep`; 4 and 8 retain their specialized
+graphs. Failed loads do not enter the cache. Retiring the language retires all
+three models; preview warming and per-render voice-state loading are unchanged.
 
 ## Contracts beyond Swift signatures
 

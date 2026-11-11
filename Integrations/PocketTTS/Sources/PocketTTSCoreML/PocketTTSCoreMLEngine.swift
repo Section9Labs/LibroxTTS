@@ -217,7 +217,7 @@ public actor PocketTTSCoreMLEngine {
         let compiledRoot: URL
         let configuration: MLModelConfiguration
         let bos: [Float]
-        var flows: [Int: MLModel] = [:]
+        var flows = PocketFlowModels<MLModel>()
         var collectTimings = false
         var timings: [String: StageTiming] = [:]
         private func predict(_ model: MLModel, _ inputs: [String: Any]) throws -> any MLFeatureProvider {
@@ -264,11 +264,11 @@ public actor PocketTTSCoreMLEngine {
             guard bos.count == 32 else { throw Failure.invalidShape }
         }
         func flow(_ steps: Int) throws -> MLModel {
-            if let value = flows[steps] { return value }
-            let value = try autoreleasepool {
-                try MLModel(contentsOf: compiledRoot.appendingPathComponent(([4, 8].contains(steps) ? "flow\(steps)" : "flowstep") + ".mlmodelc"), configuration: configuration)
+            try flows.model(steps: steps) { graph in
+                try autoreleasepool {
+                    try MLModel(contentsOf: compiledRoot.appendingPathComponent(graph + ".mlmodelc"), configuration: configuration)
+                }
             }
-            flows[steps] = value; return value
         }
         func sample(_ model: MLModel, steps: Int, condition: [Float], noise: [Float]) throws -> [Float] {
             try measure("flow") { try autoreleasepool {
