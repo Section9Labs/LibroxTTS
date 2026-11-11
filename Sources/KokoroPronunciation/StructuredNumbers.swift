@@ -6,6 +6,11 @@ import Foundation
 /// dates. Ambiguous slashed dates/identifiers are deliberately left unresolved.
 enum StructuredNumbers {
     static func expand(_ text: String, language: PronunciationLanguage) -> String {
+        // Every numeric production requires a decimal digit. Italian's lexical
+        // hour correction is the one unconditional rule and must still run.
+        guard text.unicodeScalars.contains(where: {
+            $0.properties.numericType != nil || CharacterSet.decimalDigits.contains($0)
+        }) else { return italianHours(text, language: language) }
         var text = text.map { c -> String in
             if c.unicodeScalars.count == 1, c.unicodeScalars.first?.properties.numericType == .decimal,
                let n = c.wholeNumberValue { return String(n) }
@@ -54,10 +59,7 @@ enum StructuredNumbers {
             case .chinese: return (h == 2 ? "两" : hour) + "点" + (m == 0 ? "" : (m < 10 ? "零" : "") + minute + "分")
             }
         }
-        if language == .italian {
-            text = text.replacingOccurrences(of: #"\balle una\b"#, with: "all'una", options: .regularExpression)
-                .replacingOccurrences(of: #"\bAlle una\b"#, with: "All'una", options: .regularExpression)
-        }
+        text = italianHours(text, language: language)
         let numeric = #"[−-]?\d+(?:[.,\x{00A0}\x{202F}]\d+)*"#
         text = replace(text, left + "(" + numeric + #")\s*[%％]"#) { g in
             let words = TextNormalizer.normalize(g[1], language: language)
@@ -128,8 +130,14 @@ enum StructuredNumbers {
         return text
     }
 
+    private static func italianHours(_ text: String, language: PronunciationLanguage) -> String {
+        guard language == .italian else { return text }
+        return text.replacingOccurrences(of: #"\balle una\b"#, with: "all'una", options: .regularExpression)
+            .replacingOccurrences(of: #"\bAlle una\b"#, with: "All'una", options: .regularExpression)
+    }
+
     private static func replace(_ text: String, _ pattern: String, transform: ([String]) -> String) -> String {
-        guard let regex = try? NSRegularExpression(pattern: pattern) else { return text }
+        guard let regex = CompiledTextRules.expression(pattern) else { return text }
         var result = text
         for match in regex.matches(in: text, range: NSRange(text.startIndex..., in: text)).reversed() {
             let groups = (0..<match.numberOfRanges).map { Range(match.range(at: $0), in: text).map { String(text[$0]) } ?? "" }

@@ -12,16 +12,17 @@ final class Release07ContractTests: XCTestCase {
         var plans: [String: [[String: String]]] = [:]
     }
 
-    static func capture() throws -> Snapshot {
-        var result = Snapshot()
-        let readings = [
+    static let readings = [
             "", "La puerta estaba abierta y nadie regresaba,", "alle una", "Alle una",
             "Capítulo XII. Chapter IV. 第IV章", "XII\n\nMIX\n\nI", "Cafe\u{301}...\r\n\r\n«Sí?!»",
             "21 libros y 21 personas; 2.000.001 páginas", "2024-02-29 2023-02-29 14:01 24:00",
             "€21,01 $1.50 £2.01 R$2,00 ₹21.50 12%", "1,234.56 1.234,56 1234567890123456",
             "٠١٢ １２３ २१ 2人 4時 2个", "v1.2.3 12/03/2026 abc12 A_21", "\"\"___😀\u{00A0}−0.01",
             "第Ⅻ章 Ⅳ", "He paused\n\nthen returned."
-        ]
+    ]
+
+    static func capture() throws -> Snapshot {
+        var result = Snapshot()
         for language in PronunciationLanguage.allCases {
             for (index, input) in readings.enumerated() {
                 result.normalized["\(language.rawValue)/\(index)"] = TextNormalizer.normalize(input, language: language)
@@ -95,6 +96,17 @@ final class Release07ContractTests: XCTestCase {
         XCTAssertEqual(preset.voiceID, "pocket-caro_davy-es-v1")
         XCTAssertEqual(preset.delivery.narratorStyle, .calm)
         XCTAssertEqual(preset.chunking, .carefulReading)
+    }
+
+    func testConcurrentNormalizationMatchesFrozenReadings() throws {
+        let url = try XCTUnwrap(Bundle.module.url(forResource: "release-062-contracts", withExtension: "json"))
+        let expected = try JSONDecoder().decode(Snapshot.self, from: Data(contentsOf: url)).normalized
+        DispatchQueue.concurrentPerform(iterations: 32) { iteration in
+            let language = PronunciationLanguage.allCases[iteration % PronunciationLanguage.allCases.count]
+            for (index, input) in Self.readings.enumerated() {
+                XCTAssertEqual(TextNormalizer.normalize(input, language: language), expected["\(language.rawValue)/\(index)"])
+            }
+        }
     }
 
     func testPlanningLimitsAndProtectedPassagesRemainErrors() {

@@ -1,7 +1,9 @@
 # 0.7 architecture review evidence
 
 Baseline: `v0.6.2`, `f75bacfbdc86c0c6dd81f0fb11cb9bcd160e49dd`.
-Date: 2026-11-11. No runtime implementation changes are included here.
+Date: 2026-11-11. Baseline artifacts below precede runtime implementation changes.
+Candidate artifacts and subsequent validation are described in the
+[implementation report](../implementation-07.md).
 
 ## Fresh validation
 

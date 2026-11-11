@@ -25,7 +25,7 @@ enum NarrativeText {
 
 enum TextReplacement {
     static func replace(_ text: String, _ pattern: String, transform: ([String]) -> String) -> String {
-        guard let regex = try? NSRegularExpression(pattern: pattern) else { return text }
+        guard let regex = CompiledTextRules.expression(pattern) else { return text }
         var result = text
         for match in regex.matches(in: text, range: NSRange(text.startIndex..., in: text)).reversed() {
             let groups = (0..<match.numberOfRanges).map { Range(match.range(at: $0), in: text).map { String(text[$0]) } ?? "" }

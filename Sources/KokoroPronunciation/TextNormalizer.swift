@@ -8,6 +8,11 @@ public enum TextNormalizer {
         var result = StructuredNumbers.expand(NarrativeText.normalize(roman), language: language)
         // Misaki already has context-aware English number/currency expansion.
         guard language != .english else { return result }
+        // Structured readings may consume all numbers. The remaining rule only
+        // matches decimal digits; preserve all earlier narrative/Roman handling.
+        guard result.unicodeScalars.contains(where: {
+            $0.properties.numericType != nil || CharacterSet.decimalDigits.contains($0)
+        }) else { return result }
         let formatter = NumberFormatter()
         formatter.numberStyle = .spellOut
         formatter.locale = language.locale
@@ -52,7 +57,7 @@ public enum TextNormalizer {
     }
 
     private static func replacing(_ text: String, pattern: String, transform: ([String]) -> String) -> String {
-        guard let regex = try? NSRegularExpression(pattern: pattern) else { return text }
+        guard let regex = CompiledTextRules.expression(pattern) else { return text }
         var result = text
         for match in regex.matches(in: text, range: NSRange(text.startIndex..., in: text)).reversed() {
             let groups = (0..<match.numberOfRanges).map { Range(match.range(at: $0), in: text).map { String(text[$0]) } ?? "" }

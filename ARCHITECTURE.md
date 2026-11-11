@@ -1,8 +1,9 @@
-# LibroxTTS architecture — 0.6.2 baseline for 0.7
+# LibroxTTS architecture — 0.7 implementation
 
-Reviewed on 2026-11-11 at `f75bacfbdc86c0c6dd81f0fb11cb9bcd160e49dd`.
-This describes the existing implementation. Proposed changes are in
-[the 0.7 architecture review](docs/architecture-review-2026-11-11.md).
+Reviewed on 2026-11-11 against `f75bacfbdc86c0c6dd81f0fb11cb9bcd160e49dd` (0.6.2).
+The [architecture review](docs/architecture-review-2026-11-11.md) records the
+baseline and roadmap. [Implementation evidence](docs/implementation-07.md)
+distinguishes completed changes from remaining qualification.
 
 ## Public entry points and ownership
 
@@ -48,6 +49,12 @@ This is the significant dependency graph, not every manifest edge. The full
 under `Sources/KokoroKit`; its public name must remain `LibroxTTS`.
 
 ## Execution and state
+
+Text normalization shares only immutable compiled regular expressions behind a
+bounded, synchronized cache. Matching and replacement run outside the lock;
+recursive numeric readings remain safe. Mutable formatters remain invocation-local.
+Digit-free text skips numeric productions, retaining Italian's lexical hour
+correction. Rule order, prefix-scan decisions and cache identities remain unchanged.
 
 | Path | Execution | Stateful resources | Output |
 |---|---|---|---|
