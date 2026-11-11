@@ -39,19 +39,25 @@ public actor NarrationRenderer {
     public func setMaxResourceObserver(_ observer: (@Sendable (MaxResourceSnapshot) -> Void)?) async {
         await acquire(); defer { release() }
         maxResourceObserver = observer
-        await pocket?.setResourceObserver(observer)
-        await pocketCoreML?.setResourceObserver(observer)
+        await maxBackend?.setObserver(observer)
     }
-    private var pocket: PocketTTSEngine?
-    private var pocketCoreML: PocketTTSCoreMLEngine?
-    private var plus: CTEngine?
-    private var plusBackend: CTEngine.Backend?
     private let admission: NarrationAdmission
-    private var kokoro: KokoroEngine?
-    private var current: NarrationModel?
-    private var currentDirectory: URL?
-    private var currentRepositoryID: String?
+    private var session: NarrationSession?
     private var executionContext: ExecutionContext = .background
+    private let maxFactory: @Sendable (URL, ExecutionContext) -> any NarrationMaxBackend
+    private var current: NarrationModel? { session?.selection }
+    private var maxBackend: (any NarrationMaxBackend)? {
+        guard case .max(let engine) = session?.engine else { return nil }
+        return engine
+    }
+    private var plus: CTEngine? {
+        guard case .plus(let engine, _) = session?.engine else { return nil }
+        return engine
+    }
+    private var kokoro: KokoroEngine? {
+        guard case .basic(let engine) = session?.engine else { return nil }
+        return engine
+    }
     private let compactDirectory: URL
     private let harmonicSource: URL?
     private let contextStyleDiagnostic: CTContextStyleDiagnostic.Configuration?
@@ -60,6 +66,7 @@ public actor NarrationRenderer {
     /// Host-facing initializer: storage and bundled resources, with no model graph knowledge.
     public init(storageRoot: URL, resources: Bundle, expressionDirectory: URL? = nil) {
         admission = NarrationAdmission()
+        maxFactory = { PocketNarrationBackend.make(directory: $0, context: $1) }
         compactDirectory = storageRoot.appendingPathComponent(
             NarrationAssets.repositoryID(.compact).replacingOccurrences(of: "/", with: "_"), isDirectory: true)
         harmonicSource = resources.url(forResource: "NarrationSource", withExtension: "mlmodelc")
@@ -69,17 +76,23 @@ public actor NarrationRenderer {
     public init(compactDirectory: URL, harmonicSource: URL?,
                 contextStyleDiagnostic: CTContextStyleDiagnostic.Configuration? = nil) {
         admission = NarrationAdmission()
+        maxFactory = { PocketNarrationBackend.make(directory: $0, context: $1) }
         self.compactDirectory = compactDirectory
         self.harmonicSource = harmonicSource
         self.contextStyleDiagnostic = contextStyleDiagnostic
     }
 
-    init(compactDirectory: URL, admission: NarrationAdmission) {
+    init(compactDirectory: URL, admission: NarrationAdmission,
+         maxFactory: @escaping @Sendable (URL, ExecutionContext) -> any NarrationMaxBackend = {
+             PocketNarrationBackend.make(directory: $0, context: $1)
+         }) {
+        self.maxFactory = maxFactory
         self.compactDirectory = compactDirectory
         self.admission = admission
         harmonicSource = nil
         contextStyleDiagnostic = nil
     }
+
     private func acquire() async { await admission.acquire() }
     private func release() { admission.release() }
     public func unload() async {
@@ -89,10 +102,7 @@ public actor NarrationRenderer {
 
     /// The Max language whose model is in memory, or nil.
     public var loadedPocketLanguage: String? {
-        get async {
-            if let pocketCoreML { return await pocketCoreML.loadedLanguage }
-            return await pocket?.loadedLanguage
-        }
+        get async { await maxBackend?.loadedLanguage }
     }
 
     /// Removes one Max language, serialized with rendering: waits for any
@@ -102,18 +112,18 @@ public actor NarrationRenderer {
     @discardableResult
     public func uninstallPocketLanguage(_ language: String, in directory: URL) async throws -> Int64 {
         await acquire(); defer { release() }
-        if let pocket, await pocket.loadedLanguage == language { await pocket.unload() }
-        if let pocketCoreML, await pocketCoreML.loadedLanguage == language { await pocketCoreML.unload() }
+        if let maxBackend, await maxBackend.loadedLanguage == language { await maxBackend.unload() }
         return try NarrationAssets.uninstallPocketLanguage(language, in: directory)
     }
     private func unloadHeld() async {
-        await pocket?.unload(); pocket = nil
-        await pocketCoreML?.unload(); pocketCoreML = nil
-        await plus?.unload(); plus = nil
-        plusBackend = nil
-        await kokoro?.unload()
-        kokoro = nil
-        current = nil; currentDirectory = nil; currentRepositoryID = nil
+        if let session {
+            switch session.engine {
+            case .max(let engine): await engine.unload()
+            case .plus(let engine, _): await engine.unload()
+            case .basic(let engine): await engine.unload()
+            }
+        }
+        session = nil
         executionContext = .background
     }
 
@@ -135,8 +145,7 @@ public actor NarrationRenderer {
     public func setCPUBudget(fraction: Double?) async {
         await acquire(); defer { release() }
         cpuBudgetFraction = fraction
-        await pocket?.setCPUBudgetFraction(fraction)
-        await pocketCoreML?.setCPUBudgetFraction(executionContext == .foreground ? nil : fraction)
+        await maxBackend?.setBudget(fraction, context: executionContext)
     }
     private var cpuBudgetFraction: Double? = PocketTTSBackend.platform == .coreML ? nil : 0.5
 
@@ -156,16 +165,15 @@ public actor NarrationRenderer {
         guard NarrationAssets.compatibleRepositoryIDs(selection).contains(repositoryID) else {
             throw RenderError.unavailable("This installed voice version is not supported by the current library.")
         }
-        if current == selection, currentDirectory == directory, currentRepositoryID == repositoryID {
-            if selection == .pocket, let pocket {
-                await pocket.setBackend(executionContext == .background ? .cpu : .gpu)
-            }
-            if selection == .pocket, let pocketCoreML {
-                await pocketCoreML.setCPUBudgetFraction(executionContext == .foreground ? nil : cpuBudgetFraction)
-            }
-            if selection == .plus, plusBackend != backend, let plus {
-                do { try await plus.setBackend(backend); plusBackend = backend }
-                catch { await unloadHeld(); throw error }
+        if let session, session.selection == selection, session.directory == directory, session.repositoryID == repositoryID {
+            switch session.engine {
+            case .max(let engine): await engine.setContext(executionContext, cpuBudget: cpuBudgetFraction)
+            case .plus(let engine, let previousBackend) where previousBackend != backend:
+                do {
+                    try await engine.setBackend(backend)
+                    self.session?.engine = .plus(engine, backend)
+                } catch { await unloadHeld(); throw error }
+            default: break
             }
             self.executionContext = executionContext
             return
@@ -173,16 +181,11 @@ public actor NarrationRenderer {
         await unloadHeld()
         self.executionContext = executionContext
         if selection == .pocket {
-            if PocketTTSBackend.platform == .coreML {
-                pocketCoreML = PocketTTSCoreMLEngine(directory: directory, placement: .cpu)
-                await pocketCoreML?.setResourceObserver(maxResourceObserver)
-                await pocketCoreML?.setCPUBudgetFraction(executionContext == .foreground ? nil : cpuBudgetFraction)
-            } else {
-                pocket = PocketTTSEngine(directory: directory, backend: executionContext == .background ? .cpu : .gpu)
-                await pocket?.setResourceObserver(maxResourceObserver)
-                await pocket?.setCPUBudgetFraction(cpuBudgetFraction)
-            }
-            current = selection; currentDirectory = directory; currentRepositoryID = repositoryID
+            let engine = maxFactory(directory, executionContext)
+            await engine.setObserver(maxResourceObserver)
+            await engine.setContext(executionContext, cpuBudget: cpuBudgetFraction)
+            do { try Task.checkCancellation() } catch { await engine.unload(); throw error }
+            session = NarrationSession(selection: selection, directory: directory, repositoryID: repositoryID, engine: .max(engine))
             return
         }
         if selection == .plus {
@@ -190,7 +193,7 @@ public actor NarrationRenderer {
                 contextStyleDiagnostic: contextStyleDiagnostic)
             try await engine.load()
             do { try Task.checkCancellation() } catch { await engine.unload(); throw error }
-            plus = engine; plusBackend = backend; current = selection; currentDirectory = directory; currentRepositoryID = repositoryID
+            session = NarrationSession(selection: selection, directory: directory, repositoryID: repositoryID, engine: .plus(engine, backend))
             return
         }
         let started = Date()
@@ -209,8 +212,7 @@ public actor NarrationRenderer {
         try await engine.load()
         do { try Task.checkCancellation() }
         catch { await engine.unload(); throw error }
-        kokoro = engine
-        current = selection; currentDirectory = directory; currentRepositoryID = repositoryID
+        session = NarrationSession(selection: selection, directory: directory, repositoryID: repositoryID, engine: .basic(engine))
         logger.notice("Narration model load completed in \(Date().timeIntervalSince(started), privacy: .public) seconds")
     }
 
@@ -226,28 +228,21 @@ public actor NarrationRenderer {
         try await admission.acquireCancellable(); defer { release() }
         try Task.checkCancellation()
         guard current == .pocket else { throw RenderError.unavailable("Load Max before streaming its audio.") }
-        if pocketCoreML == nil { try validateGPUAuthorization(executionContext) }
-        let sampling = unit.pocketSampling ?? .init()
-        try sampling.validate()
-        do {
-            if let pocketCoreML {
-                try await pocketCoreML.renderFrames(unit.synthesisText, voiceID: unit.voiceID,
-                    temperature: sampling.temperature, chunking: unit.pocketChunking ?? .init(),
-                    role: unit.role == .dialogue ? .dialogue : .narration, samplerSteps: sampling.samplerSteps,
-                    deliveryStyle: unit.pocketDeliveryStyle ?? .original, onTextChunk: onTextChunk, receive: receive)
-            } else if let pocket {
-                try await pocket.renderFrames(unit.synthesisText, voiceID: unit.voiceID,
-                    temperature: sampling.temperature, chunking: unit.pocketChunking ?? .init(),
-                    role: unit.role == .dialogue ? .dialogue : .narration, samplerSteps: sampling.samplerSteps,
-                    deliveryStyle: unit.pocketDeliveryStyle ?? .original, onTextChunk: onTextChunk, receive: receive)
-            } else { throw RenderError.invalidAudio }
-        } catch let error as PocketTTSResourceError {
+        guard let maxBackend else { throw RenderError.invalidAudio }
+        if !maxBackend.isCoreML { try validateGPUAuthorization(executionContext) }
+        do { try await maxBackend.renderFrames(unit, onTextChunk: onTextChunk, receive: receive) }
+        catch { try rethrowMaxError(error) }
+    }
+
+    private func rethrowMaxError(_ error: any Error) throws -> Never {
+        if let resource = error as? PocketTTSResourceError {
             try Task.checkCancellation()
-            switch error {
+            switch resource {
             case .memory: throw RenderError.memory
             case .thermal: throw RenderError.thermal
             }
         }
+        throw error
     }
 
     public func render(_ unit: BookNarrationUnit, delivery: NarrationDeliveryOptions = .init()) async throws -> [Float] {
@@ -256,37 +251,9 @@ public actor NarrationRenderer {
         if current != .pocket || PocketTTSBackend.platform != .coreML {
             try validateGPUAuthorization(executionContext)
         }
-        if let pocketCoreML {
-            let sampling = unit.pocketSampling ?? .init()
-            try sampling.validate()
-            do {
-                return try await pocketCoreML.synthesize(unit.synthesisText, voiceID: unit.voiceID,
-                temperature: sampling.temperature, chunking: unit.pocketChunking ?? .init(),
-                role: unit.role == .dialogue ? .dialogue : .narration, samplerSteps: sampling.samplerSteps,
-                deliveryStyle: unit.pocketDeliveryStyle ?? .original).samples
-            } catch let error as PocketTTSResourceError {
-                try Task.checkCancellation()
-                switch error {
-                case .memory: throw RenderError.memory
-                case .thermal: throw RenderError.thermal
-                }
-            }
-        }
-        if let pocket {
-            let sampling = unit.pocketSampling ?? .init()
-            try sampling.validate()
-            do {
-                return try await pocket.synthesize(unit.synthesisText, voiceID: unit.voiceID,
-                    temperature: sampling.temperature, chunking: unit.pocketChunking ?? .init(),
-                    role: unit.role == .dialogue ? .dialogue : .narration, samplerSteps: sampling.samplerSteps,
-                    deliveryStyle: unit.pocketDeliveryStyle ?? .original).samples
-            } catch let error as PocketTTSResourceError {
-                try Task.checkCancellation()
-                switch error {
-                case .memory: throw RenderError.memory
-                case .thermal: throw RenderError.thermal
-                }
-            }
+        if let maxBackend {
+            do { return try await maxBackend.synthesize(unit) }
+            catch { try rethrowMaxError(error) }
         }
         if let plus {
             guard let voice = NarrationModel.plus.nativeVoices.first(where: { $0.id == unit.voiceID }) else {
