@@ -304,7 +304,7 @@ public actor CTEngine {
         guard samples.count == latentLength * 3072, samples.allSatisfy(\.isFinite), samples.contains(where: { $0 != 0 }) else {
             throw CTError.invalidAudio
         }
-        record("waveform", try CTTensor(samples, shape: [samples.count]))
+        if captureTrace { record("waveform", try CTTensor(samples, shape: [samples.count])) }
         return Output(samples: samples, predictedDuration: seconds, trace: trace, graphSeconds: times,
                       textContextDisposition: contextDisposition)
     }

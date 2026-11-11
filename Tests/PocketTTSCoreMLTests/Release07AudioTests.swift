@@ -121,6 +121,9 @@ final class Release07AudioTests: XCTestCase {
                                      kind: .float32, data: Data(contentsOf: noiseURL))
             } else { noise = nil }
             let traced = try await engine.synthesize(text, language: code, initialNoise: noise, captureTrace: true)
+            let waveform = try XCTUnwrap(traced.trace["waveform"])
+            XCTAssertEqual(waveform.shape, [traced.samples.count])
+            XCTAssertEqual(waveform.data, traced.samples.withUnsafeBytes { Data($0) })
             let frozenNoise = try XCTUnwrap(traced.trace["initial_latent"])
             if baseline == nil {
                 try frozenNoise.data.write(to: noiseURL, options: .withoutOverwriting)

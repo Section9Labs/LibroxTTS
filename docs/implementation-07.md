@@ -9,7 +9,7 @@ untouched. These are local implementation and validation results, not a release.
 Before runtime edits, `Release07ContractTests` recorded 128 normalization results
 across eight languages and full plan fields for multilingual, numeric, paragraph,
 combining-character, CJK, unbroken-text and expanding/shrinking dictionary inputs.
-The fixture also freezes serialization, defaults, cache identities and limit errors.
+The suite also freezes serialization, defaults, cache identities and limit errors.
 Concurrent callers compare against the same frozen normalization fixture.
 
 `Scripts/check-public-api.py` compares public declarations against 2,802 baseline
@@ -71,3 +71,8 @@ drained; it was corrected to exercise and assert ownership across pool boundarie
 `FlowConditionTests.testTransportMicrobenchmark` compares the former round trip
 with the new bridge, with alternating order over five warmed 20,000-call runs.
 It is opt-in and has no timing threshold; it measures host transport only.
+
+Plus now checks `captureTrace` before constructing its waveform `CTTensor`.
+Trace-enabled output remains present and byte-equal to returned PCM. Ordinary
+synthesis avoids a copy of `samples.count * 4` bytes (up to 5,296,128 payload bytes
+at the existing 431-latent limit). This does not change the graph or vocoder.

@@ -81,6 +81,8 @@ then uses compatible arrays directly or a read-only shape view that retains its
 source array. Strided outputs retain the logical-order copying fallback. The
 view lives only through synchronous flow prediction inside the existing
 autorelease pool; mutable attention/Mimi state and emitted PCM are never pooled.
+Plus constructs its waveform diagnostic tensor only when tracing is enabled;
+ordinary synthesis returns the same validated PCM without the extra Data copy.
 
 ## Contracts beyond Swift signatures
 
