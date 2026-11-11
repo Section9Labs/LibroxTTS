@@ -1,0 +1,22 @@
+{
+  "copyMedianSeconds" : 0.027787791681475937,
+  "copySeconds" : [
+    0.027865874988492578,
+    0.026567750028334558,
+    0.027848458325024694,
+    0.025573166669346392,
+    0.027787791681475937
+  ],
+  "iterations" : 20000,
+  "removedPayloadBytesPerCondition" : 8192,
+  "scope" : "Host transport only, synthetic contiguous Float32 [1,1,1024]; no inference or RSS measurement",
+  "speedup" : 1.0177435604470693,
+  "viewMedianSeconds" : 0.027303333336021751,
+  "viewSeconds" : [
+    0.028059166681487113,
+    0.030401874973904341,
+    0.026840833364985883,
+    0.026302499987650663,
+    0.027303333336021751
+  ]
+}

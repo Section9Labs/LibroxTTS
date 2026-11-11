@@ -1,0 +1,58 @@
+[
+  {
+    "inputScalars" : 512,
+    "medianSeconds" : 0.15267687500454485,
+    "model" : "ctPlusV1",
+    "planSHA256" : "0597aeb94b070c5b4f2577fc574144749dc7b8b911a7f7c47412fab9d34eeffa",
+    "units" : 2
+  },
+  {
+    "inputScalars" : 2048,
+    "medianSeconds" : 0.5829752917052247,
+    "model" : "ctPlusV1",
+    "planSHA256" : "dd48b4656f58795a580ed11b4f1c74f16b3d429457b56d11f3d25c0f4875173c",
+    "units" : 5
+  },
+  {
+    "inputScalars" : 8192,
+    "medianSeconds" : 2.349834499997087,
+    "model" : "ctPlusV1",
+    "planSHA256" : "f00af112ea409c1cea3d101f6d89ba0c2106c286ede52715856fb46e70683c6f",
+    "units" : 17
+  },
+  {
+    "inputScalars" : 16000,
+    "medianSeconds" : 4.689938374969643,
+    "model" : "ctPlusV1",
+    "planSHA256" : "a44901d34c240aaa0e647e6b71598aec255f7cf877bc587711efd88e34e64673",
+    "units" : 33
+  },
+  {
+    "inputScalars" : 512,
+    "medianSeconds" : 0.0014350000419653952,
+    "model" : "pocketTTSV1",
+    "planSHA256" : "deded72c08d0310235257df6062b4f33c5335d02510b6480c436927e20adef1b",
+    "units" : 1
+  },
+  {
+    "inputScalars" : 2048,
+    "medianSeconds" : 0.003180041676387191,
+    "model" : "pocketTTSV1",
+    "planSHA256" : "ba0cca50d9cc0004c4e1f475886a3302ac1aa2e206e840d1cfbc586be819733a",
+    "units" : 1
+  },
+  {
+    "inputScalars" : 8192,
+    "medianSeconds" : 3.8828812083229423,
+    "model" : "pocketTTSV1",
+    "planSHA256" : "63cec5e18e7ae6a0da04dd8031308bdae87d1514e44c85e5d00b9a95a4f5780d",
+    "units" : 4
+  },
+  {
+    "inputScalars" : 16000,
+    "medianSeconds" : 7.6627610416617244,
+    "model" : "pocketTTSV1",
+    "planSHA256" : "324981e70bf65c98d98882e6c2856090c7209fff09179a59f0073104759c87fc",
+    "units" : 7
+  }
+]

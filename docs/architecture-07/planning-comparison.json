@@ -1,0 +1,82 @@
+{
+  "exactPlanFingerprints": true,
+  "rows": [
+    {
+      "model": "ctPlusV1",
+      "inputScalars": 512,
+      "units": 2,
+      "planSHA256": "0597aeb94b070c5b4f2577fc574144749dc7b8b911a7f7c47412fab9d34eeffa",
+      "baselineSeconds": 0.937774833291769,
+      "candidateSeconds": 0.15267687500454485,
+      "speedup": 6.142219201590637
+    },
+    {
+      "model": "ctPlusV1",
+      "inputScalars": 2048,
+      "units": 5,
+      "planSHA256": "dd48b4656f58795a580ed11b4f1c74f16b3d429457b56d11f3d25c0f4875173c",
+      "baselineSeconds": 3.771119583339896,
+      "candidateSeconds": 0.5829752917052247,
+      "speedup": 6.468746852562532
+    },
+    {
+      "model": "ctPlusV1",
+      "inputScalars": 8192,
+      "units": 17,
+      "planSHA256": "f00af112ea409c1cea3d101f6d89ba0c2106c286ede52715856fb46e70683c6f",
+      "baselineSeconds": 14.827542625018395,
+      "candidateSeconds": 2.349834499997087,
+      "speedup": 6.310036994110342
+    },
+    {
+      "model": "ctPlusV1",
+      "inputScalars": 16000,
+      "units": 33,
+      "planSHA256": "a44901d34c240aaa0e647e6b71598aec255f7cf877bc587711efd88e34e64673",
+      "baselineSeconds": 28.909806500014383,
+      "candidateSeconds": 4.689938374969643,
+      "speedup": 6.164218842257498
+    },
+    {
+      "model": "pocketTTSV1",
+      "inputScalars": 512,
+      "units": 1,
+      "planSHA256": "deded72c08d0310235257df6062b4f33c5335d02510b6480c436927e20adef1b",
+      "baselineSeconds": 0.004197374975774437,
+      "candidateSeconds": 0.0014350000419653952,
+      "speedup": 2.9249998975788576
+    },
+    {
+      "model": "pocketTTSV1",
+      "inputScalars": 2048,
+      "units": 1,
+      "planSHA256": "ba0cca50d9cc0004c4e1f475886a3302ac1aa2e206e840d1cfbc586be819733a",
+      "baselineSeconds": 0.0061325833084993064,
+      "candidateSeconds": 0.003180041676387191,
+      "speedup": 1.928460043160964
+    },
+    {
+      "model": "pocketTTSV1",
+      "inputScalars": 8192,
+      "units": 4,
+      "planSHA256": "63cec5e18e7ae6a0da04dd8031308bdae87d1514e44c85e5d00b9a95a4f5780d",
+      "baselineSeconds": 14.794891999976244,
+      "candidateSeconds": 3.8828812083229423,
+      "speedup": 3.810287053918478
+    },
+    {
+      "model": "pocketTTSV1",
+      "inputScalars": 16000,
+      "units": 7,
+      "planSHA256": "324981e70bf65c98d98882e6c2856090c7209fff09179a59f0073104759c87fc",
+      "baselineSeconds": 29.609366749995388,
+      "candidateSeconds": 7.6627610416617244,
+      "speedup": 3.86405978067331
+    }
+  ],
+  "scope": "Spanish repeated-clause source planning; three-run medians; no model inference",
+  "limitations": [
+    "Shared workstation, not a device or representative book benchmark",
+    "Fingerprints cover ranges, voices and synthesis text; the separate golden suite covers other plan fields"
+  ]
+}

@@ -1,0 +1,30 @@
+[
+  {
+    "inputScalars" : 512,
+    "medianSeconds" : 1.0084395833546296,
+    "model" : "ctPlusV1",
+    "planSHA256" : "0597aeb94b070c5b4f2577fc574144749dc7b8b911a7f7c47412fab9d34eeffa",
+    "units" : 2
+  },
+  {
+    "inputScalars" : 2048,
+    "medianSeconds" : 4.013527041650377,
+    "model" : "ctPlusV1",
+    "planSHA256" : "dd48b4656f58795a580ed11b4f1c74f16b3d429457b56d11f3d25c0f4875173c",
+    "units" : 5
+  },
+  {
+    "inputScalars" : 512,
+    "medianSeconds" : 0.0047332916292361915,
+    "model" : "pocketTTSV1",
+    "planSHA256" : "deded72c08d0310235257df6062b4f33c5335d02510b6480c436927e20adef1b",
+    "units" : 1
+  },
+  {
+    "inputScalars" : 2048,
+    "medianSeconds" : 0.006819749949499965,
+    "model" : "pocketTTSV1",
+    "planSHA256" : "ba0cca50d9cc0004c4e1f475886a3302ac1aa2e206e840d1cfbc586be819733a",
+    "units" : 1
+  }
+]

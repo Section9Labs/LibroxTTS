@@ -1,0 +1,363 @@
+{
+  "exactPCM": true,
+  "exactChunkEvents": true,
+  "trials": 32,
+  "groups": {
+    "pocket-en": {
+      "trials": 11,
+      "baselineSeconds": 10.058890291722491,
+      "candidateSeconds": 7.968188000144437,
+      "aggregateSpeedup": 1.262381145065874,
+      "medianPairedSpeedup": 1.1989589142294728
+    },
+    "pocket-es": {
+      "trials": 11,
+      "baselineSeconds": 9.906109291769098,
+      "candidateSeconds": 8.85989779169904,
+      "aggregateSpeedup": 1.1180839242920237,
+      "medianPairedSpeedup": 1.222206257748033
+    },
+    "plus-en": {
+      "trials": 3,
+      "baselineSeconds": 1.6812506666756235,
+      "candidateSeconds": 1.7995809582644142,
+      "aggregateSpeedup": 0.9342456414392643,
+      "medianPairedSpeedup": 0.9362543252878007
+    },
+    "plus-es": {
+      "trials": 3,
+      "baselineSeconds": 2.3221668750047684,
+      "candidateSeconds": 2.425046041724272,
+      "aggregateSpeedup": 0.957576406818918,
+      "medianPairedSpeedup": 0.9168555340662906
+    }
+  },
+  "rows": [
+    {
+      "name": "plus-en-0",
+      "samples": 76800,
+      "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+      "baselineSeconds": 0.5779620833345689,
+      "candidateSeconds": 0.6173131249961443,
+      "baselineFirstFrameSeconds": 0,
+      "candidateFirstFrameSeconds": 0,
+      "speedup": 0.9362543252878007
+    },
+    {
+      "name": "plus-en-1",
+      "samples": 76800,
+      "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+      "baselineSeconds": 0.5649847916793078,
+      "candidateSeconds": 0.6222010832861997,
+      "baselineFirstFrameSeconds": 0,
+      "candidateFirstFrameSeconds": 0,
+      "speedup": 0.9080421215201042
+    },
+    {
+      "name": "plus-en-2",
+      "samples": 76800,
+      "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24",
+      "baselineSeconds": 0.5383037916617468,
+      "candidateSeconds": 0.5600667499820702,
+      "baselineFirstFrameSeconds": 0,
+      "candidateFirstFrameSeconds": 0,
+      "speedup": 0.9611422061370005
+    },
+    {
+      "name": "plus-es-0",
+      "samples": 104448,
+      "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+      "baselineSeconds": 0.7833769166609272,
+      "candidateSeconds": 0.8544169583474286,
+      "baselineFirstFrameSeconds": 0,
+      "candidateFirstFrameSeconds": 0,
+      "speedup": 0.9168555340662906
+    },
+    {
+      "name": "plus-es-1",
+      "samples": 104448,
+      "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+      "baselineSeconds": 0.8804529583430849,
+      "candidateSeconds": 0.7889909166842699,
+      "baselineFirstFrameSeconds": 0,
+      "candidateFirstFrameSeconds": 0,
+      "speedup": 1.1159228068723321
+    },
+    {
+      "name": "plus-es-2",
+      "samples": 104448,
+      "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a",
+      "baselineSeconds": 0.6583370000007562,
+      "candidateSeconds": 0.7816381666925736,
+      "baselineFirstFrameSeconds": 0,
+      "candidateFirstFrameSeconds": 0,
+      "speedup": 0.8422528838202025
+    },
+    {
+      "name": "pocket-en-0-steps1",
+      "samples": 44160,
+      "sha256": "e0bafef9032b0b39a44dec3701424f58996d4d9c7bde706624b921e55a392a5d",
+      "baselineSeconds": 2.2446572083281353,
+      "candidateSeconds": 1.859399458335247,
+      "baselineFirstFrameSeconds": 1.8226590416161343,
+      "candidateFirstFrameSeconds": 1.4265582500374876,
+      "speedup": 1.2071947199219992
+    },
+    {
+      "name": "pocket-en-1-steps2",
+      "samples": 44160,
+      "sha256": "e4deab016d5a29b4bbeb31567b2f07c58f2a1a7a3b656da30849d36617b66df8",
+      "baselineSeconds": 0.47008300002198666,
+      "candidateSeconds": 0.5242836666875519,
+      "baselineFirstFrameSeconds": 0.05236654164036736,
+      "candidateFirstFrameSeconds": 0.04903029167326167,
+      "speedup": 0.8966195780844985
+    },
+    {
+      "name": "pocket-en-10-steps4",
+      "samples": 34560,
+      "sha256": "548195b40ab6fe9b49be84c6e52a8f635dd7d6167113e328e2b4a7eb92e6f200",
+      "baselineSeconds": 0.4893234583432786,
+      "candidateSeconds": 0.40812362503493205,
+      "baselineFirstFrameSeconds": 0.06332108337664977,
+      "candidateFirstFrameSeconds": 0.05498516670195386,
+      "speedup": 1.1989589142294728
+    },
+    {
+      "name": "pocket-en-11-steps4",
+      "samples": 163200,
+      "sha256": "cdbe06afe137fd3e6b4f5d6400e91c5d1b77fc57a0144f5f91df9c8f1288ad5a",
+      "baselineSeconds": 2.8179113749647513,
+      "candidateSeconds": 1.8121775000472553,
+      "baselineFirstFrameSeconds": 0.055191999999806285,
+      "candidateFirstFrameSeconds": 0.06768808333436027,
+      "speedup": 1.5549864044174866
+    },
+    {
+      "name": "pocket-en-2-steps3",
+      "samples": 44160,
+      "sha256": "23ca164e07633553b10e1b82076c2e4369b874880e693d194eac2901dbf64eb2",
+      "baselineSeconds": 0.5390157916699536,
+      "candidateSeconds": 0.6757610000204295,
+      "baselineFirstFrameSeconds": 0.053331749979406595,
+      "candidateFirstFrameSeconds": 0.054662875016219914,
+      "speedup": 0.7976426453341613
+    },
+    {
+      "name": "pocket-en-3-steps4",
+      "samples": 44160,
+      "sha256": "c515fa6965f8d481550eff3598336fb0ad1a634d13c946fdb40cfd6ef1ad293c",
+      "baselineSeconds": 0.988105500000529,
+      "candidateSeconds": 0.7715489999973215,
+      "baselineFirstFrameSeconds": 0.2807944166706875,
+      "candidateFirstFrameSeconds": 0.13961141667095944,
+      "speedup": 1.2806775720063914
+    },
+    {
+      "name": "pocket-en-4-steps5",
+      "samples": 44160,
+      "sha256": "b99787914ca64fd142e6aaf3de48f7350f7dfb531505609bcc4a714055670274",
+      "baselineSeconds": 0.6802862083422951,
+      "candidateSeconds": 0.556427875009831,
+      "baselineFirstFrameSeconds": 0.0747563749901019,
+      "candidateFirstFrameSeconds": 0.0650094166630879,
+      "speedup": 1.2225954861270667
+    },
+    {
+      "name": "pocket-en-5-steps6",
+      "samples": 44160,
+      "sha256": "15dcbcba1c3ef3647644530d2d01d6d43f5815173db4e899e666bf72915fa6f2",
+      "baselineSeconds": 0.8907555833575316,
+      "candidateSeconds": 0.5859714583493769,
+      "baselineFirstFrameSeconds": 0.08832750003784895,
+      "candidateFirstFrameSeconds": 0.04657283332198858,
+      "speedup": 1.5201347619672485
+    },
+    {
+      "name": "pocket-en-6-steps7",
+      "samples": 44160,
+      "sha256": "ae27bac5beebfefd4d3e595502de6ee3078e9271c5059ce9016acb10a905768b",
+      "baselineSeconds": 1.0033097083796747,
+      "candidateSeconds": 0.9304796250071377,
+      "baselineFirstFrameSeconds": 0.0691995833767578,
+      "candidateFirstFrameSeconds": 0.07158525002887473,
+      "speedup": 1.0782715509455443
+    },
+    {
+      "name": "pocket-en-7-steps8",
+      "samples": 44160,
+      "sha256": "42f860b46efcc0067b728da77b55f00587f74c9256298791f4a570e0a56746ae",
+      "baselineSeconds": 1.0130073750042357,
+      "candidateSeconds": 0.6999244166654535,
+      "baselineFirstFrameSeconds": 0.37678470835089684,
+      "candidateFirstFrameSeconds": 0.11563087499234825,
+      "speedup": 1.447309667850076
+    },
+    {
+      "name": "pocket-en-8-steps2",
+      "samples": 44160,
+      "sha256": "e4deab016d5a29b4bbeb31567b2f07c58f2a1a7a3b656da30849d36617b66df8",
+      "baselineSeconds": 0.5364739582873881,
+      "candidateSeconds": 0.4610441666445695,
+      "baselineFirstFrameSeconds": 0.07671608333475888,
+      "candidateFirstFrameSeconds": 0.061824333330150694,
+      "speedup": 1.1636064331792517
+    },
+    {
+      "name": "pocket-en-9-steps4",
+      "samples": 42240,
+      "sha256": "a67d1420455faf513375439e831887377b53c370058994b6f2ba65b6c5c0daa3",
+      "baselineSeconds": 0.630618333350867,
+      "candidateSeconds": 0.5424456666805781,
+      "baselineFirstFrameSeconds": 0.09036187501624227,
+      "candidateFirstFrameSeconds": 0.03761629166547209,
+      "speedup": 1.1625465407620443
+    },
+    {
+      "name": "pocket-en-recovered",
+      "samples": 44160,
+      "sha256": "c515fa6965f8d481550eff3598336fb0ad1a634d13c946fdb40cfd6ef1ad293c",
+      "baselineSeconds": 3.6804308750433847,
+      "candidateSeconds": 1.501165833324194,
+      "baselineFirstFrameSeconds": 0,
+      "candidateFirstFrameSeconds": 0,
+      "speedup": 2.451715055953151
+    },
+    {
+      "name": "pocket-es-0-steps1",
+      "samples": 55680,
+      "sha256": "27b4bfb93328b622a38b48cf395b6a2e871b084ce405a80880a94cb6d3693133",
+      "baselineSeconds": 2.7196606666548178,
+      "candidateSeconds": 2.03054229170084,
+      "baselineFirstFrameSeconds": 2.138872583338525,
+      "candidateFirstFrameSeconds": 1.5936489583691582,
+      "speedup": 1.3393765191547686
+    },
+    {
+      "name": "pocket-es-1-steps2",
+      "samples": 55680,
+      "sha256": "25e41496606aba63d861ff50050c38119e8f2731a46eb293cc7b43d9e33d39bf",
+      "baselineSeconds": 0.7331471249926835,
+      "candidateSeconds": 0.5141116666491143,
+      "baselineFirstFrameSeconds": 0.05796574999112636,
+      "candidateFirstFrameSeconds": 0.0401786666479893,
+      "speedup": 1.4260464652965419
+    },
+    {
+      "name": "pocket-es-10-steps4",
+      "samples": 53760,
+      "sha256": "1e037fb2c67931b257ba51eb904b9c88bd7e136978c05df0e64b3c044c595ba7",
+      "baselineSeconds": 0.7430308333132416,
+      "candidateSeconds": 0.7483958333614282,
+      "baselineFirstFrameSeconds": 0.046040541667025536,
+      "candidateFirstFrameSeconds": 0.0540002083289437,
+      "speedup": 0.992831333621822
+    },
+    {
+      "name": "pocket-es-11-steps4",
+      "samples": 159360,
+      "sha256": "d63ce42522a1dd61e8af22f110a3e3e65f2a9e8a7367b42dd2005e43ce5e1a0d",
+      "baselineSeconds": 1.8546666250331327,
+      "candidateSeconds": 1.9749618750065565,
+      "baselineFirstFrameSeconds": 0.05954358336748555,
+      "candidateFirstFrameSeconds": 0.06705929164309055,
+      "speedup": 0.9390898368744336
+    },
+    {
+      "name": "pocket-es-2-steps3",
+      "samples": 55680,
+      "sha256": "05389dc8acdb92e7e9c7e371736a3fe8a50489e75e03d5b650f84a2cbb1c2ba9",
+      "baselineSeconds": 0.8188681667088531,
+      "candidateSeconds": 0.5949852083576843,
+      "baselineFirstFrameSeconds": 0.055274666694458574,
+      "candidateFirstFrameSeconds": 0.04577250004513189,
+      "speedup": 1.376283233946512
+    },
+    {
+      "name": "pocket-es-3-steps4",
+      "samples": 55680,
+      "sha256": "83a6a9f533394bec5348ea4c8288e6c7be681f34853e05c121b30892ef625644",
+      "baselineSeconds": 0.835335458337795,
+      "candidateSeconds": 0.5860960833379067,
+      "baselineFirstFrameSeconds": 0.21633483335608616,
+      "candidateFirstFrameSeconds": 0.08408762502949685,
+      "speedup": 1.425253438959073
+    },
+    {
+      "name": "pocket-es-4-steps5",
+      "samples": 55680,
+      "sha256": "78a3c8ef905900390b75a083650f8950a160fee2fb859445fb4e9f2538711505",
+      "baselineSeconds": 0.752503625000827,
+      "candidateSeconds": 0.6096826666616835,
+      "baselineFirstFrameSeconds": 0.052431916643399745,
+      "candidateFirstFrameSeconds": 0.037782333325594664,
+      "speedup": 1.2342545821765927
+    },
+    {
+      "name": "pocket-es-5-steps6",
+      "samples": 55680,
+      "sha256": "a895d5be24f071b5f42a9d888962abcee02029a17f00e441408f90f0f32946ef",
+      "baselineSeconds": 0.958664208301343,
+      "candidateSeconds": 0.8766524583334103,
+      "baselineFirstFrameSeconds": 0.06044287496479228,
+      "candidateFirstFrameSeconds": 0.04656391666503623,
+      "speedup": 1.0935510408809483
+    },
+    {
+      "name": "pocket-es-6-steps7",
+      "samples": 55680,
+      "sha256": "354cab63aaea63a4b3353efd79ca5282a873f321b45f23a4356d46350be9c270",
+      "baselineSeconds": 0.8669661249732599,
+      "candidateSeconds": 0.700434333353769,
+      "baselineFirstFrameSeconds": 0.0716065833112225,
+      "candidateFirstFrameSeconds": 0.042784458375535905,
+      "speedup": 1.237755038109162
+    },
+    {
+      "name": "pocket-es-7-steps8",
+      "samples": 55680,
+      "sha256": "b97e17b3a089f7aaf0aee8b7fc9d0377aeafab2bb43ad7a884d1a62c24ebd5da",
+      "baselineSeconds": 1.1175307083758526,
+      "candidateSeconds": 0.9143552500172518,
+      "baselineFirstFrameSeconds": 0.3625912083662115,
+      "candidateFirstFrameSeconds": 0.12096766667673364,
+      "speedup": 1.222206257748033
+    },
+    {
+      "name": "pocket-es-8-steps2",
+      "samples": 55680,
+      "sha256": "25e41496606aba63d861ff50050c38119e8f2731a46eb293cc7b43d9e33d39bf",
+      "baselineSeconds": 0.6094005416962318,
+      "candidateSeconds": 0.6468792083323933,
+      "baselineFirstFrameSeconds": 0.04827554168878123,
+      "candidateFirstFrameSeconds": 0.04821216664277017,
+      "speedup": 0.9420623415416632
+    },
+    {
+      "name": "pocket-es-9-steps4",
+      "samples": 51840,
+      "sha256": "521382fc56f86d34eb9677ba656578c013e8d1489182be9e73838f21d0b038e2",
+      "baselineSeconds": 0.6159958750358783,
+      "candidateSeconds": 0.6933432082878426,
+      "baselineFirstFrameSeconds": 0.06337216671090573,
+      "candidateFirstFrameSeconds": 0.06048133329022676,
+      "speedup": 0.888442935147562
+    },
+    {
+      "name": "pocket-es-recovered",
+      "samples": 55680,
+      "sha256": "83a6a9f533394bec5348ea4c8288e6c7be681f34853e05c121b30892ef625644",
+      "baselineSeconds": 1.6335751250153407,
+      "candidateSeconds": 1.6324558749911375,
+      "baselineFirstFrameSeconds": 0,
+      "candidateFirstFrameSeconds": 0,
+      "speedup": 1.0006856234470713
+    }
+  ],
+  "limitations": [
+    "Shared workstation; one observation per paired request, not a confidence interval",
+    "Pocket first language load and cancellation/reload excluded from warm group totals",
+    "Different sampler counts and voices are distinct workloads, not repetitions",
+    "No physical-device, listening, thermal or energy qualification"
+  ]
+}
