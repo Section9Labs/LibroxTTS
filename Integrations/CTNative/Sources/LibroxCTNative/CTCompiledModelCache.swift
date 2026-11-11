@@ -1,6 +1,5 @@
 import CoreML
 import CryptoKit
-import Darwin
 import Foundation
 
 /// Source hashes plus OS/architecture identify reusable compiler output. The
@@ -35,38 +34,33 @@ enum CTCompiledModelCache {
                 .appendingPathComponent("com.section9labs.LibroxTTS.CT/v2", isDirectory: true)
         }
         try fm.createDirectory(at: root, withIntermediateDirectories: true)
-        let lockURL = root.appendingPathComponent(".compile.lock")
-        let descriptor = open(lockURL.path, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR)
-        guard descriptor >= 0 else { throw CTError.invalidAssets("compiler cache lock") }
-        defer { close(descriptor) }
-        guard flock(descriptor, LOCK_EX) == 0 else { throw CTError.invalidAssets("compiler cache lock") }
-        defer { flock(descriptor, LOCK_UN) }
-        try Task.checkCancellation()
-        let destination = root.appendingPathComponent(key, isDirectory: true)
-        let model = destination.appendingPathComponent("model.mlmodelc", isDirectory: true)
-        let receipt = destination.appendingPathComponent("identity.txt")
-        if (try? String(contentsOf: receipt, encoding: .utf8)) == identity,
-           fm.fileExists(atPath: model.path) { return model }
-        if fm.fileExists(atPath: destination.path) { try fm.removeItem(at: destination) }
-        let staging = root.appendingPathComponent(".compile-" + UUID().uuidString, isDirectory: true)
-        try fm.createDirectory(at: staging, withIntermediateDirectories: true)
-        defer { try? fm.removeItem(at: staging) }
-        let compiled = try MLModel.compileModel(at: package)
-        defer { try? fm.removeItem(at: compiled) }
-        // Compilation cannot be interrupted. Once it finishes, publish its
-        // valid result even if speculation was cancelled while it ran. The
-        // successor can reuse this work without loading two models at once.
-        try fm.copyItem(at: compiled, to: staging.appendingPathComponent("model.mlmodelc"))
-        try identity.write(to: staging.appendingPathComponent("identity.txt"), atomically: true, encoding: .utf8)
-        #if os(iOS)
-        if let entries = fm.enumerator(at: staging, includingPropertiesForKeys: nil) {
-            for case let file as URL in entries {
-                try fm.setAttributes([.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication], ofItemAtPath: file.path)
+        return try CTCompilerLock.withLock(root: root, key: key) {
+            let destination = root.appendingPathComponent(key, isDirectory: true)
+            let model = destination.appendingPathComponent("model.mlmodelc", isDirectory: true)
+            let receipt = destination.appendingPathComponent("identity.txt")
+            if (try? String(contentsOf: receipt, encoding: .utf8)) == identity,
+               fm.fileExists(atPath: model.path) { return model }
+            if fm.fileExists(atPath: destination.path) { try fm.removeItem(at: destination) }
+            let staging = root.appendingPathComponent(".compile-" + UUID().uuidString, isDirectory: true)
+            try fm.createDirectory(at: staging, withIntermediateDirectories: true)
+            defer { try? fm.removeItem(at: staging) }
+            let compiled = try MLModel.compileModel(at: package)
+            defer { try? fm.removeItem(at: compiled) }
+            // Compilation cannot be interrupted. Once it finishes, publish its
+            // valid result even if speculation was cancelled while it ran. The
+            // successor can reuse this work without loading two models at once.
+            try fm.copyItem(at: compiled, to: staging.appendingPathComponent("model.mlmodelc"))
+            try identity.write(to: staging.appendingPathComponent("identity.txt"), atomically: true, encoding: .utf8)
+            #if os(iOS)
+            if let entries = fm.enumerator(at: staging, includingPropertiesForKeys: nil) {
+                for case let file as URL in entries {
+                    try fm.setAttributes([.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication], ofItemAtPath: file.path)
+                }
             }
+            #endif
+            try fm.moveItem(at: staging, to: destination)
+            try Task.checkCancellation()
+            return model
         }
-        #endif
-        try fm.moveItem(at: staging, to: destination)
-        try Task.checkCancellation()
-        return model
     }
 }
