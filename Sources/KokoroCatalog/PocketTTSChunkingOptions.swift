@@ -1,7 +1,8 @@
 import Foundation
 
 /// Book-level defaults may be overridden on an individual narration unit.
-/// Targets are soft: a complete sentence or connected pair may exceed them.
+/// Targets are soft: an unpunctuated clause or connected pair may exceed them.
+/// Long sentences may span internal chunks at their original clause punctuation.
 /// The maximum is a hard limit, including punctuation added for synthesis.
 public struct PocketTTSChunkingOptions: Codable, Hashable, Sendable {
     public enum Grouping: String, Codable, Sendable {
@@ -44,7 +45,7 @@ public struct PocketTTSChunkingOptions: Codable, Hashable, Sendable {
               (128...8192).contains(maximumUnitScalars) else { throw ValidationError.invalidLimits }
     }
 
-    public static let revision = "pocket-adaptive-chunks-1"
+    public static let revision = "pocket-continuous-clauses-2"
     public var cacheIdentity: String {
         "\(Self.revision):\(grouping.rawValue):n\(narrationTargetTokens):d\(dialogueTargetTokens):max\(maximumTokens):short\(shortSentenceTokens):unit\(maximumUnitScalars)"
     }

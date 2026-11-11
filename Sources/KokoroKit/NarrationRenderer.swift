@@ -219,6 +219,7 @@ public actor NarrationRenderer {
     /// This preserves continuation across a long planned unit. A partial stream
     /// is not a completed cache entry: commit prepared audio only after success.
     public func renderPocketFrames(_ unit: BookNarrationUnit,
+                                   onTextChunk: @Sendable (PocketTTSChunkProgress) throws -> Void = { _ in },
                                    receive: @escaping @Sendable ([Float]) throws -> Void) async throws {
         await acquire(); defer { release() }
         try Task.checkCancellation()
@@ -231,12 +232,12 @@ public actor NarrationRenderer {
                 try await pocketCoreML.renderFrames(unit.synthesisText, voiceID: unit.voiceID,
                     temperature: sampling.temperature, chunking: unit.pocketChunking ?? .init(),
                     role: unit.role == .dialogue ? .dialogue : .narration, samplerSteps: sampling.samplerSteps,
-                    deliveryStyle: unit.pocketDeliveryStyle ?? .original, receive: receive)
+                    deliveryStyle: unit.pocketDeliveryStyle ?? .original, onTextChunk: onTextChunk, receive: receive)
             } else if let pocket {
                 try await pocket.renderFrames(unit.synthesisText, voiceID: unit.voiceID,
                     temperature: sampling.temperature, chunking: unit.pocketChunking ?? .init(),
                     role: unit.role == .dialogue ? .dialogue : .narration, samplerSteps: sampling.samplerSteps,
-                    deliveryStyle: unit.pocketDeliveryStyle ?? .original, receive: receive)
+                    deliveryStyle: unit.pocketDeliveryStyle ?? .original, onTextChunk: onTextChunk, receive: receive)
             } else { throw RenderError.invalidAudio }
         } catch let error as PocketTTSResourceError {
             try Task.checkCancellation()

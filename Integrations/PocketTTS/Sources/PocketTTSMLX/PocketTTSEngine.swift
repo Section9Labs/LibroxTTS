@@ -135,6 +135,7 @@ public actor PocketTTSEngine {
                              role: PocketTTSPassageRole = .narration,
                              samplerSteps: Int = PocketTTSSamplingOptions.defaultSamplerSteps,
                              deliveryStyle: PocketTTSDeliveryStyle = .original,
+                             onTextChunk: @Sendable (PocketTTSChunkProgress) throws -> Void = { _ in },
                              receive: @Sendable ([Float]) throws -> Void) throws {
         try chunking.validate()
         guard (1...8).contains(samplerSteps) else { throw PocketTTSError.invalidSamplerSteps }
@@ -152,7 +153,8 @@ public actor PocketTTSEngine {
             model.lsd_decode_steps = samplerSteps
             var sampleCount = 0
             try model.render(text: text, voice: stateName, continuation: continueChunks,
-                             chunking: chunking, role: role, language: voice.language, checkpoint: { try self.resources.checkpoint($0) }) { chunk in
+                             chunking: chunking, role: role, language: voice.language, checkpoint: { try self.resources.checkpoint($0) },
+                             onTextChunk: onTextChunk) { chunk in
                 guard sampleCount + chunk.count <= 24_000 * 300 else { throw PocketTTSError.textTooLong }
                 sampleCount += chunk.count
                 try budget?.checkpoint()

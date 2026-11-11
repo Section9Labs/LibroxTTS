@@ -4,7 +4,10 @@ import Foundation
 public enum PocketTTSTextUtils {
     private static let closers = "\"'”’)]»"
     private static let titles: Set<String> = ["Mr.", "Mrs.", "Ms.", "Dr.", "Prof.", "Rev.", "vs.", "e.g.", "i.e."]
-    public static func prepareTextPrompt(_ text: String, config: PocketTTSModelConfig) throws -> (String, Int) {
+    /// Internal clauses retain punctuation and case so teacher-forced audio and
+    /// its text prefix describe the same continuing sentence.
+    public static func prepareTextPrompt(_ text: String, config: PocketTTSModelConfig,
+                                         preserveSentenceBoundaries: Bool = false) throws -> (String, Int) {
         var value = text.trimmingCharacters(in: .whitespacesAndNewlines)
         if !config.replaceCharacters.isEmpty {
             value = value.map { config.replaceCharacters[String($0)] ?? String($0) }.joined()
@@ -13,12 +16,12 @@ public enum PocketTTSTextUtils {
         }
         guard !value.isEmpty else { throw PocketTTSError.emptyText }
         value = value.replacingOccurrences(of: "\n", with: " ").replacingOccurrences(of: "\r", with: " ").replacingOccurrences(of: "  ", with: " ")
-        if config.removeSemicolons { value = value.replacingOccurrences(of: ";", with: ",") }
+        if config.removeSemicolons && !preserveSentenceBoundaries { value = value.replacingOccurrences(of: ";", with: ",") }
         let count = value.split(whereSeparator: \.isWhitespace).count
-        if let first = value.first, !first.isUppercase { value = first.uppercased() + value.dropFirst() }
+        if !preserveSentenceBoundaries, let first = value.first, !first.isUppercase { value = first.uppercased() + value.dropFirst() }
         var core = value
         while let last = core.last, (closers + " ").contains(last) { core.removeLast() }
-        if let last = core.last, !".!?…".contains(last) {
+        if !preserveSentenceBoundaries, let last = core.last, !".!?…".contains(last) {
             if ",;:-–—".contains(last) {
                 let suffix = value.dropFirst(core.count).trimmingCharacters(in: .whitespaces)
                 while let last = core.last, ",;:-–— ".contains(last) { core.removeLast() }

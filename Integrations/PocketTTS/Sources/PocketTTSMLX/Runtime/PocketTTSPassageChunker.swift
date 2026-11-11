@@ -47,7 +47,7 @@ public enum PocketTTSPassageChunker {
             if sentences.isEmpty { sentences = [prepared] }
             var pieces: [(String, PocketTTSTextChunk.Boundary)] = []
             for sentence in sentences {
-                pieces += try splitLongSentence(sentence, maximum: options.maximumTokens,
+                pieces += try splitLongSentence(sentence, target: target, maximum: options.maximumTokens,
                                                 prepare: prepare, tokenCount: tokenCount)
             }
             var current = "", boundary = PocketTTSTextChunk.Boundary.sentence
@@ -64,13 +64,20 @@ public enum PocketTTSPassageChunker {
                 if !current.isEmpty {
                     let joined = current + " " + piece
                     let count = tokenCount(try prepare(joined))
-                    let short = min(tokenCount(try prepare(piece)), tokenCount(try prepare(current)))
+                    let currentCount = tokenCount(try prepare(current))
+                    let short = min(tokenCount(try prepare(piece)), currentCount)
                         <= options.shortSentenceTokens
+                    // A soft target is not a reason to isolate a tiny clause.
+                    // Choose the nearer natural boundary, allowing a bounded
+                    // overshoot only when joining improves the target distance.
+                    let nearerClauseBoundary = boundary == .clause &&
+                        abs(count - target) < abs(currentCount - target)
                     let linked = beginsContinuation(piece, language: language)
-                    // Never break a sentence merely to meet a soft target. A short
-                    // response/follow-on may stay with its setup up to the hard cap.
+                    // Keep small complete thoughts together, but do not undo an
+                    // internal clause boundary selected for a long sentence.
                     let keep = count <= options.maximumTokens &&
-                        (count <= target || short || linked || boundary != .sentence)
+                        (count <= target || nearerClauseBoundary ||
+                         (boundary == .sentence && ending == .sentence && (short || linked)))
                     if !keep { try emit(boundary) }
                 }
                 current += (current.isEmpty ? "" : " ") + piece
@@ -97,9 +104,40 @@ public enum PocketTTSPassageChunker {
         return first.map { cues[language]?.contains($0) == true } ?? false
     }
 
-    private static func splitLongSentence(_ text: String, maximum: Int,
+    private static func splitLongSentence(_ text: String, target: Int, maximum: Int,
                                           prepare: (String) throws -> String,
                                           tokenCount: (String) -> Int) throws -> [(String, PocketTTSTextChunk.Boundary)] {
+        if tokenCount(try prepare(text)) <= target { return [(text, .sentence)] }
+        // Only existing clause punctuation justifies a soft-target split. Keep
+        // unpunctuated clauses intact up to the hard cap; never invent a stop.
+        var clauses: [String] = []
+        var start = text.startIndex
+        for index in text.indices where text[index].isWhitespace {
+            let prefix = text[start..<index].trimmingCharacters(in: .whitespacesAndNewlines)
+            if prefix.last.map({ ",;:—–".contains($0) }) == true {
+                clauses.append(prefix)
+                start = text.index(after: index)
+            }
+        }
+        let tail = text[start...].trimmingCharacters(in: .whitespacesAndNewlines)
+        if !tail.isEmpty { clauses.append(tail) }
+        if clauses.count > 1 {
+            var pieces: [(String, PocketTTSTextChunk.Boundary)] = []
+            for (index, clause) in clauses.enumerated() {
+                var split = try splitAtHardLimit(clause, maximum: maximum, prepare: prepare, tokenCount: tokenCount)
+                if index < clauses.count - 1, let last = split.popLast() {
+                    split.append((last.0, .clause))
+                }
+                pieces += split
+            }
+            return pieces
+        }
+        return try splitAtHardLimit(text, maximum: maximum, prepare: prepare, tokenCount: tokenCount)
+    }
+
+    private static func splitAtHardLimit(_ text: String, maximum: Int,
+                                         prepare: (String) throws -> String,
+                                         tokenCount: (String) -> Int) throws -> [(String, PocketTTSTextChunk.Boundary)] {
         if tokenCount(try prepare(text)) <= maximum { return [(text, .sentence)] }
         var remaining = text[...], output: [(String, PocketTTSTextChunk.Boundary)] = []
         while !remaining.isEmpty {

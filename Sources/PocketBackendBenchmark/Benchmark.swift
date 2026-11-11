@@ -17,6 +17,8 @@ public enum PocketBackendBenchmark {
         public var text: String
         public var voiceID: String
         public var style: PocketTTSDeliveryStyle
+        public var continueChunks: Bool?
+        public var chunking: PocketTTSChunkingOptions?
         public init(backend: String, language: String = "en", repetitions: Int = 3,
                     steps: Int = 4, temperature: Float = 0.3, seed: UInt64 = 42,
                     text: String = "She rested her hand against the door. For a moment, she could almost hear his voice again. It was the small things she remembered: the way he folded the newspaper, the sound of his keys on the table, and the cup he always left beside the window. She waited. Nobody came.",
@@ -73,7 +75,7 @@ public enum PocketBackendBenchmark {
         let core = PocketTTSCoreMLEngine(directory: assets, modelsDirectory: models,
             placement: request.backend == "coreml-cpu" ? .cpu : request.backend == "coreml-ane" ? .cpuANE : request.backend == "coreml-all" ? .all : .cpuGPU)
         await core.setTimingCollection(true)
-        let chunking = PocketTTSChunkingOptions.carefulReading
+        let chunking = request.chunking ?? PocketTTSChunkingOptions.carefulReading
         let loadStart = ProcessInfo.processInfo.systemUptime
         let chunks = try await isMLX
             ? mlx.previewChunks(request.text, voiceID: request.voiceID, chunking: chunking)
@@ -88,11 +90,11 @@ public enum PocketBackendBenchmark {
             let thermalStart = ProcessInfo.processInfo.thermalState.rawValue
             if isMLX {
                 await mlx.setRandomSeed(request.seed)
-                try await mlx.renderFrames(request.text, voiceID: request.voiceID, temperature: request.temperature,
+                try await mlx.renderFrames(request.text, voiceID: request.voiceID, temperature: request.temperature, continueChunks: request.continueChunks ?? true,
                     chunking: chunking, samplerSteps: request.steps, deliveryStyle: request.style, receive: capture.append)
             } else {
                 await core.setRandomSeed(request.seed)
-                try await core.renderFrames(request.text, voiceID: request.voiceID, temperature: request.temperature,
+                try await core.renderFrames(request.text, voiceID: request.voiceID, temperature: request.temperature, continueChunks: request.continueChunks ?? true,
                     chunking: chunking, samplerSteps: request.steps, deliveryStyle: request.style, receive: capture.append)
             }
             let elapsed = ProcessInfo.processInfo.systemUptime - capture.start

@@ -141,3 +141,39 @@ func pocketChunksUseRealTokenizerAndExposeDecisions() async throws {
     #expect(plan.map(\.text).joined(separator: " ") == text.replacingOccurrences(of: "\n\n", with: " "))
     await engine.unload()
 }
+
+@Test func pocketLongSentenceUsesOriginalClausesWithoutInventingSentenceStops() throws {
+    let text = "At the old café, the price was 3.14 euros; she counted the coins slowly, and remembered every word he had said before leaving the garden."
+    let options = PocketTTSChunkingOptions(narrationTargetTokens: 8, dialogueTargetTokens: 8,
+                                         maximumTokens: 40, shortSentenceTokens: 0)
+    let plan = try chunks(text, options: options)
+    #expect(plan.count > 1)
+    #expect(plan.dropLast().allSatisfy { $0.boundaryAfter == .clause })
+    #expect(plan.map(\.text).joined(separator: " ") == text)
+    #expect(plan.contains { $0.text.contains("3.14") })
+    #expect(plan.filter(\.startsNewPassage).count == 1)
+    // A long final clause stays intact even above the soft target.
+    #expect(plan.last?.text == "and remembered every word he had said before leaving the garden.")
+    #expect(plan.last?.tokenCount ?? 0 > options.narrationTargetTokens)
+}
+
+@Test func pocketShortClausesGroupWithoutRegluingTheEntireLongSentence() throws {
+    let text = "She brought bread, fruit, tea, and all the other things that the children had asked her to bring."
+    let options = PocketTTSChunkingOptions(narrationTargetTokens: 8, dialogueTargetTokens: 8,
+                                         maximumTokens: 40, shortSentenceTokens: 12)
+    let plan = try chunks(text, options: options)
+    #expect(plan.map(\.text) == ["She brought bread, fruit, tea,", "and all the other things that the children had asked her to bring."])
+    #expect(plan.first?.boundaryAfter == .clause)
+    #expect(plan.map(\.text).joined(separator: " ") == text)
+}
+
+@Test func pocketClauseTargetSelectsNearerBoundaryInsteadOfTinyFragment() throws {
+    let text = "She brought bread and cheese, fruit for the children, and remembered every word he had said before leaving the garden."
+    let options = PocketTTSChunkingOptions(narrationTargetTokens: 8, dialogueTargetTokens: 8,
+                                         maximumTokens: 40, shortSentenceTokens: 0)
+    let plan = try chunks(text, options: options)
+    #expect(plan.first?.text == "She brought bread and cheese, fruit for the children,")
+    #expect(plan.first?.tokenCount == 9)
+    #expect(plan.count == 2)
+    #expect(plan.map(\.text).joined(separator: " ") == text)
+}

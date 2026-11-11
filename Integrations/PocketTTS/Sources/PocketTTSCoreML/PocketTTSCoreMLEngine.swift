@@ -62,13 +62,15 @@ public actor PocketTTSCoreMLEngine {
                              continueChunks: Bool = true, chunking: PocketTTSChunkingOptions = .init(),
                              role: PocketTTSPassageRole = .narration, samplerSteps: Int = 4,
                              deliveryStyle: PocketTTSDeliveryStyle = .original,
+                             onTextChunk: @Sendable (PocketTTSChunkProgress) throws -> Void = { _ in },
                              receive: @Sendable ([Float]) throws -> Void) throws {
         try render(text, voiceID: voiceID, temperature: temperature, continueChunks: continueChunks,
-                   chunking: chunking, role: role, samplerSteps: samplerSteps, deliveryStyle: deliveryStyle, receive: receive)
+                   chunking: chunking, role: role, samplerSteps: samplerSteps, deliveryStyle: deliveryStyle, onTextChunk: onTextChunk, receive: receive)
     }
     private func render(_ text: String, voiceID: String, temperature: Float,
                         continueChunks: Bool, chunking: PocketTTSChunkingOptions,
                         role: PocketTTSPassageRole, samplerSteps: Int, deliveryStyle: PocketTTSDeliveryStyle,
+                        onTextChunk: (PocketTTSChunkProgress) throws -> Void = { _ in },
                         receive: ([Float]) throws -> Void) throws {
         try chunking.validate()
         try PocketTTSSamplingOptions(temperature: temperature, samplerSteps: samplerSteps).validate()
@@ -93,11 +95,12 @@ public actor PocketTTSCoreMLEngine {
                     var total = 0
                     for chunk in chunks {
                         try Task.checkCancellation()
+                        let chunkStart = total
                         if chunk.startsNewPassage { previousText = nil; previous = [] }
                         let forced = continueChunks && !previous.isEmpty
                         let joined = forced ? previousText! + " " + chunk.text : chunk.text
-                        let prepared = try PocketTTSTextUtils.prepareTextPrompt(joined, config: m.config).0
-                        let tail = try PocketTTSTextUtils.prepareTextPrompt(chunk.text, config: m.config).1
+                        let prepared = try PocketTTSTextUtils.prepareTextPrompt(joined, config: m.config, preserveSentenceBoundaries: chunking.grouping == .adaptive).0
+                        let tail = try PocketTTSTextUtils.prepareTextPrompt(chunk.text, config: m.config, preserveSentenceBoundaries: chunking.grouping == .adaptive).1
                         let tokens = m.tokenizer.encode(prepared)
                         var cache = prompt
                         _ = try m.transform(m.textModel, value: Self.ints(tokens), cache: &cache)
@@ -143,6 +146,8 @@ public actor PocketTTSCoreMLEngine {
                             current.append(next); input = next
                         }
                         guard complete else { throw Failure.generationLimit(tokens: tokens.count, frames: cap) }
+                        try Task.checkCancellation()
+                        try onTextChunk(.init(text: chunk.text, startSample: chunkStart, endSample: total))
                         previousText = chunk.text; previous = current
                     }
                     guard total > 0 else { throw PocketTTSError.emptyText }
@@ -285,7 +290,7 @@ public actor PocketTTSCoreMLEngine {
         }
         func chunks(_ text: String, options: PocketTTSChunkingOptions, role: PocketTTSPassageRole) throws -> [PocketTTSTextChunk] {
             try PocketTTSPassageChunker.plan(text, language: language, role: role, options: options,
-                prepare: { try PocketTTSTextUtils.prepareTextPrompt($0, config: self.config).0 },
+                prepare: { try PocketTTSTextUtils.prepareTextPrompt($0, config: self.config, preserveSentenceBoundaries: options.grouping == .adaptive).0 },
                 tokenCount: { self.tokenizer.encode($0).count })
         }
         func voice(_ name: String) throws -> [MLMultiArray] {

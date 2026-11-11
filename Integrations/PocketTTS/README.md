@@ -118,7 +118,10 @@ Librox now defaults to **four sampler steps** for quality-first narration and
 uses configurable **adaptive phrasing**, replacing its initial fixed 25-token
 target. This is structural grouping, not an emotion classifier:
 
-- A whole sentence stays together when it fits the hard cap, even above the target.
+- Long sentences may span internal requests at existing clause punctuation near
+  the soft target. The nearer natural boundary may slightly exceed the target,
+  avoiding tiny fragments. An unpunctuated clause stays intact up to the hard cap.
+  `.keepTogether` still protects the whole paragraph or fails explicitly.
 - Short setup/follow-on sentences and a small set of language-specific connective
   words can keep adjacent sentences together above the target.
 - Narration and dialogue have separate soft targets: initially 48 and 32 tokens.
@@ -157,8 +160,8 @@ let chunks = try await engine.previewChunks(
 
 The policy is Codable for book settings. Include `NarrationModel.pocket.renderIdentity(for: unit)`
 in prepared-audio cache keys alongside the usual text/voice/model identities. It
-includes the policy and resolved role; the runtime revision also changed so old
-25-token audio is not reused. Direct synthesis and `renderFrames` accept the same
+includes the policy and resolved role. The clause revision is now
+`pocket-continuous-clauses-2`, so old rendered audio is not reused as corrected audio. Direct synthesis and `renderFrames` accept the same
 `chunking` and `role` arguments. Direct engine callers must supply separate speaker
 turns; `role: .dialogue` alone does not perform speaker attribution.
 
@@ -168,12 +171,22 @@ independently rendered unit. No hidden context from another character or previou
 played chapter enters a render. Resetting is distinct from adding a timed pause;
 this policy does not insert synthetic silence or emotion tags.
 
-The latest punctuation preparation prevents unfinished clause endings, keeps
-abbreviations/decimals together, preserves closing quotes with their sentence,
-and removes characters absent from individual languages' training data. Rewrites
-apply only to synthesis text; the displayed book and UTF-16 source ranges remain
-unchanged. Spoken dictionary readings run before model tokenization. Kokoro IPA,
+Adaptive chunk preparation retains internal comma/semicolon endings and
+continuation case; it does not turn each clause into a new sentence. Existing
+language-config character normalization still applies, including removal of
+characters absent from that language's training data. Rewrites apply only to
+synthesis text; the displayed book and UTF-16 source ranges remain unchanged. Spoken dictionary readings run before model tokenization. Kokoro IPA,
 CT style tensors, acting instructions and SSML are not passed to this model.
+
+`renderFrames` on both backends and `NarrationRenderer.renderPocketFrames` accept
+an optional synchronous `onTextChunk` callback. `PocketTTSChunkProgress` carries
+prepared input text and its cumulative half-open `startSample..<endSample` range
+in 24 kHz source PCM. It fires only after every frame of that completed chunk was
+accepted by the receiver; cancellation does not announce an unfinished chunk.
+A host maps these intervals against **played** source samples, not generation or
+wall time, and holds unknown progress during starvation. These are chunk bounds,
+not word alignment or proof that the model pronounced every input word. The
+callback participates in cancellation/backpressure and adds no PCM or rate change.
 
 EOS is ignored during the first six frames to prevent premature short-utterance
 stops. A fresh decoder fades in over five milliseconds; continued chunks use the

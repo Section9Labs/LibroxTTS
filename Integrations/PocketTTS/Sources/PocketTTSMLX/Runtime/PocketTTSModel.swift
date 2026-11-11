@@ -188,7 +188,7 @@ public final class PocketTTSModel: Module {
     public func chunkPlan(text: String, language: String, role: PocketTTSPassageRole,
                           options: PocketTTSChunkingOptions) throws -> [PocketTTSTextChunk] {
         try PocketTTSPassageChunker.plan(text, language: language, role: role, options: options,
-            prepare: { try PocketTTSTextUtils.prepareTextPrompt($0, config: self.config).0 },
+            prepare: { try PocketTTSTextUtils.prepareTextPrompt($0, config: self.config, preserveSentenceBoundaries: options.grouping == .adaptive).0 },
             tokenCount: { self.flow_lm.conditioner.tokenizer.encode($0).count })
     }
 
@@ -198,6 +198,7 @@ public final class PocketTTSModel: Module {
                        chunking: PocketTTSChunkingOptions = .init(),
                        role: PocketTTSPassageRole = .narration, language: String = "en",
                        checkpoint: (String) throws -> Void = { _ in },
+                       onTextChunk: (PocketTTSChunkProgress) throws -> Void = { _ in },
                        onChunk: ([Float]) throws -> Void) throws {
         try validateSampling()
         defer { mimi.resetState(); diagnosticTokenCount = nil; diagnosticFrameIndex = nil }
@@ -207,6 +208,7 @@ public final class PocketTTSModel: Module {
         let chunks = try chunkPlan(text: text, language: language, role: role, options: chunking)
         var previousText: String?
         var previousLatents: [MLXArray] = []
+        var totalSamples = 0
         for decision in chunks {
             try Task.checkCancellation()
             let chunk = decision.text
@@ -214,10 +216,16 @@ public final class PocketTTSModel: Module {
             sliceFlowCache(&state, to: promptFrames)
             let forced = continuation && !previousLatents.isEmpty ? concatenated(previousLatents, axis: 1) : nil
             let joined = forced == nil ? chunk : (previousText! + " " + chunk)
-            let (preparedText, _) = try PocketTTSTextUtils.prepareTextPrompt(joined, config: config)
-            let (_, tail) = try PocketTTSTextUtils.prepareTextPrompt(chunk, config: config)
+            let (preparedText, _) = try PocketTTSTextUtils.prepareTextPrompt(joined, config: config, preserveSentenceBoundaries: chunking.grouping == .adaptive)
+            let (_, tail) = try PocketTTSTextUtils.prepareTextPrompt(chunk, config: config, preserveSentenceBoundaries: chunking.grouping == .adaptive)
+            let chunkStart = totalSamples
             previousLatents = try renderChunk(state: &state, text: preparedText, forced: forced,
-                framesAfterEOS: config.framesAfterEOS ?? tail + 2, checkpoint: checkpoint, onChunk: onChunk)
+                framesAfterEOS: config.framesAfterEOS ?? tail + 2, checkpoint: checkpoint) { samples in
+                    try onChunk(samples)
+                    totalSamples += samples.count
+                }
+            try Task.checkCancellation()
+            try onTextChunk(.init(text: chunk, startSample: chunkStart, endSample: totalSamples))
             previousText = chunk
         }
     }
