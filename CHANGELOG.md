@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.7.0 — Unreleased
+
+- Add frozen 0.6.2 planning/settings contracts, a public API comparison gate and
+  exact PCM/chunk-event comparisons for English/Spanish Plus and Core ML Max.
+- Reuse immutable normalization rules and skip numeric rules for digit-free text,
+  preserving readings, source ranges and the existing chunk-selection algorithm.
+- Reuse Core ML flow models by graph identity across sampler settings, reducing
+  the maximum resident flow objects from eight to three.
+- Pass contiguous transformer conditioning to flow without intermediate payload
+  copies; retain stride-aware fallback and explicit buffer ownership.
+- Construct Plus waveform trace data only when tracing is enabled.
+- Preserve public contracts, model assets, audio/cache identities, routing,
+  voice/style defaults and sampler settings. Local measurements and qualification
+  limits are recorded in [the implementation report](docs/implementation-07.md).
+
 ## 0.6.2 — 2026-11-11
 
 - Integrate approved commit `56393f12bcb33a51b78327a2d4b8ece75d2f4ea8` without runtime changes.

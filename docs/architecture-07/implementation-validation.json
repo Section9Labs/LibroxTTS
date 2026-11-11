@@ -1,0 +1,167 @@
+{
+  "schema": 1,
+  "date": "2026-11-11",
+  "baselineRuntime": "f75bacfbdc86c0c6dd81f0fb11cb9bcd160e49dd",
+  "baselineHarness": "94d8eaa",
+  "candidateRuntime": "e9bac85651a707d911e31826cd45ea991010274b",
+  "toolchain": "Apple Swift version 6.4.2 (swiftlang-6.4.2.1.9 clang-2100.4.1.1)\nTarget: arm64-apple-macosx27.0.0",
+  "hardwareModel": "Mac15,14",
+  "os": "macOS 27.0.1 (26A434)",
+  "logs": {
+    "baseline-audio": {
+      "command": "Release07AudioTests on unchanged 0.6.2 runtime, using verified en/es assets",
+      "exitCode": 0,
+      "path": "/tmp/libroxtts-07-audio-baseline.log",
+      "sha256": "d19690883f548c6dff9850869f384017322915cbac2c98a7745bd73ca3967e37",
+      "summaries": [
+        "Test Suite 'Selected tests' passed at 2026-11-11 10:21:29.973.",
+        "Test Suite 'Selected tests' passed at 2026-11-11 10:21:30.120.",
+        "Test Suite 'Selected tests' passed at 2026-11-11 10:22:18.900.",
+        "Test Suite 'Selected tests' passed at 2026-11-11 10:22:19.089.",
+        "Test Suite 'Selected tests' passed at 2026-11-11 10:22:19.241.",
+        "Test Suite 'Selected tests' passed at 2026-11-11 10:22:19.387.",
+        "Test Suite 'Selected tests' passed at 2026-11-11 10:22:19.537.",
+        "Test Suite 'Selected tests' passed at 2026-11-11 10:22:19.669.",
+        "Test Suite 'Selected tests' passed at 2026-11-11 10:22:19.816."
+      ]
+    },
+    "debug": {
+      "command": "swift test",
+      "exitCode": 0,
+      "path": "/tmp/libroxtts-07-final-debug.log",
+      "sha256": "4fc091c9152d5d0070c6daa0daf86dbd98c0953874d911591a969c7772ac0faf",
+      "summaries": [
+        "Test Suite 'All tests' passed at 2026-11-11 10:32:49.078.",
+        "Test Suite 'All tests' passed at 2026-11-11 10:32:49.631.",
+        "Test Suite 'All tests' passed at 2026-11-11 10:32:50.577.",
+        "Test Suite 'All tests' passed at 2026-11-11 10:32:50.747.",
+        "Test Suite 'All tests' passed at 2026-11-11 10:32:51.037.",
+        "Test Suite 'All tests' passed at 2026-11-11 10:32:54.284.",
+        "Test Suite 'All tests' passed at 2026-11-11 10:32:54.855.",
+        "Test Suite 'All tests' passed at 2026-11-11 10:32:55.002.",
+        "Test Suite 'All tests' passed at 2026-11-11 10:32:55.558.",
+        "\udbc4\udc5b  Test run with 0 tests in 0 suites passed after 0.001 seconds.",
+        "\udbc4\udc5b  Test run with 63 tests in 1 suite passed after 0.380 seconds.",
+        "\udbc4\udc5b  Test run with 0 tests in 0 suites passed after 0.001 seconds.",
+        "\udbc4\udc5b  Test run with 31 tests in 0 suites passed after 0.115 seconds.",
+        "\udbc4\udc5b  Test run with 198 tests in 19 suites passed after 32.361 seconds.",
+        "\udbc4\udc5b  Test run with 186 tests in 7 suites passed after 22.094 seconds.",
+        "\udbc4\udc5b  Test run with 43 tests in 1 suite passed after 7.548 seconds.",
+        "\udbc4\udc5b  Test run with 23 tests in 3 suites passed after 10.795 seconds.",
+        "\udbc4\udc5b  Test run with 14 tests in 0 suites passed after 0.120 seconds."
+      ]
+    },
+    "release": {
+      "command": "swift test -c release",
+      "exitCode": 0,
+      "path": "/tmp/libroxtts-07-final-release.log",
+      "sha256": "8ac3e2adc50b4774744b07838ff6a4e075a82708f6f37bb69fbd42d151efd9ea",
+      "summaries": [
+        "Test Suite 'All tests' passed at 2026-11-11 10:37:02.881.",
+        "Test Suite 'All tests' passed at 2026-11-11 10:37:03.246.",
+        "Test Suite 'All tests' passed at 2026-11-11 10:37:03.969.",
+        "Test Suite 'All tests' passed at 2026-11-11 10:37:04.137.",
+        "Test Suite 'All tests' passed at 2026-11-11 10:37:04.416.",
+        "Test Suite 'All tests' passed at 2026-11-11 10:37:06.924.",
+        "Test Suite 'All tests' passed at 2026-11-11 10:37:07.297.",
+        "Test Suite 'All tests' passed at 2026-11-11 10:37:07.429.",
+        "Test Suite 'All tests' passed at 2026-11-11 10:37:07.798.",
+        "\udbc4\udc5b  Test run with 0 tests in 0 suites passed after 0.001 seconds.",
+        "\udbc4\udc5b  Test run with 63 tests in 1 suite passed after 0.313 seconds.",
+        "\udbc4\udc5b  Test run with 0 tests in 0 suites passed after 0.001 seconds.",
+        "\udbc4\udc5b  Test run with 31 tests in 0 suites passed after 0.023 seconds.",
+        "\udbc4\udc5b  Test run with 198 tests in 19 suites passed after 6.417 seconds.",
+        "\udbc4\udc5b  Test run with 186 tests in 7 suites passed after 4.938 seconds.",
+        "\udbc4\udc5b  Test run with 43 tests in 1 suite passed after 1.834 seconds.",
+        "\udbc4\udc5b  Test run with 23 tests in 3 suites passed after 0.052 seconds.",
+        "\udbc4\udc5b  Test run with 14 tests in 0 suites passed after 0.054 seconds."
+      ]
+    },
+    "audio-and-transport-confirmation": {
+      "command": "swift test -c release --skip-build --filter Release07|FlowConditionTests; audio baseline and tensor benchmark environment enabled",
+      "exitCode": 0,
+      "path": "/tmp/libroxtts-07-confirmation.log",
+      "sha256": "7b78fdb671c98d92bf35d8ab236a8698b2dd261b552aceaeb36c77be67f4ba81",
+      "summaries": [
+        "Test Suite 'Selected tests' passed at 2026-11-11 10:38:28.451.",
+        "Test Suite 'Selected tests' passed at 2026-11-11 10:38:28.585.",
+        "Test Suite 'Selected tests' passed at 2026-11-11 10:39:05.085.",
+        "Test Suite 'Selected tests' passed at 2026-11-11 10:39:05.264.",
+        "Test Suite 'Selected tests' passed at 2026-11-11 10:39:05.409.",
+        "Test Suite 'Selected tests' passed at 2026-11-11 10:39:07.875.",
+        "Test Suite 'Selected tests' passed at 2026-11-11 10:39:08.039.",
+        "Test Suite 'Selected tests' passed at 2026-11-11 10:39:08.183.",
+        "Test Suite 'Selected tests' passed at 2026-11-11 10:39:08.332."
+      ]
+    },
+    "ios": {
+      "command": "xcodebuild -project Examples/KokoroDemo/KokoroDemo.xcodeproj -scheme KokoroDemo -configuration Release -destination generic/platform=iOS -derivedDataPath /tmp/libroxtts-07-ios-build CODE_SIGNING_ALLOWED=NO build",
+      "exitCode": 0,
+      "path": "/tmp/libroxtts-07-ios-build.log",
+      "sha256": "0d786238157d1649fea779b2f319dfae66d663ae1e29fbaf13f7d46dc99013fc",
+      "summaries": [
+        "** BUILD SUCCEEDED **"
+      ]
+    },
+    "catalyst": {
+      "command": "xcodebuild -project Examples/KokoroDemo/KokoroDemo.xcodeproj -scheme KokoroDemo -configuration Release -destination 'generic/platform=macOS,variant=Mac Catalyst' -derivedDataPath /tmp/libroxtts-07-ios-build CODE_SIGNING_ALLOWED=NO build",
+      "exitCode": 0,
+      "path": "/tmp/libroxtts-07-catalyst-build.log",
+      "sha256": "5402ac1de4ab47c9d0e010208bfb5e842a3033b97aab64d43bb5b27a738842cc",
+      "summaries": [
+        "** BUILD SUCCEEDED **"
+      ]
+    },
+    "symbol-extraction": {
+      "command": "swift package dump-symbol-graph --minimum-access-level public --skip-synthesized-members",
+      "exitCode": 0,
+      "path": "/tmp/libroxtts-07-final-symbols.log",
+      "sha256": "be6b846bc31f9ba0114775d04119ddc523251c1f576b905259ef085ec4720286",
+      "summaries": [
+        "Files written to /Users/matt/Code/swift/librox-tts-07-review/.build/out/symbolgraph"
+      ]
+    },
+    "public-api": {
+      "command": "python3 Scripts/check-public-api.py",
+      "exitCode": 0,
+      "path": "/tmp/libroxtts-07-api-check.log",
+      "sha256": "814afb9c7ced52f18a43fc3377bf73c3ba867eca56e597f048e3b586a8a58446",
+      "summaries": [
+        "2802 baseline entries; 2802 current; 0 missing, 0 added, 0 changed"
+      ]
+    }
+  },
+  "artifactsSHA256": {
+    "docs/architecture-07/planning-paired-comparison.json": "72c1092f5f67d8095ec4ad4d6dfd22687fc6cff6ab1b504acad1c8c0bb9af009",
+    "docs/architecture-07/planning-comparison.json": "4e3163217cee80f3a63f00f4da0a2086e77168d780b29cfa33665edbc3d2f043",
+    "docs/architecture-07/audio-confirmation.json": "f2e8bcb75068d13735a676862d9f457bde5482265b3dacde67a30799ef660259",
+    "docs/architecture-07/audio-candidate-initial.json": "c226488254130c1b75f8614a7ab662da185b1e244ccb53fba7e867ac9b97d99e",
+    "docs/architecture-07/tensor-transport-release.json": "728f2566f1aa2d2343cf774be6486cee9866ccb5851b4cbd523ce9a07c4298c6",
+    "Tests/KokoroNarrationTests/Fixtures/release-062-contracts.json": "3f40e5bd884380f36617c5585817d31498f73662749b9203687e9d569d2c9d54"
+  },
+  "baselineNoiseSHA256": {
+    "plus-es-noise-shape.json": "d797e35a2614cb6b78fe38dde4ccc26ab0b57046de8a420447a1f5ba18e9872b",
+    "plus-es-noise.f32": "2e2da879d1a20ed458ccb35add15c76e04d6867afc003f9eb0d313e95b58a711",
+    "plus-en-noise-shape.json": "11cf0040c68db1b4f4b3c84183340898a370fb2d09d8fbb1bc8870afd666c966",
+    "plus-en-noise.f32": "2a3c2fb71d4f5958f7f3e3433a708cc5ffda536e3f18b8debe9d69d554764ba9"
+  },
+  "assets": {
+    "pocket": "/private/tmp/libroxtts-07-assets",
+    "plus": "/Users/matt/Code/swift/librox-approved-expression-qualification-v1/public-install",
+    "validation": "Pinned asset verification through PocketTTSCoreMLAssets.prepare and CTEngine.load"
+  },
+  "correctedTest": {
+    "logPath": "/tmp/libroxtts-07-candidate-tests.log",
+    "originalExitCode": 1,
+    "reason": "Owner release asserted before the Objective-C autorelease pool drained; test corrected to prove lifetime across nested pool boundaries",
+    "finalResult": "Debug, Release and opt-in confirmation all pass"
+  },
+  "notQualified": [
+    "Physical-device inference and sustained playback",
+    "Minimum Swift 6.3 toolchain",
+    "All-language model audio",
+    "MLX real-model parity (acoustic code unchanged)",
+    "RSS, thermal, energy and statistical throughput confidence",
+    "Binary ABI"
+  ]
+}

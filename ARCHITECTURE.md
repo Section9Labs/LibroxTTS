@@ -99,8 +99,10 @@ ordinary synthesis returns the same validated PCM without the extra Data copy.
 
 ## Current validation boundary
 
-Model-independent Debug and Release suites pass in the review environment.
-Many real-model tests are opt-in. The baseline public-symbol snapshot is macOS
-only and includes reexports; it is not an iOS API or binary-ABI certification.
-Release 0.6.2 itself records remaining device and broader listening qualification.
-The 0.7 review does not change those acceptance boundaries.
+Full Debug and Release suites pass. English/Spanish Core ML Plus/Max fixtures
+match 0.6.2 PCM and completed chunk events exactly across 32 recordings. Generic
+iOS and Catalyst Release builds pass. The macOS public-symbol comparison reports
+zero changes and includes reexports; it is not binary-ABI certification.
+Physical-device, other-language audio, minimum-toolchain, thermal/energy and
+broader listening qualification remain open. Planning speedups are measured;
+render-throughput measurements remain mixed. See the implementation report.

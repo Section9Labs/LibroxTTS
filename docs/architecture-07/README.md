@@ -55,9 +55,10 @@ for Max at 512/2,048 scalars respectively, with the same plan fingerprints.
 
 The initial Debug/Release probes and some build/symbol work overlapped on a shared
 workstation. Thermal state, other apps and CPU placement were not controlled.
-Do not interpret the Debug/Release ratio as an optimization result. There is no
-candidate implementation, A/B speedup, model timing, energy measurement or
-physical-device result here.
+Do not interpret the Debug/Release ratio as an optimization result. These
+baseline artifacts alone provide no A/B speedup, model timing, energy measurement
+or physical-device result. Subsequent candidate comparisons are described in the
+implementation report linked above.
 
 The [`stack excerpt`](planning-stack-excerpt.txt) is from a one-second `sample`
 of the Release probe. Its dominant sampled call path reaches
