@@ -1,9 +1,10 @@
-# LibroxTTS architecture — 0.7 implementation
+# LibroxTTS architecture — 0.8 implementation
 
 Reviewed on 2026-11-11 against `f75bacfbdc86c0c6dd81f0fb11cb9bcd160e49dd` (0.6.2).
 The [architecture review](docs/architecture-review-2026-11-11.md) records the
 baseline and roadmap. [Implementation evidence](docs/implementation-07.md)
 distinguishes completed changes from remaining qualification.
+The [0.8 implementation record](docs/implementation-08.md) extends that baseline.
 
 ## Public entry points and ownership
 
@@ -69,6 +70,12 @@ The renderer lease matters because actors are reentrant at `await`. Removing it
 without a replacement could allow unload or voice selection to interleave with
 an active render. Max callbacks execute on the engine actor, provide backpressure,
 and may throw. They must not be converted into unbounded fire-and-forget work.
+
+`NarrationAdmission` owns a synchronized FIFO lease. Throwing load/render work
+can cancel while queued; settings, unload and uninstall join their predecessors.
+Queue cancellation never releases active ownership. `NarrationSession` pairs one
+loaded identity with exactly one engine. Max dispatch has an internal production
+adapter and a controlled test actor; the public engine products are unchanged.
 
 Each loaded Core ML language owns `PocketFlowModels`. Placement and source root
 are fixed for that owner, so the graph name uniquely identifies each resident
