@@ -1,0 +1,296 @@
+{
+  "cache" : [
+    {
+      "backend" : "gpu",
+      "capacity" : false,
+      "peakMLXBytes" : 37294116,
+      "seconds" : 0.90264412498800084,
+      "steps" : 128
+    },
+    {
+      "backend" : "gpu",
+      "capacity" : true,
+      "peakMLXBytes" : 40374308,
+      "seconds" : 0.86659799999324605,
+      "steps" : 128
+    },
+    {
+      "backend" : "gpu",
+      "capacity" : true,
+      "peakMLXBytes" : 28839972,
+      "seconds" : 0.78307020833017305,
+      "steps" : 128
+    },
+    {
+      "backend" : "gpu",
+      "capacity" : false,
+      "peakMLXBytes" : 35917860,
+      "seconds" : 1.0005444583366625,
+      "steps" : 128
+    },
+    {
+      "backend" : "gpu",
+      "capacity" : false,
+      "peakMLXBytes" : 94900260,
+      "seconds" : 3.7225752082886174,
+      "steps" : 512
+    },
+    {
+      "backend" : "gpu",
+      "capacity" : true,
+      "peakMLXBytes" : 115888164,
+      "seconds" : 4.0861147499526851,
+      "steps" : 512
+    },
+    {
+      "backend" : "gpu",
+      "capacity" : true,
+      "peakMLXBytes" : 81268772,
+      "seconds" : 3.6659422499942593,
+      "steps" : 512
+    },
+    {
+      "backend" : "gpu",
+      "capacity" : false,
+      "peakMLXBytes" : 87232548,
+      "seconds" : 3.6269469583639875,
+      "steps" : 512
+    },
+    {
+      "backend" : "gpu",
+      "capacity" : false,
+      "peakMLXBytes" : 239226916,
+      "seconds" : 12.877106333326083,
+      "steps" : 1500
+    },
+    {
+      "backend" : "gpu",
+      "capacity" : true,
+      "peakMLXBytes" : 229117988,
+      "seconds" : 10.247171750001144,
+      "steps" : 1500
+    },
+    {
+      "backend" : "gpu",
+      "capacity" : true,
+      "peakMLXBytes" : 266866724,
+      "seconds" : 10.288897708349396,
+      "steps" : 1500
+    },
+    {
+      "backend" : "gpu",
+      "capacity" : false,
+      "peakMLXBytes" : 238227492,
+      "seconds" : 12.319238958356436,
+      "steps" : 1500
+    },
+    {
+      "backend" : "cpu",
+      "capacity" : false,
+      "peakMLXBytes" : 25694244,
+      "seconds" : 0.14538975001778454,
+      "steps" : 128
+    },
+    {
+      "backend" : "cpu",
+      "capacity" : true,
+      "peakMLXBytes" : 15208484,
+      "seconds" : 0.016434291610494256,
+      "steps" : 128
+    },
+    {
+      "backend" : "cpu",
+      "capacity" : true,
+      "peakMLXBytes" : 15208484,
+      "seconds" : 0.015832625038456172,
+      "steps" : 128
+    },
+    {
+      "backend" : "cpu",
+      "capacity" : false,
+      "peakMLXBytes" : 25694244,
+      "seconds" : 0.1580871666665189,
+      "steps" : 128
+    },
+    {
+      "backend" : "cpu",
+      "capacity" : false,
+      "peakMLXBytes" : 63442980,
+      "seconds" : 1.3177974999998696,
+      "steps" : 512
+    },
+    {
+      "backend" : "cpu",
+      "capacity" : true,
+      "peakMLXBytes" : 71831604,
+      "seconds" : 0.075641000003088266,
+      "steps" : 512
+    },
+    {
+      "backend" : "cpu",
+      "capacity" : true,
+      "peakMLXBytes" : 71831604,
+      "seconds" : 0.076353416661731899,
+      "steps" : 512
+    },
+    {
+      "backend" : "cpu",
+      "capacity" : false,
+      "peakMLXBytes" : 63442980,
+      "seconds" : 1.285121499968227,
+      "steps" : 512
+    },
+    {
+      "backend" : "cpu",
+      "capacity" : false,
+      "peakMLXBytes" : 160567332,
+      "seconds" : 8.9882259999867529,
+      "steps" : 1500
+    },
+    {
+      "backend" : "cpu",
+      "capacity" : true,
+      "peakMLXBytes" : 172494896,
+      "seconds" : 0.79982170829316601,
+      "steps" : 1500
+    },
+    {
+      "backend" : "cpu",
+      "capacity" : true,
+      "peakMLXBytes" : 172494892,
+      "seconds" : 0.68383191665634513,
+      "steps" : 1500
+    },
+    {
+      "backend" : "cpu",
+      "capacity" : false,
+      "peakMLXBytes" : 160567332,
+      "seconds" : 9.8727606249740347,
+      "steps" : 1500
+    }
+  ],
+  "note" : "Checkpoint intervals include lazy work; before-codec includes deferred flow sampling. Cache timings omit attention and codec and are not end-to-end gains.",
+  "os" : "Version 27.0.1 (Build 26A434)",
+  "profile" : [
+    {
+      "backend" : "gpu",
+      "cold" : true,
+      "intervalSeconds" : {
+        "after-codec" : 0.0031161249498836696,
+        "after-prefill" : 4.2083556763827801e-06,
+        "before-codec" : 28.534399416588712,
+        "before-flow" : 7.5008560417336412,
+        "before-prefill" : 3.9882293750415556,
+        "before-voice" : 0.0041648333426564932,
+        "codec-warmup" : 1.4048137083300389,
+        "start" : 1.1875003110617399e-05
+      },
+      "iteration" : 0,
+      "loadSeconds" : 1.0159623749786988,
+      "pcmSHA256" : "66d530a009c6fef47f64f0ed92d8852aedcc2b85970020803ddac7570346a435",
+      "peakMLXBytes" : 514192157,
+      "renderSeconds" : 41.437127458339091,
+      "samples" : 224640
+    },
+    {
+      "backend" : "gpu",
+      "cold" : false,
+      "intervalSeconds" : {
+        "after-codec" : 0.0023129580658860505,
+        "after-prefill" : 3.5833218134939671e-06,
+        "before-codec" : 25.485193124739453,
+        "before-flow" : 7.9677000005613081,
+        "before-prefill" : 0.44132212502881885,
+        "before-voice" : 0.002965124964248389,
+        "codec-warmup" : 1.7587456249748357,
+        "start" : 1.8416671082377434e-05
+      },
+      "iteration" : 1,
+      "loadSeconds" : 1.0159623749786988,
+      "pcmSHA256" : "66d530a009c6fef47f64f0ed92d8852aedcc2b85970020803ddac7570346a435",
+      "peakMLXBytes" : 514195313,
+      "renderSeconds" : 35.659848583338317,
+      "samples" : 224640
+    },
+    {
+      "backend" : "gpu",
+      "cold" : false,
+      "intervalSeconds" : {
+        "after-codec" : 0.0024024582235142589,
+        "after-prefill" : 2.6666093617677689e-06,
+        "before-codec" : 28.226935333223082,
+        "before-flow" : 8.2141618752502836,
+        "before-prefill" : 0.44622670829994604,
+        "before-voice" : 0.0028732916689477861,
+        "codec-warmup" : 1.8044757916941307,
+        "start" : 1.9708357285708189e-05
+      },
+      "iteration" : 2,
+      "loadSeconds" : 1.0159623749786988,
+      "pcmSHA256" : "66d530a009c6fef47f64f0ed92d8852aedcc2b85970020803ddac7570346a435",
+      "peakMLXBytes" : 514195313,
+      "renderSeconds" : 38.698845458333381,
+      "samples" : 224640
+    },
+    {
+      "backend" : "cpu",
+      "cold" : true,
+      "intervalSeconds" : {
+        "after-codec" : 0.0012754586059600115,
+        "after-prefill" : 2.333370503038168e-06,
+        "before-codec" : 12.764491458481643,
+        "before-flow" : 0.83545141620561481,
+        "before-prefill" : 0.12182941666105762,
+        "before-voice" : 0.0031616250053048134,
+        "codec-warmup" : 2.5209062916692346,
+        "start" : 1.4875025954097509e-05
+      },
+      "iteration" : 0,
+      "loadSeconds" : 0.13069479167461395,
+      "pcmSHA256" : "7ccc486d1ba1e7e72794a10ad92bc953f9c94248128acd5120372ac04e9b68b9",
+      "peakMLXBytes" : 457204368,
+      "renderSeconds" : 16.249017583322711,
+      "samples" : 224640
+    },
+    {
+      "backend" : "cpu",
+      "cold" : false,
+      "intervalSeconds" : {
+        "after-codec" : 0.0011999171110801399,
+        "after-prefill" : 5.3750118240714073e-06,
+        "before-codec" : 12.857085624826141,
+        "before-flow" : 0.84471633308567107,
+        "before-prefill" : 0.10845091665396467,
+        "before-voice" : 0.0026059166993945837,
+        "codec-warmup" : 2.4562366249738261,
+        "start" : 1.9166618585586548e-05
+      },
+      "iteration" : 1,
+      "loadSeconds" : 0.13069479167461395,
+      "pcmSHA256" : "7ccc486d1ba1e7e72794a10ad92bc953f9c94248128acd5120372ac04e9b68b9",
+      "peakMLXBytes" : 457186448,
+      "renderSeconds" : 16.271901166648604,
+      "samples" : 224640
+    },
+    {
+      "backend" : "cpu",
+      "cold" : false,
+      "intervalSeconds" : {
+        "after-codec" : 0.0012791671906597912,
+        "after-prefill" : 4.2499159462749958e-06,
+        "before-codec" : 12.878049624909181,
+        "before-flow" : 0.85861979133915156,
+        "before-prefill" : 0.10946662497008219,
+        "before-voice" : 0.0027817916707135737,
+        "codec-warmup" : 2.4593722500139847,
+        "start" : 2.3416650947183371e-05
+      },
+      "iteration" : 2,
+      "loadSeconds" : 0.13069479167461395,
+      "pcmSHA256" : "7ccc486d1ba1e7e72794a10ad92bc953f9c94248128acd5120372ac04e9b68b9",
+      "peakMLXBytes" : 457186448,
+      "renderSeconds" : 16.311137916636653,
+      "samples" : 224640
+    }
+  ]
+}
