@@ -7,11 +7,16 @@ See [implementation decisions](../implementation-09.md).
 ## Build and contracts
 
 ```sh
-swift test
-swift test -c release
+swift test --build-system swiftbuild
+swift test --build-system swiftbuild -c release
 swift package dump-symbol-graph --minimum-access-level public --skip-synthesized-members
 python3 Scripts/check-public-api.py
 ```
+
+Select Swift Build explicitly on Swift 6.3 so the MLX Metal shaders are compiled
+and bundled for the unconditional CPU/GPU cache contracts. Swift 6.4 uses this
+build system by default. The release CI enables the same path instead of skipping
+GPU checks when the older native build system omits the shader library.
 
 Real-asset gates require explicit opt-in variables. Use disposable Core ML assets
 because the existing preparation-recovery suite renames owned compiled generations.

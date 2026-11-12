@@ -5,7 +5,7 @@
   "previousPublishedRelease": "v0.6.2",
   "validatedCandidate": "6b532b2",
   "runtimeTestBenchmarkCommit": "d5c83c27c808dfe7023d5b153dcb5db3b20317cc",
-  "releasePreparation": "Release documentation plus explicit Sendable test-closure captures for Swift 6.3; production runtime unchanged from the validated candidate",
+  "releasePreparation": "Release documentation, explicitly Sendable test captures, and Swift Build CI selection; production runtime unchanged from validated candidate",
   "includedDevelopmentMilestones": [
     "0.7",
     "0.8",
@@ -37,5 +37,13 @@
     "change": "Declare the map and detached-task closures @Sendable so captured synchronized test state has an explicit checked transfer boundary",
     "localFocusedTest": "passed on Swift 6.4.2",
     "localLogSHA256": "144c6606f1946c755e11ee3e54aef57ad0f3f3bf3ea9049484ab93135d2eb963"
+  },
+  "ciBuildSystemAdjustment": {
+    "failedCIRun": "https://github.com/Section9Labs/LibroxTTS/actions/runs/43133622452",
+    "reason": "Swift 6.3 native command-line build omits the MLX Metal shader library required by unconditional cache GPU tests",
+    "change": "Run both Debug and Release with --build-system swiftbuild; retain all cache tests",
+    "source": "https://github.com/swiftlang/swift-package-manager/blob/main/Sources/PackageManagerDocs/Documentation.docc/SwiftBuildPreview.md",
+    "localFocusedTest": "CompilerLockTests and CacheContract09Tests passed with --build-system swiftbuild",
+    "localLogSHA256": "2c0c0236b532cac7892370a0cce3db0e7cef0737dae5e068b5294e53e1afd5d8"
   }
 }

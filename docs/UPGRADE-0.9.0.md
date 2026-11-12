@@ -29,7 +29,9 @@ Release: https://github.com/Section9Labs/LibroxTTS/releases/tag/v0.9.0
    required solely by this update. Retain the actual approved app behavior and
    make only integration changes supported by a demonstrated mismatch.
 4. Build/test the app's supported iPhone/iPad and Mac/Catalyst configurations.
-   Run its narration, persistence, downloads and playback tests. Use available
+   Run its narration, persistence, downloads and playback tests. For SDK CLI tests,
+   use `swift test --build-system swiftbuild` (also with `-c release`) so Swift 6.3
+   builds the MLX Metal shader library; Xcode app builds already handle it. Use available
    physical devices for the acceptance checks below; report unavailable checks
    explicitly rather than substituting simulator success for device evidence.
 5. Commit the integration and provide the release manager with the commit, exact

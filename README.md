@@ -135,9 +135,13 @@ The app owns playback, the audio session, reading position and remote commands. 
 
 ## Develop
 
+Use the Swift Build backend for CLI tests so MLX Metal shaders are compiled and
+bundled. It is opt-in in Swift 6.3 and the default in Swift 6.4; see the
+[Swift Build documentation](https://github.com/swiftlang/swift-build#with-swiftpm).
+
 ```sh
-swift test
-swift test -c release
+swift test --build-system swiftbuild
+swift test --build-system swiftbuild -c release
 swift run pronunciation-probe es 'Capítulo XII. Son las 14:01.'
 python3 Scripts/download-models.py /path/to/models
 swift run -c release kokoro-probe /path/to/models \

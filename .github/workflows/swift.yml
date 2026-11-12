@@ -12,9 +12,9 @@ jobs:
       - name: Verify Swift toolchain
         run: swift --version
       - name: Debug tests
-        run: swift test
+        run: swift test --build-system swiftbuild
       - name: Release tests
-        run: swift test -c release
+        run: swift test --build-system swiftbuild -c release
       - name: Compile benchmark Python scripts
         run: python3 -m compileall -q Benchmarks/Narration Scripts/PocketTTS
       - name: Install XcodeGen
