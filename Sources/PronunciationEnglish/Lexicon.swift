@@ -39,7 +39,7 @@ internal struct TokenContext {
     var futureTo = false
 }
 
-internal enum LexiconValue {
+internal enum LexiconValue: Sendable {
     case single(String)
     case variants([String: String?])
 }
@@ -147,30 +147,43 @@ public final class Lexicon {
     public let british: Bool
     public let capStresses: (Double, Double) = (0.5, 2.0)
 
-    private let golds: [String: LexiconValue]
-    private let silvers: [String: String]
-    private let supplement: [String: String]
-    private let reviewedSpellings: Set<String>
+    private static let owners = WeakResourceCache<Bool, Resources>()
+    private let resources: Resources
+    private var golds: [String: LexiconValue] { resources.golds }
+    private var silvers: [String: String] { resources.silvers }
+    private var supplement: [String: String] { resources.supplement }
+    private var reviewedSpellings: Set<String> { resources.reviewedSpellings }
+    var resourceIdentity: ObjectIdentifier { ObjectIdentifier(resources) }
 
     public init(british: Bool = false) throws {
         self.british = british
-        self.golds = try Self.loadLexicon(named: british ? "gb_gold" : "us_gold", mixed: true)
-        self.silvers = try Self.loadLexicon(named: british ? "gb_silver" : "us_silver", mixed: false)
-        // CMUdict is US English. Never substitute its rhotic pronunciations
-        // into the British route; that route has a separately authored name list.
-        let names = try Self.loadSupplement(named: "gb_names", british: true)
-        var base = british ? names : try Self.loadSupplement(named: "us_cmudict", british: false)
-        if !british {
-            let usNames = try Self.loadSupplement(named: "us_names", british: false)
-            base.merge(usNames, uniquingKeysWith: { _, reviewed in reviewed })
+        resources = try Self.owners.value(for: british) { try Resources(british: british) }
+    }
+
+    private final class Resources: Sendable {
+        let golds: [String: LexiconValue]
+        let silvers: [String: String]
+        let supplement: [String: String]
+        let reviewedSpellings: Set<String>
+        init(british: Bool) throws {
+            self.golds = try Lexicon.loadLexicon(named: british ? "gb_gold" : "us_gold", mixed: true)
+            self.silvers = try Lexicon.loadLexicon(named: british ? "gb_silver" : "us_silver", mixed: false)
+            // CMUdict is US English. Never substitute its rhotic pronunciations
+            // into the British route; that route has a separately authored name list.
+            let names = try Lexicon.loadSupplement(named: "gb_names", british: true)
+            var base = british ? names : try Lexicon.loadSupplement(named: "us_cmudict", british: false)
+            if !british {
+                let usNames = try Lexicon.loadSupplement(named: "us_names", british: false)
+                base.merge(usNames, uniquingKeysWith: { _, reviewed in reviewed })
+            }
+            let loans = try Lexicon.loadSupplement(named: british ? "gb_loans" : "us_loans", british: british)
+            // A small, explicit list: reviewed names and accented English loans,
+            // never all 69k CMU spellings. Thus CAFÉ is a word but FBI stays letters.
+            self.reviewedSpellings = Set(names.keys.filter { $0.count >= 4 })
+                .union(loans.keys.filter { $0.unicodeScalars.contains { !$0.isASCII } })
+            self.supplement = base.merging(loans, uniquingKeysWith: { _, reviewed in reviewed })
+            try Lexicon.validate(golds: golds, british: british)
         }
-        let loans = try Self.loadSupplement(named: british ? "gb_loans" : "us_loans", british: british)
-        // A small, explicit list: reviewed names and accented English loans,
-        // never all 69k CMU spellings. Thus CAFÉ is a word but FBI stays letters.
-        self.reviewedSpellings = Set(names.keys.filter { $0.count >= 4 })
-            .union(loans.keys.filter { $0.unicodeScalars.contains { !$0.isASCII } })
-        self.supplement = base.merging(loans, uniquingKeysWith: { _, reviewed in reviewed })
-        try Self.validate(golds: golds, british: british)
     }
 
     private static func loadLexicon(named name: String, mixed: Bool) throws -> [String: LexiconValue] {
