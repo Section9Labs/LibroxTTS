@@ -1,0 +1,38 @@
+[
+  {
+    "british" : false,
+    "coldSeconds" : 0.620655833336059,
+    "fourOwnersSeconds" : 2.4112400833400898,
+    "kind" : "lexicon"
+  },
+  {
+    "british" : true,
+    "coldSeconds" : 0.55320470832521096,
+    "fourOwnersSeconds" : 2.1627919166930951,
+    "kind" : "lexicon"
+  },
+  {
+    "kind" : "dsp",
+    "pcmSHA256" : "d817c3d30d7fd35f6ffef64f9548686cf8b36bf706fa97096b55d0b4959a04da",
+    "reused" : false,
+    "seconds" : 0.16389387502567843
+  },
+  {
+    "kind" : "dsp",
+    "pcmSHA256" : "d817c3d30d7fd35f6ffef64f9548686cf8b36bf706fa97096b55d0b4959a04da",
+    "reused" : true,
+    "seconds" : 0.16091725003207102
+  },
+  {
+    "kind" : "dsp",
+    "pcmSHA256" : "d817c3d30d7fd35f6ffef64f9548686cf8b36bf706fa97096b55d0b4959a04da",
+    "reused" : true,
+    "seconds" : 0.16650062496773899
+  },
+  {
+    "kind" : "dsp",
+    "pcmSHA256" : "d817c3d30d7fd35f6ffef64f9548686cf8b36bf706fa97096b55d0b4959a04da",
+    "reused" : false,
+    "seconds" : 0.16857429168885574
+  }
+]

@@ -38,7 +38,7 @@ final class Release09BenchmarkTests: XCTestCase {
         let observer: @Sendable (PocketTTSResourceSnapshot) -> Void = { s in observedPeak.withLock { $0 = max($0,s.footprintBytes) } }
         await core.setResourceObserver(observer); await mlx.setResourceObserver(observer)
         func unload() async { await core.unload(); await mlx.unload() }
-        // Existing reading-corpus.json, first sentence excerpt of Alice, plus
+        // Existing reading-corpus.json, adapted first clause of Alice, plus
         // the existing Spanish reading fixture. Fixed source, not invented timings.
         let book = "Alice was beginning to get very tired of sitting by her sister on the bank, and of having nothing to do."
         let cases = [

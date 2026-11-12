@@ -1,0 +1,335 @@
+{
+  "exactPlanFingerprints": true,
+  "order": "ABBA",
+  "runs": [
+    {
+      "revision": "baseline",
+      "rows": [
+        {
+          "inputScalars": 512,
+          "medianSeconds": 0.002564208349213004,
+          "model": "ctPlusV1",
+          "planSHA256": "0597aeb94b070c5b4f2577fc574144749dc7b8b911a7f7c47412fab9d34eeffa",
+          "units": 2
+        },
+        {
+          "inputScalars": 2048,
+          "medianSeconds": 0.006413750001229346,
+          "model": "ctPlusV1",
+          "planSHA256": "dd48b4656f58795a580ed11b4f1c74f16b3d429457b56d11f3d25c0f4875173c",
+          "units": 5
+        },
+        {
+          "inputScalars": 8192,
+          "medianSeconds": 0.01901337504386902,
+          "model": "ctPlusV1",
+          "planSHA256": "f00af112ea409c1cea3d101f6d89ba0c2106c286ede52715856fb46e70683c6f",
+          "units": 17
+        },
+        {
+          "inputScalars": 16000,
+          "medianSeconds": 0.03636525000911206,
+          "model": "ctPlusV1",
+          "planSHA256": "a44901d34c240aaa0e647e6b71598aec255f7cf877bc587711efd88e34e64673",
+          "units": 33
+        },
+        {
+          "inputScalars": 512,
+          "medianSeconds": 0.0011750833364203572,
+          "model": "pocketTTSV1",
+          "planSHA256": "deded72c08d0310235257df6062b4f33c5335d02510b6480c436927e20adef1b",
+          "units": 1
+        },
+        {
+          "inputScalars": 2048,
+          "medianSeconds": 0.002860833308659494,
+          "model": "pocketTTSV1",
+          "planSHA256": "ba0cca50d9cc0004c4e1f475886a3302ac1aa2e206e840d1cfbc586be819733a",
+          "units": 1
+        },
+        {
+          "inputScalars": 8192,
+          "medianSeconds": 0.01885083335218951,
+          "model": "pocketTTSV1",
+          "planSHA256": "63cec5e18e7ae6a0da04dd8031308bdae87d1514e44c85e5d00b9a95a4f5780d",
+          "units": 4
+        },
+        {
+          "inputScalars": 16000,
+          "medianSeconds": 0.035504166677128524,
+          "model": "pocketTTSV1",
+          "planSHA256": "324981e70bf65c98d98882e6c2856090c7209fff09179a59f0073104759c87fc",
+          "units": 7
+        }
+      ]
+    },
+    {
+      "revision": "candidate",
+      "rows": [
+        {
+          "inputScalars": 512,
+          "medianSeconds": 0.002112500020302832,
+          "model": "ctPlusV1",
+          "planSHA256": "0597aeb94b070c5b4f2577fc574144749dc7b8b911a7f7c47412fab9d34eeffa",
+          "units": 2
+        },
+        {
+          "inputScalars": 2048,
+          "medianSeconds": 0.00608908332651481,
+          "model": "ctPlusV1",
+          "planSHA256": "dd48b4656f58795a580ed11b4f1c74f16b3d429457b56d11f3d25c0f4875173c",
+          "units": 5
+        },
+        {
+          "inputScalars": 8192,
+          "medianSeconds": 0.019243124988861382,
+          "model": "ctPlusV1",
+          "planSHA256": "f00af112ea409c1cea3d101f6d89ba0c2106c286ede52715856fb46e70683c6f",
+          "units": 17
+        },
+        {
+          "inputScalars": 16000,
+          "medianSeconds": 0.037023333308752626,
+          "model": "ctPlusV1",
+          "planSHA256": "a44901d34c240aaa0e647e6b71598aec255f7cf877bc587711efd88e34e64673",
+          "units": 33
+        },
+        {
+          "inputScalars": 512,
+          "medianSeconds": 0.0010732082882896066,
+          "model": "pocketTTSV1",
+          "planSHA256": "deded72c08d0310235257df6062b4f33c5335d02510b6480c436927e20adef1b",
+          "units": 1
+        },
+        {
+          "inputScalars": 2048,
+          "medianSeconds": 0.0028157083434052765,
+          "model": "pocketTTSV1",
+          "planSHA256": "ba0cca50d9cc0004c4e1f475886a3302ac1aa2e206e840d1cfbc586be819733a",
+          "units": 1
+        },
+        {
+          "inputScalars": 8192,
+          "medianSeconds": 0.018813666654750705,
+          "model": "pocketTTSV1",
+          "planSHA256": "63cec5e18e7ae6a0da04dd8031308bdae87d1514e44c85e5d00b9a95a4f5780d",
+          "units": 4
+        },
+        {
+          "inputScalars": 16000,
+          "medianSeconds": 0.0362554166931659,
+          "model": "pocketTTSV1",
+          "planSHA256": "324981e70bf65c98d98882e6c2856090c7209fff09179a59f0073104759c87fc",
+          "units": 7
+        }
+      ]
+    },
+    {
+      "revision": "candidate",
+      "rows": [
+        {
+          "inputScalars": 512,
+          "medianSeconds": 0.0019497916800901294,
+          "model": "ctPlusV1",
+          "planSHA256": "0597aeb94b070c5b4f2577fc574144749dc7b8b911a7f7c47412fab9d34eeffa",
+          "units": 2
+        },
+        {
+          "inputScalars": 2048,
+          "medianSeconds": 0.006831708364188671,
+          "model": "ctPlusV1",
+          "planSHA256": "dd48b4656f58795a580ed11b4f1c74f16b3d429457b56d11f3d25c0f4875173c",
+          "units": 5
+        },
+        {
+          "inputScalars": 8192,
+          "medianSeconds": 0.019296208338346332,
+          "model": "ctPlusV1",
+          "planSHA256": "f00af112ea409c1cea3d101f6d89ba0c2106c286ede52715856fb46e70683c6f",
+          "units": 17
+        },
+        {
+          "inputScalars": 16000,
+          "medianSeconds": 0.03748933336464688,
+          "model": "ctPlusV1",
+          "planSHA256": "a44901d34c240aaa0e647e6b71598aec255f7cf877bc587711efd88e34e64673",
+          "units": 33
+        },
+        {
+          "inputScalars": 512,
+          "medianSeconds": 0.0011912499903701246,
+          "model": "pocketTTSV1",
+          "planSHA256": "deded72c08d0310235257df6062b4f33c5335d02510b6480c436927e20adef1b",
+          "units": 1
+        },
+        {
+          "inputScalars": 2048,
+          "medianSeconds": 0.00291237497003749,
+          "model": "pocketTTSV1",
+          "planSHA256": "ba0cca50d9cc0004c4e1f475886a3302ac1aa2e206e840d1cfbc586be819733a",
+          "units": 1
+        },
+        {
+          "inputScalars": 8192,
+          "medianSeconds": 0.0188967083231546,
+          "model": "pocketTTSV1",
+          "planSHA256": "63cec5e18e7ae6a0da04dd8031308bdae87d1514e44c85e5d00b9a95a4f5780d",
+          "units": 4
+        },
+        {
+          "inputScalars": 16000,
+          "medianSeconds": 0.03641316667199135,
+          "model": "pocketTTSV1",
+          "planSHA256": "324981e70bf65c98d98882e6c2856090c7209fff09179a59f0073104759c87fc",
+          "units": 7
+        }
+      ]
+    },
+    {
+      "revision": "baseline",
+      "rows": [
+        {
+          "inputScalars": 512,
+          "medianSeconds": 0.0019338750280439854,
+          "model": "ctPlusV1",
+          "planSHA256": "0597aeb94b070c5b4f2577fc574144749dc7b8b911a7f7c47412fab9d34eeffa",
+          "units": 2
+        },
+        {
+          "inputScalars": 2048,
+          "medianSeconds": 0.007104333315510303,
+          "model": "ctPlusV1",
+          "planSHA256": "dd48b4656f58795a580ed11b4f1c74f16b3d429457b56d11f3d25c0f4875173c",
+          "units": 5
+        },
+        {
+          "inputScalars": 8192,
+          "medianSeconds": 0.018672333331778646,
+          "model": "ctPlusV1",
+          "planSHA256": "f00af112ea409c1cea3d101f6d89ba0c2106c286ede52715856fb46e70683c6f",
+          "units": 17
+        },
+        {
+          "inputScalars": 16000,
+          "medianSeconds": 0.03768383333226666,
+          "model": "ctPlusV1",
+          "planSHA256": "a44901d34c240aaa0e647e6b71598aec255f7cf877bc587711efd88e34e64673",
+          "units": 33
+        },
+        {
+          "inputScalars": 512,
+          "medianSeconds": 0.0012890833313576877,
+          "model": "pocketTTSV1",
+          "planSHA256": "deded72c08d0310235257df6062b4f33c5335d02510b6480c436927e20adef1b",
+          "units": 1
+        },
+        {
+          "inputScalars": 2048,
+          "medianSeconds": 0.0030776666826568544,
+          "model": "pocketTTSV1",
+          "planSHA256": "ba0cca50d9cc0004c4e1f475886a3302ac1aa2e206e840d1cfbc586be819733a",
+          "units": 1
+        },
+        {
+          "inputScalars": 8192,
+          "medianSeconds": 0.01856620830949396,
+          "model": "pocketTTSV1",
+          "planSHA256": "63cec5e18e7ae6a0da04dd8031308bdae87d1514e44c85e5d00b9a95a4f5780d",
+          "units": 4
+        },
+        {
+          "inputScalars": 16000,
+          "medianSeconds": 0.03585104166995734,
+          "model": "pocketTTSV1",
+          "planSHA256": "324981e70bf65c98d98882e6c2856090c7209fff09179a59f0073104759c87fc",
+          "units": 7
+        }
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "model": "ctPlusV1",
+      "inputScalars": 512,
+      "units": 2,
+      "planSHA256": "0597aeb94b070c5b4f2577fc574144749dc7b8b911a7f7c47412fab9d34eeffa",
+      "baselineSeconds": 0.0022490416886284947,
+      "candidateSeconds": 0.0020311458501964808,
+      "speedup": 1.1072772978912055
+    },
+    {
+      "model": "ctPlusV1",
+      "inputScalars": 2048,
+      "units": 5,
+      "planSHA256": "dd48b4656f58795a580ed11b4f1c74f16b3d429457b56d11f3d25c0f4875173c",
+      "baselineSeconds": 0.006759041658369824,
+      "candidateSeconds": 0.006460395845351741,
+      "speedup": 1.046227169382037
+    },
+    {
+      "model": "ctPlusV1",
+      "inputScalars": 8192,
+      "units": 17,
+      "planSHA256": "f00af112ea409c1cea3d101f6d89ba0c2106c286ede52715856fb46e70683c6f",
+      "baselineSeconds": 0.018842854187823832,
+      "candidateSeconds": 0.019269666663603857,
+      "speedup": 0.9778505522056498
+    },
+    {
+      "model": "ctPlusV1",
+      "inputScalars": 16000,
+      "units": 33,
+      "planSHA256": "a44901d34c240aaa0e647e6b71598aec255f7cf877bc587711efd88e34e64673",
+      "baselineSeconds": 0.03702454167068936,
+      "candidateSeconds": 0.037256333336699754,
+      "speedup": 0.9937784627403989
+    },
+    {
+      "model": "pocketTTSV1",
+      "inputScalars": 512,
+      "units": 1,
+      "planSHA256": "deded72c08d0310235257df6062b4f33c5335d02510b6480c436927e20adef1b",
+      "baselineSeconds": 0.0012320833338890225,
+      "candidateSeconds": 0.0011322291393298656,
+      "speedup": 1.0881925672909794
+    },
+    {
+      "model": "pocketTTSV1",
+      "inputScalars": 2048,
+      "units": 1,
+      "planSHA256": "ba0cca50d9cc0004c4e1f475886a3302ac1aa2e206e840d1cfbc586be819733a",
+      "baselineSeconds": 0.002969249995658174,
+      "candidateSeconds": 0.0028640416567213833,
+      "speedup": 1.0367342209181512
+    },
+    {
+      "model": "pocketTTSV1",
+      "inputScalars": 8192,
+      "units": 4,
+      "planSHA256": "63cec5e18e7ae6a0da04dd8031308bdae87d1514e44c85e5d00b9a95a4f5780d",
+      "baselineSeconds": 0.018708520830841735,
+      "candidateSeconds": 0.01885518748895265,
+      "speedup": 0.992221416085263
+    },
+    {
+      "model": "pocketTTSV1",
+      "inputScalars": 16000,
+      "units": 7,
+      "planSHA256": "324981e70bf65c98d98882e6c2856090c7209fff09179a59f0073104759c87fc",
+      "baselineSeconds": 0.03567760417354293,
+      "candidateSeconds": 0.03633429168257862,
+      "speedup": 0.9819265085783809
+    }
+  ],
+  "machine": "arm64",
+  "os": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+  "binarySHA256": {
+    "baseline": "f83e70a4f2717be138f43f162dde9e97fb772dfc1fc2109875b3b42ba30eb5b4",
+    "candidate": "2ac26eaab8fb257fd41ba717436d4219f652106897ea4a2867dcebcfdd7c32f1"
+  },
+  "scope": "Existing 0.8 plain Spanish long-sentence control; three samples per case per process; ABBA",
+  "limitations": [
+    "Synthetic long-sentence workload on a shared Mac; not a representative book or device benchmark",
+    "Fingerprints cover ranges, voice IDs and synthesis text; separate differential tests compare complete plans"
+  ]
+}

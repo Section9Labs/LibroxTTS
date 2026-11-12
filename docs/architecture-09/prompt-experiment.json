@@ -1,0 +1,26 @@
+[
+  {
+    "coldSeconds" : 0.0025887499796226621,
+    "retainedPayloadBytes" : 0,
+    "reuse" : false,
+    "warmMedianSeconds" : 0.0026134999934583902
+  },
+  {
+    "coldSeconds" : 0.0059622083208523691,
+    "retainedPayloadBytes" : 6242304,
+    "reuse" : true,
+    "warmMedianSeconds" : 0.0033456666860729456
+  },
+  {
+    "coldSeconds" : 0.0061211250140331686,
+    "retainedPayloadBytes" : 6242304,
+    "reuse" : true,
+    "warmMedianSeconds" : 0.0033470833441242576
+  },
+  {
+    "coldSeconds" : 0.0025710416957736015,
+    "retainedPayloadBytes" : 0,
+    "reuse" : false,
+    "warmMedianSeconds" : 0.0026591666392050683
+  }
+]
