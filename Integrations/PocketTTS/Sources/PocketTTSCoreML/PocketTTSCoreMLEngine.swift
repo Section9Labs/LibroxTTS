@@ -18,7 +18,7 @@ public actor PocketTTSCoreMLEngine {
     private let assets: URL
     private let models: URL?
     private let placement: Placement
-    private var loaded: Loaded?
+    private var loaded: PocketCoreMLExecutionPlan?
     private var seed: UInt64?
     private var random: MLXRandom.RandomState?
     public init(directory: URL, modelsDirectory: URL? = nil, placement: Placement = .cpu) {
@@ -78,7 +78,10 @@ public actor PocketTTSCoreMLEngine {
         guard let voice = PocketTTSCatalog.voice(id: voiceID) else { throw PocketTTSError.invalidVoice }
         try PocketTTSDeliveryCatalog.validate(deliveryStyle, voiceID: voiceID, in: assets)
         let name = try PocketTTSDeliveryCatalog.stateName(voiceID: voiceID, style: deliveryStyle)
-        try Device.withDefaultDevice(.cpu) {
+        // Synchronous actor work can be called repeatedly without a run-loop
+        // autorelease drain. Bound Foundation/Core ML bridge lifetimes to one
+        // render, including retained-output views and native voice preparation.
+        try autoreleasepool { try Device.withDefaultDevice(.cpu) {
             if random == nil { random = seed.map(MLXRandom.RandomState.init(seed:)) ?? MLXRandom.RandomState() }
             try withRandomState(random!) {
                 defer { if let random { eval(random) }; Memory.clearCache() }
@@ -91,7 +94,7 @@ public actor PocketTTSCoreMLEngine {
                     let prompt = try m.voice(name)
                     let chunks = try m.chunks(text, options: chunking, role: role)
                     var previousText: String?
-                    var previous: [[Float]] = []
+                    var previous: [MLMultiArray] = []
                     var total = 0
                     for chunk in chunks {
                         try Task.checkCancellation()
@@ -104,16 +107,16 @@ public actor PocketTTSCoreMLEngine {
                         let tokens = m.tokenizer.encode(prepared)
                         var cache = prompt
                         _ = try m.transform(m.textModel, value: Self.ints(tokens), cache: &cache)
-                        var input = m.bos
+                        var input = try Self.floats(m.bos, shape: [1,32])
                         var mimiState = try m.emptyMimiState()
                         if forced {
-                            let prefix = [m.bos] + previous.dropLast()
+                            let prefix = [input] + previous.dropLast()
                             // The graph accepts up to 512 tokens per invocation.
                             // Preserve the entire native continuation, including
                             // rare long tails, by causally prefilling in blocks.
                             for start in stride(from: 0, to: prefix.count, by: 512) {
                                 let block = prefix[start..<min(start + 512, prefix.count)]
-                                _ = try m.transform(m.latentModel, value: Self.floats(block.flatMap { $0 }, shape: [1, block.count, 32]), cache: &cache)
+                                _ = try m.transform(m.latentModel, value: Self.floats(block.flatMap { Self.values($0) }, shape: [1, block.count, 32]), cache: &cache)
                             }
                             input = previous.last!
                             for frame in previous.suffix(12) { _ = try m.decode(frame, state: &mimiState) }
@@ -122,12 +125,12 @@ public actor PocketTTSCoreMLEngine {
                         // teacher-forcing's discarded last flow output.
                         _ = MLXRandom.normal([1, 32])
                         var eosStep: Int?
-                        var current: [[Float]] = []
+                        var current: [MLMultiArray] = []
                         let cap = min(1500, Int(ceil((Double(tokens.count) / 3 + 2) * m.config.mimi.frameRate)))
                         var complete = false
                         for step in 0..<cap {
                             try PocketTTSResourceChecks.checkpoint("frame", backend: "coreml-" + placement.rawValue, samplerSteps: samplerSteps, frameIndex: step, observer: resourceObserver)
-                            let result = try m.transform(m.latentModel, value: Self.floats(input, shape: [1, 1, 32]), cache: &cache)
+                            let result = try m.transform(m.latentModel, value: Self.latentInput(input), cache: &cache)
                             var noise = MLXRandom.normal([1, 32]) * Float(sqrt(temperature))
                             if let clamp = m.config.noiseClamp { noise = MLX.minimum(MLX.maximum(noise, -clamp), clamp) }
                             let next = try m.sample(flow, steps: samplerSteps, condition: result.0, noise: noise.asArray(Float.self))
@@ -153,9 +156,9 @@ public actor PocketTTSCoreMLEngine {
                     guard total > 0 else { throw PocketTTSError.emptyText }
                 } catch { loaded = nil; random = nil; throw error }
             }
-        }
+        } }
     }
-    private func load(_ language: String) throws -> Loaded {
+    private func load(_ language: String) throws -> PocketCoreMLExecutionPlan {
         if loaded?.language != language {
             loaded = nil
             if models == nil {
@@ -164,7 +167,7 @@ public actor PocketTTSCoreMLEngine {
                 try PocketTTSCatalog.validate(PocketTTSCoreMLCatalog.sharedManifest(language: language), in: assets)
             }
             loaded = try autoreleasepool {
-                try Loaded(language: language, assets: assets, models: models, placement: placement)
+                try PocketCoreMLExecutionPlan(language: language, assets: assets, models: models, placement: placement)
             }
             loaded?.collectTimings = collectTimings
         }
@@ -206,138 +209,5 @@ public actor PocketTTSCoreMLEngine {
     static func output(_ result: any MLFeatureProvider, _ name: String) throws -> MLMultiArray {
         guard let value = result.featureValue(for: name)?.multiArrayValue else { throw Failure.missingOutput(name) }
         return value
-    }
-    private final class Loaded {
-        let language: String
-        let root: URL
-        let config: PocketTTSModelConfig
-        let tokenizer: PocketTTSSentencePieceTokenizer
-        let textModel: MLModel, latentModel: MLModel, mimiModel: MLModel
-        let modelRoot: URL
-        let compiledRoot: URL
-        let configuration: MLModelConfiguration
-        let bos: [Float]
-        var flows = PocketFlowModels<MLModel>()
-        var collectTimings = false
-        var timings: [String: StageTiming] = [:]
-        private func predict(_ model: MLModel, _ inputs: [String: Any]) throws -> any MLFeatureProvider {
-            try model.prediction(from: MLDictionaryFeatureProvider(dictionary: inputs))
-        }
-        private func measure<T>(_ name: String, _ body: () throws -> T) rethrows -> T {
-            guard collectTimings else { return try body() }
-            func cpu() -> Double {
-                var usage = rusage(); getrusage(RUSAGE_SELF, &usage)
-                return Double(usage.ru_utime.tv_sec + usage.ru_stime.tv_sec)
-                    + Double(usage.ru_utime.tv_usec + usage.ru_stime.tv_usec) / 1_000_000
-            }
-            let start = ProcessInfo.processInfo.systemUptime, startedCPU = cpu()
-            defer {
-                var row = timings[name] ?? StageTiming()
-                row.calls += 1; row.wallSeconds += ProcessInfo.processInfo.systemUptime - start
-                row.cpuSeconds += cpu() - startedCPU; timings[name] = row
-            }
-            return try body()
-        }
-        init(language: String, assets: URL, models: URL?, placement: Placement) throws {
-            self.language = language; root = assets.appendingPathComponent(language); modelRoot = models?.appendingPathComponent(language) ?? PocketTTSCoreMLAssets.modelDirectory(in: assets, language: language)
-            config = try PocketTTSModelConfig.load(from: root.appendingPathComponent("config.json"))
-            tokenizer = try PocketTTSSentencePieceTokenizer(nBins: config.flowLM.lookupTable.nBins, modelFolder: root, tokenizerPath: config.tokenizerName)
-            let manifest = try JSONSerialization.jsonObject(with: Data(contentsOf: modelRoot.appendingPathComponent("manifest.json"))) as? [String: Any]
-            let original = try PocketTTSCatalog.manifest(language: language).installedFiles.first { $0.path == "\(language)/model.safetensors" }
-            guard manifest?["snapshot"] as? String == "a7056f505a4a8ca72d8b5fb1440071d6f1a35739",
-                  manifest?["weightsSHA256"] as? String == original?.sha256,
-                  manifest?["precision"] as? String == "float32", manifest?["gelu"] as? String == "tanh" else { throw Failure.incompatibleModel }
-            configuration = MLModelConfiguration()
-            switch placement {
-            case .cpu: configuration.computeUnits = .cpuOnly
-            case .cpuGPU: configuration.computeUnits = .cpuAndGPU
-            case .cpuANE: configuration.computeUnits = .cpuAndNeuralEngine
-            case .all: configuration.computeUnits = .all
-            }
-            compiledRoot = models == nil ? modelRoot.appendingPathComponent("compiled") : modelRoot
-            textModel = try MLModel(contentsOf: compiledRoot.appendingPathComponent("text.mlmodelc"), configuration: configuration)
-            latentModel = try MLModel(contentsOf: compiledRoot.appendingPathComponent("latent.mlmodelc"), configuration: configuration)
-            let mimiConfig = MLModelConfiguration(); mimiConfig.computeUnits = .cpuOnly
-            mimiModel = try MLModel(contentsOf: compiledRoot.appendingPathComponent("mimi.mlmodelc"), configuration: mimiConfig)
-            let data = try Data(contentsOf: modelRoot.appendingPathComponent("bos.bin"))
-            bos = data.withUnsafeBytes { Array($0.bindMemory(to: Float.self)) }
-            guard bos.count == 32 else { throw Failure.invalidShape }
-        }
-        func flow(_ steps: Int) throws -> MLModel {
-            try flows.model(steps: steps) { graph in
-                try autoreleasepool {
-                    try MLModel(contentsOf: compiledRoot.appendingPathComponent(graph + ".mlmodelc"), configuration: configuration)
-                }
-            }
-        }
-        func sample(_ model: MLModel, steps: Int, condition: MLMultiArray, noise: [Float]) throws -> [Float] {
-            try measure("flow") { try autoreleasepool {
-                let condition = try PocketTTSCoreMLEngine.flowCondition(condition)
-                var latent = try PocketTTSCoreMLEngine.floats(noise, shape: [1,32])
-                for index in 0..<([4, 8].contains(steps) ? 1 : steps) {
-                    try Task.checkCancellation()
-                    var inputs: [String: Any] = ["condition": condition, "noise": latent]
-                    if ![4, 8].contains(steps) {
-                        inputs["s"] = try PocketTTSCoreMLEngine.floats([Float(Double(index) / Double(steps))], shape: [1,1])
-                        inputs["t"] = try PocketTTSCoreMLEngine.floats([Float(Double(index + 1) / Double(steps))], shape: [1,1])
-                        inputs["steps"] = try PocketTTSCoreMLEngine.floats([Float(steps)], shape: [1])
-                    }
-                    let output = try predict(model, inputs)
-                    latent = try PocketTTSCoreMLEngine.output(output, "latent")
-                }
-                return PocketTTSCoreMLEngine.values(latent)
-            } }
-        }
-        func chunks(_ text: String, options: PocketTTSChunkingOptions, role: PocketTTSPassageRole) throws -> [PocketTTSTextChunk] {
-            try PocketTTSPassageChunker.plan(text, language: language, role: role, options: options,
-                prepare: { try PocketTTSTextUtils.prepareTextPrompt($0, config: self.config, preserveSentenceBoundaries: options.grouping == .adaptive).0 },
-                tokenCount: { self.tokenizer.encode($0).count })
-        }
-        func voice(_ name: String) throws -> [MLMultiArray] {
-            try Device.withDefaultDevice(.cpu) {
-                let arrays = try MLX.loadArrays(url: root.appendingPathComponent("embeddings/\(name).safetensors"))
-                var caches: [MLMultiArray] = []
-                for i in 0..<6 {
-                    let prefix = "transformer.layers.\(i).self_attn/"
-                    guard let kv = arrays[prefix + "cache"], let offset = arrays[prefix + "offset"] else { throw Failure.invalidShape }
-                    let n = offset.item(Int.self)
-                    guard kv.ndim == 5, kv.shape[0] == 2, kv.shape[1] == 1, kv.shape[3] == 16, kv.shape[4] == 64,
-                          n > 0, n <= kv.shape[2], n <= 512 else { throw Failure.invalidShape }
-                    for j in 0..<2 {
-                        let value = kv[j, 0..., ..<n, 0..., 0...].transposed(0, 2, 1, 3).asType(.float32)
-                        caches.append(try PocketTTSCoreMLEngine.floats(value.asArray(Float.self), shape: [1,16,n,64]))
-                    }
-                }
-                return caches
-            }
-        }
-        func transform(_ model: MLModel, value: MLMultiArray, cache: inout [MLMultiArray]) throws -> (MLMultiArray, Float) {
-            try measure(model === textModel ? "text" : "latent") { try autoreleasepool {
-            try Task.checkCancellation()
-            guard cache.count == 12, cache[0].shape[2].intValue <= 4096, value.shape[1].intValue <= 512 else { throw Failure.cacheLimit }
-            var input: [String: Any] = ["value": value, "position": try PocketTTSCoreMLEngine.floats([Float(cache[0].shape[2].intValue)], shape: [1])]
-            for i in 0..<12 { input["cache\(i)"] = cache[i] }
-            let out = try predict(model, input)
-            cache = try (0..<12).map { try PocketTTSCoreMLEngine.output(out, "next\($0)") }
-            return (try PocketTTSCoreMLEngine.output(out, "hidden"), try PocketTTSCoreMLEngine.output(out, "eos")[0].floatValue)
-            } }
-        }
-        func emptyMimiState() throws -> [String: MLMultiArray] {
-            var result: [String: MLMultiArray] = [:]
-            for (name, description) in mimiModel.modelDescription.inputDescriptionsByName where name != "latent" {
-                guard let shape = description.multiArrayConstraint?.shape.map(\.intValue) else { throw Failure.invalidShape }
-                result[name] = try PocketTTSCoreMLEngine.floats([Float](repeating: 0, count: shape.reduce(1,*)), shape: shape)
-            }
-            return result
-        }
-        func decode(_ latent: [Float], state: inout [String: MLMultiArray]) throws -> [Float] {
-            try measure("mimi") { try autoreleasepool {
-            try Task.checkCancellation()
-            var input = state; input["latent"] = try PocketTTSCoreMLEngine.floats(latent, shape: [1,32])
-            let out = try predict(mimiModel, input)
-            for name in state.keys { state[name] = try PocketTTSCoreMLEngine.output(out, "next_\(name)") }
-            return PocketTTSCoreMLEngine.values(try PocketTTSCoreMLEngine.output(out, "audio"))
-            } }
-        }
     }
 }

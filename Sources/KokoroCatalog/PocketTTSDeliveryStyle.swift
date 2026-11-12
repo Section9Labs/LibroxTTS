@@ -138,9 +138,13 @@ public enum PocketTTSDeliveryCatalog {
         let handle = try FileHandle(forReadingFrom: url)
         defer { try? handle.close() }
         var hash = SHA256()
-        while let data = try handle.read(upToCount: 1_048_576), !data.isEmpty {
+        // Validation runs for every styled render, including synchronous loops
+        // without a run-loop drain. Release each Foundation read immediately.
+        while try autoreleasepool(invoking: {
+            guard let data = try handle.read(upToCount: 1_048_576), !data.isEmpty else { return false }
             try Task.checkCancellation(); hash.update(data: data)
-        }
+            return true
+        }) {}
         guard hash.finalize().map({ String(format: "%02x", $0) }).joined() == file.sha256 else {
             throw DeliveryError.missingOrInvalidAsset
         }
