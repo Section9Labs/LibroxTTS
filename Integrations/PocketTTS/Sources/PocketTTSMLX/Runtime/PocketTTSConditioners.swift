@@ -29,6 +29,15 @@ public final class PocketTTSSentencePieceTokenizer {
         }
     }
 
+    package init(data: Data, isJSON: Bool, nBins: Int) throws {
+        tokenizer = try isJSON ? SentencePieceTokenizer(tokenizerJSONData: data)
+            : SentencePieceTokenizer(sentencePieceModelData: data)
+        guard tokenizer.vocabularySize == nBins else {
+            throw NSError(domain: "PocketTTSConditioners", code: 2,
+                userInfo: [NSLocalizedDescriptionKey: "Tokenizer vocabulary does not match n_bins (\(nBins))"])
+        }
+    }
+
     public func callAsFunction(_ text: String) -> TokenizedText {
         let ids = tokenizer.encodeWithByteFallback(text)
         let arr = MLXArray(ids.map(Int32.init)).expandedDimensions(axis: 0)
