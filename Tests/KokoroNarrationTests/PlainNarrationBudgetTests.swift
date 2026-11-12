@@ -54,7 +54,8 @@ final class PlainNarrationBudgetTests: XCTestCase {
             XCTAssertNil(PlainNarrationBudget(text, language: language, lexicon: .init()), text)
         }
         let lexicon = SpokenTextLexicon(entries: [.init(written: "QX", spoken: "a longer reading", language: "en")])
-        XCTAssertNil(PlainNarrationBudget("ordinary text", language: "en", lexicon: lexicon))
+        XCTAssertNil(PlainNarrationBudget("QX text", language: "en", lexicon: lexicon))
+        XCTAssertNotNil(PlainNarrationBudget("ordinary text", language: "en", lexicon: lexicon))
     }
 
     func testCompletePlansMatchFrozen07Algorithm() throws {

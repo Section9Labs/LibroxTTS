@@ -21,7 +21,6 @@ public enum TextNativeNarrationPlanner {
         if model == .pocket { try pocketChunking.validate() }
         let source = text as NSString
         var plainBudget: PlainNarrationBudget?
-        var checkedPlainBudget = false
         func spoken(_ range: NSRange) -> String { lexicon.text(source.substring(with: range), language: voice.language) }
         func fits(_ range: NSRange, allowEmptyPrefix: Bool = false) -> Bool {
             if let result = plainBudget?.fits(range, model: model, maximum: pocketChunking.maximumUnitScalars,
@@ -63,6 +62,10 @@ public enum TextNativeNarrationPlanner {
         }
         var ranges: [NSRange] = []
         for sentence in sentences {
+            // Contextual material elsewhere in a book must not disqualify a
+            // safe sentence. Cross-sentence budget checks still use full rules.
+            plainBudget = nil
+            var checkedPlainBudget = false
             var start = sentence.location
             while start < NSMaxRange(sentence) {
                 try Task.checkCancellation()
@@ -72,7 +75,8 @@ public enum TextNativeNarrationPlanner {
                         throw PlanningError.unbreakableText
                     }
                     if !checkedPlainBudget {
-                        plainBudget = PlainNarrationBudget(text, language: voice.language, lexicon: lexicon)
+                        plainBudget = PlainNarrationBudget(source.substring(with: sentence), language: voice.language,
+                            lexicon: lexicon, origin: sentence.location)
                         checkedPlainBudget = true
                     }
                     // Grow by grapheme clusters; never split a surrogate pair,

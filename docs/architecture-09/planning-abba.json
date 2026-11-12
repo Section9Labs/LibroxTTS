@@ -1,0 +1,409 @@
+{
+  "exactPlanFingerprints": true,
+  "order": "ABBA",
+  "runs": [
+    {
+      "revision": "baseline",
+      "rows": [
+        {
+          "inputScalars": 2866,
+          "medianSeconds": 0.6842067916295491,
+          "model": "ctPlusV1-case0",
+          "planSHA256": "c7e3528aed50c42aa2ca8bda33ed0dd60702ecba1547c54b31312c5811d87597",
+          "units": 6
+        },
+        {
+          "inputScalars": 2886,
+          "medianSeconds": 0.6786679166834801,
+          "model": "ctPlusV1-case1",
+          "planSHA256": "31fe8124fc83ab3d26cb80c06e9b503ae18482d30a1efd1cf5e128c6f9221736",
+          "units": 7
+        },
+        {
+          "inputScalars": 2864,
+          "medianSeconds": 0.6672552499803714,
+          "model": "ctPlusV1-case2",
+          "planSHA256": "3c95c7e260c2c8a2d3a68ea7d25e589db4fa7ae9fa11fb21b3c2caf666f065be",
+          "units": 6
+        },
+        {
+          "inputScalars": 2877,
+          "medianSeconds": 0.6763255416881293,
+          "model": "ctPlusV1-case3",
+          "planSHA256": "d4fcec3dc0bf2d57cd3d6a5ff004158e22693fe5cdfc4499b5f36f3755ed6c2b",
+          "units": 7
+        },
+        {
+          "inputScalars": 2807,
+          "medianSeconds": 0.7028827916365117,
+          "model": "ctPlusV1-case4",
+          "planSHA256": "5f913b5232613e8947f05902c5b863566ab0f58be7472d8d98af52b1b0e73c75",
+          "units": 6
+        },
+        {
+          "inputScalars": 2866,
+          "medianSeconds": 1.3020121667068452,
+          "model": "pocketTTSV1-case0",
+          "planSHA256": "0badf7d0497ef6df2afef200f7af4898d6bdb254243ec4bf9fb7fd42c6ff5a0b",
+          "units": 2
+        },
+        {
+          "inputScalars": 2886,
+          "medianSeconds": 1.2085884166881442,
+          "model": "pocketTTSV1-case1",
+          "planSHA256": "d3f468375ca0c438bfd2538f15dc2394353bd2b61daa1a2c4c1d2dcaa8f2e453",
+          "units": 3
+        },
+        {
+          "inputScalars": 2864,
+          "medianSeconds": 1.1621365416795015,
+          "model": "pocketTTSV1-case2",
+          "planSHA256": "e12c478c9c0dee01c79aab8ed58aeeb6f68e6649ba65a54eb29e97c5a161805d",
+          "units": 2
+        },
+        {
+          "inputScalars": 2877,
+          "medianSeconds": 1.1861769167007878,
+          "model": "pocketTTSV1-case3",
+          "planSHA256": "d27d93a2aa4a67ce2d0c6f63642cb537a650d6180952ab0912d9af9e3cc79466",
+          "units": 3
+        },
+        {
+          "inputScalars": 2807,
+          "medianSeconds": 1.3191599166602828,
+          "model": "pocketTTSV1-case4",
+          "planSHA256": "9de234c05dd1b4b43cb9abd38fb5272cfda4a2710086c9ea5a9c25692aee7e16",
+          "units": 2
+        }
+      ]
+    },
+    {
+      "revision": "candidate",
+      "rows": [
+        {
+          "inputScalars": 2866,
+          "medianSeconds": 0.010279666690621525,
+          "model": "ctPlusV1-case0",
+          "planSHA256": "c7e3528aed50c42aa2ca8bda33ed0dd60702ecba1547c54b31312c5811d87597",
+          "units": 6
+        },
+        {
+          "inputScalars": 2886,
+          "medianSeconds": 0.0113957499852404,
+          "model": "ctPlusV1-case1",
+          "planSHA256": "31fe8124fc83ab3d26cb80c06e9b503ae18482d30a1efd1cf5e128c6f9221736",
+          "units": 7
+        },
+        {
+          "inputScalars": 2864,
+          "medianSeconds": 0.008179166645277292,
+          "model": "ctPlusV1-case2",
+          "planSHA256": "3c95c7e260c2c8a2d3a68ea7d25e589db4fa7ae9fa11fb21b3c2caf666f065be",
+          "units": 6
+        },
+        {
+          "inputScalars": 2877,
+          "medianSeconds": 0.01020616665482521,
+          "model": "ctPlusV1-case3",
+          "planSHA256": "d4fcec3dc0bf2d57cd3d6a5ff004158e22693fe5cdfc4499b5f36f3755ed6c2b",
+          "units": 7
+        },
+        {
+          "inputScalars": 2807,
+          "medianSeconds": 0.009644041652791202,
+          "model": "ctPlusV1-case4",
+          "planSHA256": "5f913b5232613e8947f05902c5b863566ab0f58be7472d8d98af52b1b0e73c75",
+          "units": 6
+        },
+        {
+          "inputScalars": 2866,
+          "medianSeconds": 0.008212166663724929,
+          "model": "pocketTTSV1-case0",
+          "planSHA256": "0badf7d0497ef6df2afef200f7af4898d6bdb254243ec4bf9fb7fd42c6ff5a0b",
+          "units": 2
+        },
+        {
+          "inputScalars": 2886,
+          "medianSeconds": 0.009661333344411105,
+          "model": "pocketTTSV1-case1",
+          "planSHA256": "d3f468375ca0c438bfd2538f15dc2394353bd2b61daa1a2c4c1d2dcaa8f2e453",
+          "units": 3
+        },
+        {
+          "inputScalars": 2864,
+          "medianSeconds": 0.006840333342552185,
+          "model": "pocketTTSV1-case2",
+          "planSHA256": "e12c478c9c0dee01c79aab8ed58aeeb6f68e6649ba65a54eb29e97c5a161805d",
+          "units": 2
+        },
+        {
+          "inputScalars": 2877,
+          "medianSeconds": 0.008632999961264431,
+          "model": "pocketTTSV1-case3",
+          "planSHA256": "d27d93a2aa4a67ce2d0c6f63642cb537a650d6180952ab0912d9af9e3cc79466",
+          "units": 3
+        },
+        {
+          "inputScalars": 2807,
+          "medianSeconds": 0.008021000016015023,
+          "model": "pocketTTSV1-case4",
+          "planSHA256": "9de234c05dd1b4b43cb9abd38fb5272cfda4a2710086c9ea5a9c25692aee7e16",
+          "units": 2
+        }
+      ]
+    },
+    {
+      "revision": "candidate",
+      "rows": [
+        {
+          "inputScalars": 2866,
+          "medianSeconds": 0.010224124998785555,
+          "model": "ctPlusV1-case0",
+          "planSHA256": "c7e3528aed50c42aa2ca8bda33ed0dd60702ecba1547c54b31312c5811d87597",
+          "units": 6
+        },
+        {
+          "inputScalars": 2886,
+          "medianSeconds": 0.011511958320625126,
+          "model": "ctPlusV1-case1",
+          "planSHA256": "31fe8124fc83ab3d26cb80c06e9b503ae18482d30a1efd1cf5e128c6f9221736",
+          "units": 7
+        },
+        {
+          "inputScalars": 2864,
+          "medianSeconds": 0.008501624979544431,
+          "model": "ctPlusV1-case2",
+          "planSHA256": "3c95c7e260c2c8a2d3a68ea7d25e589db4fa7ae9fa11fb21b3c2caf666f065be",
+          "units": 6
+        },
+        {
+          "inputScalars": 2877,
+          "medianSeconds": 0.010137791687157005,
+          "model": "ctPlusV1-case3",
+          "planSHA256": "d4fcec3dc0bf2d57cd3d6a5ff004158e22693fe5cdfc4499b5f36f3755ed6c2b",
+          "units": 7
+        },
+        {
+          "inputScalars": 2807,
+          "medianSeconds": 0.009733041631989181,
+          "model": "ctPlusV1-case4",
+          "planSHA256": "5f913b5232613e8947f05902c5b863566ab0f58be7472d8d98af52b1b0e73c75",
+          "units": 6
+        },
+        {
+          "inputScalars": 2866,
+          "medianSeconds": 0.008234083361458033,
+          "model": "pocketTTSV1-case0",
+          "planSHA256": "0badf7d0497ef6df2afef200f7af4898d6bdb254243ec4bf9fb7fd42c6ff5a0b",
+          "units": 2
+        },
+        {
+          "inputScalars": 2886,
+          "medianSeconds": 0.009697333327494562,
+          "model": "pocketTTSV1-case1",
+          "planSHA256": "d3f468375ca0c438bfd2538f15dc2394353bd2b61daa1a2c4c1d2dcaa8f2e453",
+          "units": 3
+        },
+        {
+          "inputScalars": 2864,
+          "medianSeconds": 0.006974208285100758,
+          "model": "pocketTTSV1-case2",
+          "planSHA256": "e12c478c9c0dee01c79aab8ed58aeeb6f68e6649ba65a54eb29e97c5a161805d",
+          "units": 2
+        },
+        {
+          "inputScalars": 2877,
+          "medianSeconds": 0.008660833351314068,
+          "model": "pocketTTSV1-case3",
+          "planSHA256": "d27d93a2aa4a67ce2d0c6f63642cb537a650d6180952ab0912d9af9e3cc79466",
+          "units": 3
+        },
+        {
+          "inputScalars": 2807,
+          "medianSeconds": 0.008175458351615816,
+          "model": "pocketTTSV1-case4",
+          "planSHA256": "9de234c05dd1b4b43cb9abd38fb5272cfda4a2710086c9ea5a9c25692aee7e16",
+          "units": 2
+        }
+      ]
+    },
+    {
+      "revision": "baseline",
+      "rows": [
+        {
+          "inputScalars": 2866,
+          "medianSeconds": 0.6847367500304244,
+          "model": "ctPlusV1-case0",
+          "planSHA256": "c7e3528aed50c42aa2ca8bda33ed0dd60702ecba1547c54b31312c5811d87597",
+          "units": 6
+        },
+        {
+          "inputScalars": 2886,
+          "medianSeconds": 0.6806816666503437,
+          "model": "ctPlusV1-case1",
+          "planSHA256": "31fe8124fc83ab3d26cb80c06e9b503ae18482d30a1efd1cf5e128c6f9221736",
+          "units": 7
+        },
+        {
+          "inputScalars": 2864,
+          "medianSeconds": 0.665060541650746,
+          "model": "ctPlusV1-case2",
+          "planSHA256": "3c95c7e260c2c8a2d3a68ea7d25e589db4fa7ae9fa11fb21b3c2caf666f065be",
+          "units": 6
+        },
+        {
+          "inputScalars": 2877,
+          "medianSeconds": 0.6735521249938756,
+          "model": "ctPlusV1-case3",
+          "planSHA256": "d4fcec3dc0bf2d57cd3d6a5ff004158e22693fe5cdfc4499b5f36f3755ed6c2b",
+          "units": 7
+        },
+        {
+          "inputScalars": 2807,
+          "medianSeconds": 0.7012776249903254,
+          "model": "ctPlusV1-case4",
+          "planSHA256": "5f913b5232613e8947f05902c5b863566ab0f58be7472d8d98af52b1b0e73c75",
+          "units": 6
+        },
+        {
+          "inputScalars": 2866,
+          "medianSeconds": 1.2953705833642744,
+          "model": "pocketTTSV1-case0",
+          "planSHA256": "0badf7d0497ef6df2afef200f7af4898d6bdb254243ec4bf9fb7fd42c6ff5a0b",
+          "units": 2
+        },
+        {
+          "inputScalars": 2886,
+          "medianSeconds": 1.224658124963753,
+          "model": "pocketTTSV1-case1",
+          "planSHA256": "d3f468375ca0c438bfd2538f15dc2394353bd2b61daa1a2c4c1d2dcaa8f2e453",
+          "units": 3
+        },
+        {
+          "inputScalars": 2864,
+          "medianSeconds": 1.186263041687198,
+          "model": "pocketTTSV1-case2",
+          "planSHA256": "e12c478c9c0dee01c79aab8ed58aeeb6f68e6649ba65a54eb29e97c5a161805d",
+          "units": 2
+        },
+        {
+          "inputScalars": 2877,
+          "medianSeconds": 1.190738916688133,
+          "model": "pocketTTSV1-case3",
+          "planSHA256": "d27d93a2aa4a67ce2d0c6f63642cb537a650d6180952ab0912d9af9e3cc79466",
+          "units": 3
+        },
+        {
+          "inputScalars": 2807,
+          "medianSeconds": 1.3228967083268799,
+          "model": "pocketTTSV1-case4",
+          "planSHA256": "9de234c05dd1b4b43cb9abd38fb5272cfda4a2710086c9ea5a9c25692aee7e16",
+          "units": 2
+        }
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "model": "ctPlusV1-case0",
+      "inputScalars": 2866,
+      "units": 6,
+      "planSHA256": "c7e3528aed50c42aa2ca8bda33ed0dd60702ecba1547c54b31312c5811d87597",
+      "baselineSeconds": 0.6844717708299868,
+      "candidateSeconds": 0.01025189584470354,
+      "speedup": 66.76538478330396
+    },
+    {
+      "model": "ctPlusV1-case1",
+      "inputScalars": 2886,
+      "units": 7,
+      "planSHA256": "31fe8124fc83ab3d26cb80c06e9b503ae18482d30a1efd1cf5e128c6f9221736",
+      "baselineSeconds": 0.6796747916669119,
+      "candidateSeconds": 0.011453854152932763,
+      "speedup": 59.34026944920378
+    },
+    {
+      "model": "ctPlusV1-case2",
+      "inputScalars": 2864,
+      "units": 6,
+      "planSHA256": "3c95c7e260c2c8a2d3a68ea7d25e589db4fa7ae9fa11fb21b3c2caf666f065be",
+      "baselineSeconds": 0.6661578958155587,
+      "candidateSeconds": 0.008340395812410861,
+      "speedup": 79.87125680825454
+    },
+    {
+      "model": "ctPlusV1-case3",
+      "inputScalars": 2877,
+      "units": 7,
+      "planSHA256": "d4fcec3dc0bf2d57cd3d6a5ff004158e22693fe5cdfc4499b5f36f3755ed6c2b",
+      "baselineSeconds": 0.6749388333410025,
+      "candidateSeconds": 0.010171979170991108,
+      "speedup": 66.3527541686108
+    },
+    {
+      "model": "ctPlusV1-case4",
+      "inputScalars": 2807,
+      "units": 6,
+      "planSHA256": "5f913b5232613e8947f05902c5b863566ab0f58be7472d8d98af52b1b0e73c75",
+      "baselineSeconds": 0.7020802083134186,
+      "candidateSeconds": 0.009688541642390192,
+      "speedup": 72.46500394255551
+    },
+    {
+      "model": "pocketTTSV1-case0",
+      "inputScalars": 2866,
+      "units": 2,
+      "planSHA256": "0badf7d0497ef6df2afef200f7af4898d6bdb254243ec4bf9fb7fd42c6ff5a0b",
+      "baselineSeconds": 1.2986913750355598,
+      "candidateSeconds": 0.008223125012591481,
+      "speedup": 157.9316103120124
+    },
+    {
+      "model": "pocketTTSV1-case1",
+      "inputScalars": 2886,
+      "units": 3,
+      "planSHA256": "d3f468375ca0c438bfd2538f15dc2394353bd2b61daa1a2c4c1d2dcaa8f2e453",
+      "baselineSeconds": 1.2166232708259486,
+      "candidateSeconds": 0.009679333335952833,
+      "speedup": 125.69287869309485
+    },
+    {
+      "model": "pocketTTSV1-case2",
+      "inputScalars": 2864,
+      "units": 2,
+      "planSHA256": "e12c478c9c0dee01c79aab8ed58aeeb6f68e6649ba65a54eb29e97c5a161805d",
+      "baselineSeconds": 1.1741997916833498,
+      "candidateSeconds": 0.006907270813826472,
+      "speedup": 169.99475238945635
+    },
+    {
+      "model": "pocketTTSV1-case3",
+      "inputScalars": 2877,
+      "units": 3,
+      "planSHA256": "d27d93a2aa4a67ce2d0c6f63642cb537a650d6180952ab0912d9af9e3cc79466",
+      "baselineSeconds": 1.1884579166944604,
+      "candidateSeconds": 0.00864691665628925,
+      "speedup": 137.44297116938756
+    },
+    {
+      "model": "pocketTTSV1-case4",
+      "inputScalars": 2807,
+      "units": 2,
+      "planSHA256": "9de234c05dd1b4b43cb9abd38fb5272cfda4a2710086c9ea5a9c25692aee7e16",
+      "baselineSeconds": 1.3210283124935813,
+      "candidateSeconds": 0.00809822918381542,
+      "speedup": 163.12557751930512
+    }
+  ],
+  "machine": "arm64",
+  "os": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+  "binarySHA256": {
+    "baseline": "06ffa92c334251060c868fa2fab170cbc14bb590bb3ce2774a371fd2f69b77fe",
+    "candidate": "046766e0db1092c9e1a3d692a77cf84793eab2df361c6a1826b6e97634c53305"
+  },
+  "scope": "Five quoted, mixed-numeric, dictionary, and Italian long sentences per model; three samples per process; ABBA",
+  "limitations": [
+    "Synthetic long-sentence workload on a shared Mac; not a representative book or device benchmark",
+    "Fingerprints cover ranges, voice IDs and synthesis text; separate differential tests compare complete plans"
+  ]
+}

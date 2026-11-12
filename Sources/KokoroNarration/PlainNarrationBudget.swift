@@ -10,10 +10,16 @@ struct PlainNarrationBudget {
     private let letters: [Int]
     private let boundaries: [Bool]
     private let tagScalars: Int
+    private let origin: Int
 
-    init?(_ text: String, language: String, lexicon: SpokenTextLexicon) {
-        guard lexicon.entries.isEmpty, let code = PronunciationLanguage(rawValue: language),
-              TextNormalizer.permitsPlainPrefixCounting(text, language: code) else { return nil }
+    init?(_ text: String, language: String, lexicon: SpokenTextLexicon, origin: Int = 0) {
+        let canonical = text.precomposedStringWithCanonicalMapping
+        // Absence of every literal reading is sufficient even without checking
+        // word boundaries. A possible match always falls back to full rewriting.
+        guard !lexicon.entries.contains(where: { $0.language == language && canonical.contains($0.written) }),
+              let code = PronunciationLanguage(rawValue: language),
+              TextNormalizer.permitsPlainPrefixCounting(canonical, language: code) else { return nil }
+        self.origin = origin
         source = Array(text.utf16)
         var nfc = [Int](repeating: 0, count: source.count + 1), nfkd = nfc, letters = nfc
         var boundaries = [Bool](repeating: false, count: source.count + 1)
@@ -35,8 +41,8 @@ struct PlainNarrationBudget {
     }
 
     func fits(_ range: NSRange, model: NarrationModel, maximum: Int, allowEmptyPrefix: Bool) -> Bool? {
-        let start = range.location, end = NSMaxRange(range)
-        guard start >= 0, end <= source.count, boundaries[start], boundaries[end] else { return nil }
+        let start = range.location - origin, end = NSMaxRange(range) - origin
+        guard start >= 0, end >= start, end <= source.count, boundaries[start], boundaries[end] else { return nil }
         let spokenCount = nfc[end] - nfc[start]
         if model == .pocket { return spokenCount <= maximum }
         guard spokenCount <= 4096 else { return false }
