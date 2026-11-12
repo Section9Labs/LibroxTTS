@@ -1,0 +1,173 @@
+{
+  "exactPCM": true,
+  "exactChunkEvents": true,
+  "trials": 32,
+  "samples": 2047104,
+  "rows": [
+    {
+      "name": "plus-en-0",
+      "samples": 76800,
+      "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24"
+    },
+    {
+      "name": "plus-en-1",
+      "samples": 76800,
+      "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24"
+    },
+    {
+      "name": "plus-en-2",
+      "samples": 76800,
+      "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24"
+    },
+    {
+      "name": "plus-es-0",
+      "samples": 104448,
+      "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a"
+    },
+    {
+      "name": "plus-es-1",
+      "samples": 104448,
+      "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a"
+    },
+    {
+      "name": "plus-es-2",
+      "samples": 104448,
+      "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a"
+    },
+    {
+      "name": "pocket-en-0-steps1",
+      "samples": 44160,
+      "sha256": "e0bafef9032b0b39a44dec3701424f58996d4d9c7bde706624b921e55a392a5d"
+    },
+    {
+      "name": "pocket-en-1-steps2",
+      "samples": 44160,
+      "sha256": "e4deab016d5a29b4bbeb31567b2f07c58f2a1a7a3b656da30849d36617b66df8"
+    },
+    {
+      "name": "pocket-en-10-steps4",
+      "samples": 34560,
+      "sha256": "548195b40ab6fe9b49be84c6e52a8f635dd7d6167113e328e2b4a7eb92e6f200"
+    },
+    {
+      "name": "pocket-en-11-steps4",
+      "samples": 163200,
+      "sha256": "cdbe06afe137fd3e6b4f5d6400e91c5d1b77fc57a0144f5f91df9c8f1288ad5a"
+    },
+    {
+      "name": "pocket-en-2-steps3",
+      "samples": 44160,
+      "sha256": "23ca164e07633553b10e1b82076c2e4369b874880e693d194eac2901dbf64eb2"
+    },
+    {
+      "name": "pocket-en-3-steps4",
+      "samples": 44160,
+      "sha256": "c515fa6965f8d481550eff3598336fb0ad1a634d13c946fdb40cfd6ef1ad293c"
+    },
+    {
+      "name": "pocket-en-4-steps5",
+      "samples": 44160,
+      "sha256": "b99787914ca64fd142e6aaf3de48f7350f7dfb531505609bcc4a714055670274"
+    },
+    {
+      "name": "pocket-en-5-steps6",
+      "samples": 44160,
+      "sha256": "15dcbcba1c3ef3647644530d2d01d6d43f5815173db4e899e666bf72915fa6f2"
+    },
+    {
+      "name": "pocket-en-6-steps7",
+      "samples": 44160,
+      "sha256": "ae27bac5beebfefd4d3e595502de6ee3078e9271c5059ce9016acb10a905768b"
+    },
+    {
+      "name": "pocket-en-7-steps8",
+      "samples": 44160,
+      "sha256": "42f860b46efcc0067b728da77b55f00587f74c9256298791f4a570e0a56746ae"
+    },
+    {
+      "name": "pocket-en-8-steps2",
+      "samples": 44160,
+      "sha256": "e4deab016d5a29b4bbeb31567b2f07c58f2a1a7a3b656da30849d36617b66df8"
+    },
+    {
+      "name": "pocket-en-9-steps4",
+      "samples": 42240,
+      "sha256": "a67d1420455faf513375439e831887377b53c370058994b6f2ba65b6c5c0daa3"
+    },
+    {
+      "name": "pocket-en-recovered",
+      "samples": 44160,
+      "sha256": "c515fa6965f8d481550eff3598336fb0ad1a634d13c946fdb40cfd6ef1ad293c"
+    },
+    {
+      "name": "pocket-es-0-steps1",
+      "samples": 55680,
+      "sha256": "27b4bfb93328b622a38b48cf395b6a2e871b084ce405a80880a94cb6d3693133"
+    },
+    {
+      "name": "pocket-es-1-steps2",
+      "samples": 55680,
+      "sha256": "25e41496606aba63d861ff50050c38119e8f2731a46eb293cc7b43d9e33d39bf"
+    },
+    {
+      "name": "pocket-es-10-steps4",
+      "samples": 53760,
+      "sha256": "1e037fb2c67931b257ba51eb904b9c88bd7e136978c05df0e64b3c044c595ba7"
+    },
+    {
+      "name": "pocket-es-11-steps4",
+      "samples": 159360,
+      "sha256": "d63ce42522a1dd61e8af22f110a3e3e65f2a9e8a7367b42dd2005e43ce5e1a0d"
+    },
+    {
+      "name": "pocket-es-2-steps3",
+      "samples": 55680,
+      "sha256": "05389dc8acdb92e7e9c7e371736a3fe8a50489e75e03d5b650f84a2cbb1c2ba9"
+    },
+    {
+      "name": "pocket-es-3-steps4",
+      "samples": 55680,
+      "sha256": "83a6a9f533394bec5348ea4c8288e6c7be681f34853e05c121b30892ef625644"
+    },
+    {
+      "name": "pocket-es-4-steps5",
+      "samples": 55680,
+      "sha256": "78a3c8ef905900390b75a083650f8950a160fee2fb859445fb4e9f2538711505"
+    },
+    {
+      "name": "pocket-es-5-steps6",
+      "samples": 55680,
+      "sha256": "a895d5be24f071b5f42a9d888962abcee02029a17f00e441408f90f0f32946ef"
+    },
+    {
+      "name": "pocket-es-6-steps7",
+      "samples": 55680,
+      "sha256": "354cab63aaea63a4b3353efd79ca5282a873f321b45f23a4356d46350be9c270"
+    },
+    {
+      "name": "pocket-es-7-steps8",
+      "samples": 55680,
+      "sha256": "b97e17b3a089f7aaf0aee8b7fc9d0377aeafab2bb43ad7a884d1a62c24ebd5da"
+    },
+    {
+      "name": "pocket-es-8-steps2",
+      "samples": 55680,
+      "sha256": "25e41496606aba63d861ff50050c38119e8f2731a46eb293cc7b43d9e33d39bf"
+    },
+    {
+      "name": "pocket-es-9-steps4",
+      "samples": 51840,
+      "sha256": "521382fc56f86d34eb9677ba656578c013e8d1489182be9e73838f21d0b038e2"
+    },
+    {
+      "name": "pocket-es-recovered",
+      "samples": 55680,
+      "sha256": "83a6a9f533394bec5348ea4c8288e6c7be681f34853e05c121b30892ef625644"
+    }
+  ],
+  "scope": "Frozen 0.6.2 English/Spanish Plus and Core ML Max recordings; all supported Max sampler counts, original/calm, multichunk, cancellation/reload",
+  "limitations": [
+    "Compatibility only: concurrent client builds make these timings unsuitable for performance claims",
+    "No new listening or physical-device qualification"
+  ]
+}

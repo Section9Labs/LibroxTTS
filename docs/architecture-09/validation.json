@@ -1,0 +1,138 @@
+{
+  "date": "2026-11-11",
+  "sourceCommit": "d5c83c27c808dfe7023d5b153dcb5db3b20317cc",
+  "branch": "codex/0.9-preparation-refactor",
+  "base": "e72a0cd",
+  "contractBaseline": "f75bacfbdc86c0c6dd81f0fb11cb9bcd160e49dd",
+  "environment": {
+    "machine": "Mac15,14",
+    "os": "macOS 27.0.1 (26A434)",
+    "swift": "Apple Swift 6.4.2 (swiftlang-6.4.2.1.9)",
+    "architecture": "arm64"
+  },
+  "checks": [
+    {
+      "name": "Release with real-asset contract gates",
+      "command": "swift test -c release (LIBROX_07/08 asset, baseline, output and POCKET_METALLIB variables documented in README)",
+      "exitCode": 0,
+      "log": "/tmp/libroxtts-09-release-final.log",
+      "logSHA256": "e17c678c8a92ba64e7766dce7caaa46e3fe4d49f6f7a37e7c1c923e8e5a8cf76",
+      "runnerSummaries": [
+        "Build complete! (126.22 sec)",
+        "Executed 29 tests, with 9 tests skipped and 0 failures (0 unexpected) in 0.012 (0.017) seconds",
+        "Executed 3 tests, with 0 failures (0 unexpected) in 0.109 (0.111) seconds",
+        "Executed 31 tests, with 9 tests skipped and 0 failures (0 unexpected) in 26.721 (26.728) seconds",
+        "Executed 7 tests, with 0 failures (0 unexpected) in 0.034 (0.037) seconds",
+        "Executed 19 tests, with 0 failures (0 unexpected) in 1.411 (1.414) seconds",
+        "Executed 11 tests, with 0 failures (0 unexpected) in 10.537 (10.540) seconds",
+        "Executed 17 tests, with 0 failures (0 unexpected) in 44.617 (44.621) seconds",
+        "Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds",
+        "Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds",
+        "\udbc4\udc5b  Test run with 0 tests in 0 suites passed after 0.001 seconds.",
+        "\udbc4\udc5b  Test run with 64 tests in 1 suite passed after 0.234 seconds.",
+        "\udbc4\udc5b  Test run with 0 tests in 0 suites passed after 0.001 seconds.",
+        "\udbc4\udc5b  Test run with 31 tests in 0 suites passed after 0.021 seconds.",
+        "\udbc4\udc5b  Test run with 198 tests in 19 suites passed after 1.395 seconds.",
+        "\udbc4\udc5b  Test run with 186 tests in 7 suites passed after 1.285 seconds.",
+        "\udbc4\udc5b  Test run with 43 tests in 1 suite passed after 1.437 seconds.",
+        "\udbc4\udc5b  Test run with 23 tests in 3 suites passed after 0.042 seconds.",
+        "\udbc4\udc5b  Test run with 14 tests in 0 suites passed after 0.045 seconds."
+      ]
+    },
+    {
+      "name": "Debug suite",
+      "command": "swift test",
+      "exitCode": 0,
+      "log": "/tmp/libroxtts-09-debug-final.log",
+      "logSHA256": "231a577d075da969abc6929e6fca6f9cb561b3ed7d0b773dd67f31477ab61f5a",
+      "runnerSummaries": [
+        "Build complete! (30.66 sec)",
+        "Executed 29 tests, with 9 tests skipped and 0 failures (0 unexpected) in 0.030 (0.034) seconds",
+        "Executed 3 tests, with 0 failures (0 unexpected) in 0.197 (0.199) seconds",
+        "Executed 31 tests, with 12 tests skipped and 0 failures (0 unexpected) in 0.346 (0.351) seconds",
+        "Executed 7 tests, with 0 failures (0 unexpected) in 0.033 (0.036) seconds",
+        "Executed 19 tests, with 0 failures (0 unexpected) in 1.729 (1.733) seconds",
+        "Executed 11 tests, with 0 failures (0 unexpected) in 17.540 (17.542) seconds",
+        "Executed 17 tests, with 2 tests skipped and 0 failures (0 unexpected) in 0.044 (0.047) seconds",
+        "Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds",
+        "Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds",
+        "\udbc4\udc5b  Test run with 0 tests in 0 suites passed after 0.001 seconds.",
+        "\udbc4\udc5b  Test run with 64 tests in 1 suite passed after 0.313 seconds.",
+        "\udbc4\udc5b  Test run with 0 tests in 0 suites passed after 0.001 seconds.",
+        "\udbc4\udc5b  Test run with 31 tests in 0 suites passed after 0.103 seconds.",
+        "\udbc4\udc5b  Test run with 198 tests in 19 suites passed after 1.979 seconds.",
+        "\udbc4\udc5b  Test run with 186 tests in 7 suites passed after 1.833 seconds.",
+        "\udbc4\udc5b  Test run with 43 tests in 1 suite passed after 2.276 seconds.",
+        "\udbc4\udc5b  Test run with 23 tests in 3 suites passed after 6.868 seconds.",
+        "\udbc4\udc5b  Test run with 14 tests in 0 suites passed after 0.084 seconds."
+      ]
+    },
+    {
+      "name": "Public API",
+      "command": "swift package dump-symbol-graph --minimum-access-level public --skip-synthesized-members; python3 Scripts/check-public-api.py",
+      "exitCode": 0,
+      "log": "/tmp/libroxtts-09-symbols.log",
+      "logSHA256": "814afb9c7ced52f18a43fc3377bf73c3ba867eca56e597f048e3b586a8a58446",
+      "runnerSummaries": [
+        "2802 baseline entries; 2802 current; 0 missing, 0 added, 0 changed"
+      ]
+    },
+    {
+      "name": "iOS client",
+      "command": "xcodebuild -project Examples/KokoroDemo/KokoroDemo.xcodeproj -scheme KokoroDemo -configuration Release -destination generic/platform=iOS -derivedDataPath /tmp/libroxtts-09-ios-build CODE_SIGNING_ALLOWED=NO build",
+      "exitCode": 0,
+      "log": "/tmp/libroxtts-09-ios-final.log",
+      "logSHA256": "ee5aace6743a7cae2c47485b89196064ad488c1020380204dda0353c170bb663",
+      "runnerSummaries": [
+        "BUILD SUCCEEDED"
+      ]
+    },
+    {
+      "name": "Catalyst client",
+      "command": "xcodebuild -project Examples/KokoroDemo/KokoroDemo.xcodeproj -scheme KokoroDemo -configuration Release -destination generic/platform=macOS,variant=Mac Catalyst -derivedDataPath /tmp/libroxtts-09-catalyst-build CODE_SIGNING_ALLOWED=NO build",
+      "exitCode": 0,
+      "log": "/tmp/libroxtts-09-catalyst-final.log",
+      "logSHA256": "f8730a8448a8d75bf04088d6cc0748123048954962e1467bfff00e1878ecb656",
+      "runnerSummaries": [
+        "BUILD SUCCEEDED"
+      ]
+    }
+  ],
+  "artifactSHA256": {
+    "audio-parity.json": "7c9298964ed363ce033dee47e4db5181b42714f4b32cdcb981cb8e5e10fbd61a",
+    "backend-abba.json": "58916f47aad0611e4e3ee3b541c46b6e4f65e8f1987466b6f47bacf8a53560b7",
+    "capacity-cache.patch": "124555ac1d3e3a1d7f54c6ca843cdec5abadc200d2ad022267d7e51e25ba851b",
+    "capacity-contract-result.json": "2a125bc1a55440d7db51270236d82dbce7366d99a3d320712b72750ead4b0b22",
+    "capacity-model-experiment.json": "8b8c103862f7d199e4dff077d6594e638f64e02d9507b3c0fde2c5218f768e74",
+    "initial-backend-baselines.json": "e999a7e884ebcd32b8bdd693f0965a98fa7bf5a0ebd23baf47a1a9a3166a9024",
+    "planning-abba.json": "57e6c20306249f71767af0e9cfd176e464bd8806a54396b02c32fa14432bb438",
+    "planning-baseline.json": "47ef67e41b2eda9620803c8754b03edcb221b0da5dbebeb56558be7503c32a82",
+    "planning-plain-abba.json": "1dbb746155ebc41d85bd19632ac0a8031e41b974bced08e04d8907c86b16a928",
+    "planning-short-abba.json": "234b493cdbf6fb93a0644584c7456b318bca22e48e27926064d323705e0205d2",
+    "preparation-baseline.json": "3c2655ade1b326313bfc3b5f8718cdb2f7be35b46fe3af142c83013c69415ac7",
+    "preparation-candidate.json": "45c71b13e8a784eacac705911e097d9ba2585474cbed8f7dd5cb45dc18817972",
+    "prompt-experiment.json": "f00c71945b0d6b8eabc6f7d42f9e9c51b6a91d42c815f20a5bcf3350caf6d839"
+  },
+  "decisions": {
+    "adopted": [
+      "Weakly shared immutable English dictionaries",
+      "Per-sentence broader exact prefix planning",
+      "Common private Max MLX request preparation",
+      "Verified per-file transfer/publication"
+    ],
+    "rejected": [
+      "DSP reuse: neutral measured gain",
+      "Verified prompt cache: slower and retains 6.24 MB",
+      "Capacity cache: exact model audio but public reference-semantics regression"
+    ]
+  },
+  "limits": [
+    "Local candidate, not merged/pushed/tagged/released",
+    "Shared Mac measurements; no physical-device or energy qualification",
+    "Minimum Swift 6.3 not installed/verified",
+    "Basic/Qwen real-model tests not enabled; inference unchanged",
+    "No new broader listening or long-book qualification",
+    "Symbol inventory does not certify binary ABI",
+    "Asset publication retains host serialization and does not promise multi-file transactions or power-loss durability"
+  ]
+}

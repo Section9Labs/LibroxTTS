@@ -1,10 +1,12 @@
-# LibroxTTS architecture — 0.8 implementation
+# LibroxTTS architecture — 0.9 candidate
 
 Reviewed on 2026-11-11 against `f75bacfbdc86c0c6dd81f0fb11cb9bcd160e49dd` (0.6.2).
 The [architecture review](docs/architecture-review-2026-11-11.md) records the
 baseline and roadmap. [Implementation evidence](docs/implementation-07.md)
 distinguishes completed changes from remaining qualification.
 The [0.8 implementation record](docs/implementation-08.md) extends that baseline.
+The [0.9 implementation record](docs/implementation-09.md) records preparation,
+planning and verified-publication changes and the gated cache experiment.
 
 ## Public entry points and ownership
 
@@ -57,12 +59,19 @@ recursive numeric readings remain safe. Mutable formatters remain invocation-loc
 Digit-free text skips numeric productions, retaining Italian's lexical hour
 correction. Rule order, prefix-scan decisions and cache identities remain unchanged.
 
-Long plain-text source units can use `PlainNarrationBudget`: per-plan NFC/NFKD
+Long eligible source units can use `PlainNarrationBudget`: per-sentence NFC/NFKD
 scalar prefix sums keyed by original UTF-16 grapheme boundaries. The normalizer
-owns the conservative eligibility rules; contextual rewrites, custom lexicons
-and unsupported scripts abstain. Construction is deferred until a source unit
+owns the conservative eligibility rules, including safe quote combinations and
+Italian. Contextual rewrites, possible custom-reading matches and unsupported
+scripts abstain; unrelated dictionary entries and neighboring contextual sentences
+do not disqualify a safe sentence. Construction is deferred until a source unit
 exceeds its budget. The planner still selects the first failing prefix in the
 same order, then performs full normalization for the final synthesis text.
+
+English `Lexicon` instances share immutable decoded dictionaries by dialect through
+a synchronized weak resource cache. Live clients own the dictionaries; releasing
+the last client releases the resources. Mutable frontend/tagger and DSP state
+remains caller-owned. DSP and verified prompt reuse were measured but not adopted.
 
 | Path | Execution | Stateful resources | Output |
 |---|---|---|---|
@@ -89,6 +98,18 @@ staging generations before compiling. Host serialization remains required.
 `PreparedModelTransaction` owns recoverable publication and cleanup; receipts
 retain source/OS identity checks and full byte hashes. Plus compiler locks are
 exclusive per cache key, with a shared legacy lock excluding older SDK writers.
+
+`VerifiedAssetTransfer` centralizes per-file download, verification, cleanup and
+progress. Basic/narration callers retain their public size/error policies.
+`VerifiedFilePublication` stages and verifies a sibling copy before replacing
+installed bytes. Injectable copy/adopt/download operations allow filesystem and
+network failure tests without live downloads. This is a per-file publication
+boundary, not a multi-file transaction or concurrent-installation coordinator.
+
+The Max MLX engine's private request boundary owns common validation and model
+preparation. Complete and streamed bodies keep their distinct budget/callback
+ordering. Backend execution still owns RNG and retirement; no public engine type
+has moved and no universal engine protocol has been introduced.
 
 Each loaded Core ML language owns `PocketFlowModels`. Placement and source root
 are fixed for that owner, so the graph name uniquely identifies each resident
@@ -119,14 +140,23 @@ ordinary synthesis returns the same validated PCM without the extra Data copy.
 
 ## Current validation boundary
 
-Full Debug and Release suites pass. English/Spanish Core ML Plus/Max fixtures
-match 0.6.2 PCM and completed chunk events exactly across 32 recordings. Generic
-iOS and Catalyst Release builds pass. The macOS public-symbol comparison reports
-zero changes across 2,802 entries and includes reexports; it is not binary-ABI
-certification. Real renderer parity also passes for cold/warm English MLX CPU/GPU
-renders and streaming, and Core ML cancellation/recovery.
-Physical-device, other-language audio, minimum-toolchain, thermal/energy and
-broader listening qualification remain open. Long plain-text planning speedups
-are measured; short warmed controls are effectively unchanged. A capacity-cache
-experiment is retained only in tests: no production inference replacement or
-general render-throughput speedup is claimed. See the 0.8 implementation report.
+Full 0.9 Debug and Release suites pass. English/Spanish Core ML Plus/Max fixtures
+match 0.6.2 PCM and completed chunk events exactly across 32 recordings and
+2,047,104 samples. Generic iOS and Catalyst Release builds pass. The macOS public
+inventory remains 2,802 declarations with zero changes; it is not binary-ABI
+certification. Real renderer parity also passes for cold/warm MLX CPU/GPU,
+streaming and Core ML cancellation/recovery.
+
+The new eight-case sidecar passes exact PCM/events in ABBA runs on Core ML,
+MLX CPU and MLX GPU. Dictionary ownership and broader long-sentence planning
+have measured gains; general inference throughput is essentially unchanged.
+DSP/prompt reuse did not justify adoption. An actual-model capacity prototype
+passes the sixteen CPU/GPU audio cases but fails the public mutable-reference
+contract, so production retains concatenation. See the 0.9 implementation report
+for raw measurements, failed experiment evidence and reproduction.
+
+Physical devices, minimum Swift 6.3, longer thermal/energy sessions, broader
+language/listening coverage and Basic/Qwen real-model qualification remain open.
+The package suites do not turn generic client compilation into device-runtime
+acceptance. No models, sampler defaults, platform routing or audio identities
+changed; no release, tag or integration is implied by these local gates.

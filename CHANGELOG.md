@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.9.0 — Unreleased
+
+- Share immutable English dictionaries while clients retain them; release resources
+  with the last owner and preserve independent mutable pronunciation state.
+- Extend exact long-sentence prefix planning to conservative quote combinations,
+  Italian, unrelated dictionary entries and sentences beside contextual text.
+- Consolidate Max MLX request validation/loading while preserving RNG, errors,
+  resource retirement and complete/streamed delivery order.
+- Share verified asset transfer and stage replacements beside their destination,
+  preserving installed bytes when copying, verification or adoption fails.
+- Add cold/preview/warm/switch/backpressure measurements, failure-injection tests
+  and an actual-model cache experiment. Public contracts and audio remain the gates
+  for adoption; measured decisions are in the [0.9 report](docs/implementation-09.md).
+
 ## 0.8.0 — Unreleased
 
 - Cancel queued throwing renderer requests promptly while preserving joined
