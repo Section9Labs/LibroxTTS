@@ -5,7 +5,7 @@
   "previousPublishedRelease": "v0.6.2",
   "validatedCandidate": "6b532b2",
   "runtimeTestBenchmarkCommit": "d5c83c27c808dfe7023d5b153dcb5db3b20317cc",
-  "releasePreparation": "Documentation and migration handoff only; runtime unchanged from validated candidate",
+  "releasePreparation": "Release documentation plus explicit Sendable test-closure captures for Swift 6.3; production runtime unchanged from the validated candidate",
   "includedDevelopmentMilestones": [
     "0.7",
     "0.8",
@@ -29,5 +29,13 @@
     "Physical-device sustained thermal/energy and broader listening",
     "Basic/Qwen real-model suites not enabled"
   ],
-  "githubCI": "Check the Swift workflow for the release commit; local receipt does not claim remote CI completion"
+  "githubCI": "Check the Swift workflow for the release commit; local receipt does not claim remote CI completion",
+  "testCompatibilityAdjustment": {
+    "failedCIRun": "https://github.com/Section9Labs/LibroxTTS/actions/runs/43133116158",
+    "toolchain": "Apple Swift 6.3.3 (swiftlang-6.3.3.1.3)",
+    "file": "Integrations/CTNative/Tests/LibroxCTNativeTests/CompilerLockTests.swift",
+    "change": "Declare the map and detached-task closures @Sendable so captured synchronized test state has an explicit checked transfer boundary",
+    "localFocusedTest": "passed on Swift 6.4.2",
+    "localLogSHA256": "144c6606f1946c755e11ee3e54aef57ad0f3f3bf3ea9049484ab93135d2eb963"
+  }
 }

@@ -20,8 +20,8 @@ import XCTest
         let root = try root()
         defer { try? FileManager.default.removeItem(at: root) }
         let release = DispatchSemaphore(value: 0), entered = Mutex(0)
-        let tasks = ["english", "spanish"].map { key in
-            Task.detached {
+        let tasks = ["english", "spanish"].map { @Sendable key in
+            Task.detached { @Sendable in
                 try CTCompilerLock.withLock(root: root, key: key) {
                     entered.withLock { $0 += 1 }; release.wait()
                 }
