@@ -1,0 +1,10 @@
+{
+  "candidate": "capacity-cache.patch",
+  "decision": "rejected",
+  "cacheTests": 2,
+  "cacheFailures": 1,
+  "passing": "CPU/GPU append, snapshot, restore, trim/reset and manual offset comparison",
+  "failure": "Published mutable MLXArray reference no longer affects subsequent append",
+  "log": "/tmp/libroxtts-09-capacity-build.log",
+  "logSHA256": "3caefd255c5a625529c9b74ef10599dec57a6fe6f30b65256b5a4dd366426cca"
+}

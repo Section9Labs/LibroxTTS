@@ -1,0 +1,52 @@
+diff --git a/Integrations/PocketTTS/Sources/PocketTTSMLX/Runtime/KVCache.swift b/Integrations/PocketTTS/Sources/PocketTTSMLX/Runtime/KVCache.swift
+index 05b14e2..5898bf0 100644
+--- a/Integrations/PocketTTS/Sources/PocketTTSMLX/Runtime/KVCache.swift
++++ b/Integrations/PocketTTS/Sources/PocketTTSMLX/Runtime/KVCache.swift
+@@ -7,21 +7,38 @@ public final class KVCacheSimple {
+     public var offset = 0
+     private var keys: MLXArray?
+     private var values: MLXArray?
++    private var length = 0
+     public init() {}
+     public var state: [MLXArray] {
+-        get { guard let keys, let values else { return [] }; return [keys, values] }
+-        set { precondition(newValue.count == 2); keys = newValue[0]; values = newValue[1]; offset = newValue[0].shape[2] }
++        get {
++            guard let keys, let values else { return [] }
++            return [keys[.ellipsis, ..<length, 0...], values[.ellipsis, ..<length, 0...]]
++        }
++        set {
++            precondition(newValue.count == 2)
++            keys = newValue[0]; values = newValue[1]
++            length = newValue[0].shape[2]; offset = length
++        }
+     }
+     public func update(keys: MLXArray, values: MLXArray) -> (MLXArray, MLXArray) {
+-        let k = self.keys.map { concatenated([$0, keys], axis: 2) } ?? keys
+-        let v = self.values.map { concatenated([$0, values], axis: 2) } ?? values
+-        self.keys = k; self.values = v; offset += keys.shape[2]
+-        return (k, v)
++        let end = length + keys.shape[2]
++        if self.keys == nil || end > self.keys!.shape[2] {
++            let capacity = ((end + 255) / 256) * 256
++            let extra = capacity - (self.keys?.shape[2] ?? 0)
++            var ks = keys.shape, vs = values.shape; ks[2] = extra; vs[2] = extra
++            let kp = MLXArray.zeros(ks,dtype:keys.dtype), vp = MLXArray.zeros(vs,dtype:values.dtype)
++            self.keys = self.keys.map { concatenated([$0,kp],axis:2) } ?? kp
++            self.values = self.values.map { concatenated([$0,vp],axis:2) } ?? vp
++        }
++        self.keys![.ellipsis, length..<end, 0...] = keys
++        self.values![.ellipsis, length..<end, 0...] = values
++        length = end; offset += keys.shape[2]
++        return (self.keys![.ellipsis, ..<end, 0...],self.values![.ellipsis, ..<end, 0...])
+     }
+     @discardableResult public func trim(_ count: Int) -> Int {
+-        let n = min(offset, max(0, count)); offset -= n
+-        if offset == 0 { keys = nil; values = nil }
+-        else { keys = keys?[.ellipsis, ..<offset, 0...]; values = values?[.ellipsis, ..<offset, 0...] }
++        let n = min(offset,max(0,count)); offset -= n
++        if offset == 0 { keys = nil; values = nil; length = 0 }
++        else { length = min(offset,length) }
+         return n
+     }
+ }
