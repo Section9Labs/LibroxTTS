@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-11",
+  "release": "v0.9.0",
+  "previousPublishedRelease": "v0.6.2",
+  "validatedCandidate": "6b532b2",
+  "runtimeTestBenchmarkCommit": "d5c83c27c808dfe7023d5b153dcb5db3b20317cc",
+  "releasePreparation": "Documentation and migration handoff only; runtime unchanged from validated candidate",
+  "includedDevelopmentMilestones": [
+    "0.7",
+    "0.8",
+    "0.9"
+  ],
+  "publicDeclarations": 2802,
+  "publicDeclarationsChanged": 0,
+  "modelAssetsChanged": false,
+  "audioCacheIdentitiesChangedFrom062": false,
+  "audioFixtureCount": 32,
+  "exactAudioSamples": 2047104,
+  "backendBenchmarkCases": 24,
+  "backendABBAExecutions": 96,
+  "validationReceipt": "../architecture-09/validation.json",
+  "validationReceiptSHA256": "a8816dd8547b5c8f3f39515e6117fbb12fcaa82736d5d3f8df6af270e979cfa9",
+  "migrationHandoff": "../UPGRADE-0.9.0.md",
+  "physicalDeviceRerunPerformed": false,
+  "remainingQualification": [
+    "Minimum Swift 6.3 toolchain locally unverified; see release CI for its actual toolchain",
+    "Combined Librox app integration and device behavior",
+    "Physical-device sustained thermal/energy and broader listening",
+    "Basic/Qwen real-model suites not enabled"
+  ],
+  "githubCI": "Check the Swift workflow for the release commit; local receipt does not claim remote CI completion"
+}

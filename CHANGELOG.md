@@ -1,6 +1,10 @@
 # Changelog
 
-## 0.9.0 — Unreleased
+## 0.9.0 — 2026-11-11
+
+- Publish the validated 0.7–0.9 work together; 0.7 and 0.8 were not separately
+  released. Upgrade from 0.6.2 without changing model assets or audio identities.
+- [Librox migration handoff](docs/UPGRADE-0.9.0.md). SDK release only.
 
 - Share immutable English dictionaries while clients retain them; release resources
   with the last owner and preserve independent mutable pronunciation state.
@@ -14,7 +18,7 @@
   and an actual-model cache experiment. Public contracts and audio remain the gates
   for adoption; measured decisions are in the [0.9 report](docs/implementation-09.md).
 
-## 0.8.0 — Unreleased
+## 0.8 development milestone — included in 0.9.0
 
 - Cancel queued throwing renderer requests promptly while preserving joined
   cleanup, FIFO ownership and synchronous streaming backpressure.
@@ -30,7 +34,7 @@
 - Public signatures, models, voices, styles and sampler defaults remain unchanged.
   Measurements and qualification limits: [implementation report](docs/implementation-08.md).
 
-## 0.7.0 — Unreleased
+## 0.7 development milestone — included in 0.9.0
 
 - Add frozen 0.6.2 planning/settings contracts, a public API comparison gate and
   exact PCM/chunk-event comparisons for English/Spanish Plus and Core ML Max.
