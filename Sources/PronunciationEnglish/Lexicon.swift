@@ -39,7 +39,7 @@ internal struct TokenContext {
     var futureTo = false
 }
 
-internal enum LexiconValue: Sendable {
+internal enum LexiconValue: Sendable, Equatable {
     case single(String)
     case variants([String: String?])
 }
@@ -149,9 +149,9 @@ public final class Lexicon {
 
     private static let owners = WeakResourceCache<Bool, Resources>()
     private let resources: Resources
-    private var golds: [String: LexiconValue] { resources.golds }
-    private var silvers: [String: String] { resources.silvers }
-    private var supplement: [String: String] { resources.supplement }
+    private var golds: LexiconTable { resources.golds }
+    private var silvers: StringLexiconTable { resources.silvers }
+    private var supplement: StringLexiconTable { resources.supplement }
     private var reviewedSpellings: Set<String> { resources.reviewedSpellings }
     var resourceIdentity: ObjectIdentifier { ObjectIdentifier(resources) }
 
@@ -161,29 +161,68 @@ public final class Lexicon {
     }
 
     private final class Resources: Sendable {
-        let golds: [String: LexiconValue]
-        let silvers: [String: String]
-        let supplement: [String: String]
+        let golds: LexiconTable
+        let silvers: StringLexiconTable
+        let supplement: StringLexiconTable
         let reviewedSpellings: Set<String>
         init(british: Bool) throws {
-            self.golds = try Lexicon.loadLexicon(named: british ? "gb_gold" : "us_gold", mixed: true)
-            self.silvers = try Lexicon.loadLexicon(named: british ? "gb_silver" : "us_silver", mixed: false)
+            var originalGolds: [String: LexiconValue]?
+            let goldName = british ? "gb_gold" : "us_gold"
+            if let archive = CompiledLexicon(name: goldName) { golds = LexiconTable(archive) }
+            else {
+                let values: [String: LexiconValue] = try Lexicon.loadLexicon(named: goldName, mixed: true)
+                // Validation remains after supplement loading, preserving errors.
+                golds = LexiconTable(values)
+                originalGolds = values
+            }
+            let silverName = british ? "gb_silver" : "us_silver"
+            if let archive = CompiledLexicon(name: silverName) { silvers = StringLexiconTable(archive) }
+            else { silvers = StringLexiconTable(try Lexicon.loadLexicon(named: silverName, mixed: false)) }
             // CMUdict is US English. Never substitute its rhotic pronunciations
             // into the British route; that route has a separately authored name list.
             let names = try Lexicon.loadSupplement(named: "gb_names", british: true)
-            var base = british ? names : try Lexicon.loadSupplement(named: "us_cmudict", british: false)
+            var base: StringLexiconTable
+            if british { base = StringLexiconTable(names) }
+            else if let archive = CompiledLexicon(name: "us_cmudict") { base = StringLexiconTable(archive) }
+            else { base = StringLexiconTable(try Lexicon.loadSupplement(named: "us_cmudict", british: false)) }
             if !british {
                 let usNames = try Lexicon.loadSupplement(named: "us_names", british: false)
-                base.merge(usNames, uniquingKeysWith: { _, reviewed in reviewed })
+                base.merge(usNames)
             }
             let loans = try Lexicon.loadSupplement(named: british ? "gb_loans" : "us_loans", british: british)
             // A small, explicit list: reviewed names and accented English loans,
             // never all 69k CMU spellings. Thus CAFÉ is a word but FBI stays letters.
             self.reviewedSpellings = Set(names.keys.filter { $0.count >= 4 })
                 .union(loans.keys.filter { $0.unicodeScalars.contains { !$0.isASCII } })
-            self.supplement = base.merging(loans, uniquingKeysWith: { _, reviewed in reviewed })
-            try Lexicon.validate(golds: golds, british: british)
+            base.merge(loans)
+            self.supplement = base
+            if let originalGolds {
+                try Lexicon.validate(golds: originalGolds, british: british)
+            }
         }
+    }
+
+    static func verifyCompiledDictionaries() throws -> Int {
+        var checked = 0
+        for name in ["us_gold", "gb_gold", "us_silver", "gb_silver", "us_cmudict"] {
+            guard let archive = CompiledLexicon(name: name) else { throw LexiconError.missingResource(name + ".lxt") }
+            let values: [String: LexiconValue]
+            if name.hasSuffix("gold") {
+                values = try loadLexicon(named: name, mixed: true)
+                try validate(golds: values, british: name.hasPrefix("gb"))
+            } else {
+                let strings: [String: String] = name == "us_cmudict"
+                    ? try loadSupplement(named: name, british: false)
+                    : try loadLexicon(named: name, mixed: false)
+                values = strings.mapValues(LexiconValue.single)
+            }
+            guard values.count == archive.count else { throw LexiconError.malformedResource(name) }
+            for (key, value) in values {
+                guard archive.value(for: key) == value else { throw LexiconError.malformedResource(name + ":" + key) }
+                checked += 1
+            }
+        }
+        return checked
     }
 
     private static func loadLexicon(named name: String, mixed: Bool) throws -> [String: LexiconValue] {
