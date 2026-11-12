@@ -61,6 +61,34 @@ final class PreparedNarrationTextTests: XCTestCase {
         }
     }
 
+    func testSeededMixedUnicodePlansAgainstLegacyOracle() throws {
+        var state: UInt64 = 0x102026
+        func choose(_ values: [String]) -> String {
+            state = state &* 6364136223846793005 &+ 1442695040888963407
+            return values[Int((state >> 32) % UInt64(values.count))]
+        }
+        let words = ["Ada", "21", "Ⅳ", "IV", "12:05", "31st", "€21,50", "e\u{301}", "K", "🙂", "3.14", "USD 31", "12kg", "l’été", "1,234.50", "0001", "−12", "+3.2", "Ⅻ", "１２３"]
+        for language in ["en", "es", "fr", "pt", "it"] {
+            let lexicon = SpokenTextLexicon(entries: [.init(written:"Ada",spoken:"Aída 21",language:language)])
+            for trial in 0..<5 {
+                let text = (0..<80).map { _ in choose(words) + choose([" ",", ","; ","! ","? ","  "]) }.joined()
+                for model in [NarrationModel.plus, .pocket] {
+                    let voice = model == .plus ? "plus-f1-\(language)-v1" : "pocket-caro_davy-\(language)-v1"
+                    let options = PocketTTSChunkingOptions(maximumUnitScalars:128)
+                    let old = try ReferencePlanner07.plan(text,voiceID:voice,lexicon:lexicon,model:model,pocketChunking:options)
+                    let new = try TextNativeNarrationPlanner.plan(text,voiceID:voice,lexicon:lexicon,model:model,pocketChunking:options)
+                    XCTAssertEqual(old.count,new.count,"\(language) trial \(trial)")
+                    for (a,b) in zip(old,new) {
+                        XCTAssertEqual(a.text,b.text); XCTAssertEqual(a.range,b.range)
+                        XCTAssertEqual(a.synthesisText,b.synthesisText); XCTAssertEqual(a.boundaryAfter,b.boundaryAfter)
+                        XCTAssertEqual(String(reflecting:a.prosody),String(reflecting:b.prosody))
+                        XCTAssertEqual(model.renderIdentity(for:a),model.renderIdentity(for:b))
+                    }
+                }
+            }
+        }
+    }
+
     func testCrossBoundaryReadingsAndNewlinesAbstain() {
         for entry in [SpokenTextLexicon.Entry(written: "Ada, Lovelace", spoken: "Ada", language: "en"),
                       .init(written: "Ada", spoken: "IV\nII", language: "en")] {
