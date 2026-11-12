@@ -1,7 +1,6 @@
 import PocketTTSMLX
 import PocketTTSCoreML
 import CoreML
-import CryptoKit
 import Foundation
 import LibroxCTNative
 import KokoroNarration
@@ -232,28 +231,9 @@ public enum NarrationAssets {
     private static func downloadFiles(_ pinned: AssetManifest, to directory: URL,
                                       progress: (@Sendable (Double) -> Void)?) async throws {
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        var downloaded: Int64 = 0
-        for file in pinned.files {
-            try Task.checkCancellation()
-            guard !file.path.hasPrefix("/"), !file.path.split(separator: "/").contains("..") else {
-                throw CTError.invalidAssets(file.path)
-            }
-            let destination = directory.appendingPathComponent(file.path)
-            if (try? matches(destination, size: file.size, sha256: file.sha256)) != true {
-                let (temporary, response) = try await URLSession.shared.download(from: pinned.url(for: file))
-                defer { try? FileManager.default.removeItem(at: temporary) }
-                guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw URLError(.badServerResponse) }
-                guard try matches(temporary, size: file.size, sha256: file.sha256) else {
-                    throw CTError.invalidAssets(file.path)
-                }
-                try Task.checkCancellation()
-                try FileManager.default.createDirectory(at: destination.deletingLastPathComponent(), withIntermediateDirectories: true)
-                if FileManager.default.fileExists(atPath: destination.path) { try FileManager.default.removeItem(at: destination) }
-                try FileManager.default.moveItem(at: temporary, to: destination)
-            }
-            downloaded += file.size
-            progress?(Double(downloaded) / Double(pinned.downloadSize))
-        }
+        try await VerifiedAssetTransfer().run(pinned, to: directory,
+            matches: { try matches($0, size: $1.size, sha256: $1.sha256) },
+            invalid: { CTError.invalidAssets($0.path) }, progress: progress)
     }
     /// Fast receipt/UI check. Loading separately verifies every pinned hash.
     public static func isPrepared(_ directory: URL, model: NarrationModel, repositoryID: String? = nil, language: String? = nil) -> Bool {
@@ -305,15 +285,7 @@ public enum NarrationAssets {
     }
     public static func matches(_ url: URL, size: Int64, sha256: String) throws -> Bool {
         guard (try? url.resourceValues(forKeys: [.fileSizeKey]))?.fileSize == Int(size) else { return false }
-        let handle = try FileHandle(forReadingFrom: url); defer { try? handle.close() }
-        var digest = SHA256()
-        while try autoreleasepool(invoking: {
-            try Task.checkCancellation()
-            guard let data = try handle.read(upToCount: 1_048_576), !data.isEmpty else { return false }
-            digest.update(data: data)
-            return true
-        }) {}
-        return digest.finalize().map { String(format: "%02x", $0) }.joined() == sha256
+        return try VerifiedAssetFile.matchesDigest(url, sha256: sha256)
     }
     private static func configureForPlayback(_ directory: URL) throws {
         #if os(iOS)

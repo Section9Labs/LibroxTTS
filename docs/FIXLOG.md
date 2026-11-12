@@ -31,3 +31,15 @@ orphans. Fault-injection tests and a real receipt-inode test cover reopening.
 
 Rule: publication may temporarily move the canonical path only when reopening
 can identify and fully verify a surviving generation.
+
+## 0.9 — downloaded replacement removed the installed file too early
+
+Both download paths deleted the destination before moving downloaded bytes into
+place. A failed move could therefore lose the existing installation. A shared
+publication helper now copies to a unique sibling, verifies that copy and replaces
+the destination only at adoption. Tests inject partial-copy/disk-full, corrupt
+staging, cancellation and failed adoption, verifying unchanged installed bytes
+and cleanup; a successful real filesystem replacement is also covered.
+
+Rule: verify replacement bytes on the destination filesystem before replacing
+the installed file; failed staging must leave the installed path intact.

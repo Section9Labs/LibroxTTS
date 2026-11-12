@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 // Copyright (c) 2026 Section9Labs and contributors
-import CryptoKit
 import Foundation
 import KokoroCatalog
 
@@ -47,29 +46,9 @@ public enum ModelAssets {
             progress?(1)
             return
         }
-        var downloaded: Int64 = 0
-        for file in manifest.files {
-            try Task.checkCancellation()
-            let destination = directory.appendingPathComponent(file.path)
-            if (try? matches(destination, file: file)) == true {
-                downloaded += file.size
-                progress?(Double(downloaded) / Double(manifest.downloadSize))
-                continue
-            }
-            let (temporary, response) = try await URLSession.shared.download(from: manifest.url(for: file))
-            defer { try? FileManager.default.removeItem(at: temporary) }
-            guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw URLError(.badServerResponse) }
-            guard try matches(temporary, file: file) else {
-                throw CocoaError(.fileReadCorruptFile)
-            }
-            try FileManager.default.createDirectory(at: destination.deletingLastPathComponent(), withIntermediateDirectories: true)
-            if FileManager.default.fileExists(atPath: destination.path) {
-                try FileManager.default.removeItem(at: destination)
-            }
-            try FileManager.default.moveItem(at: temporary, to: destination)
-            downloaded += file.size
-            progress?(Double(downloaded) / Double(manifest.downloadSize))
-        }
+        try await VerifiedAssetTransfer().run(manifest, to: directory,
+            matches: { try matches($0, file: $1) },
+            invalid: { _ in CocoaError(.fileReadCorruptFile) }, progress: progress)
         try prepare(in: directory)
     }
 
@@ -77,16 +56,7 @@ public enum ModelAssets {
     private static func matches(_ url: URL, file: AssetManifest.File) throws -> Bool {
         let attributes = try FileManager.default.attributesOfItem(atPath: url.path)
         guard attributes[.size] as? Int64 == file.size else { return false }
-        let input = try FileHandle(forReadingFrom: url)
-        defer { try? input.close() }
-        var digest = SHA256()
-        while try autoreleasepool(invoking: {
-            try Task.checkCancellation()
-            guard let data = try input.read(upToCount: 1_048_576), !data.isEmpty else { return false }
-            digest.update(data: data)
-            return true
-        }) { }
-        return digest.finalize().map { String(format: "%02x", $0) }.joined() == file.sha256
+        return try VerifiedAssetFile.matchesDigest(url, sha256: file.sha256)
     }
 
     private static func configureForPlayback(_ directory: URL) throws {
