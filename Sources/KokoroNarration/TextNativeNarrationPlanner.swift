@@ -21,10 +21,13 @@ public enum TextNativeNarrationPlanner {
         if model == .pocket { try pocketChunking.validate() }
         let source = text as NSString
         var plainBudget: PlainNarrationBudget?
+        var prepared: PreparedNarrationText?
         func spoken(_ range: NSRange) -> String { lexicon.text(source.substring(with: range), language: voice.language) }
         func fits(_ range: NSRange, allowEmptyPrefix: Bool = false) -> Bool {
             if let result = plainBudget?.fits(range, model: model, maximum: pocketChunking.maximumUnitScalars,
                                               allowEmptyPrefix: allowEmptyPrefix) { return result }
+            if let result = prepared?.fits(range, model: model, maximum: pocketChunking.maximumUnitScalars,
+                                            allowEmptyPrefix: allowEmptyPrefix) { return result }
             if model == .pocket {
                 // The source planner preserves speaker/paragraph boundaries; the
                 // renderer applies sentence-aware budgets with the real tokenizer.
@@ -65,6 +68,7 @@ public enum TextNativeNarrationPlanner {
             // Contextual material elsewhere in a book must not disqualify a
             // safe sentence. Cross-sentence budget checks still use full rules.
             plainBudget = nil
+            prepared = nil
             var checkedPlainBudget = false
             var start = sentence.location
             while start < NSMaxRange(sentence) {
@@ -77,6 +81,10 @@ public enum TextNativeNarrationPlanner {
                     if !checkedPlainBudget {
                         plainBudget = PlainNarrationBudget(source.substring(with: sentence), language: voice.language,
                             lexicon: lexicon, origin: sentence.location)
+                        if plainBudget == nil {
+                            prepared = PreparedNarrationText(source.substring(with: sentence), language: voice.language,
+                                lexicon: lexicon, origin: sentence.location)
+                        }
                         checkedPlainBudget = true
                     }
                     // Grow by grapheme clusters; never split a surrogate pair,
