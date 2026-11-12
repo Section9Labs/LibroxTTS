@@ -65,9 +65,9 @@ public enum PocketTTSCoreMLAssets {
     }
     private static func validateCompiled(at root: URL, language: String) throws {
         let receipt = try receipt(at: root, language: language)
-        for file in receipt.files {
-            guard try digest(root.appendingPathComponent(file.path)) == file.sha256 else { throw CocoaError(.fileReadCorruptFile) }
-        }
+        try VerifiedAssetHashing.validate(receipt.files.map {
+            .init(url: root.appendingPathComponent($0.path), sha256: $0.sha256)
+        })
     }
     // iOS enumerators may expand /var to /private/var. Compare canonical
     // components rather than dropping a character count from an aliased URL.

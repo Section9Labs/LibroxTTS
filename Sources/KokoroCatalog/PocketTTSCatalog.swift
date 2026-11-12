@@ -53,21 +53,8 @@ public enum PocketTTSCatalog {
         try validate(manifest(language: language), in: directory)
     }
     public static func validate(_ manifest: AssetManifest, in directory: URL) throws {
-        for file in manifest.installedFiles {
-            try Task.checkCancellation()
-            let url = directory.appendingPathComponent(file.path)
-            guard (try url.resourceValues(forKeys: [.fileSizeKey])).fileSize == Int(file.size) else { throw CocoaError(.fileReadCorruptFile) }
-            let handle = try FileHandle(forReadingFrom: url); defer { try? handle.close() }
-            var hash = SHA256()
-            // FileHandle may return autoreleased NSData. Drain each block so a
-            // multi-gigabyte pack never accumulates an entire validation read.
-            while try autoreleasepool(invoking: {
-                try Task.checkCancellation()
-                guard let data = try handle.read(upToCount: 1_048_576), !data.isEmpty else { return false }
-                hash.update(data: data)
-                return true
-            }) {}
-            guard hash.finalize().map({ String(format: "%02x", $0) }).joined() == file.sha256 else { throw CocoaError(.fileReadCorruptFile) }
-        }
+        try VerifiedAssetHashing.validate(manifest.installedFiles.map {
+            .init(url: directory.appendingPathComponent($0.path), size: Int($0.size), sha256: $0.sha256)
+        })
     }
 }
