@@ -1,0 +1,44 @@
+{
+  "rawEngineSourceCommit": "44c25af",
+  "seed": 42,
+  "samplerSteps": 4,
+  "temperature": 0.3,
+  "role": "dialogue",
+  "sampleRate": 24000,
+  "calibrationPassages": [
+    0,
+    1,
+    2
+  ],
+  "holdoutPassages": [
+    3,
+    4
+  ],
+  "corpusSHA256": "58f93135e53ac717e368bb62c24b969f23237957c4cddf05280ec429cd968eb1",
+  "backends": {
+    "coreml-cpu": [
+      "en",
+      "es"
+    ],
+    "mlx-cpu": [
+      "en",
+      "es",
+      "fr",
+      "de",
+      "pt",
+      "it",
+      "nl"
+    ]
+  },
+  "voiceCount": 23,
+  "referenceVoiceCount": 4,
+  "referenceStylesPerVoice": 13,
+  "expectedRecordings": 3375,
+  "expectedProfiles": 525,
+  "platform": "ProductName:\t\tmacOS\nProductVersion:\t\t27.0.1\nBuildVersion:\t\t26A434",
+  "note": "Captured executable hashes before rebuilding with facade level transform. Calibration requests call raw engines. Later probe source adds resume-integrity checks without changing synthesis parameters. Original-only recordings predate the style-loop probe extension; their earlier test binary was not separately archived.",
+  "styleCalibrationBinarySHA256": {
+    "PocketTTSCoreMLTests.xctest/Contents/MacOS/PocketTTSCoreMLTests": "6ad8a995dcce0997e98cd9b89fb071cb50f7707f4d14b614ccf087fae516d4c7",
+    "pocket-backend-benchmark": "b96eed3b434dc768f7c4eedf788b02675eaf0e8b7080f0560541dc74de5188ec"
+  }
+}

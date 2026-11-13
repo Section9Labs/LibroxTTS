@@ -1,0 +1,98 @@
+[
+  {
+    "name": "en-cast-after.wav",
+    "sha256": "4aa9b3c54c634cc418581a93afcb208669dfb812f2535c6f6d1c6d26ddaf61ca",
+    "codec_name": "pcm_f32le",
+    "sample_rate": "24000",
+    "channels": 1,
+    "duration": "18.500000"
+  },
+  {
+    "name": "en-cast-before.wav",
+    "sha256": "df9ee354bf989c806225a04fd2fec75119fc49c6352a1b12873601a7e3a4fd35",
+    "codec_name": "pcm_f32le",
+    "sample_rate": "24000",
+    "channels": 1,
+    "duration": "18.500000"
+  },
+  {
+    "name": "en-expression-after.wav",
+    "sha256": "1a1a7d21b1c17e31f4fc0f045b366bdcf6c6e2ba85ba057f90323215e53de903",
+    "codec_name": "pcm_f32le",
+    "sample_rate": "24000",
+    "channels": 1,
+    "duration": "27.940000"
+  },
+  {
+    "name": "en-expression-before.wav",
+    "sha256": "7dd17eadc8120c0212332abe4a40c06cd67190d406bf8e47f547888428485066",
+    "codec_name": "pcm_f32le",
+    "sample_rate": "24000",
+    "channels": 1,
+    "duration": "27.940000"
+  },
+  {
+    "name": "es-cast-after.wav",
+    "sha256": "3b2355b68839684e14eeb1eb399f8648ccebce7b493ade39b0d4c6243bd001da",
+    "codec_name": "pcm_f32le",
+    "sample_rate": "24000",
+    "channels": 1,
+    "duration": "23.860000"
+  },
+  {
+    "name": "es-cast-before.wav",
+    "sha256": "2264a4d44dddf6317ca289b8eeb3e901fab43adcb559c91238256cceb85428d6",
+    "codec_name": "pcm_f32le",
+    "sample_rate": "24000",
+    "channels": 1,
+    "duration": "23.860000"
+  },
+  {
+    "name": "es-expression-after.wav",
+    "sha256": "ff00f455d034535dc2381ac43da6f25c4a0ce6f9f2dd3b850c8249038bebb739",
+    "codec_name": "pcm_f32le",
+    "sample_rate": "24000",
+    "channels": 1,
+    "duration": "34.100000"
+  },
+  {
+    "name": "es-expression-before.wav",
+    "sha256": "4923d75649fc5897dc7b6914e0bda301fb5e27ad57aa0c7883fa6e6f82c0f0d4",
+    "codec_name": "pcm_f32le",
+    "sample_rate": "24000",
+    "channels": 1,
+    "duration": "34.100000"
+  },
+  {
+    "name": "peak-1-de-giovanni-original-after.wav",
+    "sha256": "72b6e621f38911ad349ace07295d759ac1a6da02e5cf3000c747cf3a9ce9897b",
+    "codec_name": "pcm_f32le",
+    "sample_rate": "24000",
+    "channels": 1,
+    "duration": "3.760000"
+  },
+  {
+    "name": "peak-1-de-giovanni-original-before.wav",
+    "sha256": "d4691b858b7727a7017a33181ccae2158bfd76ca4c91849ce3e61ad20a33aec9",
+    "codec_name": "pcm_f32le",
+    "sample_rate": "24000",
+    "channels": 1,
+    "duration": "3.760000"
+  },
+  {
+    "name": "peak-2-de-peter_yearsley-tired-after.wav",
+    "sha256": "3fdf2223684d61cb31c9730bef227b01e0afbe2ff89a0d4f1a8dae618a7cc1ef",
+    "codec_name": "pcm_f32le",
+    "sample_rate": "24000",
+    "channels": 1,
+    "duration": "4.400000"
+  },
+  {
+    "name": "peak-2-de-peter_yearsley-tired-before.wav",
+    "sha256": "5c45f0b60cbf9cf19650d495da438dc8fe03bb588db424b5a990c38623a25b64",
+    "codec_name": "pcm_f32le",
+    "sample_rate": "24000",
+    "channels": 1,
+    "duration": "4.400000"
+  }
+]

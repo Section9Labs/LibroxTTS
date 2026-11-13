@@ -4,9 +4,11 @@ Offline speech synthesis and book narration for iPhone, iPad and Mac. **Librox P
 
 [![Swift](https://github.com/Section9Labs/LibroxTTS/actions/workflows/swift.yml/badge.svg)](https://github.com/Section9Labs/LibroxTTS/actions/workflows/swift.yml)
 
-The **1.0 development candidate** and its measured goals are documented in the
-[implementation record](docs/implementation-10.md). It is not a published release;
-the stable installation instructions below still use 0.9.0.
+The latest **1.0 development candidate** includes the [synthesis speed repair and
+default Max voice-level calibration](docs/implementation-10-speed.md). It is not
+published; listening acceptance remains open. The [initial implementation
+record](docs/implementation-10.md) preserves the original goals and measurements.
+The stable installation instructions below still use 0.9.0.
 
 ## Max — powered by Pocket TTS
 

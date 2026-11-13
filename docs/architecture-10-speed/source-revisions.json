@@ -1,0 +1,11 @@
+{
+  "baseline": "07fcf437004027f58ad8bb16de7877d0ee74a9a8",
+  "initial10": "fc2b53c57cf2f66d88acd1d7c8704fc44558576b",
+  "speedFix": "44c25af",
+  "physicalDeviceScope": "Raw Core ML; predates narration-level facade change",
+  "taskAppsRemovedAfterCollection": true,
+  "rawDeviceBytesCompared": 12,
+  "defaultMaxLevelSourceCommit": "b3b055b",
+  "levelRevision": "pocket-level-v1-41466443134c33e7",
+  "qualificationToolingCommit": "e4ba079"
+}

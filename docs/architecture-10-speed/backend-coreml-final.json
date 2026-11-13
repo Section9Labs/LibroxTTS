@@ -1,0 +1,912 @@
+{
+  "capacityAblation": [],
+  "order": "ABBA for Core ML; baseline/candidate/capacity/capacity/candidate/baseline for MLX when capacity supplied",
+  "exactPCMAndEvents": true,
+  "runs": [
+    {
+      "backend": "coreml",
+      "revision": "baseline",
+      "rows": [
+        {
+          "events": [
+            {
+              "accepted": 34560,
+              "end": 34560,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstAcceptedFrameSeconds": 1.541294916649349,
+          "frameServiceP50": 0.01390158326830715,
+          "frameServiceP95": 0.015065833344124258,
+          "name": "cold",
+          "sampledPeakFootprint": 68339296,
+          "samples": 34560,
+          "sha256": "548195b40ab6fe9b49be84c6e52a8f635dd7d6167113e328e2b4a7eb92e6f200",
+          "thermalEnd": 0,
+          "thermalStart": 0,
+          "wallSeconds": 1.7899693750077859
+        },
+        {
+          "events": [
+            {
+              "accepted": 34560,
+              "end": 34560,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstAcceptedFrameSeconds": 0.04811774997506291,
+          "frameServiceP50": 0.013954916736111045,
+          "frameServiceP95": 0.015001208405010402,
+          "name": "preview",
+          "previewSeconds": 0.7934667500667274,
+          "sampledPeakFootprint": 79529568,
+          "samples": 34560,
+          "sha256": "548195b40ab6fe9b49be84c6e52a8f635dd7d6167113e328e2b4a7eb92e6f200",
+          "thermalEnd": 0,
+          "thermalStart": 0,
+          "wallSeconds": 0.2973203333094716
+        },
+        {
+          "events": [
+            {
+              "accepted": 34560,
+              "end": 34560,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstAcceptedFrameSeconds": 0.02744629164226353,
+          "frameServiceP50": 0.013587333378382027,
+          "frameServiceP95": 0.014939874992705882,
+          "name": "warm-0",
+          "sampledPeakFootprint": 90572384,
+          "samples": 34560,
+          "sha256": "548195b40ab6fe9b49be84c6e52a8f635dd7d6167113e328e2b4a7eb92e6f200",
+          "thermalEnd": 0,
+          "thermalStart": 0,
+          "wallSeconds": 0.2706062499200925
+        },
+        {
+          "events": [
+            {
+              "accepted": 34560,
+              "end": 34560,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstAcceptedFrameSeconds": 0.026157625019550323,
+          "frameServiceP50": 0.013971208361908793,
+          "frameServiceP95": 0.014702374930493534,
+          "name": "warm-1",
+          "sampledPeakFootprint": 101172856,
+          "samples": 34560,
+          "sha256": "548195b40ab6fe9b49be84c6e52a8f635dd7d6167113e328e2b4a7eb92e6f200",
+          "thermalEnd": 0,
+          "thermalStart": 0,
+          "wallSeconds": 0.270999624975957
+        },
+        {
+          "events": [
+            {
+              "accepted": 80640,
+              "end": 80640,
+              "start": 0,
+              "text": "Alice was beginning to get very tired of sitting by her sister on the bank,"
+            },
+            {
+              "accepted": 120960,
+              "end": 120960,
+              "start": 80640,
+              "text": "and of having nothing to do."
+            }
+          ],
+          "firstAcceptedFrameSeconds": 0.03241512493696064,
+          "frameServiceP50": 0.014139166683889925,
+          "frameServiceP95": 0.015220333356410265,
+          "name": "book",
+          "sampledPeakFootprint": 124569280,
+          "samples": 120960,
+          "sha256": "24f9de81c851da00e7b60511dfa24e66d850192e9177c26238a32d3c24ed594f",
+          "thermalEnd": 0,
+          "thermalStart": 0,
+          "wallSeconds": 1.0178819582797587
+        },
+        {
+          "events": [
+            {
+              "accepted": 42240,
+              "end": 42240,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstAcceptedFrameSeconds": 0.025825541582889855,
+          "frameServiceP50": 0.013726499979384243,
+          "frameServiceP95": 0.014300041599199176,
+          "name": "voice-switch",
+          "sampledPeakFootprint": 130500312,
+          "samples": 42240,
+          "sha256": "a67d1420455faf513375439e831887377b53c370058994b6f2ba65b6c5c0daa3",
+          "thermalEnd": 0,
+          "thermalStart": 0,
+          "wallSeconds": 0.3259444165742025
+        },
+        {
+          "events": [
+            {
+              "accepted": 117120,
+              "end": 117120,
+              "start": 0,
+              "text": "La noche la pas\u00f3 gozosa. Oh ventajas de un buen prop\u00f3sito!"
+            }
+          ],
+          "firstAcceptedFrameSeconds": 1.5831113333115354,
+          "frameServiceP50": 0.013907458283938468,
+          "frameServiceP95": 0.015218500047922134,
+          "name": "language-switch",
+          "sampledPeakFootprint": 141903504,
+          "samples": 117120,
+          "sha256": "9769c01c04023c950c58be86a7fca615e0d159ceec58644061045468d625c49a",
+          "thermalEnd": 0,
+          "thermalStart": 0,
+          "wallSeconds": 2.430899166618474
+        },
+        {
+          "events": [
+            {
+              "accepted": 53760,
+              "end": 53760,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstAcceptedFrameSeconds": 0.02740820834878832,
+          "frameServiceP50": 0.013678083312697709,
+          "frameServiceP95": 0.014918583328835666,
+          "name": "slow-receiver",
+          "sampledPeakFootprint": 153421456,
+          "samples": 53760,
+          "sha256": "1e037fb2c67931b257ba51eb904b9c88bd7e136978c05df0e64b3c044c595ba7",
+          "thermalEnd": 0,
+          "thermalStart": 0,
+          "wallSeconds": 0.48814879171550274
+        }
+      ]
+    },
+    {
+      "backend": "coreml",
+      "revision": "candidate",
+      "rows": [
+        {
+          "events": [
+            {
+              "accepted": 34560,
+              "end": 34560,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstAcceptedFrameSeconds": 0.4327829999383539,
+          "frameServiceP50": 0.013220250024460256,
+          "frameServiceP95": 0.014315291657112539,
+          "name": "cold",
+          "sampledPeakFootprint": 65308232,
+          "samples": 34560,
+          "sha256": "548195b40ab6fe9b49be84c6e52a8f635dd7d6167113e328e2b4a7eb92e6f200",
+          "thermalEnd": 0,
+          "thermalStart": 0,
+          "wallSeconds": 0.6669212916167453
+        },
+        {
+          "events": [
+            {
+              "accepted": 34560,
+              "end": 34560,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstAcceptedFrameSeconds": 0.04708345828112215,
+          "frameServiceP50": 0.01332237501628697,
+          "frameServiceP95": 0.014225875027477741,
+          "name": "preview",
+          "previewSeconds": 0.34910541656427085,
+          "sampledPeakFootprint": 69535304,
+          "samples": 34560,
+          "sha256": "548195b40ab6fe9b49be84c6e52a8f635dd7d6167113e328e2b4a7eb92e6f200",
+          "thermalEnd": 0,
+          "thermalStart": 0,
+          "wallSeconds": 0.28445287491194904
+        },
+        {
+          "events": [
+            {
+              "accepted": 34560,
+              "end": 34560,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstAcceptedFrameSeconds": 0.026225625071674585,
+          "frameServiceP50": 0.013289541704580188,
+          "frameServiceP95": 0.014677083236165345,
+          "name": "warm-0",
+          "sampledPeakFootprint": 76236360,
+          "samples": 34560,
+          "sha256": "548195b40ab6fe9b49be84c6e52a8f635dd7d6167113e328e2b4a7eb92e6f200",
+          "thermalEnd": 0,
+          "thermalStart": 0,
+          "wallSeconds": 0.2649478333769366
+        },
+        {
+          "events": [
+            {
+              "accepted": 34560,
+              "end": 34560,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstAcceptedFrameSeconds": 0.02711124997586012,
+          "frameServiceP50": 0.013655874994583428,
+          "frameServiceP95": 0.017766791628673673,
+          "name": "warm-1",
+          "sampledPeakFootprint": 76449376,
+          "samples": 34560,
+          "sha256": "548195b40ab6fe9b49be84c6e52a8f635dd7d6167113e328e2b4a7eb92e6f200",
+          "thermalEnd": 0,
+          "thermalStart": 0,
+          "wallSeconds": 0.2753257916774601
+        },
+        {
+          "events": [
+            {
+              "accepted": 80640,
+              "end": 80640,
+              "start": 0,
+              "text": "Alice was beginning to get very tired of sitting by her sister on the bank,"
+            },
+            {
+              "accepted": 120960,
+              "end": 120960,
+              "start": 80640,
+              "text": "and of having nothing to do."
+            }
+          ],
+          "firstAcceptedFrameSeconds": 0.03238695836625993,
+          "frameServiceP50": 0.013871916686184704,
+          "frameServiceP95": 0.014852583291940391,
+          "name": "book",
+          "sampledPeakFootprint": 84723344,
+          "samples": 120960,
+          "sha256": "24f9de81c851da00e7b60511dfa24e66d850192e9177c26238a32d3c24ed594f",
+          "thermalEnd": 0,
+          "thermalStart": 0,
+          "wallSeconds": 0.9853930833050981
+        },
+        {
+          "events": [
+            {
+              "accepted": 42240,
+              "end": 42240,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstAcceptedFrameSeconds": 0.026608374901115894,
+          "frameServiceP50": 0.01360195828601718,
+          "frameServiceP95": 0.014342916663736105,
+          "name": "voice-switch",
+          "sampledPeakFootprint": 85444240,
+          "samples": 42240,
+          "sha256": "a67d1420455faf513375439e831887377b53c370058994b6f2ba65b6c5c0daa3",
+          "thermalEnd": 0,
+          "thermalStart": 0,
+          "wallSeconds": 0.3223602082580328
+        },
+        {
+          "events": [
+            {
+              "accepted": 117120,
+              "end": 117120,
+              "start": 0,
+              "text": "La noche la pas\u00f3 gozosa. Oh ventajas de un buen prop\u00f3sito!"
+            }
+          ],
+          "firstAcceptedFrameSeconds": 0.40557945834007114,
+          "frameServiceP50": 0.01350566663313657,
+          "frameServiceP95": 0.014507333282381296,
+          "name": "language-switch",
+          "sampledPeakFootprint": 83641952,
+          "samples": 117120,
+          "sha256": "9769c01c04023c950c58be86a7fca615e0d159ceec58644061045468d625c49a",
+          "thermalEnd": 0,
+          "thermalStart": 0,
+          "wallSeconds": 1.2302408749237657
+        },
+        {
+          "events": [
+            {
+              "accepted": 53760,
+              "end": 53760,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstAcceptedFrameSeconds": 0.026785208377987146,
+          "frameServiceP50": 0.013844875036738813,
+          "frameServiceP95": 0.014820458367466927,
+          "name": "slow-receiver",
+          "sampledPeakFootprint": 83854944,
+          "samples": 53760,
+          "sha256": "1e037fb2c67931b257ba51eb904b9c88bd7e136978c05df0e64b3c044c595ba7",
+          "thermalEnd": 0,
+          "thermalStart": 0,
+          "wallSeconds": 0.4856609583366662
+        }
+      ]
+    },
+    {
+      "backend": "coreml",
+      "revision": "candidate",
+      "rows": [
+        {
+          "events": [
+            {
+              "accepted": 34560,
+              "end": 34560,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstAcceptedFrameSeconds": 0.42206895840354264,
+          "frameServiceP50": 0.013876000070013106,
+          "frameServiceP95": 0.014558791648596525,
+          "name": "cold",
+          "sampledPeakFootprint": 63931952,
+          "samples": 34560,
+          "sha256": "548195b40ab6fe9b49be84c6e52a8f635dd7d6167113e328e2b4a7eb92e6f200",
+          "thermalEnd": 0,
+          "thermalStart": 0,
+          "wallSeconds": 0.6681872500339523
+        },
+        {
+          "events": [
+            {
+              "accepted": 34560,
+              "end": 34560,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstAcceptedFrameSeconds": 0.047293500043451786,
+          "frameServiceP50": 0.013494458282366395,
+          "frameServiceP95": 0.01458370836917311,
+          "name": "preview",
+          "previewSeconds": 0.3725607499945909,
+          "sampledPeakFootprint": 78710320,
+          "samples": 34560,
+          "sha256": "548195b40ab6fe9b49be84c6e52a8f635dd7d6167113e328e2b4a7eb92e6f200",
+          "thermalEnd": 0,
+          "thermalStart": 0,
+          "wallSeconds": 0.28763849998358637
+        },
+        {
+          "events": [
+            {
+              "accepted": 34560,
+              "end": 34560,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstAcceptedFrameSeconds": 0.027219291660003364,
+          "frameServiceP50": 0.013478499953635037,
+          "frameServiceP95": 0.0143909165635705,
+          "name": "warm-0",
+          "sampledPeakFootprint": 81184304,
+          "samples": 34560,
+          "sha256": "548195b40ab6fe9b49be84c6e52a8f635dd7d6167113e328e2b4a7eb92e6f200",
+          "thermalEnd": 0,
+          "thermalStart": 0,
+          "wallSeconds": 0.2655312083661556
+        },
+        {
+          "events": [
+            {
+              "accepted": 34560,
+              "end": 34560,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstAcceptedFrameSeconds": 0.0260732916649431,
+          "frameServiceP50": 0.013707250007428229,
+          "frameServiceP95": 0.014867958379909396,
+          "name": "warm-1",
+          "sampledPeakFootprint": 81479240,
+          "samples": 34560,
+          "sha256": "548195b40ab6fe9b49be84c6e52a8f635dd7d6167113e328e2b4a7eb92e6f200",
+          "thermalEnd": 0,
+          "thermalStart": 0,
+          "wallSeconds": 0.2666816667187959
+        },
+        {
+          "events": [
+            {
+              "accepted": 80640,
+              "end": 80640,
+              "start": 0,
+              "text": "Alice was beginning to get very tired of sitting by her sister on the bank,"
+            },
+            {
+              "accepted": 120960,
+              "end": 120960,
+              "start": 80640,
+              "text": "and of having nothing to do."
+            }
+          ],
+          "firstAcceptedFrameSeconds": 0.03196262498386204,
+          "frameServiceP50": 0.01362083328422159,
+          "frameServiceP95": 0.014569791732355952,
+          "name": "book",
+          "sampledPeakFootprint": 90097296,
+          "samples": 120960,
+          "sha256": "24f9de81c851da00e7b60511dfa24e66d850192e9177c26238a32d3c24ed594f",
+          "thermalEnd": 0,
+          "thermalStart": 0,
+          "wallSeconds": 0.9727840416599065
+        },
+        {
+          "events": [
+            {
+              "accepted": 42240,
+              "end": 42240,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstAcceptedFrameSeconds": 0.025788000086322427,
+          "frameServiceP50": 0.013384000048972666,
+          "frameServiceP95": 0.014107208233326674,
+          "name": "voice-switch",
+          "sampledPeakFootprint": 90801808,
+          "samples": 42240,
+          "sha256": "a67d1420455faf513375439e831887377b53c370058994b6f2ba65b6c5c0daa3",
+          "thermalEnd": 0,
+          "thermalStart": 0,
+          "wallSeconds": 0.31554629176389426
+        },
+        {
+          "events": [
+            {
+              "accepted": 117120,
+              "end": 117120,
+              "start": 0,
+              "text": "La noche la pas\u00f3 gozosa. Oh ventajas de un buen prop\u00f3sito!"
+            }
+          ],
+          "firstAcceptedFrameSeconds": 0.407466416596435,
+          "frameServiceP50": 0.013722624978981912,
+          "frameServiceP95": 0.014504333375953138,
+          "name": "language-switch",
+          "sampledPeakFootprint": 88508000,
+          "samples": 117120,
+          "sha256": "9769c01c04023c950c58be86a7fca615e0d159ceec58644061045468d625c49a",
+          "thermalEnd": 0,
+          "thermalStart": 0,
+          "wallSeconds": 1.237163541605696
+        },
+        {
+          "events": [
+            {
+              "accepted": 53760,
+              "end": 53760,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstAcceptedFrameSeconds": 0.025842041592113674,
+          "frameServiceP50": 0.013608833309262991,
+          "frameServiceP95": 0.014493166701868176,
+          "name": "slow-receiver",
+          "sampledPeakFootprint": 90719840,
+          "samples": 53760,
+          "sha256": "1e037fb2c67931b257ba51eb904b9c88bd7e136978c05df0e64b3c044c595ba7",
+          "thermalEnd": 0,
+          "thermalStart": 0,
+          "wallSeconds": 0.4832538749324158
+        }
+      ]
+    },
+    {
+      "backend": "coreml",
+      "revision": "baseline",
+      "rows": [
+        {
+          "events": [
+            {
+              "accepted": 34560,
+              "end": 34560,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstAcceptedFrameSeconds": 0.8531929166056216,
+          "frameServiceP50": 0.013542250031605363,
+          "frameServiceP95": 0.014895291649736464,
+          "name": "cold",
+          "sampledPeakFootprint": 69355080,
+          "samples": 34560,
+          "sha256": "548195b40ab6fe9b49be84c6e52a8f635dd7d6167113e328e2b4a7eb92e6f200",
+          "thermalEnd": 0,
+          "thermalStart": 0,
+          "wallSeconds": 1.0945937499636784
+        },
+        {
+          "events": [
+            {
+              "accepted": 34560,
+              "end": 34560,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstAcceptedFrameSeconds": 0.045640749973244965,
+          "frameServiceP50": 0.013876374927349389,
+          "frameServiceP95": 0.01446104166097939,
+          "name": "preview",
+          "previewSeconds": 0.7840348333120346,
+          "sampledPeakFootprint": 79611464,
+          "samples": 34560,
+          "sha256": "548195b40ab6fe9b49be84c6e52a8f635dd7d6167113e328e2b4a7eb92e6f200",
+          "thermalEnd": 0,
+          "thermalStart": 0,
+          "wallSeconds": 0.2908730832859874
+        },
+        {
+          "events": [
+            {
+              "accepted": 34560,
+              "end": 34560,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstAcceptedFrameSeconds": 0.026833000010810792,
+          "frameServiceP50": 0.014113249955698848,
+          "frameServiceP95": 0.015046166605316103,
+          "name": "warm-0",
+          "sampledPeakFootprint": 90703456,
+          "samples": 34560,
+          "sha256": "548195b40ab6fe9b49be84c6e52a8f635dd7d6167113e328e2b4a7eb92e6f200",
+          "thermalEnd": 0,
+          "thermalStart": 0,
+          "wallSeconds": 0.27838795830029994
+        },
+        {
+          "events": [
+            {
+              "accepted": 34560,
+              "end": 34560,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstAcceptedFrameSeconds": 0.02778504171874374,
+          "frameServiceP50": 0.014194791670888662,
+          "frameServiceP95": 0.026590916677378118,
+          "name": "warm-1",
+          "sampledPeakFootprint": 101484152,
+          "samples": 34560,
+          "sha256": "548195b40ab6fe9b49be84c6e52a8f635dd7d6167113e328e2b4a7eb92e6f200",
+          "thermalEnd": 0,
+          "thermalStart": 0,
+          "wallSeconds": 0.2905470416881144
+        },
+        {
+          "events": [
+            {
+              "accepted": 80640,
+              "end": 80640,
+              "start": 0,
+              "text": "Alice was beginning to get very tired of sitting by her sister on the bank,"
+            },
+            {
+              "accepted": 120960,
+              "end": 120960,
+              "start": 80640,
+              "text": "and of having nothing to do."
+            }
+          ],
+          "firstAcceptedFrameSeconds": 0.03259337495546788,
+          "frameServiceP50": 0.013579458347521722,
+          "frameServiceP95": 0.015244500013068318,
+          "name": "book",
+          "sampledPeakFootprint": 125257408,
+          "samples": 120960,
+          "sha256": "24f9de81c851da00e7b60511dfa24e66d850192e9177c26238a32d3c24ed594f",
+          "thermalEnd": 0,
+          "thermalStart": 0,
+          "wallSeconds": 0.9723498749081045
+        },
+        {
+          "events": [
+            {
+              "accepted": 42240,
+              "end": 42240,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstAcceptedFrameSeconds": 0.027065541595220566,
+          "frameServiceP50": 0.013700083363801241,
+          "frameServiceP95": 0.014361875015310943,
+          "name": "voice-switch",
+          "sampledPeakFootprint": 131581656,
+          "samples": 42240,
+          "sha256": "a67d1420455faf513375439e831887377b53c370058994b6f2ba65b6c5c0daa3",
+          "thermalEnd": 0,
+          "thermalStart": 0,
+          "wallSeconds": 0.3224160416284576
+        },
+        {
+          "events": [
+            {
+              "accepted": 117120,
+              "end": 117120,
+              "start": 0,
+              "text": "La noche la pas\u00f3 gozosa. Oh ventajas de un buen prop\u00f3sito!"
+            }
+          ],
+          "firstAcceptedFrameSeconds": 0.8424574167001992,
+          "frameServiceP50": 0.013798041734844446,
+          "frameServiceP95": 0.014600416645407677,
+          "name": "language-switch",
+          "sampledPeakFootprint": 144950928,
+          "samples": 117120,
+          "sha256": "9769c01c04023c950c58be86a7fca615e0d159ceec58644061045468d625c49a",
+          "thermalEnd": 0,
+          "thermalStart": 0,
+          "wallSeconds": 1.6751144583104178
+        },
+        {
+          "events": [
+            {
+              "accepted": 53760,
+              "end": 53760,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstAcceptedFrameSeconds": 0.026324083330109715,
+          "frameServiceP50": 0.013837958336807787,
+          "frameServiceP95": 0.014782999991439283,
+          "name": "slow-receiver",
+          "sampledPeakFootprint": 155813520,
+          "samples": 53760,
+          "sha256": "1e037fb2c67931b257ba51eb904b9c88bd7e136978c05df0e64b3c044c595ba7",
+          "thermalEnd": 0,
+          "thermalStart": 0,
+          "wallSeconds": 0.4902748332824558
+        }
+      ]
+    }
+  ],
+  "summary": [
+    {
+      "backend": "coreml",
+      "name": "cold",
+      "wallSeconds": {
+        "baseline": 1.4422815624857321,
+        "candidate": 0.6675542708253488
+      },
+      "firstAcceptedFrameSeconds": {
+        "baseline": 1.1972439166274853,
+        "candidate": 0.42742597917094827
+      },
+      "frameServiceP50": {
+        "baseline": 0.013721916649956256,
+        "candidate": 0.013548125047236681
+      },
+      "frameServiceP95": {
+        "baseline": 0.01498056249693036,
+        "candidate": 0.014437041652854532
+      },
+      "sampledPeakFootprint": {
+        "baseline": 68847188.0,
+        "candidate": 64620092.0
+      },
+      "wallSpeedup": 2.160545779600104
+    },
+    {
+      "backend": "coreml",
+      "name": "preview",
+      "wallSeconds": {
+        "baseline": 0.2940967082977295,
+        "candidate": 0.2860456874477677
+      },
+      "firstAcceptedFrameSeconds": {
+        "baseline": 0.046879249974153936,
+        "candidate": 0.04718847916228697
+      },
+      "frameServiceP50": {
+        "baseline": 0.013915645831730217,
+        "candidate": 0.013408416649326682
+      },
+      "frameServiceP95": {
+        "baseline": 0.014731125032994896,
+        "candidate": 0.014404791698325425
+      },
+      "sampledPeakFootprint": {
+        "baseline": 79570516.0,
+        "candidate": 74122812.0
+      },
+      "wallSpeedup": 1.028145926344133
+    },
+    {
+      "backend": "coreml",
+      "name": "warm-0",
+      "wallSeconds": {
+        "baseline": 0.27449710411019623,
+        "candidate": 0.2652395208715461
+      },
+      "firstAcceptedFrameSeconds": {
+        "baseline": 0.027139645826537162,
+        "candidate": 0.026722458365838975
+      },
+      "frameServiceP50": {
+        "baseline": 0.013850291667040437,
+        "candidate": 0.013384020829107612
+      },
+      "frameServiceP95": {
+        "baseline": 0.014993020799010992,
+        "candidate": 0.014533999899867922
+      },
+      "sampledPeakFootprint": {
+        "baseline": 90637920.0,
+        "candidate": 78710332.0
+      },
+      "wallSpeedup": 1.0349027294583808
+    },
+    {
+      "backend": "coreml",
+      "name": "warm-1",
+      "wallSeconds": {
+        "baseline": 0.2807733333320357,
+        "candidate": 0.271003729198128
+      },
+      "firstAcceptedFrameSeconds": {
+        "baseline": 0.026971333369147032,
+        "candidate": 0.02659227082040161
+      },
+      "frameServiceP50": {
+        "baseline": 0.014083000016398728,
+        "candidate": 0.013681562501005828
+      },
+      "frameServiceP95": {
+        "baseline": 0.020646645803935826,
+        "candidate": 0.016317375004291534
+      },
+      "sampledPeakFootprint": {
+        "baseline": 101328504.0,
+        "candidate": 78964308.0
+      },
+      "wallSpeedup": 1.0360497036805174
+    },
+    {
+      "backend": "coreml",
+      "name": "book",
+      "wallSeconds": {
+        "baseline": 0.9951159165939316,
+        "candidate": 0.9790885624825023
+      },
+      "firstAcceptedFrameSeconds": {
+        "baseline": 0.03250424994621426,
+        "candidate": 0.03217479167506099
+      },
+      "frameServiceP50": {
+        "baseline": 0.013859312515705824,
+        "candidate": 0.013746374985203147
+      },
+      "frameServiceP95": {
+        "baseline": 0.015232416684739292,
+        "candidate": 0.014711187512148172
+      },
+      "sampledPeakFootprint": {
+        "baseline": 124913344.0,
+        "candidate": 87410320.0
+      },
+      "wallSpeedup": 1.0163696673882
+    },
+    {
+      "backend": "coreml",
+      "name": "voice-switch",
+      "wallSeconds": {
+        "baseline": 0.32418022910133004,
+        "candidate": 0.31895325001096353
+      },
+      "firstAcceptedFrameSeconds": {
+        "baseline": 0.02644554158905521,
+        "candidate": 0.02619818749371916
+      },
+      "frameServiceP50": {
+        "baseline": 0.013713291671592742,
+        "candidate": 0.013492979167494923
+      },
+      "frameServiceP95": {
+        "baseline": 0.01433095830725506,
+        "candidate": 0.01422506244853139
+      },
+      "sampledPeakFootprint": {
+        "baseline": 131040984.0,
+        "candidate": 88123024.0
+      },
+      "wallSpeedup": 1.0163879160666551
+    },
+    {
+      "backend": "coreml",
+      "name": "language-switch",
+      "wallSeconds": {
+        "baseline": 2.053006812464446,
+        "candidate": 1.2337022082647309
+      },
+      "firstAcceptedFrameSeconds": {
+        "baseline": 1.2127843750058673,
+        "candidate": 0.4065229374682531
+      },
+      "frameServiceP50": {
+        "baseline": 0.013852750009391457,
+        "candidate": 0.013614145806059241
+      },
+      "frameServiceP95": {
+        "baseline": 0.014909458346664906,
+        "candidate": 0.014505833329167217
+      },
+      "sampledPeakFootprint": {
+        "baseline": 143427216.0,
+        "candidate": 86074976.0
+      },
+      "wallSpeedup": 1.6641024055165723
+    },
+    {
+      "backend": "coreml",
+      "name": "slow-receiver",
+      "wallSeconds": {
+        "baseline": 0.48921181249897927,
+        "candidate": 0.484457416634541
+      },
+      "firstAcceptedFrameSeconds": {
+        "baseline": 0.026866145839449018,
+        "candidate": 0.02631362498505041
+      },
+      "frameServiceP50": {
+        "baseline": 0.013758020824752748,
+        "candidate": 0.013726854173000902
+      },
+      "frameServiceP95": {
+        "baseline": 0.014850791660137475,
+        "candidate": 0.014656812534667552
+      },
+      "sampledPeakFootprint": {
+        "baseline": 154617488.0,
+        "candidate": 87287392.0
+      },
+      "wallSpeedup": 1.0098138571135238
+    }
+  ],
+  "machine": "arm64",
+  "os": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+  "binarySHA256": {
+    "baseline": "78f984ed178b3c65bc16050bd80ac8e251994bb46a7edb7aaa2fc19ab896b0e2",
+    "candidate": "6ad8a995dcce0997e98cd9b89fb071cb50f7707f4d14b614ccf087fae516d4c7"
+  },
+  "limitations": [
+    "Shared Mac, two process runs per revision per backend; descriptive measurements, not a statistical performance guarantee",
+    "Sampled process footprint is not allocation high-water or system-wide Core ML memory",
+    "Short fixed excerpts; no long-form listening, physical-device, energy or sustained thermal qualification"
+  ]
+}

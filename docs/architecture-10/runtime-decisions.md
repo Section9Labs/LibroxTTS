@@ -1,5 +1,9 @@
 # Execution decisions and limits
 
+This records the initial 1.0 candidate. The [speed-repair follow-up](../implementation-10-speed.md)
+supersedes final-latent ownership and warm timing: intermediate flow tensors stay
+native, but the final 32 values are detached before continuation-history retention.
+
 The unchanged 0.9 Core ML profile for the fixed Caro/Calm four-step passage spent
 about 57% in latent-transformer predictions, 23% in the codec, 16% in flow, and 2%
 in text prefill. Those timers include each stage's host bridge. Even eliminating

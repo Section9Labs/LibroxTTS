@@ -1,5 +1,9 @@
 # 1.0 execution redesign — implementation and measurement record
 
+**Historical first candidate:** synthesis regressions below are superseded by the
+[speed repair and default Max level report](implementation-10-speed.md). Keep this
+record to compare the original targets and rejected experiments.
+
 Baseline: v0.9.0, `07fcf437004027f58ad8bb16de7877d0ee74a9a8`.
 Isolated worktree: `librox-tts-10-review`. This is not a published release.
 The [design](1.0-execution-redesign.md) and [targets](architecture-10/targets.json)

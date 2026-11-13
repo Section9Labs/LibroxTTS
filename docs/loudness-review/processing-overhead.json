@@ -1,0 +1,11 @@
+{
+  "audioSeconds" : 11803.6,
+  "firstGainLookupSeconds" : 4.6666999999999999e-05,
+  "gainLookupSeconds" : 0.0048307400000000113,
+  "kneeSamples" : 27,
+  "nanosecondsPerSample" : 1.0723889145401944,
+  "recordings" : 3375,
+  "revision" : "pocket-level-v1-41466443134c33e7",
+  "samples" : 283286400,
+  "transformSeconds" : 0.30379319499999935
+}

@@ -1,0 +1,2990 @@
+{
+  "complete": true,
+  "exactPCMAndEvents": true,
+  "binaries": {
+    "baseline": "b4701128102a354d4325dd4b5ac6156c59d58642114df7bc09acabfd3fbce4cd",
+    "candidate": "0325f9ebb1ea97c06f7c211615cd89631b492778599768d9b89867f020631af8"
+  },
+  "summary": {
+    "baseline": {
+      "freshSetupPlusFirstAudioSeconds": 4.729536750019179,
+      "freshSetupSeconds": 3.016405312519055,
+      "warmPassageMedianSeconds": 3.413691541660228,
+      "warmThermalStates": [
+        0
+      ]
+    },
+    "candidate": {
+      "freshSetupPlusFirstAudioSeconds": 3.9815113125077914,
+      "freshSetupSeconds": 2.8793076666624984,
+      "warmPassageMedianSeconds": 3.2600407083227765,
+      "warmThermalStates": [
+        0
+      ]
+    },
+    "warmSpeedup": 1.0471315689234144,
+    "freshColdRatio": 0.8418395971849983
+  },
+  "runs": [
+    {
+      "kind": "fresh",
+      "revision": "baseline",
+      "path": "/tmp/libroxtts-10-speed/device-detached/final-031c2481-fresh-0-baseline",
+      "environment": {
+        "cpuBudget": "unmetered foreground",
+        "durationGoal": 0,
+        "freshAssetCopy": true,
+        "os": "Version 27.0.1 (Build 24A446)",
+        "preparationSeconds": 1.3258849583507981,
+        "runtime": "pocket-coreml-28770c06-v1:fp32:tanh:quality4:adaptive:warm12:eos6",
+        "setupSeconds": 3.1176363750128075
+      },
+      "rows": [
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 1.84181141667068,
+          "footprint": 118097120,
+          "name": "trial-0-steps1",
+          "samples": 44160,
+          "seconds": 2.0530395833193325,
+          "sha256": "b60503d94d3344914f63c2405efa5b12f5ef3a63992b9fa7d3edb4edfce9d255",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.026477208331925794,
+          "footprint": 133104888,
+          "name": "trial-1-steps2",
+          "samples": 44160,
+          "seconds": 0.243468666652916,
+          "sha256": "6df2d80b34193dc511af7c26cfc702203681fd6ac690a589a74159f3a44336db",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.027365374990040436,
+          "footprint": 148145400,
+          "name": "trial-2-steps3",
+          "samples": 44160,
+          "seconds": 0.24901574998511933,
+          "sha256": "8cdeedeabc165e815425f57edcb93e6a4d78e432025a3e9f89245f03243f7d2b",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.13021820833091624,
+          "footprint": 158205224,
+          "name": "trial-3-steps4",
+          "samples": 44160,
+          "seconds": 0.37009574999683537,
+          "sha256": "cefcd6c2cc05a71916b4cbddc7a2cf80e21f12796416219ba8cdc873d23bc27c",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.029934458318166435,
+          "footprint": 173393192,
+          "name": "trial-4-steps5",
+          "samples": 44160,
+          "seconds": 0.28275041666347533,
+          "sha256": "0628ff4ed3b162cc8f35a7f6351513af2950292166768673566181a0cce02d48",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.02810695834341459,
+          "footprint": 188450112,
+          "name": "trial-5-steps6",
+          "samples": 44160,
+          "seconds": 0.2983857083308976,
+          "sha256": "33768b6b057c63a7117293a4de9b8ed88803a180779bf9b3468553532a7f774e",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.028985208336962387,
+          "footprint": 188450112,
+          "name": "trial-6-steps7",
+          "samples": 44160,
+          "seconds": 0.30251612499705516,
+          "sha256": "5ad60769c1b59fb9c7d5071429ea60b23e8ff5febffed5814fed77936731f87e",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.23010549999889918,
+          "footprint": 210322800,
+          "name": "trial-7-steps8",
+          "samples": 44160,
+          "seconds": 0.5048956249956973,
+          "sha256": "4191ecee4cc95f1aed995a98f5f35806f0b1ac7697d7cac703473f379cf9f439",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.02613562499755062,
+          "footprint": 225215856,
+          "name": "trial-8-steps2",
+          "samples": 44160,
+          "seconds": 0.24798466663924046,
+          "sha256": "6df2d80b34193dc511af7c26cfc702203681fd6ac690a589a74159f3a44336db",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 42240,
+              "end": 42240,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.025400624988833442,
+          "footprint": 217564552,
+          "name": "trial-9-steps4",
+          "samples": 42240,
+          "seconds": 0.24491966667119414,
+          "sha256": "f39912d43e4f7a87bf389b5ecb72fe6e2ffbfd7593e26c37703b36a5a70dcaa5",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 34560,
+              "end": 34560,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.029711749986745417,
+          "footprint": 232195464,
+          "name": "trial-10-steps4",
+          "samples": 34560,
+          "seconds": 0.21476120833540335,
+          "sha256": "6c2502d8e631901b8966672c4d13d8f70cab5c2a21b07befbb6000a8da53194d",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.033554499997990206,
+          "footprint": 256968120,
+          "name": "trial-11-steps4",
+          "samples": 531840,
+          "seconds": 3.4367957083159126,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        }
+      ]
+    },
+    {
+      "kind": "fresh",
+      "revision": "candidate",
+      "path": "/tmp/libroxtts-10-speed/device-detached/final-031c2481-fresh-1-candidate",
+      "environment": {
+        "cpuBudget": "unmetered foreground",
+        "durationGoal": 0,
+        "freshAssetCopy": true,
+        "os": "Version 27.0.1 (Build 24A446)",
+        "preparationSeconds": 1.0285901666793507,
+        "runtime": "pocket-coreml-28770c06-v1:fp32:tanh:quality4:adaptive:warm12:eos6",
+        "setupSeconds": 3.146614208322717
+      },
+      "rows": [
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 1.207795583351981,
+          "footprint": 100336864,
+          "name": "trial-0-steps1",
+          "samples": 44160,
+          "seconds": 1.4141621250018943,
+          "sha256": "b60503d94d3344914f63c2405efa5b12f5ef3a63992b9fa7d3edb4edfce9d255",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.026078625000081956,
+          "footprint": 103777504,
+          "name": "trial-1-steps2",
+          "samples": 44160,
+          "seconds": 0.23522091665654443,
+          "sha256": "6df2d80b34193dc511af7c26cfc702203681fd6ac690a589a74159f3a44336db",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.025979625002946705,
+          "footprint": 103187680,
+          "name": "trial-2-steps3",
+          "samples": 44160,
+          "seconds": 0.25069158332189545,
+          "sha256": "8cdeedeabc165e815425f57edcb93e6a4d78e432025a3e9f89245f03243f7d2b",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.13102670831722207,
+          "footprint": 97125624,
+          "name": "trial-3-steps4",
+          "samples": 44160,
+          "seconds": 0.35937949997605756,
+          "sha256": "cefcd6c2cc05a71916b4cbddc7a2cf80e21f12796416219ba8cdc873d23bc27c",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.02718299999833107,
+          "footprint": 97142008,
+          "name": "trial-4-steps5",
+          "samples": 44160,
+          "seconds": 0.27640608334331773,
+          "sha256": "0628ff4ed3b162cc8f35a7f6351513af2950292166768673566181a0cce02d48",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.0276527916721534,
+          "footprint": 99239160,
+          "name": "trial-5-steps6",
+          "samples": 44160,
+          "seconds": 0.28987804165808484,
+          "sha256": "33768b6b057c63a7117293a4de9b8ed88803a180779bf9b3468553532a7f774e",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.028084791672881693,
+          "footprint": 86410488,
+          "name": "trial-6-steps7",
+          "samples": 44160,
+          "seconds": 0.2965298333147075,
+          "sha256": "5ad60769c1b59fb9c7d5071429ea60b23e8ff5febffed5814fed77936731f87e",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.20959424998727627,
+          "footprint": 91505936,
+          "name": "trial-7-steps8",
+          "samples": 44160,
+          "seconds": 0.47844483333756216,
+          "sha256": "4191ecee4cc95f1aed995a98f5f35806f0b1ac7697d7cac703473f379cf9f439",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.025498125003650784,
+          "footprint": 89425168,
+          "name": "trial-8-steps2",
+          "samples": 44160,
+          "seconds": 0.23758049999014474,
+          "sha256": "6df2d80b34193dc511af7c26cfc702203681fd6ac690a589a74159f3a44336db",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 42240,
+              "end": 42240,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.02887908334378153,
+          "footprint": 74155280,
+          "name": "trial-9-steps4",
+          "samples": 42240,
+          "seconds": 0.24213429167866707,
+          "sha256": "f39912d43e4f7a87bf389b5ecb72fe6e2ffbfd7593e26c37703b36a5a70dcaa5",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 34560,
+              "end": 34560,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.029360708344029263,
+          "footprint": 77448464,
+          "name": "trial-10-steps4",
+          "samples": 34560,
+          "seconds": 0.20983595834695734,
+          "sha256": "6c2502d8e631901b8966672c4d13d8f70cab5c2a21b07befbb6000a8da53194d",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.033400708343833685,
+          "footprint": 88474920,
+          "name": "trial-11-steps4",
+          "samples": 531840,
+          "seconds": 3.3871420416689944,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        }
+      ]
+    },
+    {
+      "kind": "fresh",
+      "revision": "candidate",
+      "path": "/tmp/libroxtts-10-speed/device-detached/final-031c2481-fresh-2-candidate",
+      "environment": {
+        "cpuBudget": "unmetered foreground",
+        "durationGoal": 0,
+        "freshAssetCopy": true,
+        "os": "Version 27.0.1 (Build 24A446)",
+        "preparationSeconds": 1.0296929583419114,
+        "runtime": "pocket-coreml-28770c06-v1:fp32:tanh:quality4:adaptive:warm12:eos6",
+        "setupSeconds": 2.61200112500228
+      },
+      "rows": [
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.9966117083386052,
+          "footprint": 108053728,
+          "name": "trial-0-steps1",
+          "samples": 44160,
+          "seconds": 1.1986007916857488,
+          "sha256": "b60503d94d3344914f63c2405efa5b12f5ef3a63992b9fa7d3edb4edfce9d255",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.025812666659476236,
+          "footprint": 111494368,
+          "name": "trial-1-steps2",
+          "samples": 44160,
+          "seconds": 0.24309695832198486,
+          "sha256": "6df2d80b34193dc511af7c26cfc702203681fd6ac690a589a74159f3a44336db",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.026270791655406356,
+          "footprint": 103859424,
+          "name": "trial-2-steps3",
+          "samples": 44160,
+          "seconds": 0.24656937501276843,
+          "sha256": "8cdeedeabc165e815425f57edcb93e6a4d78e432025a3e9f89245f03243f7d2b",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.12199991664965637,
+          "footprint": 106366200,
+          "name": "trial-3-steps4",
+          "samples": 44160,
+          "seconds": 0.35614299998269416,
+          "sha256": "cefcd6c2cc05a71916b4cbddc7a2cf80e21f12796416219ba8cdc873d23bc27c",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.026849749992834404,
+          "footprint": 106382584,
+          "name": "trial-4-steps5",
+          "samples": 44160,
+          "seconds": 0.2785191666625906,
+          "sha256": "0628ff4ed3b162cc8f35a7f6351513af2950292166768673566181a0cce02d48",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.02777024998795241,
+          "footprint": 97584376,
+          "name": "trial-5-steps6",
+          "samples": 44160,
+          "seconds": 0.2873001249972731,
+          "sha256": "33768b6b057c63a7117293a4de9b8ed88803a180779bf9b3468553532a7f774e",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.02819670832832344,
+          "footprint": 97584376,
+          "name": "trial-6-steps7",
+          "samples": 44160,
+          "seconds": 0.30730279165436514,
+          "sha256": "5ad60769c1b59fb9c7d5071429ea60b23e8ff5febffed5814fed77936731f87e",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.2029070833523292,
+          "footprint": 105366800,
+          "name": "trial-7-steps8",
+          "samples": 44160,
+          "seconds": 0.4756665833410807,
+          "sha256": "4191ecee4cc95f1aed995a98f5f35806f0b1ac7697d7cac703473f379cf9f439",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.025331249984446913,
+          "footprint": 94684456,
+          "name": "trial-8-steps2",
+          "samples": 44160,
+          "seconds": 0.23435812498792075,
+          "sha256": "6df2d80b34193dc511af7c26cfc702203681fd6ac690a589a74159f3a44336db",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 42240,
+              "end": 42240,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.02929762500571087,
+          "footprint": 96601384,
+          "name": "trial-9-steps4",
+          "samples": 42240,
+          "seconds": 0.2507249166665133,
+          "sha256": "f39912d43e4f7a87bf389b5ecb72fe6e2ffbfd7593e26c37703b36a5a70dcaa5",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 34560,
+              "end": 34560,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.03586412500590086,
+          "footprint": 99894568,
+          "name": "trial-10-steps4",
+          "samples": 34560,
+          "seconds": 0.22206658334471285,
+          "sha256": "6c2502d8e631901b8966672c4d13d8f70cab5c2a21b07befbb6000a8da53194d",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.03340991665027104,
+          "footprint": 99353896,
+          "name": "trial-11-steps4",
+          "samples": 531840,
+          "seconds": 3.4587860416504554,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        }
+      ]
+    },
+    {
+      "kind": "fresh",
+      "revision": "baseline",
+      "path": "/tmp/libroxtts-10-speed/device-detached/final-031c2481-fresh-3-baseline",
+      "environment": {
+        "cpuBudget": "unmetered foreground",
+        "durationGoal": 0,
+        "freshAssetCopy": true,
+        "os": "Version 27.0.1 (Build 24A446)",
+        "preparationSeconds": 1.2503564583312254,
+        "runtime": "pocket-coreml-28770c06-v1:fp32:tanh:quality4:adaptive:warm12:eos6",
+        "setupSeconds": 2.915174250025302
+      },
+      "rows": [
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 1.5844514583295677,
+          "footprint": 118097144,
+          "name": "trial-0-steps1",
+          "samples": 44160,
+          "seconds": 1.7956974999979138,
+          "sha256": "b60503d94d3344914f63c2405efa5b12f5ef3a63992b9fa7d3edb4edfce9d255",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.025982499995734543,
+          "footprint": 126141688,
+          "name": "trial-1-steps2",
+          "samples": 44160,
+          "seconds": 0.24173841669107787,
+          "sha256": "6df2d80b34193dc511af7c26cfc702203681fd6ac690a589a74159f3a44336db",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.026010750007117167,
+          "footprint": 141165840,
+          "name": "trial-2-steps3",
+          "samples": 44160,
+          "seconds": 0.2536616666766349,
+          "sha256": "8cdeedeabc165e815425f57edcb93e6a4d78e432025a3e9f89245f03243f7d2b",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.12870212501729839,
+          "footprint": 158467392,
+          "name": "trial-3-steps4",
+          "samples": 44160,
+          "seconds": 0.38189958332804963,
+          "sha256": "cefcd6c2cc05a71916b4cbddc7a2cf80e21f12796416219ba8cdc873d23bc27c",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.03016454164753668,
+          "footprint": 173540672,
+          "name": "trial-4-steps5",
+          "samples": 44160,
+          "seconds": 0.302912416664185,
+          "sha256": "0628ff4ed3b162cc8f35a7f6351513af2950292166768673566181a0cce02d48",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.028593958326382563,
+          "footprint": 179045696,
+          "name": "trial-5-steps6",
+          "samples": 44160,
+          "seconds": 0.30749825001112185,
+          "sha256": "33768b6b057c63a7117293a4de9b8ed88803a180779bf9b3468553532a7f774e",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.030361500015715137,
+          "footprint": 193906008,
+          "name": "trial-6-steps7",
+          "samples": 44160,
+          "seconds": 0.31971483334200457,
+          "sha256": "5ad60769c1b59fb9c7d5071429ea60b23e8ff5febffed5814fed77936731f87e",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.2608607083384413,
+          "footprint": 194086232,
+          "name": "trial-7-steps8",
+          "samples": 44160,
+          "seconds": 0.5366874583414756,
+          "sha256": "4191ecee4cc95f1aed995a98f5f35806f0b1ac7697d7cac703473f379cf9f439",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.026068958337418735,
+          "footprint": 206914952,
+          "name": "trial-8-steps2",
+          "samples": 44160,
+          "seconds": 0.24748741669463925,
+          "sha256": "6df2d80b34193dc511af7c26cfc702203681fd6ac690a589a74159f3a44336db",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 42240,
+              "end": 42240,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.02658695832360536,
+          "footprint": 216221064,
+          "name": "trial-9-steps4",
+          "samples": 42240,
+          "seconds": 0.25100062499404885,
+          "sha256": "f39912d43e4f7a87bf389b5ecb72fe6e2ffbfd7593e26c37703b36a5a70dcaa5",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 34560,
+              "end": 34560,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.02705795833026059,
+          "footprint": 230409632,
+          "name": "trial-10-steps4",
+          "samples": 34560,
+          "seconds": 0.21328737499425188,
+          "sha256": "6c2502d8e631901b8966672c4d13d8f70cab5c2a21b07befbb6000a8da53194d",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.03447766666067764,
+          "footprint": 253380048,
+          "name": "trial-11-steps4",
+          "samples": 531840,
+          "seconds": 3.453517166664824,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        }
+      ]
+    },
+    {
+      "kind": "warm",
+      "revision": "baseline",
+      "path": "/tmp/libroxtts-10-speed/device-detached/final-031c2481-warm-0-baseline",
+      "environment": {
+        "cpuBudget": "unmetered foreground",
+        "durationGoal": 30,
+        "freshAssetCopy": false,
+        "os": "Version 27.0.1 (Build 24A446)",
+        "preparationSeconds": 1.4233372499875259,
+        "runtime": "pocket-coreml-28770c06-v1:fp32:tanh:quality4:adaptive:warm12:eos6",
+        "setupSeconds": 3.604359041666612
+      },
+      "rows": [
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 1.526448624994373,
+          "footprint": 120522024,
+          "name": "trial-0-steps4",
+          "samples": 531840,
+          "seconds": 4.880398249981226,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.033777875010855496,
+          "footprint": 122045736,
+          "name": "trial-1-steps4",
+          "samples": 531840,
+          "seconds": 3.4479957916773856,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.03303279168903828,
+          "footprint": 152208704,
+          "name": "trial-2-steps4",
+          "samples": 531840,
+          "seconds": 3.4523184999998193,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.03557429165812209,
+          "footprint": 180045144,
+          "name": "trial-3-steps4",
+          "samples": 531840,
+          "seconds": 3.451622208347544,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.034141833340981975,
+          "footprint": 209651032,
+          "name": "trial-4-steps4",
+          "samples": 531840,
+          "seconds": 3.463535208342364,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.033859791670693085,
+          "footprint": 235718000,
+          "name": "trial-5-steps4",
+          "samples": 531840,
+          "seconds": 3.311335208331002,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.03207908335025422,
+          "footprint": 263603592,
+          "name": "trial-6-steps4",
+          "samples": 531840,
+          "seconds": 3.2433984166709706,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.03258629166521132,
+          "footprint": 291423648,
+          "name": "trial-7-steps4",
+          "samples": 531840,
+          "seconds": 3.2443392916757148,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.031741541664814577,
+          "footprint": 317965752,
+          "name": "trial-8-steps4",
+          "samples": 531840,
+          "seconds": 3.2628690833225846,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        }
+      ]
+    },
+    {
+      "kind": "warm",
+      "revision": "candidate",
+      "path": "/tmp/libroxtts-10-speed/device-detached/final-031c2481-warm-1-candidate",
+      "environment": {
+        "cpuBudget": "unmetered foreground",
+        "durationGoal": 30,
+        "freshAssetCopy": false,
+        "os": "Version 27.0.1 (Build 24A446)",
+        "preparationSeconds": 1.2449758749862667,
+        "runtime": "pocket-coreml-28770c06-v1:fp32:tanh:quality4:adaptive:warm12:eos6",
+        "setupSeconds": 3.3442080416716635
+      },
+      "rows": [
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 1.2557566250034142,
+          "footprint": 119522576,
+          "name": "trial-0-steps4",
+          "samples": 531840,
+          "seconds": 4.542402666673297,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.03262095834361389,
+          "footprint": 84788496,
+          "name": "trial-1-steps4",
+          "samples": 531840,
+          "seconds": 3.2843017500126734,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.03238808331661858,
+          "footprint": 79562024,
+          "name": "trial-2-steps4",
+          "samples": 531840,
+          "seconds": 3.3395940416667145,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.03263637499185279,
+          "footprint": 81397032,
+          "name": "trial-3-steps4",
+          "samples": 531840,
+          "seconds": 3.3459786666790023,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.03284337499644607,
+          "footprint": 79758632,
+          "name": "trial-4-steps4",
+          "samples": 531840,
+          "seconds": 3.3128699166700244,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.03271541665890254,
+          "footprint": 77645096,
+          "name": "trial-5-steps4",
+          "samples": 531840,
+          "seconds": 3.2849948333459906,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.03263383332523517,
+          "footprint": 78185768,
+          "name": "trial-6-steps4",
+          "samples": 531840,
+          "seconds": 3.2600407083227765,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.03305458332761191,
+          "footprint": 78972200,
+          "name": "trial-7-steps4",
+          "samples": 531840,
+          "seconds": 3.261363875004463,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.03294587502023205,
+          "footprint": 76891432,
+          "name": "trial-8-steps4",
+          "samples": 531840,
+          "seconds": 3.2697113750036806,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        }
+      ]
+    },
+    {
+      "kind": "warm",
+      "revision": "candidate",
+      "path": "/tmp/libroxtts-10-speed/device-detached/final-031c2481-warm-2-candidate",
+      "environment": {
+        "cpuBudget": "unmetered foreground",
+        "durationGoal": 30,
+        "freshAssetCopy": false,
+        "os": "Version 27.0.1 (Build 24A446)",
+        "preparationSeconds": 0.487426208332181,
+        "runtime": "pocket-coreml-28770c06-v1:fp32:tanh:quality4:adaptive:warm12:eos6",
+        "setupSeconds": 0.4877086250053253
+      },
+      "rows": [
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.45688112499192357,
+          "footprint": 89720080,
+          "name": "trial-0-steps4",
+          "samples": 531840,
+          "seconds": 3.8240131250058766,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.0330378333455883,
+          "footprint": 87098640,
+          "name": "trial-1-steps4",
+          "samples": 531840,
+          "seconds": 3.2361300000047777,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.032411874999525025,
+          "footprint": 83150096,
+          "name": "trial-2-steps4",
+          "samples": 531840,
+          "seconds": 3.2575166666938458,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.03291237499797717,
+          "footprint": 82412816,
+          "name": "trial-3-steps4",
+          "samples": 531840,
+          "seconds": 3.2387748333567288,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.032742374984081835,
+          "footprint": 81036560,
+          "name": "trial-4-steps4",
+          "samples": 531840,
+          "seconds": 3.2431253749819007,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.03255683335009962,
+          "footprint": 81036560,
+          "name": "trial-5-steps4",
+          "samples": 531840,
+          "seconds": 3.247253791661933,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.03326233330881223,
+          "footprint": 83166480,
+          "name": "trial-6-steps4",
+          "samples": 531840,
+          "seconds": 3.2621441666560713,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.03271970833884552,
+          "footprint": 82330896,
+          "name": "trial-7-steps4",
+          "samples": 531840,
+          "seconds": 3.2460775833169464,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.03294379165163264,
+          "footprint": 80266512,
+          "name": "trial-8-steps4",
+          "samples": 531840,
+          "seconds": 3.248974874994019,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.03290145835489966,
+          "footprint": 82117904,
+          "name": "trial-9-steps4",
+          "samples": 531840,
+          "seconds": 3.2546771250199527,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        }
+      ]
+    },
+    {
+      "kind": "warm",
+      "revision": "baseline",
+      "path": "/tmp/libroxtts-10-speed/device-detached/final-031c2481-warm-3-baseline",
+      "environment": {
+        "cpuBudget": "unmetered foreground",
+        "durationGoal": 30,
+        "freshAssetCopy": false,
+        "os": "Version 27.0.1 (Build 24A446)",
+        "preparationSeconds": 0.9227404999837745,
+        "runtime": "pocket-coreml-28770c06-v1:fp32:tanh:quality4:adaptive:warm12:eos6",
+        "setupSeconds": 0.9230185833293945
+      },
+      "rows": [
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 1.3652076250000391,
+          "footprint": 97453352,
+          "name": "trial-0-steps4",
+          "samples": 531840,
+          "seconds": 4.67928170831874,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.03416174999438226,
+          "footprint": 121242944,
+          "name": "trial-1-steps4",
+          "samples": 531840,
+          "seconds": 3.254777166672284,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.03264504167600535,
+          "footprint": 150816088,
+          "name": "trial-2-steps4",
+          "samples": 531840,
+          "seconds": 3.2490530833310913,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.03246491664322093,
+          "footprint": 176538992,
+          "name": "trial-3-steps4",
+          "samples": 531840,
+          "seconds": 3.300158666650532,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.03393370832782239,
+          "footprint": 205145456,
+          "name": "trial-4-steps4",
+          "samples": 531840,
+          "seconds": 3.401914208312519,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.03286112498608418,
+          "footprint": 234554760,
+          "name": "trial-5-steps4",
+          "samples": 531840,
+          "seconds": 3.4254688750079367,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.03440750000299886,
+          "footprint": 262702496,
+          "name": "trial-6-steps4",
+          "samples": 531840,
+          "seconds": 3.4403752916841768,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.033148916671052575,
+          "footprint": 290637240,
+          "name": "trial-7-steps4",
+          "samples": 531840,
+          "seconds": 3.477567166672088,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        },
+        {
+          "events": [
+            {
+              "accepted": 161280,
+              "end": 161280,
+              "start": 0,
+              "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+            },
+            {
+              "accepted": 295680,
+              "end": 295680,
+              "start": 161280,
+              "text": "It was the small things she remembered: the way he folded the newspaper,"
+            },
+            {
+              "accepted": 433920,
+              "end": 433920,
+              "start": 295680,
+              "text": "the sound of his keys on the table, and the cup he always left beside the window."
+            },
+            {
+              "accepted": 531840,
+              "end": 531840,
+              "start": 433920,
+              "text": "She waited. Nobody came."
+            }
+          ],
+          "firstFrameSeconds": 0.03620887501165271,
+          "footprint": 318555600,
+          "name": "trial-8-steps4",
+          "samples": 531840,
+          "seconds": 3.436601833323948,
+          "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+          "thermal": 0
+        }
+      ]
+    }
+  ],
+  "soak": {
+    "path": "/tmp/libroxtts-10-speed/device-detached/final-031c2481-candidate-soak",
+    "environment": {
+      "cpuBudget": "unmetered foreground",
+      "durationGoal": 60,
+      "freshAssetCopy": false,
+      "os": "Version 27.0.1 (Build 24A446)",
+      "preparationSeconds": 0.6242896249750629,
+      "runtime": "pocket-coreml-28770c06-v1:fp32:tanh:quality4:adaptive:warm12:eos6",
+      "setupSeconds": 0.6247802916623186
+    },
+    "rows": [
+      {
+        "events": [
+          {
+            "accepted": 161280,
+            "end": 161280,
+            "start": 0,
+            "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+          },
+          {
+            "accepted": 295680,
+            "end": 295680,
+            "start": 161280,
+            "text": "It was the small things she remembered: the way he folded the newspaper,"
+          },
+          {
+            "accepted": 433920,
+            "end": 433920,
+            "start": 295680,
+            "text": "the sound of his keys on the table, and the cup he always left beside the window."
+          },
+          {
+            "accepted": 531840,
+            "end": 531840,
+            "start": 433920,
+            "text": "She waited. Nobody came."
+          }
+        ],
+        "firstFrameSeconds": 1.289938791655004,
+        "footprint": 87295200,
+        "name": "trial-0-steps4",
+        "samples": 531840,
+        "seconds": 4.691080916672945,
+        "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+        "thermal": 0
+      },
+      {
+        "events": [
+          {
+            "accepted": 161280,
+            "end": 161280,
+            "start": 0,
+            "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+          },
+          {
+            "accepted": 295680,
+            "end": 295680,
+            "start": 161280,
+            "text": "It was the small things she remembered: the way he folded the newspaper,"
+          },
+          {
+            "accepted": 433920,
+            "end": 433920,
+            "start": 295680,
+            "text": "the sound of his keys on the table, and the cup he always left beside the window."
+          },
+          {
+            "accepted": 531840,
+            "end": 531840,
+            "start": 433920,
+            "text": "She waited. Nobody came."
+          }
+        ],
+        "firstFrameSeconds": 0.0332698333368171,
+        "footprint": 84968696,
+        "name": "trial-1-steps4",
+        "samples": 531840,
+        "seconds": 3.254363625019323,
+        "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+        "thermal": 0
+      },
+      {
+        "events": [
+          {
+            "accepted": 161280,
+            "end": 161280,
+            "start": 0,
+            "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+          },
+          {
+            "accepted": 295680,
+            "end": 295680,
+            "start": 161280,
+            "text": "It was the small things she remembered: the way he folded the newspaper,"
+          },
+          {
+            "accepted": 433920,
+            "end": 433920,
+            "start": 295680,
+            "text": "the sound of his keys on the table, and the cup he always left beside the window."
+          },
+          {
+            "accepted": 531840,
+            "end": 531840,
+            "start": 433920,
+            "text": "She waited. Nobody came."
+          }
+        ],
+        "firstFrameSeconds": 0.03287066667689942,
+        "footprint": 82887928,
+        "name": "trial-2-steps4",
+        "samples": 531840,
+        "seconds": 3.2632804166933056,
+        "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+        "thermal": 0
+      },
+      {
+        "events": [
+          {
+            "accepted": 161280,
+            "end": 161280,
+            "start": 0,
+            "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+          },
+          {
+            "accepted": 295680,
+            "end": 295680,
+            "start": 161280,
+            "text": "It was the small things she remembered: the way he folded the newspaper,"
+          },
+          {
+            "accepted": 433920,
+            "end": 433920,
+            "start": 295680,
+            "text": "the sound of his keys on the table, and the cup he always left beside the window."
+          },
+          {
+            "accepted": 531840,
+            "end": 531840,
+            "start": 433920,
+            "text": "She waited. Nobody came."
+          }
+        ],
+        "firstFrameSeconds": 0.03332116667297669,
+        "footprint": 82642168,
+        "name": "trial-3-steps4",
+        "samples": 531840,
+        "seconds": 3.2519420416792855,
+        "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+        "thermal": 0
+      },
+      {
+        "events": [
+          {
+            "accepted": 161280,
+            "end": 161280,
+            "start": 0,
+            "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+          },
+          {
+            "accepted": 295680,
+            "end": 295680,
+            "start": 161280,
+            "text": "It was the small things she remembered: the way he folded the newspaper,"
+          },
+          {
+            "accepted": 433920,
+            "end": 433920,
+            "start": 295680,
+            "text": "the sound of his keys on the table, and the cup he always left beside the window."
+          },
+          {
+            "accepted": 531840,
+            "end": 531840,
+            "start": 433920,
+            "text": "She waited. Nobody came."
+          }
+        ],
+        "firstFrameSeconds": 0.03282695834059268,
+        "footprint": 81020152,
+        "name": "trial-4-steps4",
+        "samples": 531840,
+        "seconds": 3.258661125000799,
+        "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+        "thermal": 0
+      },
+      {
+        "events": [
+          {
+            "accepted": 161280,
+            "end": 161280,
+            "start": 0,
+            "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+          },
+          {
+            "accepted": 295680,
+            "end": 295680,
+            "start": 161280,
+            "text": "It was the small things she remembered: the way he folded the newspaper,"
+          },
+          {
+            "accepted": 433920,
+            "end": 433920,
+            "start": 295680,
+            "text": "the sound of his keys on the table, and the cup he always left beside the window."
+          },
+          {
+            "accepted": 531840,
+            "end": 531840,
+            "start": 433920,
+            "text": "She waited. Nobody came."
+          }
+        ],
+        "firstFrameSeconds": 0.032914833311224356,
+        "footprint": 80004320,
+        "name": "trial-5-steps4",
+        "samples": 531840,
+        "seconds": 3.283791541645769,
+        "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+        "thermal": 0
+      },
+      {
+        "events": [
+          {
+            "accepted": 161280,
+            "end": 161280,
+            "start": 0,
+            "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+          },
+          {
+            "accepted": 295680,
+            "end": 295680,
+            "start": 161280,
+            "text": "It was the small things she remembered: the way he folded the newspaper,"
+          },
+          {
+            "accepted": 433920,
+            "end": 433920,
+            "start": 295680,
+            "text": "the sound of his keys on the table, and the cup he always left beside the window."
+          },
+          {
+            "accepted": 531840,
+            "end": 531840,
+            "start": 433920,
+            "text": "She waited. Nobody came."
+          }
+        ],
+        "firstFrameSeconds": 0.03278245835099369,
+        "footprint": 77858040,
+        "name": "trial-6-steps4",
+        "samples": 531840,
+        "seconds": 3.319348416669527,
+        "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+        "thermal": 0
+      },
+      {
+        "events": [
+          {
+            "accepted": 161280,
+            "end": 161280,
+            "start": 0,
+            "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+          },
+          {
+            "accepted": 295680,
+            "end": 295680,
+            "start": 161280,
+            "text": "It was the small things she remembered: the way he folded the newspaper,"
+          },
+          {
+            "accepted": 433920,
+            "end": 433920,
+            "start": 295680,
+            "text": "the sound of his keys on the table, and the cup he always left beside the window."
+          },
+          {
+            "accepted": 531840,
+            "end": 531840,
+            "start": 433920,
+            "text": "She waited. Nobody came."
+          }
+        ],
+        "firstFrameSeconds": 0.033225166669581085,
+        "footprint": 80184568,
+        "name": "trial-7-steps4",
+        "samples": 531840,
+        "seconds": 3.275991458329372,
+        "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+        "thermal": 0
+      },
+      {
+        "events": [
+          {
+            "accepted": 161280,
+            "end": 161280,
+            "start": 0,
+            "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+          },
+          {
+            "accepted": 295680,
+            "end": 295680,
+            "start": 161280,
+            "text": "It was the small things she remembered: the way he folded the newspaper,"
+          },
+          {
+            "accepted": 433920,
+            "end": 433920,
+            "start": 295680,
+            "text": "the sound of his keys on the table, and the cup he always left beside the window."
+          },
+          {
+            "accepted": 531840,
+            "end": 531840,
+            "start": 433920,
+            "text": "She waited. Nobody came."
+          }
+        ],
+        "firstFrameSeconds": 0.03397545832558535,
+        "footprint": 78120184,
+        "name": "trial-8-steps4",
+        "samples": 531840,
+        "seconds": 3.2984970833349507,
+        "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+        "thermal": 0
+      },
+      {
+        "events": [
+          {
+            "accepted": 161280,
+            "end": 161280,
+            "start": 0,
+            "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+          },
+          {
+            "accepted": 295680,
+            "end": 295680,
+            "start": 161280,
+            "text": "It was the small things she remembered: the way he folded the newspaper,"
+          },
+          {
+            "accepted": 433920,
+            "end": 433920,
+            "start": 295680,
+            "text": "the sound of his keys on the table, and the cup he always left beside the window."
+          },
+          {
+            "accepted": 531840,
+            "end": 531840,
+            "start": 433920,
+            "text": "She waited. Nobody came."
+          }
+        ],
+        "firstFrameSeconds": 0.033124458335805684,
+        "footprint": 78103800,
+        "name": "trial-9-steps4",
+        "samples": 531840,
+        "seconds": 3.3489804999844637,
+        "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+        "thermal": 0
+      },
+      {
+        "events": [
+          {
+            "accepted": 161280,
+            "end": 161280,
+            "start": 0,
+            "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+          },
+          {
+            "accepted": 295680,
+            "end": 295680,
+            "start": 161280,
+            "text": "It was the small things she remembered: the way he folded the newspaper,"
+          },
+          {
+            "accepted": 433920,
+            "end": 433920,
+            "start": 295680,
+            "text": "the sound of his keys on the table, and the cup he always left beside the window."
+          },
+          {
+            "accepted": 531840,
+            "end": 531840,
+            "start": 433920,
+            "text": "She waited. Nobody came."
+          }
+        ],
+        "firstFrameSeconds": 0.03371433331631124,
+        "footprint": 78087416,
+        "name": "trial-10-steps4",
+        "samples": 531840,
+        "seconds": 3.442050791665679,
+        "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+        "thermal": 0
+      },
+      {
+        "events": [
+          {
+            "accepted": 161280,
+            "end": 161280,
+            "start": 0,
+            "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+          },
+          {
+            "accepted": 295680,
+            "end": 295680,
+            "start": 161280,
+            "text": "It was the small things she remembered: the way he folded the newspaper,"
+          },
+          {
+            "accepted": 433920,
+            "end": 433920,
+            "start": 295680,
+            "text": "the sound of his keys on the table, and the cup he always left beside the window."
+          },
+          {
+            "accepted": 531840,
+            "end": 531840,
+            "start": 433920,
+            "text": "She waited. Nobody came."
+          }
+        ],
+        "firstFrameSeconds": 0.03417995834024623,
+        "footprint": 80151800,
+        "name": "trial-11-steps4",
+        "samples": 531840,
+        "seconds": 3.4888705416815355,
+        "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+        "thermal": 0
+      },
+      {
+        "events": [
+          {
+            "accepted": 161280,
+            "end": 161280,
+            "start": 0,
+            "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+          },
+          {
+            "accepted": 295680,
+            "end": 295680,
+            "start": 161280,
+            "text": "It was the small things she remembered: the way he folded the newspaper,"
+          },
+          {
+            "accepted": 433920,
+            "end": 433920,
+            "start": 295680,
+            "text": "the sound of his keys on the table, and the cup he always left beside the window."
+          },
+          {
+            "accepted": 531840,
+            "end": 531840,
+            "start": 433920,
+            "text": "She waited. Nobody came."
+          }
+        ],
+        "firstFrameSeconds": 0.03364170834538527,
+        "footprint": 77825272,
+        "name": "trial-12-steps4",
+        "samples": 531840,
+        "seconds": 3.2909569583425764,
+        "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+        "thermal": 0
+      },
+      {
+        "events": [
+          {
+            "accepted": 161280,
+            "end": 161280,
+            "start": 0,
+            "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+          },
+          {
+            "accepted": 295680,
+            "end": 295680,
+            "start": 161280,
+            "text": "It was the small things she remembered: the way he folded the newspaper,"
+          },
+          {
+            "accepted": 433920,
+            "end": 433920,
+            "start": 295680,
+            "text": "the sound of his keys on the table, and the cup he always left beside the window."
+          },
+          {
+            "accepted": 531840,
+            "end": 531840,
+            "start": 433920,
+            "text": "She waited. Nobody came."
+          }
+        ],
+        "firstFrameSeconds": 0.03285245833103545,
+        "footprint": 80168184,
+        "name": "trial-13-steps4",
+        "samples": 531840,
+        "seconds": 3.2709619166562334,
+        "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+        "thermal": 0
+      },
+      {
+        "events": [
+          {
+            "accepted": 161280,
+            "end": 161280,
+            "start": 0,
+            "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+          },
+          {
+            "accepted": 295680,
+            "end": 295680,
+            "start": 161280,
+            "text": "It was the small things she remembered: the way he folded the newspaper,"
+          },
+          {
+            "accepted": 433920,
+            "end": 433920,
+            "start": 295680,
+            "text": "the sound of his keys on the table, and the cup he always left beside the window."
+          },
+          {
+            "accepted": 531840,
+            "end": 531840,
+            "start": 433920,
+            "text": "She waited. Nobody came."
+          }
+        ],
+        "firstFrameSeconds": 0.03295666666235775,
+        "footprint": 78071032,
+        "name": "trial-14-steps4",
+        "samples": 531840,
+        "seconds": 3.2659004166780505,
+        "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+        "thermal": 0
+      },
+      {
+        "events": [
+          {
+            "accepted": 161280,
+            "end": 161280,
+            "start": 0,
+            "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+          },
+          {
+            "accepted": 295680,
+            "end": 295680,
+            "start": 161280,
+            "text": "It was the small things she remembered: the way he folded the newspaper,"
+          },
+          {
+            "accepted": 433920,
+            "end": 433920,
+            "start": 295680,
+            "text": "the sound of his keys on the table, and the cup he always left beside the window."
+          },
+          {
+            "accepted": 531840,
+            "end": 531840,
+            "start": 433920,
+            "text": "She waited. Nobody came."
+          }
+        ],
+        "firstFrameSeconds": 0.03305983330938034,
+        "footprint": 80151800,
+        "name": "trial-15-steps4",
+        "samples": 531840,
+        "seconds": 3.262280708324397,
+        "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+        "thermal": 0
+      },
+      {
+        "events": [
+          {
+            "accepted": 161280,
+            "end": 161280,
+            "start": 0,
+            "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+          },
+          {
+            "accepted": 295680,
+            "end": 295680,
+            "start": 161280,
+            "text": "It was the small things she remembered: the way he folded the newspaper,"
+          },
+          {
+            "accepted": 433920,
+            "end": 433920,
+            "start": 295680,
+            "text": "the sound of his keys on the table, and the cup he always left beside the window."
+          },
+          {
+            "accepted": 531840,
+            "end": 531840,
+            "start": 433920,
+            "text": "She waited. Nobody came."
+          }
+        ],
+        "firstFrameSeconds": 0.03317104166490026,
+        "footprint": 77808888,
+        "name": "trial-16-steps4",
+        "samples": 531840,
+        "seconds": 3.4026365833124146,
+        "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+        "thermal": 0
+      },
+      {
+        "events": [
+          {
+            "accepted": 161280,
+            "end": 161280,
+            "start": 0,
+            "text": "She rested her hand against the door. For a moment, she could almost hear his voice again."
+          },
+          {
+            "accepted": 295680,
+            "end": 295680,
+            "start": 161280,
+            "text": "It was the small things she remembered: the way he folded the newspaper,"
+          },
+          {
+            "accepted": 433920,
+            "end": 433920,
+            "start": 295680,
+            "text": "the sound of his keys on the table, and the cup he always left beside the window."
+          },
+          {
+            "accepted": 531840,
+            "end": 531840,
+            "start": 433920,
+            "text": "She waited. Nobody came."
+          }
+        ],
+        "firstFrameSeconds": 0.03538491667131893,
+        "footprint": 80151800,
+        "name": "trial-17-steps4",
+        "samples": 531840,
+        "seconds": 3.323626666679047,
+        "sha256": "bb6f05c1aa0fd81aa537dd81658ba9998110f9c1bffa0039ef1be08aa8f1ab01",
+        "thermal": 0
+      }
+    ]
+  },
+  "limitations": [
+    "Single M4 iPad foreground CPU Core ML, English Caro/Calm; no iPhone/background/playback/energy claim",
+    "Fresh includes SDK source copy/preparation/compilation; OS/compiler global caches are not purged",
+    "Shared thermal history is recorded; two process runs per revision, descriptive medians"
+  ]
+}

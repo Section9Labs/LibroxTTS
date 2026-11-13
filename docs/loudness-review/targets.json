@@ -1,0 +1,35 @@
+{
+  "intent": "User-authorized default Max narration level balancing; raw engine output remains bit-exact with 0.9",
+  "neutralTargetLUFS": -26,
+  "maximumBoostDB": 9,
+  "minimumGainDB": -24,
+  "maximumReferenceStyleOffsetLU": 3,
+  "calibrationTruePeakHeadroomDB": 3,
+  "softKneeSampleAmplitude": 0.9,
+  "softCeilingSampleAmplitude": 0.98,
+  "calibrationPassages": [
+    0,
+    1,
+    2
+  ],
+  "holdoutPassages": [
+    3,
+    4
+  ],
+  "goals": {
+    "neutralCalibrationMedianSpreadLU": 3.1,
+    "neutralHoldoutMedianSpreadLU": 5,
+    "neutralIndividualHoldoutSpreadLU": 6,
+    "sampleCountAndProgress": "unchanged",
+    "bufferedVersusStreaming": "bit-identical after calibration",
+    "ordinaryWaveform": "constant gain; no resampling, automatic gain riding, time shift, clipping or limiter activation in qualified recordings"
+  },
+  "limits": [
+    "Targets are engineering acceptance goals, not a claim that BS.1770 prescribes a -26 LUFS audiobook level",
+    "Reference-style offsets are measured relative to that voice's Neutral reference, then bounded to +/-3 LU; they are not inferred from sentiment",
+    "One fixed gain per voice/language/style preserves within-utterance dynamics; extreme native style contrasts are intentionally bounded",
+    "Boosts have a memoryless emergency soft knee above 0.9 amplitude; report any activation in measured audio",
+    "Human listening remains required before release promotion",
+    "Initial +6 dB boost cap left German calibration voices 4.5 LU apart; +9 dB chosen from calibration medians reduces that gap to 1.5 LU. Holdout peaks do not choose per-profile gains."
+  ]
+}

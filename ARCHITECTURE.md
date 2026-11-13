@@ -180,9 +180,11 @@ See [1.0 implementation evidence](docs/implementation-10.md).
 The Core ML actor owns a `PocketCoreMLExecutionPlan`: resident graphs, immutable
 text-asset leases, and bounded position/noise/sampler inputs. Each invocation owns
 RNG progress, transformer/codec state, continuation latents and delivery counters.
-Latents remain in Core ML storage between predictions; only continuation blocks
-and caller-owned PCM materialize host arrays. Shape views retain their source
-allocation. Input workspaces are used only by synchronous prediction calls.
+Within a flow sample, intermediate latents stay in Core ML storage. Its final
+32 Float32 values are copied into independent storage before joining continuation
+history. This avoids retaining prediction-owned allocations across later calls;
+shape views retain the detached source. Values are copied without arithmetic.
+Input workspaces are used only by synchronous prediction calls.
 
 `PocketPreparedTextAssets` shares only parsed immutable configuration/tokenizer
 state. Acquisitions still read and hash current source bytes. Weak leases and a
@@ -204,3 +206,25 @@ Public direct-model construction keeps the original computation path. The capaci
 storage experiment is retained as an experiment artifact, not a public API change.
 It is excluded from production because paired CPU/GPU results did not establish
 a consistent benefit. See the implementation record for measured tradeoffs.
+
+
+## Default Max delivery levels
+
+`PocketNarrationLevel` is package-scoped, owned by `KokoroNarration`. It hides
+catalog-pinned calibration and transient safety behind a voice/style gain lookup
+and a sample transform. `NarrationRenderer` applies the same transform to buffered
+output and each accepted streaming frame. No model, token, sampler, progress,
+source-range, backpressure or direct-engine contract changes.
+
+Each voice/language/reference style receives a fixed gain selected offline from
+three calibration passages. Held-out passages evaluate it independently. A boost
+has a memoryless continuous safety knee above amplitude 0.9; unity and attenuation
+preserve the simple multiplication path. This retains frame partition equivalence
+and prevents new sample clipping without an extra buffer or lookahead.
+
+This is the user-authorized exception to the 1.0 unchanged-audio requirement:
+default Max facade levels change; raw engine PCM and Basic/Plus levels do not.
+`NarrationModel.pocket.deliveryIdentity` includes a hash of the policy, frozen gain
+bits and source manifests, so hosts using the SDK render identity invalidate old
+prepared audio without redownloading models. No new public policy or host-side
+normalizer is required. See [calibration evidence](docs/loudness-review/README.md).

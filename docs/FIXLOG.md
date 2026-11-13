@@ -76,3 +76,25 @@ path now requires a catalog-pinned whole-file digest on every read. Unknown or
 changed bytes use the original reader. A replacement-archive regression and all
 48 installed English/Spanish voice fixtures pass, followed by final exact audio
 and device qualification. No verification result is cached.
+
+
+## 1.0 — retained Core ML prediction outputs regressed warm synthesis
+
+The execution plan retained the final model-owned 32-value flow output in the
+continuation history. Detaching those values before retention restored warm
+throughput in paired Mac/iPad probes while keeping the autorelease fixes and exact
+raw PCM. Removing the memory scopes would have reintroduced sustained memory growth.
+
+Rule: retain independent tiny state across predictions; prove output parity and
+measure sustained memory as well as latency before removing ownership boundaries.
+
+## 1.0 — published Max voices had large level differences
+
+Neutral calibration found substantial voice-to-voice loudness differences. The
+user authorized default narration level balancing. SDK-owned frozen gains now
+cover voice, language and reference style, with separate held-out assessment.
+Both facade delivery methods use the same transform; direct engines stay exact.
+The prepared-audio identity changes with the policy and profiles.
+
+Rule: level calibration belongs at the SDK delivery boundary, must preserve timing
+and expressive dynamics, and must invalidate prepared audio when defaults change.

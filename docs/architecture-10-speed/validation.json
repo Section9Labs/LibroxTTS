@@ -1,0 +1,151 @@
+{
+  "debug": {
+    "xctest": [
+      {
+        "bundle": "QwenANETests.xctest",
+        "tests": 29,
+        "skipped": 9
+      },
+      {
+        "bundle": "PocketTTSMLXTests.xctest",
+        "tests": 7,
+        "skipped": 3
+      },
+      {
+        "bundle": "PocketTTSCoreMLTests.xctest",
+        "tests": 40,
+        "skipped": 18
+      },
+      {
+        "bundle": "LibroxCTNativeTests.xctest",
+        "tests": 7,
+        "skipped": 0
+      },
+      {
+        "bundle": "KokoroPronunciationTests.xctest",
+        "tests": 22,
+        "skipped": 0
+      },
+      {
+        "bundle": "KokoroNarrationTests.xctest",
+        "tests": 21,
+        "skipped": 1
+      },
+      {
+        "bundle": "KokoroKitTests.xctest",
+        "tests": 22,
+        "skipped": 3
+      }
+    ],
+    "xctestTotal": 148,
+    "xctestSkipped": 34,
+    "swiftTestingRunCounts": [
+      0,
+      64,
+      0,
+      31,
+      198,
+      186,
+      43,
+      23,
+      14
+    ],
+    "swiftTestingTotal": 559,
+    "logSHA256": "463754c01adc3fc1c21112c6f23c6646aa4672a43fd0c92d0866a45defe56665"
+  },
+  "release": {
+    "xctest": [
+      {
+        "bundle": "QwenANETests.xctest",
+        "tests": 29,
+        "skipped": 9
+      },
+      {
+        "bundle": "PocketTTSMLXTests.xctest",
+        "tests": 7,
+        "skipped": 3
+      },
+      {
+        "bundle": "PocketTTSCoreMLTests.xctest",
+        "tests": 40,
+        "skipped": 18
+      },
+      {
+        "bundle": "LibroxCTNativeTests.xctest",
+        "tests": 7,
+        "skipped": 0
+      },
+      {
+        "bundle": "KokoroPronunciationTests.xctest",
+        "tests": 22,
+        "skipped": 0
+      },
+      {
+        "bundle": "KokoroNarrationTests.xctest",
+        "tests": 21,
+        "skipped": 1
+      },
+      {
+        "bundle": "KokoroKitTests.xctest",
+        "tests": 22,
+        "skipped": 3
+      }
+    ],
+    "xctestTotal": 148,
+    "xctestSkipped": 34,
+    "swiftTestingRunCounts": [
+      0,
+      64,
+      0,
+      31,
+      198,
+      186,
+      43,
+      23,
+      14
+    ],
+    "swiftTestingTotal": 559,
+    "logSHA256": "58453bf8b0c792196d713fc6e01d02735a8a28b7c2f8d7507670f944c9b1c1e7"
+  },
+  "levels-production-audit": {
+    "passed": true,
+    "logSHA256": "70b56389b23a885de77af4b1643d5841059d43bd773c35242b6bc22cba049af5"
+  },
+  "levels-facade-models": {
+    "passed": true,
+    "logSHA256": "6c7ffeaa47367ec99f676098fc0b86f828162da2dab0d95daf8750769e8cacce"
+  },
+  "levels-api": {
+    "passed": true,
+    "logSHA256": "814afb9c7ced52f18a43fc3377bf73c3ba867eca56e597f048e3b586a8a58446"
+  },
+  "levels-ios": {
+    "passed": true,
+    "logSHA256": "a6556d41dc06aa47a200e284d82dbc6f4dac4a62b2709d1371ce136703069a94"
+  },
+  "levels-catalyst": {
+    "passed": true,
+    "logSHA256": "bf839b001930b3986f8ef9a8245be169bc78365cc9219d9f0a63cc191d6d28e7"
+  },
+  "publicAPI": "2802 baseline entries; 2802 current; 0 missing, 0 added, 0 changed",
+  "profileRevision": "pocket-level-v1-41466443134c33e7",
+  "realFacadeScope": "Core ML English/Spanish raw frozen PCM plus calibrated buffered/streaming/events/cancellation recovery; MLX CPU and GPU cold/warm calibrated buffered/streaming parity",
+  "rawMaxMatrix": {
+    "cases": 78,
+    "exactPCMAndEvents": true,
+    "receipt": "audio-matrix.json"
+  },
+  "physicalDevice": {
+    "cases": 12,
+    "samples": 1006080,
+    "soakRenders": 411,
+    "soakRenderSeconds": 1801.3107405003102,
+    "taskAppsRemoved": true,
+    "scope": "Raw Core ML prior to facade loudness change; no physical iPhone or listening claim"
+  },
+  "limitations": [
+    "Local Xcode 27.2 / Swift 6.4.2; Swift 6.3 CI not executed",
+    "Generic unsigned iOS/Catalyst builds are compilation checks, not app integration or perceptual acceptance",
+    "Ordinary suites skip opt-in models and experiments; actual facade and raw-engine qualification are separate receipts"
+  ]
+}

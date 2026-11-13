@@ -1,0 +1,21 @@
+{
+  "rawEngineExactPCMAndEvents": true,
+  "warmMacSpeedup": 1.004857213771083,
+  "macFootprintReductionFraction": 0.367466746696514,
+  "warmIPadSpeedup": 1.0336841351534671,
+  "iPadMatchedSoakFootprintReductionFraction": 0.9439237249616859,
+  "gates": {
+    "restoreWarmSynthesisToBaseline": "Recovered on nominated probes: ten-warm-render Mac follow-up 1.5 percent faster; iPad 3.4 percent faster. Shared Mac timing differences remain small and aggregation-sensitive.",
+    "preserveMemoryImprovement": "met on nominated Mac and iPad workloads",
+    "original2xSynthesisGoal": "not met",
+    "unchangedRawEngineAudio": "met in 78 Mac and 12 device qualification cases",
+    "defaultMaxNarrationLevels": "All neutral calibration, holdout-median and individual-holdout spread goals met across measured backends and seven languages.",
+    "humanListening": "pending",
+    "publication": "not performed",
+    "noPeakSafetyActivation": "Not met: 27 samples in two German holdouts; no measured delivered true peak at or above 0 dBTP."
+  },
+  "warmMacStabilitySpeedup": 1.0152700776831267,
+  "macStabilityFootprintReductionFraction": 0.6926443008593159,
+  "loudnessRevision": "pocket-level-v1-41466443134c33e7",
+  "loudnessRecordings": 3375
+}

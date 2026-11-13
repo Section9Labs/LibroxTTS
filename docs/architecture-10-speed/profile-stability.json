@@ -1,0 +1,1730 @@
+{
+  "order": "ABBA",
+  "rounds": 1,
+  "repetitions": 10,
+  "exactWAV": true,
+  "summary": {
+    "baseline": {
+      "warmMedianSeconds": 4.773516708344687,
+      "medianProcessWarmMedianSeconds": 4.778135427070083,
+      "firstAudioIncludingLoadSeconds": 0.494684083329048,
+      "peakSampledFootprint": 386049884.0
+    },
+    "candidate": {
+      "warmMedianSeconds": 4.701721062476281,
+      "medianProcessWarmMedianSeconds": 4.698895479203202,
+      "firstAudioIncludingLoadSeconds": 0.17197418754221871,
+      "peakSampledFootprint": 118654632.0
+    },
+    "warmSpeedup": 1.0152700776831267,
+    "footprintRatio": 0.3073556991406841
+  },
+  "runs": [
+    {
+      "revision": "baseline",
+      "report": {
+        "chunks": [
+          "She rested her hand against the door. For a moment, she could almost hear his voice again.",
+          "It was the small things she remembered: the way he folded the newspaper,",
+          "the sound of his keys on the table, and the cup he always left beside the window.",
+          "She waited. Nobody came."
+        ],
+        "complete": true,
+        "loadSeconds": 0.18762112502008677,
+        "machine": "arm64",
+        "operatingSystem": "Version 27.0.1 (Build 26A434)",
+        "request": {
+          "backend": "coreml-cpu",
+          "language": "en",
+          "repetitions": 10,
+          "seed": 42,
+          "steps": 4,
+          "style": "calm",
+          "temperature": 0.3,
+          "text": "She rested her hand against the door. For a moment, she could almost hear his voice again. It was the small things she remembered: the way he folded the newspaper, the sound of his keys on the table, and the cup he always left beside the window. She waited. Nobody came.",
+          "voiceID": "pocket-caro_davy-en-v1"
+        },
+        "rows": [
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": true,
+            "firstAudioSeconds": 0.6068299167091027,
+            "iteration": 0,
+            "peakPhysicalFootprintBytes": 100091512,
+            "realTimeFactor": 3.607617787725146,
+            "renderSeconds": 6.142557583400048,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.05314812494907528,
+            "iteration": 1,
+            "peakPhysicalFootprintBytes": 131335848,
+            "realTimeFactor": 3.905848143899522,
+            "renderSeconds": 5.673543666722253,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.054538166616111994,
+            "iteration": 2,
+            "peakPhysicalFootprintBytes": 159581864,
+            "realTimeFactor": 3.9307287111454436,
+            "renderSeconds": 5.637631500023417,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.05077233340125531,
+            "iteration": 3,
+            "peakPhysicalFootprintBytes": 187107008,
+            "realTimeFactor": 3.8016005135658326,
+            "renderSeconds": 5.829123791656457,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.05029541673138738,
+            "iteration": 4,
+            "peakPhysicalFootprintBytes": 216745688,
+            "realTimeFactor": 3.811908491271633,
+            "renderSeconds": 5.8133609583601356,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.049326624954119325,
+            "iteration": 5,
+            "peakPhysicalFootprintBytes": 245581552,
+            "realTimeFactor": 4.837308351868895,
+            "renderSeconds": 4.5810600416734815,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.038586208363994956,
+            "iteration": 6,
+            "peakPhysicalFootprintBytes": 273614600,
+            "realTimeFactor": 5.092813617134293,
+            "renderSeconds": 4.35122933331877,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.04083008330781013,
+            "iteration": 7,
+            "peakPhysicalFootprintBytes": 301532960,
+            "realTimeFactor": 4.6755969243452435,
+            "renderSeconds": 4.739501791656949,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.042462124954909086,
+            "iteration": 8,
+            "peakPhysicalFootprintBytes": 329385760,
+            "realTimeFactor": 4.744044847302548,
+            "renderSeconds": 4.671119416714646,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.041012250003404915,
+            "iteration": 9,
+            "peakPhysicalFootprintBytes": 357418808,
+            "realTimeFactor": 4.726882760096418,
+            "renderSeconds": 4.688079041661695,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.041652249987237155,
+            "iteration": 10,
+            "peakPhysicalFootprintBytes": 387549032,
+            "realTimeFactor": 4.640400300048103,
+            "renderSeconds": 4.775450083427131,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          }
+        ],
+        "runtime": "pocket-coreml-28770c06-v1:fp32:tanh:quality4:adaptive:warm12:eos6",
+        "tokenCounts": [
+          24,
+          22,
+          23,
+          8
+        ]
+      },
+      "stages": [
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.919434000000006,
+            "wallSeconds": 1.0040847071213648
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 8.963023999999997,
+            "wallSeconds": 3.0843934572767466
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.9365080000000028,
+            "wallSeconds": 1.5761884583625942
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.5809430000000005,
+            "wallSeconds": 0.33911762514617294
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.7142120000000123,
+            "wallSeconds": 0.9414274173323065
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 8.476438999999974,
+            "wallSeconds": 2.97989658289589
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.9137729999999813,
+            "wallSeconds": 1.5317175411619246
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.19051200000000001,
+            "wallSeconds": 0.11947295849677175
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.7883919999999804,
+            "wallSeconds": 0.9131585403811187
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 8.618071000000018,
+            "wallSeconds": 2.955186499748379
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.9305149999999252,
+            "wallSeconds": 1.5507547071902081
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.1918259999999954,
+            "wallSeconds": 0.11789145832881331
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.794493999999844,
+            "wallSeconds": 1.0105774168623611
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 8.70145300000005,
+            "wallSeconds": 3.014372083824128
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.9780059999999935,
+            "wallSeconds": 1.581669208360836
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.18786700000001133,
+            "wallSeconds": 0.11956241668667644
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.796090000000021,
+            "wallSeconds": 0.9724740005331114
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 8.67628600000004,
+            "wallSeconds": 3.05540137400385
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.9341140000000578,
+            "wallSeconds": 1.5625194176100194
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.18279199999999207,
+            "wallSeconds": 0.11410291667561978
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.4942640000002,
+            "wallSeconds": 0.7359742090338841
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.8956279999999595,
+            "wallSeconds": 2.517254582955502
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.4701770000001773,
+            "wallSeconds": 1.1463452517054975
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.15662999999999272,
+            "wallSeconds": 0.09667162515688688
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.393561000000247,
+            "wallSeconds": 0.7135316650383174
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.639615000000063,
+            "wallSeconds": 2.466713292757049
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.315585000000226,
+            "wallSeconds": 1.0169727918691933
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.12513900000000433,
+            "wallSeconds": 0.07408199994824827
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.501751000000027,
+            "wallSeconds": 0.7436112073482946
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.930982999999856,
+            "wallSeconds": 2.626722083776258
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.535805000000039,
+            "wallSeconds": 1.1946958735352382
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.1538179999999869,
+            "wallSeconds": 0.09031654184218496
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.620487999999952,
+            "wallSeconds": 0.7512045009061694
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 8.06112600000013,
+            "wallSeconds": 2.5893141250126064
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.537817999999973,
+            "wallSeconds": 1.1597902070498094
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.15819900000001041,
+            "wallSeconds": 0.09259054157882929
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.637658999999914,
+            "wallSeconds": 0.7781160835875198
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.918291000000082,
+            "wallSeconds": 2.579262583167292
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.5417959999998914,
+            "wallSeconds": 1.1659062086837366
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.1424260000000146,
+            "wallSeconds": 0.08385974995326251
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.560743000000116,
+            "wallSeconds": 0.7798908761469647
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 8.102578000000136,
+            "wallSeconds": 2.5980573336128145
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.5680179999997108,
+            "wallSeconds": 1.2165922076674178
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.15486299999997755,
+            "wallSeconds": 0.09426012495532632
+          }
+        }
+      ],
+      "wavSHA256": [
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d"
+      ]
+    },
+    {
+      "revision": "candidate",
+      "report": {
+        "chunks": [
+          "She rested her hand against the door. For a moment, she could almost hear his voice again.",
+          "It was the small things she remembered: the way he folded the newspaper,",
+          "the sound of his keys on the table, and the cup he always left beside the window.",
+          "She waited. Nobody came."
+        ],
+        "complete": true,
+        "loadSeconds": 0.07986016664654016,
+        "machine": "arm64",
+        "operatingSystem": "Version 27.0.1 (Build 26A434)",
+        "request": {
+          "backend": "coreml-cpu",
+          "language": "en",
+          "repetitions": 10,
+          "seed": 42,
+          "steps": 4,
+          "style": "calm",
+          "temperature": 0.3,
+          "text": "She rested her hand against the door. For a moment, she could almost hear his voice again. It was the small things she remembered: the way he folded the newspaper, the sound of his keys on the table, and the cup he always left beside the window. She waited. Nobody came.",
+          "voiceID": "pocket-caro_davy-en-v1"
+        },
+        "rows": [
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": true,
+            "firstAudioSeconds": 0.11194595834240317,
+            "iteration": 0,
+            "peakPhysicalFootprintBytes": 90244752,
+            "realTimeFactor": 4.722853718966355,
+            "renderSeconds": 4.692078416701406,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.04295062506571412,
+            "iteration": 1,
+            "peakPhysicalFootprintBytes": 103532224,
+            "realTimeFactor": 4.759059460789926,
+            "renderSeconds": 4.6563822500174865,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.03955674997996539,
+            "iteration": 2,
+            "peakPhysicalFootprintBytes": 106366656,
+            "realTimeFactor": 4.853316529310197,
+            "renderSeconds": 4.565949874930084,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.03896704164799303,
+            "iteration": 3,
+            "peakPhysicalFootprintBytes": 118834880,
+            "realTimeFactor": 4.8597717272613,
+            "renderSeconds": 4.559884958318435,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.04112137493211776,
+            "iteration": 4,
+            "peakPhysicalFootprintBytes": 115672768,
+            "realTimeFactor": 4.653041698942645,
+            "renderSeconds": 4.762476125033572,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.04024149989709258,
+            "iteration": 5,
+            "peakPhysicalFootprintBytes": 115230400,
+            "realTimeFactor": 4.658549330155173,
+            "renderSeconds": 4.756845625001006,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.04092070832848549,
+            "iteration": 6,
+            "peakPhysicalFootprintBytes": 110315200,
+            "realTimeFactor": 4.686408396921524,
+            "renderSeconds": 4.728567833430134,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.04158600000664592,
+            "iteration": 7,
+            "peakPhysicalFootprintBytes": 98305728,
+            "realTimeFactor": 4.6460307911025485,
+            "renderSeconds": 4.769662750069983,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.04414050001651049,
+            "iteration": 8,
+            "peakPhysicalFootprintBytes": 100796096,
+            "realTimeFactor": 4.648908135913744,
+            "renderSeconds": 4.766710666706786,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.039779874961823225,
+            "iteration": 9,
+            "peakPhysicalFootprintBytes": 98076352,
+            "realTimeFactor": 4.67496366650477,
+            "renderSeconds": 4.74014379165601,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.042479791678488255,
+            "iteration": 10,
+            "peakPhysicalFootprintBytes": 99026624,
+            "realTimeFactor": 4.72097945343044,
+            "renderSeconds": 4.693941208301112,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          }
+        ],
+        "runtime": "pocket-coreml-28770c06-v1:fp32:tanh:quality4:adaptive:warm12:eos6",
+        "tokenCounts": [
+          24,
+          22,
+          23,
+          8
+        ]
+      },
+      "stages": [
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.5220330000000013,
+            "wallSeconds": 0.7516122491797432
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 8.049456999999991,
+            "wallSeconds": 2.539403624483384
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.5272849999999927,
+            "wallSeconds": 1.1683094156906009
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.1949570000000004,
+            "wallSeconds": 0.1019807499833405
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.599468999999976,
+            "wallSeconds": 0.7379249585792422
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.711449,
+            "wallSeconds": 2.5945515814237297
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.5235520000000182,
+            "wallSeconds": 1.1580032064812258
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.14883899999999883,
+            "wallSeconds": 0.08613416668958962
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.5688639999999943,
+            "wallSeconds": 0.7555389993358403
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.3253450000000235,
+            "wallSeconds": 2.5039295819588006
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.477198999999974,
+            "wallSeconds": 1.1252674161223695
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.1518960000000007,
+            "wallSeconds": 0.1043648332124576
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.6187029999999467,
+            "wallSeconds": 0.7253044585231692
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.418769000000069,
+            "wallSeconds": 2.527079499210231
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.5117930000000186,
+            "wallSeconds": 1.1449276666389778
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.1517070000000018,
+            "wallSeconds": 0.08838704158551991
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.7017820000000583,
+            "wallSeconds": 0.7647435422986746
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.464185999999842,
+            "wallSeconds": 2.6830332088284194
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.532032000000008,
+            "wallSeconds": 1.1541298746597022
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.14969500000000124,
+            "wallSeconds": 0.0853714580880478
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.6877700000000786,
+            "wallSeconds": 0.7815536668058485
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.516856000000104,
+            "wallSeconds": 2.65053099906072
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.5382499999998913,
+            "wallSeconds": 1.1563687500311062
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.14470400000000438,
+            "wallSeconds": 0.08958545827772468
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.714530999999951,
+            "wallSeconds": 0.741890499019064
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.689761999999888,
+            "wallSeconds": 2.6750238341046497
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.5327080000000564,
+            "wallSeconds": 1.149940666044131
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.14583600000001695,
+            "wallSeconds": 0.08737554179970175
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.6840980000000343,
+            "wallSeconds": 0.7921841669594869
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.597478999999808,
+            "wallSeconds": 2.6660317081259564
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.5182619999999787,
+            "wallSeconds": 1.1428067503729835
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.14848599999999124,
+            "wallSeconds": 0.08704912499524653
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.6675729999998623,
+            "wallSeconds": 0.7951566256815568
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.529091000000264,
+            "wallSeconds": 2.6578752495115623
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.5218040000000599,
+            "wallSeconds": 1.1455671237781644
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.154397000000003,
+            "wallSeconds": 0.08959745825268328
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.7228549999999956,
+            "wallSeconds": 0.7512167498935014
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.6580589999999376,
+            "wallSeconds": 2.661773042869754
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.5373829999999629,
+            "wallSeconds": 1.1647441674722359
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.14303100000000768,
+            "wallSeconds": 0.08475229167379439
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.719774999999956,
+            "wallSeconds": 0.7613015418173745
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.468930999999969,
+            "wallSeconds": 2.627934624091722
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.5211129999999713,
+            "wallSeconds": 1.142943000420928
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.14499299999997106,
+            "wallSeconds": 0.08429475000593811
+          }
+        }
+      ],
+      "wavSHA256": [
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d"
+      ]
+    },
+    {
+      "revision": "candidate",
+      "report": {
+        "chunks": [
+          "She rested her hand against the door. For a moment, she could almost hear his voice again.",
+          "It was the small things she remembered: the way he folded the newspaper,",
+          "the sound of his keys on the table, and the cup he always left beside the window.",
+          "She waited. Nobody came."
+        ],
+        "complete": true,
+        "loadSeconds": 0.06655466672964394,
+        "machine": "arm64",
+        "operatingSystem": "Version 27.0.1 (Build 26A434)",
+        "request": {
+          "backend": "coreml-cpu",
+          "language": "en",
+          "repetitions": 10,
+          "seed": 42,
+          "steps": 4,
+          "style": "calm",
+          "temperature": 0.3,
+          "text": "She rested her hand against the door. For a moment, she could almost hear his voice again. It was the small things she remembered: the way he folded the newspaper, the sound of his keys on the table, and the cup he always left beside the window. She waited. Nobody came.",
+          "voiceID": "pocket-caro_davy-en-v1"
+        },
+        "rows": [
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": true,
+            "firstAudioSeconds": 0.08558758336585015,
+            "iteration": 0,
+            "peakPhysicalFootprintBytes": 89671264,
+            "realTimeFactor": 4.6539206958061055,
+            "renderSeconds": 4.7615766250528395,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.04299462493509054,
+            "iteration": 1,
+            "peakPhysicalFootprintBytes": 99485328,
+            "realTimeFactor": 4.581188937481668,
+            "renderSeconds": 4.837172249914147,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.04328229161910713,
+            "iteration": 2,
+            "peakPhysicalFootprintBytes": 111773328,
+            "realTimeFactor": 4.6730166352840525,
+            "renderSeconds": 4.742118791677058,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.041945541743189096,
+            "iteration": 3,
+            "peakPhysicalFootprintBytes": 118474384,
+            "realTimeFactor": 4.705381821171023,
+            "renderSeconds": 4.70950091665145,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.044222624972462654,
+            "iteration": 4,
+            "peakPhysicalFootprintBytes": 118474384,
+            "realTimeFactor": 4.606402985026767,
+            "renderSeconds": 4.810695041669533,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.04221270838752389,
+            "iteration": 5,
+            "peakPhysicalFootprintBytes": 106612368,
+            "realTimeFactor": 4.743038800761227,
+            "renderSeconds": 4.672110208426602,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.0411810833029449,
+            "iteration": 6,
+            "peakPhysicalFootprintBytes": 101697168,
+            "realTimeFactor": 4.800550330219219,
+            "renderSeconds": 4.616137416684069,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.040022541652433574,
+            "iteration": 7,
+            "peakPhysicalFootprintBytes": 101697168,
+            "realTimeFactor": 4.813503789634135,
+            "renderSeconds": 4.603715083329007,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.05794087494723499,
+            "iteration": 8,
+            "peakPhysicalFootprintBytes": 100124304,
+            "realTimeFactor": 4.760717975455641,
+            "renderSeconds": 4.6547600833000615,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.03880416660103947,
+            "iteration": 9,
+            "peakPhysicalFootprintBytes": 90637992,
+            "realTimeFactor": 5.07615865326439,
+            "renderSeconds": 4.365505791618489,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.03466812497936189,
+            "iteration": 10,
+            "peakPhysicalFootprintBytes": 95553192,
+            "realTimeFactor": 5.273023261967068,
+            "renderSeconds": 4.202522708335891,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          }
+        ],
+        "runtime": "pocket-coreml-28770c06-v1:fp32:tanh:quality4:adaptive:warm12:eos6",
+        "tokenCounts": [
+          24,
+          22,
+          23,
+          8
+        ]
+      },
+      "stages": [
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.717414999999991,
+            "wallSeconds": 0.7612875422928482
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.860744000000021,
+            "wallSeconds": 2.654078666702844
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.515874,
+            "wallSeconds": 1.1468172923196107
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.1983839999999994,
+            "wallSeconds": 0.09981987508945167
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.712419000000013,
+            "wallSeconds": 0.762865292141214
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.972389999999988,
+            "wallSeconds": 2.6787859168834984
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.5879159999999999,
+            "wallSeconds": 1.222803540644236
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.15644299999999234,
+            "wallSeconds": 0.0916845416650176
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.6629390000000157,
+            "wallSeconds": 0.7806399597320706
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.608485999999999,
+            "wallSeconds": 2.6094918319722638
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.568256999999992,
+            "wallSeconds": 1.1842069994891062
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.14915700000000243,
+            "wallSeconds": 0.08910683332942426
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.6907100000000383,
+            "wallSeconds": 0.7437792918644845
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.788650999999987,
+            "wallSeconds": 2.5905729581136256
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.5733180000000004,
+            "wallSeconds": 1.2067240392789245
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.15406099999999867,
+            "wallSeconds": 0.08926908334251493
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.68074799999998,
+            "wallSeconds": 0.7868119565537199
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.710517000000031,
+            "wallSeconds": 2.626040917588398
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.6079360000000449,
+            "wallSeconds": 1.2198645428288728
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.17033399999999688,
+            "wallSeconds": 0.10153250012081116
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.714417000000111,
+            "wallSeconds": 0.7518964166520163
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.614539999999941,
+            "wallSeconds": 2.5570584177039564
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.593683999999925,
+            "wallSeconds": 1.2013993745204061
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.14508300000000673,
+            "wallSeconds": 0.08472216664813459
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.6385079999999164,
+            "wallSeconds": 0.747250999440439
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.517037999999957,
+            "wallSeconds": 2.5242732919286937
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.5465160000001958,
+            "wallSeconds": 1.171502416022122
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.15892399999999895,
+            "wallSeconds": 0.09471341676544398
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.6244409999998766,
+            "wallSeconds": 0.7485372493974864
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.462237000000101,
+            "wallSeconds": 2.532586165703833
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.5462769999999182,
+            "wallSeconds": 1.1628488755086437
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.14930899999998815,
+            "wallSeconds": 0.08572891668882221
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.6956590000001057,
+            "wallSeconds": 0.744122501113452
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.706844999999973,
+            "wallSeconds": 2.522514708340168
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.6121159999999861,
+            "wallSeconds": 1.2096327091567218
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.14738299999999072,
+            "wallSeconds": 0.09976574999745935
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.550707000000017,
+            "wallSeconds": 0.73510174988769
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.206080999999969,
+            "wallSeconds": 2.4208909567678347
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.3895959999999121,
+            "wallSeconds": 1.052926832693629
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.14166999999999064,
+            "wallSeconds": 0.08344287506770343
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.4250110000000404,
+            "wallSeconds": 0.7065604169620201
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 6.710016999999979,
+            "wallSeconds": 2.396050791372545
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.2535349999998573,
+            "wallSeconds": 0.9580383331049234
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.12572899999999265,
+            "wallSeconds": 0.07302520831581205
+          }
+        }
+      ],
+      "wavSHA256": [
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d"
+      ]
+    },
+    {
+      "revision": "baseline",
+      "report": {
+        "chunks": [
+          "She rested her hand against the door. For a moment, she could almost hear his voice again.",
+          "It was the small things she remembered: the way he folded the newspaper,",
+          "the sound of his keys on the table, and the cup he always left beside the window.",
+          "She waited. Nobody came."
+        ],
+        "complete": true,
+        "loadSeconds": 0.10600416664965451,
+        "machine": "arm64",
+        "operatingSystem": "Version 27.0.1 (Build 26A434)",
+        "request": {
+          "backend": "coreml-cpu",
+          "language": "en",
+          "repetitions": 10,
+          "seed": 42,
+          "steps": 4,
+          "style": "calm",
+          "temperature": 0.3,
+          "text": "She rested her hand against the door. For a moment, she could almost hear his voice again. It was the small things she remembered: the way he folded the newspaper, the sound of his keys on the table, and the cup he always left beside the window. She waited. Nobody came.",
+          "voiceID": "pocket-caro_davy-en-v1"
+        },
+        "rows": [
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": true,
+            "firstAudioSeconds": 0.08891295827925205,
+            "iteration": 0,
+            "peakPhysicalFootprintBytes": 96765560,
+            "realTimeFactor": 5.182176943867323,
+            "renderSeconds": 4.276195166632533,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.03570958343334496,
+            "iteration": 1,
+            "peakPhysicalFootprintBytes": 128878224,
+            "realTimeFactor": 5.153888697323878,
+            "renderSeconds": 4.299666000064462,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.037727416725829244,
+            "iteration": 2,
+            "peakPhysicalFootprintBytes": 156927656,
+            "realTimeFactor": 5.189919595998867,
+            "renderSeconds": 4.269815666717477,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.04490224993787706,
+            "iteration": 3,
+            "peakPhysicalFootprintBytes": 185714368,
+            "realTimeFactor": 4.644160743358457,
+            "renderSeconds": 4.771583333262242,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.041752833290956914,
+            "iteration": 4,
+            "peakPhysicalFootprintBytes": 213780184,
+            "realTimeFactor": 4.591788262262599,
+            "renderSeconds": 4.82600649993401,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.04482804168947041,
+            "iteration": 5,
+            "peakPhysicalFootprintBytes": 242140912,
+            "realTimeFactor": 4.469405910660078,
+            "renderSeconds": 4.958153374958783,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.03963129164185375,
+            "iteration": 6,
+            "peakPhysicalFootprintBytes": 272058120,
+            "realTimeFactor": 4.574907923805548,
+            "renderSeconds": 4.843813333311118,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.045510041643865407,
+            "iteration": 7,
+            "peakPhysicalFootprintBytes": 300189472,
+            "realTimeFactor": 4.451299089426347,
+            "renderSeconds": 4.978321958333254,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.04318333335686475,
+            "iteration": 8,
+            "peakPhysicalFootprintBytes": 328075040,
+            "realTimeFactor": 4.775664712543387,
+            "renderSeconds": 4.640191750018857,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.04108025005552918,
+            "iteration": 9,
+            "peakPhysicalFootprintBytes": 356288312,
+            "realTimeFactor": 4.572214659089283,
+            "renderSeconds": 4.846666583325714,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.044505416648462415,
+            "iteration": 10,
+            "peakPhysicalFootprintBytes": 384550736,
+            "realTimeFactor": 4.719243186205029,
+            "renderSeconds": 4.6956681666197255,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          }
+        ],
+        "runtime": "pocket-coreml-28770c06-v1:fp32:tanh:quality4:adaptive:warm12:eos6",
+        "tokenCounts": [
+          24,
+          22,
+          23,
+          8
+        ]
+      },
+      "stages": [
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.4442260000000022,
+            "wallSeconds": 0.6964054170530289
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.309224999999996,
+            "wallSeconds": 2.3969437913037837
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.2886360000000092,
+            "wallSeconds": 0.9917504574405029
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.17412799999999998,
+            "wallSeconds": 0.08876112487632781
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.4019359999999814,
+            "wallSeconds": 0.686376541852951
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.3023150000000125,
+            "wallSeconds": 2.4712040008744225
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.2942989999999792,
+            "wallSeconds": 0.9935067077167332
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.12775100000000172,
+            "wallSeconds": 0.07401179161388427
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.439942999999971,
+            "wallSeconds": 0.6893276654882357
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.13381500000002,
+            "wallSeconds": 2.4491212915163487
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.2871189999999757,
+            "wallSeconds": 0.9835342089645565
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.12940000000000396,
+            "wallSeconds": 0.07537629164289683
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.6856899999999584,
+            "wallSeconds": 0.7684282491682097
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.856856999999934,
+            "wallSeconds": 2.5958735843887553
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.6386120000000517,
+            "wallSeconds": 1.2391940423985943
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.1484049999999968,
+            "wallSeconds": 0.08710866665933281
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.653048999999946,
+            "wallSeconds": 0.7857919986126944
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.796150999999995,
+            "wallSeconds": 2.6325300423195586
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.6198750000000857,
+            "wallSeconds": 1.2277724999003112
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.16382199999999614,
+            "wallSeconds": 0.09932141657918692
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.6961959999999436,
+            "wallSeconds": 0.8008112089009956
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.957835000000053,
+            "wallSeconds": 2.727514957776293
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.6367590000000902,
+            "wallSeconds": 1.2571508354740217
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.15057999999999794,
+            "wallSeconds": 0.08900683326646686
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.6717860000000684,
+            "wallSeconds": 0.8071692903758958
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.711642000000111,
+            "wallSeconds": 2.6294360416941345
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.61667199999998,
+            "wallSeconds": 1.2346999580040574
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.1558069999999816,
+            "wallSeconds": 0.09255741664674133
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.7120409999999566,
+            "wallSeconds": 0.8024167091352865
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.908068000000057,
+            "wallSeconds": 2.7745271257590503
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.5865650000000215,
+            "wallSeconds": 1.224433291819878
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.1454310000000021,
+            "wallSeconds": 0.08810891676694155
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.61130900000002,
+            "wallSeconds": 0.7427747098263353
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.65649300000014,
+            "wallSeconds": 2.5438376251840964
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.5516459999999626,
+            "wallSeconds": 1.1775417098542675
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.15357199999999693,
+            "wallSeconds": 0.09648099995683879
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.663110000000003,
+            "wallSeconds": 0.8039543754421175
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.86153500000006,
+            "wallSeconds": 2.657367956941016
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.5715749999999957,
+            "wallSeconds": 1.2204392497660592
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.14397100000000762,
+            "wallSeconds": 0.0832308332901448
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.6997199999999424,
+            "wallSeconds": 0.7587282918393612
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.531713999999823,
+            "wallSeconds": 2.5549790412187576
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.5954180000001372,
+            "wallSeconds": 1.215263916645199
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.14091200000001436,
+            "wallSeconds": 0.08290312520693988
+          }
+        }
+      ],
+      "wavSHA256": [
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d"
+      ]
+    }
+  ],
+  "os": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+  "limitations": [
+    "Shared Mac; descriptive repeated measurements",
+    "External prepared model directory, shared assets verified on load; installed-pack cold startup is measured separately",
+    "10 warmed repetitions per process; sampled footprint, not allocation high-water"
+  ],
+  "binarySHA256": {
+    "baseline": "52cc0c3f5aa8785d2123317d28610071c6b087022c1e1d3b1aedde7f7925f9cf",
+    "candidate": "b96eed3b434dc768f7c4eedf788b02675eaf0e8b7080f0560541dc74de5188ec"
+  }
+}

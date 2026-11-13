@@ -1,0 +1,328 @@
+{
+  "recordings": 3375,
+  "samples": 283286400,
+  "exactSampleCounts": true,
+  "policy": {
+    "intent": "User-authorized default Max narration level balancing; raw engine output remains bit-exact with 0.9",
+    "neutralTargetLUFS": -26,
+    "maximumBoostDB": 9,
+    "minimumGainDB": -24,
+    "maximumReferenceStyleOffsetLU": 3,
+    "calibrationTruePeakHeadroomDB": 3,
+    "softKneeSampleAmplitude": 0.9,
+    "softCeilingSampleAmplitude": 0.98,
+    "calibrationPassages": [
+      0,
+      1,
+      2
+    ],
+    "holdoutPassages": [
+      3,
+      4
+    ],
+    "goals": {
+      "neutralCalibrationMedianSpreadLU": 3.1,
+      "neutralHoldoutMedianSpreadLU": 5,
+      "neutralIndividualHoldoutSpreadLU": 6,
+      "sampleCountAndProgress": "unchanged",
+      "bufferedVersusStreaming": "bit-identical after calibration",
+      "ordinaryWaveform": "constant gain; no resampling, automatic gain riding, time shift, clipping or limiter activation in qualified recordings"
+    },
+    "limits": [
+      "Targets are engineering acceptance goals, not a claim that BS.1770 prescribes a -26 LUFS audiobook level",
+      "Reference-style offsets are measured relative to that voice's Neutral reference, then bounded to +/-3 LU; they are not inferred from sentiment",
+      "One fixed gain per voice/language/style preserves within-utterance dynamics; extreme native style contrasts are intentionally bounded",
+      "Boosts have a memoryless emergency soft knee above 0.9 amplitude; report any activation in measured audio",
+      "Human listening remains required before release promotion",
+      "Initial +6 dB boost cap left German calibration voices 4.5 LU apart; +9 dB chosen from calibration medians reduces that gap to 1.5 LU. Holdout peaks do not choose per-profile gains."
+    ]
+  },
+  "summary": [
+    {
+      "backend": "coreml-cpu",
+      "language": "en",
+      "recordings": 375,
+      "calibrationBefore": {
+        "medianSpreadLU": 15.5,
+        "individualPassageMaxSpreadLU": 16.2
+      },
+      "calibrationAfter": {
+        "medianSpreadLU": 0.0,
+        "individualPassageMaxSpreadLU": 5.4
+      },
+      "holdoutBefore": {
+        "medianSpreadLU": 15.7,
+        "individualPassageMaxSpreadLU": 16.1
+      },
+      "holdoutAfter": {
+        "medianSpreadLU": 2.55,
+        "individualPassageMaxSpreadLU": 3.1
+      },
+      "maximumTruePeakDBFS": -3.0,
+      "kneeSamples": 0,
+      "goals": {
+        "neutralCalibrationSpreadMet": true,
+        "neutralHoldoutMedianSpreadMet": true,
+        "neutralIndividualHoldoutSpreadMet": true,
+        "noPeakSafetyActivation": true
+      }
+    },
+    {
+      "backend": "coreml-cpu",
+      "language": "es",
+      "recordings": 375,
+      "calibrationBefore": {
+        "medianSpreadLU": 4.7,
+        "individualPassageMaxSpreadLU": 5.9
+      },
+      "calibrationAfter": {
+        "medianSpreadLU": 0.0,
+        "individualPassageMaxSpreadLU": 3.4
+      },
+      "holdoutBefore": {
+        "medianSpreadLU": 4.75,
+        "individualPassageMaxSpreadLU": 5.7
+      },
+      "holdoutAfter": {
+        "medianSpreadLU": 2.35,
+        "individualPassageMaxSpreadLU": 3.4
+      },
+      "maximumTruePeakDBFS": -4.3,
+      "kneeSamples": 0,
+      "goals": {
+        "neutralCalibrationSpreadMet": true,
+        "neutralHoldoutMedianSpreadMet": true,
+        "neutralIndividualHoldoutSpreadMet": true,
+        "noPeakSafetyActivation": true
+      }
+    },
+    {
+      "backend": "mlx-cpu",
+      "language": "de",
+      "recordings": 375,
+      "calibrationBefore": {
+        "medianSpreadLU": 18.0,
+        "individualPassageMaxSpreadLU": 18.1
+      },
+      "calibrationAfter": {
+        "medianSpreadLU": 1.5,
+        "individualPassageMaxSpreadLU": 3.7
+      },
+      "holdoutBefore": {
+        "medianSpreadLU": 16.6,
+        "individualPassageMaxSpreadLU": 17.6
+      },
+      "holdoutAfter": {
+        "medianSpreadLU": 3.45,
+        "individualPassageMaxSpreadLU": 5.3
+      },
+      "maximumTruePeakDBFS": -0.3,
+      "kneeSamples": 27,
+      "goals": {
+        "neutralCalibrationSpreadMet": true,
+        "neutralHoldoutMedianSpreadMet": true,
+        "neutralIndividualHoldoutSpreadMet": true,
+        "noPeakSafetyActivation": false
+      }
+    },
+    {
+      "backend": "mlx-cpu",
+      "language": "en",
+      "recordings": 375,
+      "calibrationBefore": {
+        "medianSpreadLU": 15.5,
+        "individualPassageMaxSpreadLU": 16.2
+      },
+      "calibrationAfter": {
+        "medianSpreadLU": 0.0,
+        "individualPassageMaxSpreadLU": 5.4
+      },
+      "holdoutBefore": {
+        "medianSpreadLU": 15.7,
+        "individualPassageMaxSpreadLU": 16.1
+      },
+      "holdoutAfter": {
+        "medianSpreadLU": 2.55,
+        "individualPassageMaxSpreadLU": 3.1
+      },
+      "maximumTruePeakDBFS": -3.0,
+      "kneeSamples": 0,
+      "goals": {
+        "neutralCalibrationSpreadMet": true,
+        "neutralHoldoutMedianSpreadMet": true,
+        "neutralIndividualHoldoutSpreadMet": true,
+        "noPeakSafetyActivation": true
+      }
+    },
+    {
+      "backend": "mlx-cpu",
+      "language": "es",
+      "recordings": 375,
+      "calibrationBefore": {
+        "medianSpreadLU": 4.7,
+        "individualPassageMaxSpreadLU": 5.9
+      },
+      "calibrationAfter": {
+        "medianSpreadLU": 0.0,
+        "individualPassageMaxSpreadLU": 3.4
+      },
+      "holdoutBefore": {
+        "medianSpreadLU": 4.75,
+        "individualPassageMaxSpreadLU": 5.7
+      },
+      "holdoutAfter": {
+        "medianSpreadLU": 2.35,
+        "individualPassageMaxSpreadLU": 3.4
+      },
+      "maximumTruePeakDBFS": -4.3,
+      "kneeSamples": 0,
+      "goals": {
+        "neutralCalibrationSpreadMet": true,
+        "neutralHoldoutMedianSpreadMet": true,
+        "neutralIndividualHoldoutSpreadMet": true,
+        "noPeakSafetyActivation": true
+      }
+    },
+    {
+      "backend": "mlx-cpu",
+      "language": "fr",
+      "recordings": 375,
+      "calibrationBefore": {
+        "medianSpreadLU": 15.5,
+        "individualPassageMaxSpreadLU": 16.8
+      },
+      "calibrationAfter": {
+        "medianSpreadLU": 0.0,
+        "individualPassageMaxSpreadLU": 5.1
+      },
+      "holdoutBefore": {
+        "medianSpreadLU": 15.95,
+        "individualPassageMaxSpreadLU": 16.4
+      },
+      "holdoutAfter": {
+        "medianSpreadLU": 4.35,
+        "individualPassageMaxSpreadLU": 5.7
+      },
+      "maximumTruePeakDBFS": -3.0,
+      "kneeSamples": 0,
+      "goals": {
+        "neutralCalibrationSpreadMet": true,
+        "neutralHoldoutMedianSpreadMet": true,
+        "neutralIndividualHoldoutSpreadMet": true,
+        "noPeakSafetyActivation": true
+      }
+    },
+    {
+      "backend": "mlx-cpu",
+      "language": "it",
+      "recordings": 375,
+      "calibrationBefore": {
+        "medianSpreadLU": 14.2,
+        "individualPassageMaxSpreadLU": 16.9
+      },
+      "calibrationAfter": {
+        "medianSpreadLU": 0.0,
+        "individualPassageMaxSpreadLU": 5.4
+      },
+      "holdoutBefore": {
+        "medianSpreadLU": 15.45,
+        "individualPassageMaxSpreadLU": 16.4
+      },
+      "holdoutAfter": {
+        "medianSpreadLU": 4.1,
+        "individualPassageMaxSpreadLU": 5.0
+      },
+      "maximumTruePeakDBFS": -1.9,
+      "kneeSamples": 0,
+      "goals": {
+        "neutralCalibrationSpreadMet": true,
+        "neutralHoldoutMedianSpreadMet": true,
+        "neutralIndividualHoldoutSpreadMet": true,
+        "noPeakSafetyActivation": true
+      }
+    },
+    {
+      "backend": "mlx-cpu",
+      "language": "nl",
+      "recordings": 375,
+      "calibrationBefore": {
+        "medianSpreadLU": 12.6,
+        "individualPassageMaxSpreadLU": 15.5
+      },
+      "calibrationAfter": {
+        "medianSpreadLU": 0.7,
+        "individualPassageMaxSpreadLU": 4.9
+      },
+      "holdoutBefore": {
+        "medianSpreadLU": 13.7,
+        "individualPassageMaxSpreadLU": 13.8
+      },
+      "holdoutAfter": {
+        "medianSpreadLU": 2.95,
+        "individualPassageMaxSpreadLU": 3.7
+      },
+      "maximumTruePeakDBFS": -3.0,
+      "kneeSamples": 0,
+      "goals": {
+        "neutralCalibrationSpreadMet": true,
+        "neutralHoldoutMedianSpreadMet": true,
+        "neutralIndividualHoldoutSpreadMet": true,
+        "noPeakSafetyActivation": true
+      }
+    },
+    {
+      "backend": "mlx-cpu",
+      "language": "pt",
+      "recordings": 375,
+      "calibrationBefore": {
+        "medianSpreadLU": 4.9,
+        "individualPassageMaxSpreadLU": 5.9
+      },
+      "calibrationAfter": {
+        "medianSpreadLU": 0.0,
+        "individualPassageMaxSpreadLU": 4.5
+      },
+      "holdoutBefore": {
+        "medianSpreadLU": 6.4,
+        "individualPassageMaxSpreadLU": 6.8
+      },
+      "holdoutAfter": {
+        "medianSpreadLU": 3.15,
+        "individualPassageMaxSpreadLU": 3.6
+      },
+      "maximumTruePeakDBFS": -4.1,
+      "kneeSamples": 0,
+      "goals": {
+        "neutralCalibrationSpreadMet": true,
+        "neutralHoldoutMedianSpreadMet": true,
+        "neutralIndividualHoldoutSpreadMet": true,
+        "noPeakSafetyActivation": true
+      }
+    }
+  ],
+  "peakSafetyActivations": [
+    {
+      "backend": "mlx-cpu",
+      "language": "de",
+      "voice": "giovanni",
+      "style": "original",
+      "passage": 3,
+      "split": "holdout",
+      "kneeSamples": 21,
+      "samples": 90240,
+      "truePeakDBFS": -0.3
+    },
+    {
+      "backend": "mlx-cpu",
+      "language": "de",
+      "voice": "peter_yearsley",
+      "style": "tired",
+      "passage": 4,
+      "split": "holdout",
+      "kneeSamples": 6,
+      "samples": 105600,
+      "truePeakDBFS": -0.5
+    }
+  ],
+  "humanListeningAccepted": false
+}
