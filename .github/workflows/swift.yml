@@ -11,14 +11,16 @@ jobs:
       - uses: actions/checkout@v4
       - name: Verify Swift toolchain
         run: swift --version
-      - name: Debug tests
-        run: swift test --build-system swiftbuild
-      - name: Release tests
-        run: swift test --build-system swiftbuild -c release
+      - name: Test API inventory checker
+        run: python3 -m unittest discover -s Scripts/tests -p 'test_public_api.py'
       - name: Verify frozen public declarations
         run: |
           swift package --build-system swiftbuild dump-symbol-graph --minimum-access-level public --skip-synthesized-members
           python3 Scripts/check-public-api.py
+      - name: Debug tests
+        run: swift test --build-system swiftbuild
+      - name: Release tests
+        run: swift test --build-system swiftbuild -c release
       - name: Compile benchmark Python scripts
         run: python3 -m compileall -q Benchmarks/Narration Scripts
       - name: Install XcodeGen
@@ -38,3 +40,10 @@ jobs:
           -scheme KokoroDemo -configuration Release
           -destination 'generic/platform=macOS,variant=Mac Catalyst'
           -derivedDataPath /tmp/kokoro-ci CODE_SIGNING_ALLOWED=NO build
+      - name: Preserve symbol graphs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-symbol-graphs
+          path: .build/out/symbolgraph
+          retention-days: 7

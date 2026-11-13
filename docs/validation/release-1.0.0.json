@@ -4,7 +4,7 @@
   "release": "v1.0.0",
   "previousPublishedRelease": "v0.9.0",
   "validatedCandidate": "657488dd15680a7b02ceaad5abf649021ee2c8d7",
-  "releasePreparation": "Release documentation and migration handoff only; production runtime unchanged from validated candidate",
+  "releasePreparation": "Release documentation and migration handoff; API-checker availability-order canonicalization and CI diagnostics. Production runtime unchanged from validated candidate.",
   "publicationAuthorization": "User explicitly instructed publication on 2026-11-13 after qualification gaps were disclosed; no listening acceptance is inferred",
   "publicDeclarations": 2802,
   "publicDeclarationsChanged": 0,
@@ -27,5 +27,13 @@
   "unmetGoals": [
     "Original 2x steady synthesis goal",
     "Zero peak-safety activation: 27 samples in two German holdouts"
-  ]
+  ],
+  "apiCheckerCompatibility": {
+    "firstCIRun": "https://github.com/Section9Labs/LibroxTTS/actions/runs/43454800116",
+    "debugAndReleaseTests": "passed",
+    "failure": "Frozen API comparison reported 61 changed Qwen declarations; Qwen source is unchanged from 0.9.0",
+    "adjustment": "Compare platform-availability clauses independent of array order, preserving every clause and field; print detailed differences and retain graphs on failure",
+    "localValidation": "3 checker regression tests passed, including rejection of changed versions, clauses, signatures and added/removed APIs; 2802 public declarations unchanged",
+    "confirmation": "See subsequent release CI; no baseline inventory entries or production declarations were changed"
+  }
 }
