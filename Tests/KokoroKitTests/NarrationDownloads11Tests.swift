@@ -36,6 +36,20 @@ final class NarrationDownloads11Tests: XCTestCase {
         try NarrationDownloads.install(plan.files[0], from: urls, in: dest)
         XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: dest.appendingPathComponent("en").path), ["test.bin"])
     }
+    func testFullOutputBufferAtInputBoundaryNeedsMoreInputNotFailure() throws {
+        // Valid gzip with FEXTRA padding and a sync-flush boundary: input byte
+        // 65536 emits exactly 65536 bytes, but the final block arrives next read.
+        var packed = Data(base64Encoded: "H4sIBAAAAAAA/6H/")!
+        packed.append(Data(repeating: 0, count: 65441))
+        packed.append(Data(base64Encoded: "7MEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABqAAAA//8DAOuOl9cAAAEA")!)
+        let directory = try root(), source = directory.appendingPathComponent("input.gz"), target = directory.appendingPathComponent("output")
+        try packed.write(to: source)
+        XCTAssertTrue(FileManager.default.createFile(atPath: target.path, contents: nil))
+        let output = try FileHandle(forWritingTo: target)
+        try DownloadFileInstallation.append(source, encoding: .gzip, expectedSize: 65536, to: output)
+        try output.close()
+        XCTAssertEqual(try Data(contentsOf: target), Data(repeating: 0, count: 65536))
+    }
     func testDecoderRejectsTruncationTrailingDataWrongLengthAndChecksumPreservingInstall() throws {
         for fault in 0..<5 {
             let source = try root(), dest = try root(), plan = try fixture(source, gzip: true)
@@ -129,6 +143,39 @@ final class NarrationDownloads11Tests: XCTestCase {
             try FileManager.default.copyItem(at: source.appendingPathComponent("part-0"), to: temp)
             return (temp, HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!)
         }
+        try await transfer.run(plan, to: dest, cache: cache, concurrency: 1, progress: nil)
+        XCTAssertEqual(calls.withLock { $0 }, [true, false])
+    }
+    func testCancellationRetainsOSResumeMetadata() async throws {
+        let source = try root(), dest = try root(), cache = try root(), plan = try fixture(source)
+        let resume = Data("opaque OS resume fixture".utf8)
+        var transfer = NarrationTransport()
+        transfer.fetch = { _, _ in
+            withUnsafeCurrentTask { $0?.cancel() }
+            throw NSError(domain: NSURLErrorDomain, code: URLError.cancelled.rawValue,
+                userInfo: ["NSURLSessionDownloadTaskResumeData": resume])
+        }
+        do { try await transfer.run(plan, to: dest, cache: cache, concurrency: 1, progress: nil); XCTFail("Expected cancellation") }
+        catch is CancellationError {}
+        let receipt = cache.appendingPathComponent(plan.files[0].artifacts[0].sha256 + ".resume")
+        XCTAssertEqual(try Data(contentsOf: receipt), resume)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: dest.appendingPathComponent("en/test.bin").path))
+    }
+    func testRejectedHTTPResumeIsDiscardedBeforeNextRetry() async throws {
+        let source = try root(), dest = try root(), cache = try root(), plan = try fixture(source)
+        let receipt = cache.appendingPathComponent(plan.files[0].artifacts[0].sha256 + ".resume")
+        try Data("expired redirect".utf8).write(to: receipt)
+        let calls = Mutex([Bool]())
+        var transfer = NarrationTransport()
+        transfer.fetch = { url, resume in
+            calls.withLock { $0.append(resume != nil) }
+            let temporary = source.appendingPathComponent(UUID().uuidString)
+            try FileManager.default.copyItem(at: source.appendingPathComponent("part-0"), to: temporary)
+            return (temporary, HTTPURLResponse(url: url, statusCode: resume == nil ? 200 : 403, httpVersion: nil, headerFields: nil)!)
+        }
+        do { try await transfer.run(plan, to: dest, cache: cache, concurrency: 1, progress: nil); XCTFail("Expected rejection") }
+        catch { XCTAssertEqual((error as? URLError)?.code, .badServerResponse) }
+        XCTAssertFalse(FileManager.default.fileExists(atPath: receipt.path))
         try await transfer.run(plan, to: dest, cache: cache, concurrency: 1, progress: nil)
         XCTAssertEqual(calls.withLock { $0 }, [true, false])
     }

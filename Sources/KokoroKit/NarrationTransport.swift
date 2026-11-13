@@ -74,6 +74,10 @@ struct NarrationTransport: Sendable {
         }
         defer { try? FileManager.default.removeItem(at: result.0) }
         guard let response = result.1 as? HTTPURLResponse, [200, 206].contains(response.statusCode) else {
+            // A resumed request can return an expired redirect or rejected range
+            // as an HTTP response rather than throw. The next retry must start
+            // from the pinned URL, not reuse that unusable resume metadata.
+            try? FileManager.default.removeItem(at: receipt)
             throw URLError(.badServerResponse)
         }
         guard try NarrationAssets.matches(result.0, size: artifact.size, sha256: artifact.sha256) else {
