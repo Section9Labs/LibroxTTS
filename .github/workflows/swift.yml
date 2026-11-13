@@ -15,8 +15,12 @@ jobs:
         run: swift test --build-system swiftbuild
       - name: Release tests
         run: swift test --build-system swiftbuild -c release
+      - name: Verify frozen public declarations
+        run: |
+          swift package --build-system swiftbuild dump-symbol-graph --minimum-access-level public --skip-synthesized-members
+          python3 Scripts/check-public-api.py
       - name: Compile benchmark Python scripts
-        run: python3 -m compileall -q Benchmarks/Narration Scripts/PocketTTS
+        run: python3 -m compileall -q Benchmarks/Narration Scripts
       - name: Install XcodeGen
         run: brew install xcodegen
       - name: Generate iOS example
@@ -27,4 +31,10 @@ jobs:
           xcodebuild -project Examples/KokoroDemo/KokoroDemo.xcodeproj
           -scheme KokoroDemo -configuration Release
           -destination 'generic/platform=iOS'
+          -derivedDataPath /tmp/kokoro-ci CODE_SIGNING_ALLOWED=NO build
+      - name: Build Catalyst example
+        run: >-
+          xcodebuild -project Examples/KokoroDemo/KokoroDemo.xcodeproj
+          -scheme KokoroDemo -configuration Release
+          -destination 'generic/platform=macOS,variant=Mac Catalyst'
           -derivedDataPath /tmp/kokoro-ci CODE_SIGNING_ALLOWED=NO build
