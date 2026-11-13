@@ -1,5 +1,10 @@
 # 1.0 follow-up — synthesis speed and Max voice levels
 
+**Historical pre-release qualification record.** The user authorized v1.0.0
+publication on 2026-11-13 with the remaining gaps disclosed. See the
+[release record](validation/release-1.0.0.json) and [app migration](UPGRADE-1.0.0.md).
+Statements below about an unpublished candidate describe the measured checkpoint.
+
 Baseline: published 0.9.0, `07fcf437004027f58ad8bb16de7877d0ee74a9a8`.
 Worktree: `/Users/matt/Code/swift/librox-tts-10-review`.
 The candidate is **unpublished**. This report supersedes the raw synthesis

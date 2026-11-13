@@ -4,38 +4,36 @@ Offline speech synthesis and book narration for iPhone, iPad and Mac. **Librox P
 
 [![Swift](https://github.com/Section9Labs/LibroxTTS/actions/workflows/swift.yml/badge.svg)](https://github.com/Section9Labs/LibroxTTS/actions/workflows/swift.yml)
 
-The latest **1.0 development candidate** includes the [synthesis speed repair and
-default Max voice-level calibration](docs/implementation-10-speed.md). It is not
-published; listening acceptance remains open. The [initial implementation
-record](docs/implementation-10.md) preserves the original goals and measurements.
-The stable installation instructions below still use 0.9.0.
+**LibroxTTS 1.0.0** adds faster preparation/planning, bounded synthesis memory,
+and default Max voice-level balancing. Public declarations and raw engine audio
+are preserved. **Default Max narration levels and prepared-audio identity change.**
+See the [1.0.0 migration handoff](docs/UPGRADE-1.0.0.md) and
+[measured results and qualification limits](docs/implementation-10-speed.md).
 
 ## Max — powered by Pocket TTS
 
-Version **0.9.0** includes the contract-preserving 0.7–0.9 architecture work:
-faster normalization and long-sentence planning, shared immutable dictionaries,
-bounded model residency, cancellation/recovery improvements and verified asset
-replacement. Max continues to use Core ML CPU on iPhone/iPad and MLX on
-macOS/Mac Catalyst, with the same hash-pinned acoustic packs, voices and styles.
+Max uses Core ML CPU on iPhone/iPad and MLX on macOS/Mac Catalyst, with the same
+hash-pinned acoustic packs, voices and styles. No model redownload is required.
+`NarrationRenderer` now balances narrator and character levels using fixed
+voice/language/reference-style gains. Direct Pocket engines continue to return
+raw audio. Basic and Plus output and identities remain unchanged.
 
-Use the [0.9.0 app migration prompt](docs/UPGRADE-0.9.0.md). Upgrading from 0.6.2
-requires no new model downloads or prepared-audio cache revision. Preserve the
-0.6.2 continuous-clause behavior and audio-led `onTextChunk` integration; completed
-chunk ranges are not word alignment. Older integrations must also follow the
-linked earlier handoffs.
+Use the SDK's full `NarrationModel.pocket.renderIdentity(for:)` in prepared-audio
+keys and receipts. Old Max prepared audio must miss under the new identity and
+be regenerated; do not relabel it or purge model packs, Basic/Plus caches or user
+data. Preserve the continuous-clause and audio-led `onTextChunk` contracts.
 
-Local Debug/Release, public-contract, exact audio and generic iOS/Catalyst checks
-pass. Targeted planning and dictionary reuse have measured gains; no general
-inference-throughput gain is claimed. Physical-device, sustained thermal/energy
-and broader listening qualification remain open. See the
-[0.9 implementation evidence](docs/implementation-09.md).
+The synthesis speed regressions were repaired while retaining memory gains. The
+original 2x synthesis goal remains unmet. Technical qualification does not replace
+host-app integration or human listening; the published release retains these
+explicit gaps in its [qualification record](docs/validation/release-1.0.0.json).
 
 ## Install
 
 Add the versioned Swift package:
 
 ```swift
-.package(url: "https://github.com/Section9Labs/LibroxTTS.git", exact: "0.9.0")
+.package(url: "https://github.com/Section9Labs/LibroxTTS.git", exact: "1.0.0")
 ```
 
 Products include `LibroxTTS` (host-facing synthesis/install API), `LibroxCTNative` (Core ML CT runtime), `KokoroCatalog` (Kokoro voices/assets), and `KokoroPronunciation` (Kokoro text to model phonemes). The shared runtime depends on MLX Swift 0.32.3. Swift 6.3 or newer, **iOS/Catalyst 18+ or macOS 15+** are required. Apple system language facilities are required, so Linux is not supported.
@@ -44,11 +42,11 @@ Products include `LibroxTTS` (host-facing synthesis/install API), `LibroxCTNativ
 
 See [the narrator integration API](docs/book-planning.md), [casting rules](docs/story-narrator.md), and [enhancement API and validation limits](docs/audio-enhancement.md). The optional, separately imported `QwenANE` product retains the Qwen renderer work; its existence does not establish device eligibility or sustained background performance. The shared LibroxTTS product now links the Pocket TTS MLX runtime; KokoroCatalog, KokoroPronunciation and KokoroNarration remain independent of MLX. Rejected model auditions are not app dependencies.
 
-Version **0.9.0** preserves the new-book default **Caro Davy / Calm**, Careful
+Version **1.0.0** preserves the new-book default **Caro Davy / Calm**, Careful
 reading, temperature 0.3 and four sampler steps. Saved choices and supported
 sampler counts 1–8 remain unchanged. It also includes the 0.4.1–0.5.0 CPU-budget,
 per-language uninstall and Original-only voice/style APIs. This SDK release does
-not publish the Librox app. [Complete app integration prompt](docs/UPGRADE-0.9.0.md).
+not publish the Librox app. [Complete app integration prompt](docs/UPGRADE-1.0.0.md).
 
 ## Speak with Plus
 

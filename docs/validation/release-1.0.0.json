@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-13",
+  "release": "v1.0.0",
+  "previousPublishedRelease": "v0.9.0",
+  "validatedCandidate": "657488dd15680a7b02ceaad5abf649021ee2c8d7",
+  "releasePreparation": "Release documentation and migration handoff only; production runtime unchanged from validated candidate",
+  "publicationAuthorization": "User explicitly instructed publication on 2026-11-13 after qualification gaps were disclosed; no listening acceptance is inferred",
+  "publicDeclarations": 2802,
+  "publicDeclarationsChanged": 0,
+  "modelAssetsChanged": false,
+  "rawEngineAudioChanged": false,
+  "defaultMaxFacadeLevelsChanged": true,
+  "maxPreparedAudioIdentityChanged": true,
+  "levelRevision": "pocket-level-v1-41466443134c33e7",
+  "basicPlusAudioAndIdentitiesChanged": false,
+  "validationReceipt": "../architecture-10-speed/validation.json",
+  "validationReceiptSHA256": "c8fed8ff167ae64701f68d48d5d954ebbe727b9a6271210ad221041ff5dda7e7",
+  "migrationHandoff": "../UPGRADE-1.0.0.md",
+  "githubCI": "Verify the Swift workflow for the published tag commit; local evidence does not establish remote CI success",
+  "remainingQualification": [
+    "Human listening including two German peak-safety cases",
+    "Librox host-app integration, cache migration and audible playback",
+    "Physical iPhone; iPad probe covers raw Core ML, not host playback or facade loudness",
+    "Background/lock, energy and route interruption acceptance in the host app"
+  ],
+  "unmetGoals": [
+    "Original 2x steady synthesis goal",
+    "Zero peak-safety activation: 27 samples in two German holdouts"
+  ]
+}
