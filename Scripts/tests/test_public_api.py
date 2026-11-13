@@ -15,7 +15,7 @@ class PublicAPICheckerTests(unittest.TestCase):
             availability=[dict(domain='iOS', introduced=dict(major=18, minor=0)),
                           dict(domain='macOS', introduced=dict(major=15, minor=0))])
 
-    def compare(self, rows):
+    def compare(self, rows, additions=None):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             (root/'baseline.json').write_text(json.dumps(dict(symbols=[self.baseline])))
@@ -23,8 +23,20 @@ class PublicAPICheckerTests(unittest.TestCase):
             symbols = [dict(accessLevel='public', identifier=dict(precise=r['usr']), pathComponents=r['path'],
                             declarationFragments=[dict(spelling=r['declaration'])], availability=r['availability']) for r in rows]
             (graphs/'Example.json').write_text(json.dumps(dict(module=dict(name='Example'), symbols=symbols)))
-            return subprocess.run([sys.executable, str(CHECKER), '--baseline', str(root/'baseline.json'), '--graphs', str(graphs)],
+            arguments = [sys.executable, str(CHECKER), '--baseline', str(root/'baseline.json'), '--graphs', str(graphs)]
+            if additions is not None:
+                (root/'additions.json').write_text(json.dumps(dict(symbols=additions)))
+                arguments += ['--additions', str(root/'additions.json')]
+            return subprocess.run(arguments,
                                   capture_output=True, text=True)
+
+    def testReviewedAdditionsAreExactAndCannotOverrideBaseline(self):
+        added = copy.deepcopy(self.baseline); added['usr'] = 's:Added'
+        self.assertEqual(self.compare([self.baseline, added], additions=[added]).returncode, 0)
+        changed = copy.deepcopy(added); changed['declaration'] = 'actor Added'
+        self.assertNotEqual(self.compare([self.baseline, changed], additions=[added]).returncode, 0)
+        self.assertNotEqual(self.compare([self.baseline], additions=[added]).returncode, 0)
+        self.assertNotEqual(self.compare([self.baseline], additions=[self.baseline]).returncode, 0)
 
     def testPlatformClauseOrderIsNotAnAPIChange(self):
         row = copy.deepcopy(self.baseline); row['availability'].reverse()

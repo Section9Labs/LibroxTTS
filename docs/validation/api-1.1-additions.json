@@ -1,0 +1,259 @@
+{
+  "version": "1.1.0",
+  "symbols": [
+    {
+      "module": "LibroxTTS",
+      "usr": "s:9LibroxTTS18NarrationDownloadsO",
+      "path": [
+        "NarrationDownloads"
+      ],
+      "declaration": "enum NarrationDownloads",
+      "availability": []
+    },
+    {
+      "module": "LibroxTTS",
+      "usr": "s:9LibroxTTS18NarrationDownloadsO4plan3forAA0C12DownloadPlanV13KokoroCatalog13AssetManifestV_tKFZ",
+      "path": [
+        "NarrationDownloads",
+        "plan(for:)"
+      ],
+      "declaration": "static func plan(for manifest: AssetManifest) throws -> NarrationDownloadPlan",
+      "availability": []
+    },
+    {
+      "module": "LibroxTTS",
+      "usr": "s:9LibroxTTS18NarrationDownloadsO7install_4from2inyAA0C12DownloadPlanV4FileV_Say10Foundation3URLVGAMtKFZ",
+      "path": [
+        "NarrationDownloads",
+        "install(_:from:in:)"
+      ],
+      "declaration": "static func install(_ file: NarrationDownloadPlan.File, from artifacts: [URL], in directory: URL) throws",
+      "availability": []
+    },
+    {
+      "module": "LibroxTTS",
+      "usr": "s:9LibroxTTS18NarrationDownloadsO8download_2to5cache017maximumConcurrentD08progressyAA0C12DownloadPlanV_10Foundation3URLVAMSiySdYbcSgtYaKFZ",
+      "path": [
+        "NarrationDownloads",
+        "download(_:to:cache:maximumConcurrentDownloads:progress:)"
+      ],
+      "declaration": "static func download(_ plan: NarrationDownloadPlan, to directory: URL, cache: URL, maximumConcurrentDownloads: Int = 3, progress: (@Sendable (Double) -> Void)? = nil) async throws",
+      "availability": []
+    },
+    {
+      "module": "LibroxTTS",
+      "usr": "s:9LibroxTTS21NarrationDownloadPlanV",
+      "path": [
+        "NarrationDownloadPlan"
+      ],
+      "declaration": "struct NarrationDownloadPlan",
+      "availability": []
+    },
+    {
+      "module": "LibroxTTS",
+      "usr": "s:9LibroxTTS21NarrationDownloadPlanV12downloadSizes5Int64Vvp",
+      "path": [
+        "NarrationDownloadPlan",
+        "downloadSize"
+      ],
+      "declaration": "var downloadSize: Int64 { get }",
+      "availability": []
+    },
+    {
+      "module": "LibroxTTS",
+      "usr": "s:9LibroxTTS21NarrationDownloadPlanV4FileV",
+      "path": [
+        "NarrationDownloadPlan",
+        "File"
+      ],
+      "declaration": "struct File",
+      "availability": []
+    },
+    {
+      "module": "LibroxTTS",
+      "usr": "s:9LibroxTTS21NarrationDownloadPlanV4FileV12downloadSizes5Int64Vvp",
+      "path": [
+        "NarrationDownloadPlan",
+        "File",
+        "downloadSize"
+      ],
+      "declaration": "var downloadSize: Int64 { get }",
+      "availability": []
+    },
+    {
+      "module": "LibroxTTS",
+      "usr": "s:9LibroxTTS21NarrationDownloadPlanV4FileV9artifactsSayAC8ArtifactVGvp",
+      "path": [
+        "NarrationDownloadPlan",
+        "File",
+        "artifacts"
+      ],
+      "declaration": "let artifacts: [Artifact]",
+      "availability": []
+    },
+    {
+      "module": "LibroxTTS",
+      "usr": "s:9LibroxTTS21NarrationDownloadPlanV4FileV9installed13KokoroCatalog13AssetManifestVADVvp",
+      "path": [
+        "NarrationDownloadPlan",
+        "File",
+        "installed"
+      ],
+      "declaration": "let installed: AssetManifest.File",
+      "availability": []
+    },
+    {
+      "module": "LibroxTTS",
+      "usr": "s:9LibroxTTS21NarrationDownloadPlanV5filesSayAC4FileVGvp",
+      "path": [
+        "NarrationDownloadPlan",
+        "files"
+      ],
+      "declaration": "let files: [File]",
+      "availability": []
+    },
+    {
+      "module": "LibroxTTS",
+      "usr": "s:9LibroxTTS21NarrationDownloadPlanV8ArtifactV",
+      "path": [
+        "NarrationDownloadPlan",
+        "Artifact"
+      ],
+      "declaration": "struct Artifact",
+      "availability": []
+    },
+    {
+      "module": "LibroxTTS",
+      "usr": "s:9LibroxTTS21NarrationDownloadPlanV8ArtifactV11decodedSizes5Int64Vvp",
+      "path": [
+        "NarrationDownloadPlan",
+        "Artifact",
+        "decodedSize"
+      ],
+      "declaration": "let decodedSize: Int64",
+      "availability": []
+    },
+    {
+      "module": "LibroxTTS",
+      "usr": "s:9LibroxTTS21NarrationDownloadPlanV8ArtifactV3url10Foundation3URLVvp",
+      "path": [
+        "NarrationDownloadPlan",
+        "Artifact",
+        "url"
+      ],
+      "declaration": "let url: URL",
+      "availability": []
+    },
+    {
+      "module": "LibroxTTS",
+      "usr": "s:9LibroxTTS21NarrationDownloadPlanV8ArtifactV4fromAEs7Decoder_p_tKcfc",
+      "path": [
+        "NarrationDownloadPlan",
+        "Artifact",
+        "init(from:)"
+      ],
+      "declaration": "init(from decoder: any Decoder) throws",
+      "availability": []
+    },
+    {
+      "module": "LibroxTTS",
+      "usr": "s:9LibroxTTS21NarrationDownloadPlanV8ArtifactV4sizes5Int64Vvp",
+      "path": [
+        "NarrationDownloadPlan",
+        "Artifact",
+        "size"
+      ],
+      "declaration": "let size: Int64",
+      "availability": []
+    },
+    {
+      "module": "LibroxTTS",
+      "usr": "s:9LibroxTTS21NarrationDownloadPlanV8ArtifactV6sha256SSvp",
+      "path": [
+        "NarrationDownloadPlan",
+        "Artifact",
+        "sha256"
+      ],
+      "declaration": "let sha256: String",
+      "availability": []
+    },
+    {
+      "module": "LibroxTTS",
+      "usr": "s:9LibroxTTS21NarrationDownloadPlanV8ArtifactV8EncodingO",
+      "path": [
+        "NarrationDownloadPlan",
+        "Artifact",
+        "Encoding"
+      ],
+      "declaration": "enum Encoding",
+      "availability": []
+    },
+    {
+      "module": "LibroxTTS",
+      "usr": "s:9LibroxTTS21NarrationDownloadPlanV8ArtifactV8EncodingO3rawyA2GmF",
+      "path": [
+        "NarrationDownloadPlan",
+        "Artifact",
+        "Encoding",
+        "raw"
+      ],
+      "declaration": "case raw",
+      "availability": []
+    },
+    {
+      "module": "LibroxTTS",
+      "usr": "s:9LibroxTTS21NarrationDownloadPlanV8ArtifactV8EncodingO4gzipyA2GmF",
+      "path": [
+        "NarrationDownloadPlan",
+        "Artifact",
+        "Encoding",
+        "gzip"
+      ],
+      "declaration": "case gzip",
+      "availability": []
+    },
+    {
+      "module": "LibroxTTS",
+      "usr": "s:9LibroxTTS21NarrationDownloadPlanV8ArtifactV8EncodingO8rawValueAGSgSS_tcfc",
+      "path": [
+        "NarrationDownloadPlan",
+        "Artifact",
+        "Encoding",
+        "init(rawValue:)"
+      ],
+      "declaration": "init?(rawValue: String)",
+      "availability": []
+    },
+    {
+      "module": "LibroxTTS",
+      "usr": "s:9LibroxTTS21NarrationDownloadPlanV8ArtifactV8encodingAE8EncodingOvp",
+      "path": [
+        "NarrationDownloadPlan",
+        "Artifact",
+        "encoding"
+      ],
+      "declaration": "let encoding: Encoding",
+      "availability": []
+    },
+    {
+      "module": "LibroxTTS",
+      "usr": "s:9LibroxTTS21NarrationDownloadPlanV8manifest13KokoroCatalog13AssetManifestVvp",
+      "path": [
+        "NarrationDownloadPlan",
+        "manifest"
+      ],
+      "declaration": "let manifest: AssetManifest",
+      "availability": []
+    },
+    {
+      "module": "LibroxTTS",
+      "usr": "s:9LibroxTTS21NarrationDownloadPlanV8revisionSSvp",
+      "path": [
+        "NarrationDownloadPlan",
+        "revision"
+      ],
+      "declaration": "let revision: String",
+      "availability": []
+    }
+  ]
+}

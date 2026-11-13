@@ -52,7 +52,7 @@ let package = Package(
         .target(name: "KokoroPronunciation", dependencies: ["PronunciationEnglish"],
                 resources: [.process("Resources")]),
         .target(name: "LibroxTTS", dependencies: ["KokoroCatalog", "CZlib", "KokoroPronunciation", "KokoroNarration", "KokoroAudio", "LibroxCTNative", "PocketTTSMLX", "PocketTTSCoreML"],
-                path: "Sources/KokoroKit", resources: [.process("Resources")]),
+                path: "Sources/KokoroKit", resources: [.process("Resources"), .copy("Transport")]),
         .executableTarget(name: "KokoroProbe", dependencies: ["LibroxTTS"]),
         .executableTarget(name: "PronunciationProbe", dependencies: ["KokoroPronunciation"]),
         .executableTarget(name: "PronunciationAudioProbe", dependencies: ["LibroxTTS", "KokoroAudio"]),

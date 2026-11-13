@@ -12,6 +12,7 @@ from pathlib import Path
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--graphs", type=Path, default=Path(".build/out/symbolgraph"))
 parser.add_argument("--baseline", type=Path, default=Path("docs/architecture-07/api-baseline.json"))
+parser.add_argument("--additions", type=Path, help="Reviewed additive declarations; existing baseline remains frozen")
 args = parser.parse_args()
 def canonical(row):
     # Availability is a set of platform clauses. Symbol-graph emitters may
@@ -21,6 +22,11 @@ def canonical(row):
 old = json.loads(args.baseline.read_text())
 key = lambda row: (row["module"], row["usr"])
 expected = {key(row): canonical(row) for row in old["symbols"]}
+if args.additions:
+    for row in json.loads(args.additions.read_text())["symbols"]:
+        if key(row) in expected:
+            raise SystemExit("Additions must not override frozen declarations")
+        expected[key(row)] = canonical(row)
 actual = {}
 for path in args.graphs.glob("*.json"):
     graph = json.loads(path.read_text())

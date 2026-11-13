@@ -16,7 +16,7 @@ jobs:
       - name: Verify frozen public declarations
         run: |
           swift package --build-system swiftbuild dump-symbol-graph --minimum-access-level public --skip-synthesized-members
-          python3 Scripts/check-public-api.py
+          python3 Scripts/check-public-api.py --additions docs/validation/api-1.1-additions.json
       - name: Debug tests
         run: swift test --build-system swiftbuild
       - name: Release tests

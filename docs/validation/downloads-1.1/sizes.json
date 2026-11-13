@@ -1,0 +1,26 @@
+{
+  "enMLX": {
+    "originalBytes": 612187052,
+    "transportBytes": 525207728,
+    "reductionPercent": 14.20796531318993,
+    "files": 86
+  },
+  "enCoreML": {
+    "originalBytes": 1172030056,
+    "transportBytes": 732448602,
+    "reductionPercent": 37.50598815701361,
+    "files": 105
+  },
+  "allMLX": {
+    "originalBytes": 4285317840,
+    "transportBytes": 3677540496,
+    "reductionPercent": 14.18278332418862,
+    "files": 602
+  },
+  "allCoreML": {
+    "originalBytes": 8204218847,
+    "transportBytes": 5128829785,
+    "reductionPercent": 37.485458632354295,
+    "files": 735
+  }
+}
