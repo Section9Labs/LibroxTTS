@@ -14,6 +14,9 @@ public final class PocketTTSModel: Module {
     private(set) var diagnosticFrameIndex: Int?
     public let config: PocketTTSModelConfig
     private let modelFolder: URL
+    func enableEngineExecution() {
+        flow_lm.transformer.rope.enableEngineExecution()
+    }
     @ModuleInfo(key: "flow_lm") public var flow_lm: FlowLMModel
     @ModuleInfo(key: "mimi") public var mimi: MimiAdapter
 

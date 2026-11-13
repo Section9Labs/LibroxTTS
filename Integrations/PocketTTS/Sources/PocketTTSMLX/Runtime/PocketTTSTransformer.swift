@@ -26,6 +26,8 @@ public final class PocketLayerScale: Module {
 
 public final class PocketRotaryEmbedding: Module {
     public let maxPeriod: Double
+    private var executionContext: PocketRotaryExecutionContext?
+    func enableEngineExecution() { executionContext = PocketRotaryExecutionContext() }
 
     public init(maxPeriod: Double = 10000.0) {
         self.maxPeriod = maxPeriod
@@ -33,12 +35,12 @@ public final class PocketRotaryEmbedding: Module {
     }
 
     public func callAsFunction(_ q: MLXArray, _ k: MLXArray, offset: Int) -> (MLXArray, MLXArray) {
-        return pocketApplyRoPE(q: q, k: k, offset: offset, maxPeriod: maxPeriod)
+        return pocketApplyRoPE(q: q, k: k, offset: offset, maxPeriod: maxPeriod, context: executionContext)
     }
 }
 
 @inline(__always)
-private func pocketApplyRoPE(q: MLXArray, k: MLXArray, offset: Int, maxPeriod: Double) -> (MLXArray, MLXArray) {
+private func pocketApplyRoPE(q: MLXArray, k: MLXArray, offset: Int, maxPeriod: Double, context: PocketRotaryExecutionContext?) -> (MLXArray, MLXArray) {
     let b = q.shape[0]
     let t = q.shape[1]
     let h = q.shape[2]
@@ -46,13 +48,6 @@ private func pocketApplyRoPE(q: MLXArray, k: MLXArray, offset: Int, maxPeriod: D
     precondition(d % 2 == 0, "RoPE requires an even head dimension")
     let half = d / 2
 
-    let indices = MLXArray(stride(from: 0, to: half, by: 1)).asType(.float32)
-    let freqScale = -Float(log(maxPeriod)) * 2.0 / Float(d)
-    let freqs = MLX.exp(indices * MLXArray(freqScale))
-
-    let ts = (MLXArray(stride(from: 0, to: t, by: 1)).asType(.float32) + MLXArray(Float(offset)))
-        .reshaped([1, t, 1, 1])
-    let freq4d = freqs.reshaped([1, 1, 1, half])
 
     let q2 = q.reshaped([b, t, h, half, 2])
     let k2 = k.reshaped([b, t, h, half, 2])
@@ -65,8 +60,19 @@ private func pocketApplyRoPE(q: MLXArray, k: MLXArray, offset: Int, maxPeriod: D
     let kr = kParts[0].squeezed(axis: 4).asType(.float32)
     let ki = kParts[1].squeezed(axis: 4).asType(.float32)
 
-    let rotr = MLX.cos(freq4d * ts)
-    let roti = MLX.sin(freq4d * ts)
+    let rotr: MLXArray, roti: MLXArray
+    if let context { (rotr, roti) = context.rotation(time: t, dimension: d, offset: offset, period: maxPeriod) }
+    else {
+        let indices = MLXArray(stride(from: 0, to: half, by: 1)).asType(.float32)
+        let freqScale = -Float(log(maxPeriod)) * 2.0 / Float(d)
+        let freqs = MLX.exp(indices * MLXArray(freqScale))
+
+        let ts = (MLXArray(stride(from: 0, to: t, by: 1)).asType(.float32) + MLXArray(Float(offset)))
+            .reshaped([1, t, 1, 1])
+        let freq4d = freqs.reshaped([1, 1, 1, half])
+        rotr = MLX.cos(freq4d * ts)
+        roti = MLX.sin(freq4d * ts)
+    }
 
     let qor = qr * rotr - qi * roti
     let qoi = qr * roti + qi * rotr

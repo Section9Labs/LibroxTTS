@@ -186,6 +186,7 @@ public actor PocketTTSEngine {
             try resources.checkpoint("before-load", additionalBytes: PocketTTSResourceMonitor.loadReservation(fileBytes: UInt64(max(0, bytes))))
             model = try PocketTTSModel.fromModelDirectory(modelDirectory,
                 checkpoint: { try self.resources.checkpoint($0) })
+            model?.enableEngineExecution()
             try resources.checkpoint("after-load")
             language = requested
         }
