@@ -61,6 +61,11 @@ import MLX
             print("Rendered \(plan.units.count) book units, \(samples.count) samples")
             return
         }
+        if a.count == 4, a[1] == "--download-styles" {
+            try await NarrationAssets.downloadPocketDeliveryStyles(to: URL(fileURLWithPath: a[2]), language: a[3])
+            print("Installed all published Max delivery styles for \(a[3])")
+            return
+        }
         if a.count == 4, a[1] == "--download-default" {
             try await NarrationAssets.downloadPocketNarratorPreset(to: URL(fileURLWithPath: a[2]), language: a[3])
             print("Installed default Max narrator: Caro Davy / Calm")
