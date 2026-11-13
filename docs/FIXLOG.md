@@ -98,3 +98,14 @@ The prepared-audio identity changes with the policy and profiles.
 
 Rule: level calibration belongs at the SDK delivery boundary, must preserve timing
 and expressive dynamics, and must invalidate prepared audio when defaults change.
+
+## 1.1 — gzip output exactly filled a streaming buffer
+
+Full-catalog reconstruction found a valid Portuguese model chunk where inflate
+consumed all input while exactly filling the output buffer. A subsequent drain
+returned Z_BUF_ERROR because it needed more input. The new transport decoder now
+distinguishes that no-progress boundary from corrupt data. A deterministic gzip
+fixture covers it, and all 616 compressed files reconstruct to their original hashes.
+
+Rule: qualify a streaming decoder at input/output boundaries and against complete
+published files, not only small successful fixtures.

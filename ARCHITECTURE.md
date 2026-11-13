@@ -1,4 +1,14 @@
-# LibroxTTS architecture — 1.0 candidate
+# LibroxTTS architecture — 1.1
+
+1.1 adds an optional transport layer (`NarrationDownloads`) ahead of the existing
+asset preparation boundary. Legacy manifests/APIs remain intact. A bundled
+hash-keyed catalog maps original Max files to independently verified gzip chunks;
+`DownloadFileInstallation` streams exact bytes to staged original paths and adopts
+only fully verified files. `NarrationTransport` provides bounded foreground
+transfers, persistent chunk reuse and OS resume-data support. Hosts retain ownership
+of background URLSession, transfer receipts, cache cleanup and install/readiness UI.
+The [1.1 handoff](docs/UPGRADE-1.1.0.md) defines that boundary. Compression does not
+alter engine inputs, installed hashes, model/render identities or Max loudness.
 
 Base architecture reviewed on 2026-11-11 against `f75bacfbdc86c0c6dd81f0fb11cb9bcd160e49dd` (0.6.2).
 The 1.0 sections below extend it against published 0.9.0; historical qualification

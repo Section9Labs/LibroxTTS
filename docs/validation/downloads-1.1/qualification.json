@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-13",
+  "baseline": "a6932878316bfc979f6c8fcc3d4f2fe84330661f",
+  "runtimeRevision": "b9a4d473d21dd61f60df3ad15b506203470a1479",
+  "assetRelease": "https://github.com/Section9Labs/LibroxTTS/releases/tag/pocket-transport-gzip-2026-11-13-v1",
+  "compressedOriginalFiles": 616,
+  "chunkReferences": 693,
+  "uniqueHostedArtifacts": 687,
+  "uniqueHostedBytes": 6248196801,
+  "allHostedSizeAndSHA256DigestsVerified": true,
+  "fullCatalogSwiftReconstruction": {
+    "files": 616,
+    "allOriginalSizesAndSHA256Match": true,
+    "seconds": 55.204,
+    "scope": "Local immutable artifacts, all seven languages, all 616 files reconstructed into a fresh empty directory in one passing run"
+  },
+  "hostedEnglish": {
+    "manifests": [
+      "en.json",
+      "coreml-en.json",
+      "delivery-en.json"
+    ],
+    "payloadBytes": 892571768,
+    "downloadAndInstallSeconds": [
+      11.813875499996357,
+      11.252101833350025,
+      8.541293125017546
+    ],
+    "alreadyInstalledRunWithNetworkDisabledPassed": true,
+    "httpRangeStatus": 206,
+    "rangeBytes": 1024,
+    "scope": "Mac URLSession, all English Max MLX/Core ML/base/style files; timings exclude Core ML preparation and are not controlled performance comparisons"
+  },
+  "coreMLPreparation": {
+    "hostedPackCompiled": true,
+    "exactReferenceSamplesAtSamplerSteps": [
+      4,
+      8,
+      3
+    ],
+    "invalidCompiledReceiptRejected": true
+  },
+  "rawSmoke": {
+    "audioSeconds": 22.16,
+    "wavSHA256": "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+    "matches10Receipt": true
+  },
+  "facadeSmoke": {
+    "hostedMLXAssets": true,
+    "wholeBufferEqualsStreaming": true,
+    "recoversAfterCancellation": true
+  },
+  "api": {
+    "frozenDeclarationsPreserved": 2802,
+    "reviewedAdditions": 24
+  },
+  "tests": {
+    "debug": {
+      "XCTest": 162,
+      "expectedSkips": 36,
+      "SwiftTesting": 559,
+      "failures": 0
+    },
+    "release": {
+      "XCTest": 162,
+      "expectedSkips": 36,
+      "SwiftTesting": 559,
+      "failures": 0
+    },
+    "finalFocused": {
+      "XCTest": 18,
+      "expectedSkips": 2,
+      "failures": 0
+    },
+    "apiCheckerRegressionTests": 4,
+    "note": "Final Debug/Release and focused suites include the boundary, HTTP resume and cancellation metadata regressions. The two focused skips are explicitly invoked full-catalog/hosted probes recorded above."
+  },
+  "unchanged": [
+    "legacy public declarations",
+    "legacy download APIs and progress",
+    "original asset manifests and hashes",
+    "installed model bytes",
+    "Pocket inference implementation",
+    "1.0 Max loudness profiles",
+    "render/cache identities",
+    "Basic and Plus transport"
+  ],
+  "remainingAppQualification": [
+    "Librox background URLSession/task receipts integration",
+    "physical iPhone/iPad install memory and temporary-disk measurements",
+    "app process relaunch/resume and readiness UI"
+  ],
+  "ci": {
+    "url": "https://github.com/Section9Labs/LibroxTTS/actions/runs/43484351288",
+    "status": "success",
+    "revision": "a7916fdca80f3695bec828c1b577166c8cc79758",
+    "scope": "Transport implementation at a7916fd. The final production-code delta only removes a rejected HTTP resume receipt before throwing, using the same FileManager API already compiled in that file; final Debug/Release and focused suites cover this delta locally. Release documentation and qualification tests are additional.",
+    "checks": [
+      "Swift 6.3.3 public API inventory",
+      "Debug tests",
+      "Release tests",
+      "Python compilation",
+      "unsigned iOS example build",
+      "unsigned Catalyst example build"
+    ]
+  }
+}

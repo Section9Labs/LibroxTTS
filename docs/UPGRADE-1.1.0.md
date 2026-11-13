@@ -6,6 +6,10 @@ settings, 1.0 Max loudness profiles, model identities or prepared-audio identiti
 Basic and Plus retain their existing transport. Existing installations need no
 redownload and existing 1.0 audio caches remain valid.
 
+If the app is still on 0.9 or earlier, also apply the [1.0 migration](UPGRADE-1.0.0.md)
+for Max loudness and prepared-audio identity. 1.1 does not undo that migration;
+it introduces no additional audio-cache invalidation.
+
 Measured complete fresh download sizes (decimal bytes, including original raw
 fallback files):
 
@@ -66,6 +70,8 @@ exit. Preserve the app's existing background URLSession for that purpose.
    Order must match `file.artifacts`. The SDK verifies compressed hashes, streams
    bounded decompression, verifies the original hash, then atomically publishes
    the file. Sources remain host-owned and may be reused/removed by the host.
+   Run installation, hashing and preparation off the main actor; keep UI updates
+   separate from this synchronous file work.
 6. After all requested files succeed, call the existing matching prepare APIs.
    Continue to gate readiness on original asset verification and Core ML
    preparation, then publish the host's existing complete-install receipt.
