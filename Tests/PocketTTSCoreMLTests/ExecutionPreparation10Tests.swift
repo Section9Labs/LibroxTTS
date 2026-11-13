@@ -36,6 +36,21 @@ final class ExecutionPreparation10Tests: XCTestCase {
             }
         }
     }
+    func testChangedOriginalVoiceAbstainsFromNativePreparation() throws {
+        guard let root = ProcessInfo.processInfo.environment["LIBROX_09_ASSETS"] else { throw XCTSkip("Requires installed voice fixtures") }
+        let source = URL(fileURLWithPath:root).appendingPathComponent("en/embeddings/caro_davy.safetensors")
+        let directory = URL.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at:directory) }
+        let copy = directory.appendingPathComponent("en/embeddings/caro_davy.safetensors")
+        try FileManager.default.createDirectory(at:copy.deletingLastPathComponent(),withIntermediateDirectories:true)
+        var bytes = try Data(contentsOf:source)
+        try bytes.write(to:copy)
+        XCTAssertNotNil(try PocketVoiceArchive.read(copy))
+        bytes[bytes.count-1] ^= 1
+        try bytes.write(to:copy)
+        XCTAssertNil(try PocketVoiceArchive.read(copy), "Changed public source must retain the legacy reader and errors")
+    }
+
     func testUnsupportedArchiveRetainsFallback() throws {
         let url = URL.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: url) }

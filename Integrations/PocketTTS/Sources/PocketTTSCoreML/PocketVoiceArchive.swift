@@ -1,14 +1,36 @@
 import CoreML
+import CryptoKit
+import KokoroCatalog
 import Foundation
 
 /// Native reader for the pinned Float32 voice-cache representation. Unsupported
 /// representations retain the MLX reader, including its conversion/error behavior.
 /// The catalog still verifies the complete source before this preparation step.
 enum PocketVoiceArchive {
+    // Only admit published bytes. A public engine can observe an original voice
+    // file replaced after loading; unknown/modified archives must still use the
+    // legacy reader, including validation of otherwise unused tensor records.
+    private static let pinnedHashes: [String: String] = {
+        var result: [String: String] = [:]
+        for language in PocketTTSCatalog.languages {
+            let manifests = [try? PocketTTSCatalog.manifest(language: language),
+                             try? PocketTTSDeliveryCatalog.manifest(language: language)]
+            for manifest in manifests.compactMap({ $0 }) {
+                for file in manifest.installedFiles where file.path.contains("/embeddings/") {
+                    result[file.path] = file.sha256
+                }
+            }
+        }
+        return result
+    }()
     private struct Tensor: Decodable { let dtype: String; let shape: [Int]; let data_offsets: [Int] }
     static func read(_ url: URL) throws -> [MLMultiArray]? {
         let data = try Data(contentsOf: url, options: .mappedIfSafe)
-        guard data.count >= 8 else { return nil }
+        let language = url.deletingLastPathComponent().deletingLastPathComponent().lastPathComponent
+        let key = language + "/embeddings/" + url.lastPathComponent
+        guard let expected = pinnedHashes[key],
+              SHA256.hash(data: data).map({ String(format: "%02x", $0) }).joined() == expected,
+              data.count >= 8 else { return nil }
         let header = data.withUnsafeBytes { UInt64(littleEndian: $0.loadUnaligned(as: UInt64.self)) }
         guard header <= UInt64(data.count - 8), header <= 1_048_576 else { return nil }
         let start = 8 + Int(header)
