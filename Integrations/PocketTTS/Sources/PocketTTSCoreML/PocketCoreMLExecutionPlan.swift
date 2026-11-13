@@ -84,7 +84,11 @@ final class PocketCoreMLExecutionPlan {
                 let output = try predict(model, inputs)
                 latent = try PocketTTSCoreMLEngine.output(output, "latent")
             }
-            return latent
+            // Continuation history outlives this prediction. Detach its tiny
+            // latent from model-owned output storage so Core ML can promptly
+            // recycle that storage; retaining outputs regressed steady inference.
+            // This copies all 32 Float32 values without changing their bits.
+            return try PocketTTSCoreMLEngine.floats(PocketTTSCoreMLEngine.values(latent), shape: [1,32])
         } }
     }
     func chunks(_ text: String, options: PocketTTSChunkingOptions, role: PocketTTSPassageRole) throws -> [PocketTTSTextChunk] {
