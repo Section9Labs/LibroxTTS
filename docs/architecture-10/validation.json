@@ -1,0 +1,189 @@
+{
+  "debug": {
+    "xctest": [
+      {
+        "bundle": "QwenANETests.xctest",
+        "tests": 29,
+        "skipped": 9
+      },
+      {
+        "bundle": "PocketTTSMLXTests.xctest",
+        "tests": 6,
+        "skipped": 1
+      },
+      {
+        "bundle": "PocketTTSCoreMLTests.xctest",
+        "tests": 39,
+        "skipped": 15
+      },
+      {
+        "bundle": "LibroxCTNativeTests.xctest",
+        "tests": 7,
+        "skipped": 0
+      },
+      {
+        "bundle": "KokoroPronunciationTests.xctest",
+        "tests": 22,
+        "skipped": 0
+      },
+      {
+        "bundle": "KokoroNarrationTests.xctest",
+        "tests": 15,
+        "skipped": 0
+      },
+      {
+        "bundle": "KokoroKitTests.xctest",
+        "tests": 21,
+        "skipped": 3
+      }
+    ],
+    "xctestTotal": 139,
+    "xctestSkipped": 28,
+    "swiftTestingRunCounts": [
+      0,
+      64,
+      0,
+      31,
+      198,
+      186,
+      43,
+      23,
+      14
+    ],
+    "logSHA256": "1b973482086400082dcd01d3ecdfdbd8db3cbd42157cb1b77d909ab5ccacc31c"
+  },
+  "release": {
+    "xctest": [
+      {
+        "bundle": "QwenANETests.xctest",
+        "tests": 29,
+        "skipped": 9
+      },
+      {
+        "bundle": "PocketTTSMLXTests.xctest",
+        "tests": 6,
+        "skipped": 1
+      },
+      {
+        "bundle": "PocketTTSCoreMLTests.xctest",
+        "tests": 39,
+        "skipped": 15
+      },
+      {
+        "bundle": "LibroxCTNativeTests.xctest",
+        "tests": 7,
+        "skipped": 0
+      },
+      {
+        "bundle": "KokoroPronunciationTests.xctest",
+        "tests": 22,
+        "skipped": 0
+      },
+      {
+        "bundle": "KokoroNarrationTests.xctest",
+        "tests": 15,
+        "skipped": 0
+      },
+      {
+        "bundle": "KokoroKitTests.xctest",
+        "tests": 21,
+        "skipped": 3
+      }
+    ],
+    "xctestTotal": 139,
+    "xctestSkipped": 28,
+    "swiftTestingRunCounts": [
+      0,
+      64,
+      0,
+      31,
+      198,
+      186,
+      43,
+      23,
+      14
+    ],
+    "logSHA256": "6d22faa45133a96e951771a3343dde346d9dd4c92697c634f52dfd2351fa5bb6"
+  },
+  "ios": {
+    "passed": true,
+    "logSHA256": "d2136a356efb7f9395298ec771ef0e12e462c89f63eaa69bde7ee09301e5d4df"
+  },
+  "catalyst": {
+    "passed": true,
+    "logSHA256": "4660e80a91781ae02670d2ddec0d3da08e111c2d30ebc9e9401536d1d32990dc"
+  },
+  "publicAPI": "2802 baseline entries; 2802 current; 0 missing, 0 added, 0 changed",
+  "realMLXResources": {
+    "passed": true,
+    "tests": 7,
+    "logSHA256": "abb9d8bc1119df88bc82f2cfd5b8777237ce9ce0a1293423f2591dab6985ce30"
+  },
+  "nativeVoiceArchives": {
+    "en": 24,
+    "es": 24
+  },
+  "environment": {
+    "mac": "Mac15,14 Apple M3 Ultra 256 GiB",
+    "os": "macOS 27.0.1 (26A434)",
+    "swift": "6.4.2",
+    "xcode": "27.2 (27B52)",
+    "note": "Swift 6.3 CI and remote workflow not executed in this task"
+  },
+  "indexedDictionaries": {
+    "gb_gold": {
+      "entries": 172976,
+      "bytes": 6647224,
+      "sha256": "7ed1809c701098e00d4e3fd8a31d22de62695401ee9ea4d47e424f082a6fdc55"
+    },
+    "gb_silver": {
+      "entries": 219532,
+      "bytes": 8645024,
+      "sha256": "2350e99d89cf484d20b6dd7814ed9956b19f70aaf1dbcb4f299c07d228c052ec"
+    },
+    "us_cmudict": {
+      "entries": 69043,
+      "bytes": 2384666,
+      "sha256": "4e33860e594df9ac9d86b0a705b0e29562e8893217116bca00912db1081c699f"
+    },
+    "us_gold": {
+      "entries": 178687,
+      "bytes": 7004447,
+      "sha256": "f7a70ff086a49b0eb2621a6ea49e23455eb6011eda4cf620a421fc48e8d06934"
+    },
+    "us_silver": {
+      "entries": 186722,
+      "bytes": 7319402,
+      "sha256": "ba8eb20b674e3263329b1ee01212bb4901c3f1217ec7a80b108381d43f197b00"
+    }
+  },
+  "exhaustivelyCheckedDictionaryEntries": 826960,
+  "rotaryFocused": {
+    "passed": true,
+    "tests": 2,
+    "logSHA256": "49fe7f913855b6c5670dca1fac11818360a033f83048daf71d9fb27f3b7c6cf8",
+    "note": "Opt-in component timing and CPU/GPU bit parity; added timing method after full suites"
+  },
+  "isolatedRepeatedMemory": {
+    "passed": true,
+    "tests": 1,
+    "logSHA256": "3bf69aaec8af14b365666c654fccd1c0845bc9c13ab74bfa0527b5b6a5bc54b7",
+    "receipt": "repeated-render-memory.json"
+  },
+  "productionSourceCommit": "f1d31fa",
+  "physicalDeviceAvailability": {
+    "ipad": "M4 iPad Pro 11-inch; connected and used for isolated qualification",
+    "iphone": "iPhone 17 Pro Max unavailable in final devicectl inventory; no physical iPhone claim"
+  },
+  "physicalIPad": {
+    "passed": true,
+    "qualificationRecordings": 12,
+    "qualificationSamples": 1006080,
+    "soakRenders": 393,
+    "soakDurationGoalSeconds": 1800,
+    "soakRenderSeconds": 1799.0855911250983,
+    "receipt": "device-final.json",
+    "memoryComparison": "device-qualification.json",
+    "taskAppsRemovedAfterCollection": true
+  }
+}

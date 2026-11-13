@@ -1,0 +1,746 @@
+{
+  "order": "ABBA",
+  "exactWAV": true,
+  "summary": {
+    "baseline": {
+      "warmMedianSeconds": 4.156371124961879,
+      "firstAudioIncludingLoadSeconds": 0.3880629166960716,
+      "peakSampledFootprint": 185960140.0
+    },
+    "candidate": {
+      "warmMedianSeconds": 4.376779583340976,
+      "firstAudioIncludingLoadSeconds": 0.1294567083241418,
+      "peakSampledFootprint": 122234524.0
+    },
+    "warmSpeedup": 0.9496414077560538,
+    "footprintRatio": 0.6573157236814298
+  },
+  "runs": [
+    {
+      "revision": "baseline",
+      "report": {
+        "chunks": [
+          "She rested her hand against the door. For a moment, she could almost hear his voice again.",
+          "It was the small things she remembered: the way he folded the newspaper,",
+          "the sound of his keys on the table, and the cup he always left beside the window.",
+          "She waited. Nobody came."
+        ],
+        "complete": true,
+        "loadSeconds": 0.13528745842631906,
+        "machine": "arm64",
+        "operatingSystem": "Version 27.0.1 (Build 26A434)",
+        "request": {
+          "backend": "coreml-cpu",
+          "language": "en",
+          "repetitions": 3,
+          "seed": 42,
+          "steps": 4,
+          "style": "calm",
+          "temperature": 0.3,
+          "text": "She rested her hand against the door. For a moment, she could almost hear his voice again. It was the small things she remembered: the way he folded the newspaper, the sound of his keys on the table, and the cup he always left beside the window. She waited. Nobody came.",
+          "voiceID": "pocket-caro_davy-en-v1"
+        },
+        "rows": [
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": true,
+            "firstAudioSeconds": 0.4674398333299905,
+            "iteration": 0,
+            "peakPhysicalFootprintBytes": 97502840,
+            "realTimeFactor": 4.884346940835424,
+            "renderSeconds": 4.536942250095308,
+            "samples": 531840,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.03507583332248032,
+            "iteration": 1,
+            "peakPhysicalFootprintBytes": 127895184,
+            "realTimeFactor": 5.3183375095661205,
+            "renderSeconds": 4.1667156249750406,
+            "samples": 531840,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.03576762496959418,
+            "iteration": 2,
+            "peakPhysicalFootprintBytes": 157976232,
+            "realTimeFactor": 5.490649810741138,
+            "renderSeconds": 4.03595216665417,
+            "samples": 531840,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.03342091664671898,
+            "iteration": 3,
+            "peakPhysicalFootprintBytes": 185910976,
+            "realTimeFactor": 5.461509910316842,
+            "renderSeconds": 4.057486000005156,
+            "samples": 531840,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          }
+        ],
+        "runtime": "pocket-coreml-28770c06-v1:fp32:tanh:quality4:adaptive:warm12:eos6",
+        "tokenCounts": [
+          24,
+          22,
+          23,
+          8
+        ]
+      },
+      "stages": [
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.513644999999997,
+            "wallSeconds": 0.730838916846551
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 6.98744299999999,
+            "wallSeconds": 2.472834876156412
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.270797999999989,
+            "wallSeconds": 0.9909744161413983
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.3753529999999993,
+            "wallSeconds": 0.2411342082777992
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.344031000000017,
+            "wallSeconds": 0.6696424997644499
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 6.910042999999979,
+            "wallSeconds": 2.390580124454573
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.2604010000000123,
+            "wallSeconds": 0.9609034160384908
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.12607900000000072,
+            "wallSeconds": 0.07336516655050218
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.334565000000044,
+            "wallSeconds": 0.6499281666474417
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 6.596238999999976,
+            "wallSeconds": 2.314981751027517
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.2301259999999559,
+            "wallSeconds": 0.932550334604457
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.12125300000000294,
+            "wallSeconds": 0.07077666674740613
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.3394920000000425,
+            "wallSeconds": 0.6589315010933205
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 6.700871000000028,
+            "wallSeconds": 2.3176148746861145
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.2345030000000108,
+            "wallSeconds": 0.9411640829639509
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.12258299999999878,
+            "wallSeconds": 0.0709509167354554
+          }
+        }
+      ],
+      "wavSHA256": [
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d"
+      ]
+    },
+    {
+      "revision": "candidate",
+      "report": {
+        "chunks": [
+          "She rested her hand against the door. For a moment, she could almost hear his voice again.",
+          "It was the small things she remembered: the way he folded the newspaper,",
+          "the sound of his keys on the table, and the cup he always left beside the window.",
+          "She waited. Nobody came."
+        ],
+        "complete": true,
+        "loadSeconds": 0.05541074997745454,
+        "machine": "arm64",
+        "operatingSystem": "Version 27.0.1 (Build 26A434)",
+        "request": {
+          "backend": "coreml-cpu",
+          "language": "en",
+          "repetitions": 3,
+          "seed": 42,
+          "steps": 4,
+          "style": "calm",
+          "temperature": 0.3,
+          "text": "She rested her hand against the door. For a moment, she could almost hear his voice again. It was the small things she remembered: the way he folded the newspaper, the sound of his keys on the table, and the cup he always left beside the window. She waited. Nobody came.",
+          "voiceID": "pocket-caro_davy-en-v1"
+        },
+        "rows": [
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": true,
+            "firstAudioSeconds": 0.07992054161150008,
+            "iteration": 0,
+            "peakPhysicalFootprintBytes": 95159928,
+            "realTimeFactor": 5.172631167355931,
+            "renderSeconds": 4.284086624975316,
+            "samples": 531840,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.035742041654884815,
+            "iteration": 1,
+            "peakPhysicalFootprintBytes": 106874536,
+            "realTimeFactor": 4.95556156252489,
+            "renderSeconds": 4.471743458416313,
+            "samples": 531840,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.04041616665199399,
+            "iteration": 2,
+            "peakPhysicalFootprintBytes": 117540520,
+            "realTimeFactor": 5.120321538989735,
+            "renderSeconds": 4.327853208291344,
+            "samples": 531840,
+            "thermalEnd": 0,
+            "thermalStart": 0
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.03493245830759406,
+            "iteration": 3,
+            "peakPhysicalFootprintBytes": 122259112,
+            "realTimeFactor": 5.151103590804665,
+            "renderSeconds": 4.301990750012919,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 0
+          }
+        ],
+        "runtime": "pocket-coreml-28770c06-v1:fp32:tanh:quality4:adaptive:warm12:eos6",
+        "tokenCounts": [
+          24,
+          22,
+          23,
+          8
+        ]
+      },
+      "stages": [
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.4012409999999895,
+            "wallSeconds": 0.7165820405352861
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 6.984078000000001,
+            "wallSeconds": 2.4297514157369733
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.2612080000000037,
+            "wallSeconds": 0.9589526677737013
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.1747879999999996,
+            "wallSeconds": 0.08688695833552629
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.5359880000000015,
+            "wallSeconds": 0.7621509177843109
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.406187000000028,
+            "wallSeconds": 2.543327834107913
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.3149499999999836,
+            "wallSeconds": 1.0123733332147822
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.132768000000004,
+            "wallSeconds": 0.07748799992259592
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.3962490000000223,
+            "wallSeconds": 0.7278590427013114
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 6.928910999999985,
+            "wallSeconds": 2.4858687927480787
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.2673509999999837,
+            "wallSeconds": 0.9656636250438169
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.1345559999999999,
+            "wallSeconds": 0.07735512510407716
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.4003050000000172,
+            "wallSeconds": 0.7169908732175827
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 6.8993970000000004,
+            "wallSeconds": 2.491259249509312
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.2420609999999854,
+            "wallSeconds": 0.9482507079374045
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.13031100000000606,
+            "wallSeconds": 0.07557154167443514
+          }
+        }
+      ],
+      "wavSHA256": [
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d"
+      ]
+    },
+    {
+      "revision": "candidate",
+      "report": {
+        "chunks": [
+          "She rested her hand against the door. For a moment, she could almost hear his voice again.",
+          "It was the small things she remembered: the way he folded the newspaper,",
+          "the sound of his keys on the table, and the cup he always left beside the window.",
+          "She waited. Nobody came."
+        ],
+        "complete": true,
+        "loadSeconds": 0.05094508337788284,
+        "machine": "arm64",
+        "operatingSystem": "Version 27.0.1 (Build 26A434)",
+        "request": {
+          "backend": "coreml-cpu",
+          "language": "en",
+          "repetitions": 3,
+          "seed": 42,
+          "steps": 4,
+          "style": "calm",
+          "temperature": 0.3,
+          "text": "She rested her hand against the door. For a moment, she could almost hear his voice again. It was the small things she remembered: the way he folded the newspaper, the sound of his keys on the table, and the cup he always left beside the window. She waited. Nobody came.",
+          "voiceID": "pocket-caro_davy-en-v1"
+        },
+        "rows": [
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": true,
+            "firstAudioSeconds": 0.07263704168144614,
+            "iteration": 0,
+            "peakPhysicalFootprintBytes": 91522632,
+            "realTimeFactor": 5.140386513106184,
+            "renderSeconds": 4.310959875001572,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.037672541686333716,
+            "iteration": 1,
+            "peakPhysicalFootprintBytes": 109856400,
+            "realTimeFactor": 4.97311214877423,
+            "renderSeconds": 4.455962250009179,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.04149962496012449,
+            "iteration": 2,
+            "peakPhysicalFootprintBytes": 119031440,
+            "realTimeFactor": 5.007110776979499,
+            "renderSeconds": 4.425705958390608,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.0336411667522043,
+            "iteration": 3,
+            "peakPhysicalFootprintBytes": 122209936,
+            "realTimeFactor": 5.242577647906688,
+            "renderSeconds": 4.226928333402611,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          }
+        ],
+        "runtime": "pocket-coreml-28770c06-v1:fp32:tanh:quality4:adaptive:warm12:eos6",
+        "tokenCounts": [
+          24,
+          22,
+          23,
+          8
+        ]
+      },
+      "stages": [
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.375165999999994,
+            "wallSeconds": 0.7137615407118574
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 6.822022000000003,
+            "wallSeconds": 2.479629000881687
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.2493970000000059,
+            "wallSeconds": 0.9468499582726508
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.1731660000000008,
+            "wallSeconds": 0.08717524993699044
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.431596000000006,
+            "wallSeconds": 0.7416352500440553
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.090616999999998,
+            "wallSeconds": 2.5600132918916643
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.318213000000016,
+            "wallSeconds": 1.0050989158917218
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.13341599999999865,
+            "wallSeconds": 0.0774044165154919
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.4553550000000293,
+            "wallSeconds": 0.7327786252135411
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 7.188601000000002,
+            "wallSeconds": 2.536052123643458
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.3057029999999799,
+            "wallSeconds": 0.9967002497287467
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.14628999999999692,
+            "wallSeconds": 0.08644674986135215
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.4158590000000544,
+            "wallSeconds": 0.7158967081923038
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 6.961161000000011,
+            "wallSeconds": 2.42178129311651
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.2483300000000455,
+            "wallSeconds": 0.9472005417337641
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.12690299999999866,
+            "wallSeconds": 0.07313816668465734
+          }
+        }
+      ],
+      "wavSHA256": [
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d"
+      ]
+    },
+    {
+      "revision": "baseline",
+      "report": {
+        "chunks": [
+          "She rested her hand against the door. For a moment, she could almost hear his voice again.",
+          "It was the small things she remembered: the way he folded the newspaper,",
+          "the sound of his keys on the table, and the cup he always left beside the window.",
+          "She waited. Nobody came."
+        ],
+        "complete": true,
+        "loadSeconds": 0.1051830833312124,
+        "machine": "arm64",
+        "operatingSystem": "Version 27.0.1 (Build 26A434)",
+        "request": {
+          "backend": "coreml-cpu",
+          "language": "en",
+          "repetitions": 3,
+          "seed": 42,
+          "steps": 4,
+          "style": "calm",
+          "temperature": 0.3,
+          "text": "She rested her hand against the door. For a moment, she could almost hear his voice again. It was the small things she remembered: the way he folded the newspaper, the sound of his keys on the table, and the cup he always left beside the window. She waited. Nobody came.",
+          "voiceID": "pocket-caro_davy-en-v1"
+        },
+        "rows": [
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": true,
+            "firstAudioSeconds": 0.06821545830462128,
+            "iteration": 0,
+            "peakPhysicalFootprintBytes": 96683664,
+            "realTimeFactor": 5.3364439043168135,
+            "renderSeconds": 4.152578083332628,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.03623258334118873,
+            "iteration": 1,
+            "peakPhysicalFootprintBytes": 126895784,
+            "realTimeFactor": 5.304468397241896,
+            "renderSeconds": 4.177609958336689,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.03474012506194413,
+            "iteration": 2,
+            "peakPhysicalFootprintBytes": 155879104,
+            "realTimeFactor": 5.197934184772838,
+            "renderSeconds": 4.263232124969363,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          },
+          {
+            "audioSeconds": 22.16,
+            "coldGeneration": false,
+            "firstAudioSeconds": 0.03474487492348999,
+            "iteration": 3,
+            "peakPhysicalFootprintBytes": 186009304,
+            "realTimeFactor": 5.344876433415113,
+            "renderSeconds": 4.146026624948718,
+            "samples": 531840,
+            "thermalEnd": 1,
+            "thermalStart": 1
+          }
+        ],
+        "runtime": "pocket-coreml-28770c06-v1:fp32:tanh:quality4:adaptive:warm12:eos6",
+        "tokenCounts": [
+          24,
+          22,
+          23,
+          8
+        ]
+      },
+      "stages": [
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.3745299999999956,
+            "wallSeconds": 0.6692733333911747
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 6.885508999999992,
+            "wallSeconds": 2.351207541534677
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.263520000000005,
+            "wallSeconds": 0.9634910407476127
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.17187899999999992,
+            "wallSeconds": 0.08601670828647912
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.38455200000001,
+            "wallSeconds": 0.6758408743189648
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 6.8482140000000555,
+            "wallSeconds": 2.396340500563383
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.2580480000000112,
+            "wallSeconds": 0.9606927486602217
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.12736999999999554,
+            "wallSeconds": 0.07341387507040054
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.389018000000032,
+            "wallSeconds": 0.6929701677290723
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 6.777510999999976,
+            "wallSeconds": 2.456538790371269
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.2661069999999839,
+            "wallSeconds": 0.9694264587014914
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.1271599999999964,
+            "wallSeconds": 0.07352762506343424
+          }
+        },
+        {
+          "flow": {
+            "calls": 281,
+            "cpuSeconds": 2.336853000000062,
+            "wallSeconds": 0.6627335833618417
+          },
+          "latent": {
+            "calls": 284,
+            "cpuSeconds": 6.570595999999952,
+            "wallSeconds": 2.4020019174786285
+          },
+          "mimi": {
+            "calls": 313,
+            "cpuSeconds": 1.2382929999999988,
+            "wallSeconds": 0.9403373748064041
+          },
+          "text": {
+            "calls": 4,
+            "cpuSeconds": 0.12332500000000124,
+            "wallSeconds": 0.07137345836963505
+          }
+        }
+      ],
+      "wavSHA256": [
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+        "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d"
+      ]
+    }
+  ],
+  "os": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+  "limitations": [
+    "Shared Mac; descriptive repeated measurements",
+    "External prepared model directory, shared assets verified on load; installed-pack cold startup is measured separately",
+    "Three warmed repetitions per process; sampled footprint, not allocation high-water"
+  ],
+  "binarySHA256": {
+    "baseline": "52cc0c3f5aa8785d2123317d28610071c6b087022c1e1d3b1aedde7f7925f9cf",
+    "candidate": "17daf6fc98ca54a22751218c6aae061d4ea4bd09f2efe57b9fe2488ffce37e72"
+  }
+}

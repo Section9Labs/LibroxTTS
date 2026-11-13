@@ -1,0 +1,28 @@
+{
+  "exact": true,
+  "baselineSeconds": 0.012954041652847081,
+  "candidateSeconds": 0.013511541648767889,
+  "speedup": 0.9587389795766462,
+  "runs": [
+    {
+      "seconds": 0.013113958295434713,
+      "sha256": "64f01a9f0507ff2ed2a7a5c9340ab6ae908721d276063840430e06b957b9748c",
+      "revision": "baseline"
+    },
+    {
+      "seconds": 0.014212666661478579,
+      "sha256": "64f01a9f0507ff2ed2a7a5c9340ab6ae908721d276063840430e06b957b9748c",
+      "revision": "candidate"
+    },
+    {
+      "seconds": 0.012810416636057198,
+      "sha256": "64f01a9f0507ff2ed2a7a5c9340ab6ae908721d276063840430e06b957b9748c",
+      "revision": "candidate"
+    },
+    {
+      "seconds": 0.01279412501025945,
+      "sha256": "64f01a9f0507ff2ed2a7a5c9340ab6ae908721d276063840430e06b957b9748c",
+      "revision": "baseline"
+    }
+  ]
+}

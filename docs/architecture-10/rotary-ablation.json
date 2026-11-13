@@ -1,0 +1,58 @@
+[
+  {
+    "candidate" : false,
+    "device" : "Device(cpu, 0)",
+    "layers" : 6,
+    "positions" : 64,
+    "seconds" : 0.038911916664801538
+  },
+  {
+    "candidate" : true,
+    "device" : "Device(cpu, 0)",
+    "layers" : 6,
+    "positions" : 64,
+    "seconds" : 0.028039791621267796
+  },
+  {
+    "candidate" : true,
+    "device" : "Device(cpu, 0)",
+    "layers" : 6,
+    "positions" : 64,
+    "seconds" : 0.029162833234295249
+  },
+  {
+    "candidate" : false,
+    "device" : "Device(cpu, 0)",
+    "layers" : 6,
+    "positions" : 64,
+    "seconds" : 0.03664770838804543
+  },
+  {
+    "candidate" : false,
+    "device" : "Device(gpu, 0)",
+    "layers" : 6,
+    "positions" : 64,
+    "seconds" : 4.5411232082406059
+  },
+  {
+    "candidate" : true,
+    "device" : "Device(gpu, 0)",
+    "layers" : 6,
+    "positions" : 64,
+    "seconds" : 3.5884264583000913
+  },
+  {
+    "candidate" : true,
+    "device" : "Device(gpu, 0)",
+    "layers" : 6,
+    "positions" : 64,
+    "seconds" : 4.2320458333706483
+  },
+  {
+    "candidate" : false,
+    "device" : "Device(gpu, 0)",
+    "layers" : 6,
+    "positions" : 64,
+    "seconds" : 5.4815902083646506
+  }
+]

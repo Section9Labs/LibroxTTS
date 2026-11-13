@@ -1,0 +1,2302 @@
+{
+  "complete": true,
+  "exactPCMAndEvents": true,
+  "runs": [
+    {
+      "backend": "coreml",
+      "revision": "baseline",
+      "rows": [
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 1.53646879165899,
+          "name": "pocket-en-0-steps1",
+          "samples": 44160,
+          "seconds": 1.8146573333651759,
+          "sha256": "e0bafef9032b0b39a44dec3701424f58996d4d9c7bde706624b921e55a392a5d"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.028466666641179472,
+          "name": "pocket-en-1-steps2",
+          "samples": 44160,
+          "seconds": 0.32801662501879036,
+          "sha256": "e4deab016d5a29b4bbeb31567b2f07c58f2a1a7a3b656da30849d36617b66df8"
+        },
+        {
+          "events": [
+            {
+              "accepted": 34560,
+              "end": 34560,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.09764241665834561,
+          "name": "pocket-en-10-steps4",
+          "samples": 34560,
+          "seconds": 1.0366349582909606,
+          "sha256": "548195b40ab6fe9b49be84c6e52a8f635dd7d6167113e328e2b4a7eb92e6f200"
+        },
+        {
+          "events": [
+            {
+              "accepted": 163200,
+              "end": 163200,
+              "start": 0,
+              "text": "The door was open. She returned to the house. Nobody was waiting inside."
+            }
+          ],
+          "firstFrameSeconds": 0.09309820830821991,
+          "name": "pocket-en-11-steps4",
+          "samples": 163200,
+          "seconds": 4.102580833307002,
+          "sha256": "cdbe06afe137fd3e6b4f5d6400e91c5d1b77fc57a0144f5f91df9c8f1288ad5a"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.029996750003192574,
+          "name": "pocket-en-2-steps3",
+          "samples": 44160,
+          "seconds": 0.35734295833390206,
+          "sha256": "23ca164e07633553b10e1b82076c2e4369b874880e693d194eac2901dbf64eb2"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.08781670831376687,
+          "name": "pocket-en-3-steps4",
+          "samples": 44160,
+          "seconds": 0.41036783333402127,
+          "sha256": "c515fa6965f8d481550eff3598336fb0ad1a634d13c946fdb40cfd6ef1ad293c"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.0384253750089556,
+          "name": "pocket-en-4-steps5",
+          "samples": 44160,
+          "seconds": 0.3974380833096802,
+          "sha256": "b99787914ca64fd142e6aaf3de48f7350f7dfb531505609bcc4a714055670274"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.031099291634745896,
+          "name": "pocket-en-5-steps6",
+          "samples": 44160,
+          "seconds": 0.48809695831732824,
+          "sha256": "15dcbcba1c3ef3647644530d2d01d6d43f5815173db4e899e666bf72915fa6f2"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.049387625011149794,
+          "name": "pocket-en-6-steps7",
+          "samples": 44160,
+          "seconds": 0.5298741667065769,
+          "sha256": "ae27bac5beebfefd4d3e595502de6ee3078e9271c5059ce9016acb10a905768b"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.39718120836187154,
+          "name": "pocket-en-7-steps8",
+          "samples": 44160,
+          "seconds": 1.0139665000024252,
+          "sha256": "42f860b46efcc0067b728da77b55f00587f74c9256298791f4a570e0a56746ae"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.053993624984286726,
+          "name": "pocket-en-8-steps2",
+          "samples": 44160,
+          "seconds": 0.45668745832517743,
+          "sha256": "e4deab016d5a29b4bbeb31567b2f07c58f2a1a7a3b656da30849d36617b66df8"
+        },
+        {
+          "events": [
+            {
+              "accepted": 42240,
+              "end": 42240,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.051506125018931925,
+          "name": "pocket-en-9-steps4",
+          "samples": 42240,
+          "seconds": 0.9150921250111423,
+          "sha256": "a67d1420455faf513375439e831887377b53c370058994b6f2ba65b6c5c0daa3"
+        },
+        {
+          "events": [],
+          "firstFrameSeconds": 0,
+          "name": "pocket-en-recovered",
+          "samples": 44160,
+          "seconds": 2.9536180833820254,
+          "sha256": "c515fa6965f8d481550eff3598336fb0ad1a634d13c946fdb40cfd6ef1ad293c"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 2.091911625000648,
+          "name": "pocket-es-0-steps1",
+          "samples": 55680,
+          "seconds": 3.2204852083232254,
+          "sha256": "27b4bfb93328b622a38b48cf395b6a2e871b084ce405a80880a94cb6d3693133"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.07334458333207294,
+          "name": "pocket-es-1-steps2",
+          "samples": 55680,
+          "seconds": 1.5134645000216551,
+          "sha256": "25e41496606aba63d861ff50050c38119e8f2731a46eb293cc7b43d9e33d39bf"
+        },
+        {
+          "events": [
+            {
+              "accepted": 53760,
+              "end": 53760,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.029673041659407318,
+          "name": "pocket-es-10-steps4",
+          "samples": 53760,
+          "seconds": 0.6291937083005905,
+          "sha256": "1e037fb2c67931b257ba51eb904b9c88bd7e136978c05df0e64b3c044c595ba7"
+        },
+        {
+          "events": [
+            {
+              "accepted": 159360,
+              "end": 159360,
+              "start": 0,
+              "text": "La puerta estaba abierta. Ella volvi\u00f3 a la casa. Nadie la esperaba dentro."
+            }
+          ],
+          "firstFrameSeconds": 0.0559319166932255,
+          "name": "pocket-es-11-steps4",
+          "samples": 159360,
+          "seconds": 2.5137987916823477,
+          "sha256": "d63ce42522a1dd61e8af22f110a3e3e65f2a9e8a7367b42dd2005e43ce5e1a0d"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.11171520833158866,
+          "name": "pocket-es-2-steps3",
+          "samples": 55680,
+          "seconds": 1.2001861250028014,
+          "sha256": "05389dc8acdb92e7e9c7e371736a3fe8a50489e75e03d5b650f84a2cbb1c2ba9"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.18528575001982972,
+          "name": "pocket-es-3-steps4",
+          "samples": 55680,
+          "seconds": 1.6098746249917895,
+          "sha256": "83a6a9f533394bec5348ea4c8288e6c7be681f34853e05c121b30892ef625644"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.15518275002250448,
+          "name": "pocket-es-4-steps5",
+          "samples": 55680,
+          "seconds": 1.7226035833591595,
+          "sha256": "78a3c8ef905900390b75a083650f8950a160fee2fb859445fb4e9f2538711505"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.10179225000320002,
+          "name": "pocket-es-5-steps6",
+          "samples": 55680,
+          "seconds": 1.7616022083675489,
+          "sha256": "a895d5be24f071b5f42a9d888962abcee02029a17f00e441408f90f0f32946ef"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.10889650002354756,
+          "name": "pocket-es-6-steps7",
+          "samples": 55680,
+          "seconds": 1.9004239166970365,
+          "sha256": "354cab63aaea63a4b3353efd79ca5282a873f321b45f23a4356d46350be9c270"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.38580729166278616,
+          "name": "pocket-es-7-steps8",
+          "samples": 55680,
+          "seconds": 1.5023591666831635,
+          "sha256": "b97e17b3a089f7aaf0aee8b7fc9d0377aeafab2bb43ad7a884d1a62c24ebd5da"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.0684052916476503,
+          "name": "pocket-es-8-steps2",
+          "samples": 55680,
+          "seconds": 0.6409540000022389,
+          "sha256": "25e41496606aba63d861ff50050c38119e8f2731a46eb293cc7b43d9e33d39bf"
+        },
+        {
+          "events": [
+            {
+              "accepted": 51840,
+              "end": 51840,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.033340124995447695,
+          "name": "pocket-es-9-steps4",
+          "samples": 51840,
+          "seconds": 0.5363508333684877,
+          "sha256": "521382fc56f86d34eb9677ba656578c013e8d1489182be9e73838f21d0b038e2"
+        },
+        {
+          "events": [],
+          "firstFrameSeconds": 0,
+          "name": "pocket-es-recovered",
+          "samples": 55680,
+          "seconds": 1.5828058333718218,
+          "sha256": "83a6a9f533394bec5348ea4c8288e6c7be681f34853e05c121b30892ef625644"
+        }
+      ]
+    },
+    {
+      "backend": "coreml",
+      "revision": "candidate",
+      "rows": [
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.8203548750607297,
+          "name": "pocket-en-0-steps1",
+          "samples": 44160,
+          "seconds": 1.09466337505728,
+          "sha256": "e0bafef9032b0b39a44dec3701424f58996d4d9c7bde706624b921e55a392a5d"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.02844229165930301,
+          "name": "pocket-en-1-steps2",
+          "samples": 44160,
+          "seconds": 0.30497333325911313,
+          "sha256": "e4deab016d5a29b4bbeb31567b2f07c58f2a1a7a3b656da30849d36617b66df8"
+        },
+        {
+          "events": [
+            {
+              "accepted": 34560,
+              "end": 34560,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.02562804170884192,
+          "name": "pocket-en-10-steps4",
+          "samples": 34560,
+          "seconds": 0.2598635000176728,
+          "sha256": "548195b40ab6fe9b49be84c6e52a8f635dd7d6167113e328e2b4a7eb92e6f200"
+        },
+        {
+          "events": [
+            {
+              "accepted": 163200,
+              "end": 163200,
+              "start": 0,
+              "text": "The door was open. She returned to the house. Nobody was waiting inside."
+            }
+          ],
+          "firstFrameSeconds": 0.034707083366811275,
+          "name": "pocket-en-11-steps4",
+          "samples": 163200,
+          "seconds": 1.1797962500713766,
+          "sha256": "cdbe06afe137fd3e6b4f5d6400e91c5d1b77fc57a0144f5f91df9c8f1288ad5a"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.029284166637808084,
+          "name": "pocket-en-2-steps3",
+          "samples": 44160,
+          "seconds": 0.3206581666599959,
+          "sha256": "23ca164e07633553b10e1b82076c2e4369b874880e693d194eac2901dbf64eb2"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.15909058332908899,
+          "name": "pocket-en-3-steps4",
+          "samples": 44160,
+          "seconds": 0.46367829164955765,
+          "sha256": "c515fa6965f8d481550eff3598336fb0ad1a634d13c946fdb40cfd6ef1ad293c"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.029235583264380693,
+          "name": "pocket-en-4-steps5",
+          "samples": 44160,
+          "seconds": 0.35626191657502204,
+          "sha256": "b99787914ca64fd142e6aaf3de48f7350f7dfb531505609bcc4a714055670274"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.031022291630506516,
+          "name": "pocket-en-5-steps6",
+          "samples": 44160,
+          "seconds": 0.37488645827397704,
+          "sha256": "15dcbcba1c3ef3647644530d2d01d6d43f5815173db4e899e666bf72915fa6f2"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.0312133333645761,
+          "name": "pocket-en-6-steps7",
+          "samples": 44160,
+          "seconds": 0.3922890833346173,
+          "sha256": "ae27bac5beebfefd4d3e595502de6ee3078e9271c5059ce9016acb10a905768b"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.13491437502671033,
+          "name": "pocket-en-7-steps8",
+          "samples": 44160,
+          "seconds": 0.4879777916939929,
+          "sha256": "42f860b46efcc0067b728da77b55f00587f74c9256298791f4a570e0a56746ae"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.027482041739858687,
+          "name": "pocket-en-8-steps2",
+          "samples": 44160,
+          "seconds": 0.30763108341488987,
+          "sha256": "e4deab016d5a29b4bbeb31567b2f07c58f2a1a7a3b656da30849d36617b66df8"
+        },
+        {
+          "events": [
+            {
+              "accepted": 42240,
+              "end": 42240,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.025124708306975663,
+          "name": "pocket-en-9-steps4",
+          "samples": 42240,
+          "seconds": 0.3197891250019893,
+          "sha256": "a67d1420455faf513375439e831887377b53c370058994b6f2ba65b6c5c0daa3"
+        },
+        {
+          "events": [],
+          "firstFrameSeconds": 0,
+          "name": "pocket-en-recovered",
+          "samples": 44160,
+          "seconds": 0.7084049583645537,
+          "sha256": "c515fa6965f8d481550eff3598336fb0ad1a634d13c946fdb40cfd6ef1ad293c"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.7727279582759365,
+          "name": "pocket-es-0-steps1",
+          "samples": 55680,
+          "seconds": 1.1162960833171383,
+          "sha256": "27b4bfb93328b622a38b48cf395b6a2e871b084ce405a80880a94cb6d3693133"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.027920624939724803,
+          "name": "pocket-es-1-steps2",
+          "samples": 55680,
+          "seconds": 0.3868002915987745,
+          "sha256": "25e41496606aba63d861ff50050c38119e8f2731a46eb293cc7b43d9e33d39bf"
+        },
+        {
+          "events": [
+            {
+              "accepted": 53760,
+              "end": 53760,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.03056208335328847,
+          "name": "pocket-es-10-steps4",
+          "samples": 53760,
+          "seconds": 0.4201672082999721,
+          "sha256": "1e037fb2c67931b257ba51eb904b9c88bd7e136978c05df0e64b3c044c595ba7"
+        },
+        {
+          "events": [
+            {
+              "accepted": 159360,
+              "end": 159360,
+              "start": 0,
+              "text": "La puerta estaba abierta. Ella volvi\u00f3 a la casa. Nadie la esperaba dentro."
+            }
+          ],
+          "firstFrameSeconds": 0.03721583331935108,
+          "name": "pocket-es-11-steps4",
+          "samples": 159360,
+          "seconds": 1.213722583372146,
+          "sha256": "d63ce42522a1dd61e8af22f110a3e3e65f2a9e8a7367b42dd2005e43ce5e1a0d"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.02974695828743279,
+          "name": "pocket-es-2-steps3",
+          "samples": 55680,
+          "seconds": 0.39995233330409974,
+          "sha256": "05389dc8acdb92e7e9c7e371736a3fe8a50489e75e03d5b650f84a2cbb1c2ba9"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.05884079169481993,
+          "name": "pocket-es-3-steps4",
+          "samples": 55680,
+          "seconds": 0.4392037499928847,
+          "sha256": "83a6a9f533394bec5348ea4c8288e6c7be681f34853e05c121b30892ef625644"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.03055112494621426,
+          "name": "pocket-es-4-steps5",
+          "samples": 55680,
+          "seconds": 0.4464860833249986,
+          "sha256": "78a3c8ef905900390b75a083650f8950a160fee2fb859445fb4e9f2538711505"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.030461958376690745,
+          "name": "pocket-es-5-steps6",
+          "samples": 55680,
+          "seconds": 0.45746604166924953,
+          "sha256": "a895d5be24f071b5f42a9d888962abcee02029a17f00e441408f90f0f32946ef"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.03223050001543015,
+          "name": "pocket-es-6-steps7",
+          "samples": 55680,
+          "seconds": 0.4867811667500064,
+          "sha256": "354cab63aaea63a4b3353efd79ca5282a873f321b45f23a4356d46350be9c270"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.08001262496691197,
+          "name": "pocket-es-7-steps8",
+          "samples": 55680,
+          "seconds": 0.522011874942109,
+          "sha256": "b97e17b3a089f7aaf0aee8b7fc9d0377aeafab2bb43ad7a884d1a62c24ebd5da"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.02740883338265121,
+          "name": "pocket-es-8-steps2",
+          "samples": 55680,
+          "seconds": 0.37657758337445557,
+          "sha256": "25e41496606aba63d861ff50050c38119e8f2731a46eb293cc7b43d9e33d39bf"
+        },
+        {
+          "events": [
+            {
+              "accepted": 51840,
+              "end": 51840,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.026100374991074204,
+          "name": "pocket-es-9-steps4",
+          "samples": 51840,
+          "seconds": 0.39245266665238887,
+          "sha256": "521382fc56f86d34eb9677ba656578c013e8d1489182be9e73838f21d0b038e2"
+        },
+        {
+          "events": [],
+          "firstFrameSeconds": 0,
+          "name": "pocket-es-recovered",
+          "samples": 55680,
+          "seconds": 0.8056148332543671,
+          "sha256": "83a6a9f533394bec5348ea4c8288e6c7be681f34853e05c121b30892ef625644"
+        }
+      ]
+    },
+    {
+      "backend": "cpu",
+      "revision": "baseline",
+      "rows": [
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.49369995831511915,
+          "name": "pocket-en-0-steps1",
+          "samples": 44160,
+          "seconds": 3.3301440000068396,
+          "sha256": "951b21c60b91b52f20a62ad24c9b24a8441411930f94ec44ce09ae5397e46ef5"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.23859216668643057,
+          "name": "pocket-en-1-steps2",
+          "samples": 44160,
+          "seconds": 3.029464583378285,
+          "sha256": "15da8272cf946a76d88c6376f53e0969cfbbe4c263c9c6c9aff2f68b50b38b45"
+        },
+        {
+          "events": [
+            {
+              "accepted": 34560,
+              "end": 34560,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.28781241667456925,
+          "name": "pocket-en-10-steps4",
+          "samples": 34560,
+          "seconds": 3.0084932083263993,
+          "sha256": "18d46d29c975ca923a0685bfd9f2ae9b7e5f64951964212cf92cc062b98bef38"
+        },
+        {
+          "events": [
+            {
+              "accepted": 163200,
+              "end": 163200,
+              "start": 0,
+              "text": "The door was open. She returned to the house. Nobody was waiting inside."
+            }
+          ],
+          "firstFrameSeconds": 0.27303512499202043,
+          "name": "pocket-en-11-steps4",
+          "samples": 163200,
+          "seconds": 16.02260454162024,
+          "sha256": "f11f7440bad9b5ceffbf8d261a62687ce4f4a51c807fd5102689b2ca76686f84"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.23585237498627976,
+          "name": "pocket-en-2-steps3",
+          "samples": 44160,
+          "seconds": 3.1198367499746382,
+          "sha256": "3d11502a07296335698050930a04cb5fa44380a524e05b7e04ed447cf8c1c46f"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.19486724998569116,
+          "name": "pocket-en-3-steps4",
+          "samples": 44160,
+          "seconds": 2.9697938333265483,
+          "sha256": "ee938e07ce040742d7b2ace0b858b6323ac5af52133f84ab6c539b832bf9daa8"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.15084883337840438,
+          "name": "pocket-en-4-steps5",
+          "samples": 44160,
+          "seconds": 3.2412360417074524,
+          "sha256": "310b72881a384f6787c2d03405ef3a222ed387a62d6f95e41680657c1f5040f9"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.20166279166005552,
+          "name": "pocket-en-5-steps6",
+          "samples": 44160,
+          "seconds": 3.8641794999712147,
+          "sha256": "82c5795a76514703cf52fa88a4bc5ada87922ebbb9c7b9b044a935c55a8d045c"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.18280595837859437,
+          "name": "pocket-en-6-steps7",
+          "samples": 44160,
+          "seconds": 3.485798291687388,
+          "sha256": "05a347ab433f334679d18ac44b877b699677a1e0f94f67cfba46b259fb63001f"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.16231912502553314,
+          "name": "pocket-en-7-steps8",
+          "samples": 44160,
+          "seconds": 3.7510006250231527,
+          "sha256": "707f7dd50027ab4a876967658107bed9fd4b04bbca38cc9b2f2f997d639cc49e"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.26522870833287016,
+          "name": "pocket-en-8-steps2",
+          "samples": 44160,
+          "seconds": 3.4873332499992102,
+          "sha256": "15da8272cf946a76d88c6376f53e0969cfbbe4c263c9c6c9aff2f68b50b38b45"
+        },
+        {
+          "events": [
+            {
+              "accepted": 42240,
+              "end": 42240,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.17704054166097194,
+          "name": "pocket-en-9-steps4",
+          "samples": 42240,
+          "seconds": 2.9585622916347347,
+          "sha256": "e70f42ecde64304727ecb929089902eb147a64b331390accf1d79b611fecfd53"
+        },
+        {
+          "events": [],
+          "firstFrameSeconds": 0,
+          "name": "pocket-en-recovered",
+          "samples": 44160,
+          "seconds": 4.68287379166577,
+          "sha256": "ada0553dac3aca964c019f255fcc02dc4a440c65c8e529b9e636466fc3877ef7"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.8084068750031292,
+          "name": "pocket-es-0-steps1",
+          "samples": 55680,
+          "seconds": 5.227116791647859,
+          "sha256": "fb061bc0bf06745885a04c2957b05c0638bead7ddd3633f82074488c964dd448"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.17652929166797549,
+          "name": "pocket-es-1-steps2",
+          "samples": 55680,
+          "seconds": 4.795956333342474,
+          "sha256": "6e3bee09ec63052f9d6f51a10595b64da5c3e74e5d6918918b554f8b6ae9be64"
+        },
+        {
+          "events": [
+            {
+              "accepted": 53760,
+              "end": 53760,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.33286887500435114,
+          "name": "pocket-es-10-steps4",
+          "samples": 53760,
+          "seconds": 3.9827091250335798,
+          "sha256": "8ac238bbafe70158b0476c1ab63de00fc4a50db2e9146c7f77bd9c37093230bf"
+        },
+        {
+          "events": [
+            {
+              "accepted": 159360,
+              "end": 159360,
+              "start": 0,
+              "text": "La puerta estaba abierta. Ella volvi\u00f3 a la casa. Nadie la esperaba dentro."
+            }
+          ],
+          "firstFrameSeconds": 0.5839225417003036,
+          "name": "pocket-es-11-steps4",
+          "samples": 159360,
+          "seconds": 12.415104833373334,
+          "sha256": "fcf78af4f334b1791e7b667fd0e4c69ee74034dbe3dc41ab3591050ce1e0b3fc"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.1871194583363831,
+          "name": "pocket-es-2-steps3",
+          "samples": 55680,
+          "seconds": 4.676463000010699,
+          "sha256": "5f20d6f1cc84b0a3c77fb2b634de7cfd684f9aaf06005e0ca82b37e681c51547"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.2784518332919106,
+          "name": "pocket-es-3-steps4",
+          "samples": 55680,
+          "seconds": 4.783754416625015,
+          "sha256": "56930fa96f7778549bfc5ba107603ef59b61cc4632f3f2546cfb7a91e46f03a3"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.15867691667517647,
+          "name": "pocket-es-4-steps5",
+          "samples": 55680,
+          "seconds": 4.919398041674867,
+          "sha256": "48ed603c16e3a154ea66d44a5b4b0236eb6aa033cd16db1c9d8ad0215ebb4c00"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.21985620830673724,
+          "name": "pocket-es-5-steps6",
+          "samples": 55680,
+          "seconds": 5.852023583312985,
+          "sha256": "f915735c76a9f70a838d9f776b35b244f44823f8cfa70a156bb647774d45a30f"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.24537512502865866,
+          "name": "pocket-es-6-steps7",
+          "samples": 55680,
+          "seconds": 5.693328958353959,
+          "sha256": "68d2f81a416b9c2b1d74920b06172c11f2d348ecf7dec6a82cef7621274ab2f9"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.2514064583228901,
+          "name": "pocket-es-7-steps8",
+          "samples": 55680,
+          "seconds": 5.779669833311345,
+          "sha256": "5c8eed33871c7eca19a364931600a92bcbb4da4a117ac27a88ac1782887d067a"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.2242919999989681,
+          "name": "pocket-es-8-steps2",
+          "samples": 55680,
+          "seconds": 5.905148374964483,
+          "sha256": "6e3bee09ec63052f9d6f51a10595b64da5c3e74e5d6918918b554f8b6ae9be64"
+        },
+        {
+          "events": [
+            {
+              "accepted": 51840,
+              "end": 51840,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.18130862497491762,
+          "name": "pocket-es-9-steps4",
+          "samples": 51840,
+          "seconds": 3.846225791668985,
+          "sha256": "7ccdee22dddd9c9def41a5851083572adb7f90aa6f7461e19c4da7df7f249587"
+        },
+        {
+          "events": [],
+          "firstFrameSeconds": 0,
+          "name": "pocket-es-recovered",
+          "samples": 57600,
+          "seconds": 5.319948583375663,
+          "sha256": "7b9ce8601457220374168ece088e3fec6913f9b4ad2bb6679a8c57ff90958452"
+        }
+      ]
+    },
+    {
+      "backend": "cpu",
+      "revision": "candidate",
+      "rows": [
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.43543020833749324,
+          "name": "pocket-en-0-steps1",
+          "samples": 44160,
+          "seconds": 2.8953774999827147,
+          "sha256": "951b21c60b91b52f20a62ad24c9b24a8441411930f94ec44ce09ae5397e46ef5"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.13880670838989317,
+          "name": "pocket-en-1-steps2",
+          "samples": 44160,
+          "seconds": 2.5768545833416283,
+          "sha256": "15da8272cf946a76d88c6376f53e0969cfbbe4c263c9c6c9aff2f68b50b38b45"
+        },
+        {
+          "events": [
+            {
+              "accepted": 34560,
+              "end": 34560,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.1342285833088681,
+          "name": "pocket-en-10-steps4",
+          "samples": 34560,
+          "seconds": 2.0562625833554193,
+          "sha256": "18d46d29c975ca923a0685bfd9f2ae9b7e5f64951964212cf92cc062b98bef38"
+        },
+        {
+          "events": [
+            {
+              "accepted": 163200,
+              "end": 163200,
+              "start": 0,
+              "text": "The door was open. She returned to the house. Nobody was waiting inside."
+            }
+          ],
+          "firstFrameSeconds": 0.1405687916558236,
+          "name": "pocket-en-11-steps4",
+          "samples": 163200,
+          "seconds": 9.79475520842243,
+          "sha256": "f11f7440bad9b5ceffbf8d261a62687ce4f4a51c807fd5102689b2ca76686f84"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.13836037495639175,
+          "name": "pocket-en-2-steps3",
+          "samples": 44160,
+          "seconds": 2.625706125050783,
+          "sha256": "3d11502a07296335698050930a04cb5fa44380a524e05b7e04ed447cf8c1c46f"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.14210037502925843,
+          "name": "pocket-en-3-steps4",
+          "samples": 44160,
+          "seconds": 2.6631049999268726,
+          "sha256": "ee938e07ce040742d7b2ace0b858b6323ac5af52133f84ab6c539b832bf9daa8"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.14236912492197007,
+          "name": "pocket-en-4-steps5",
+          "samples": 44160,
+          "seconds": 2.668565291678533,
+          "sha256": "310b72881a384f6787c2d03405ef3a222ed387a62d6f95e41680657c1f5040f9"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.14059445832390338,
+          "name": "pocket-en-5-steps6",
+          "samples": 44160,
+          "seconds": 2.6970881667220965,
+          "sha256": "82c5795a76514703cf52fa88a4bc5ada87922ebbb9c7b9b044a935c55a8d045c"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.14421158330515027,
+          "name": "pocket-en-6-steps7",
+          "samples": 44160,
+          "seconds": 2.73287016665563,
+          "sha256": "05a347ab433f334679d18ac44b877b699677a1e0f94f67cfba46b259fb63001f"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.14429574995301664,
+          "name": "pocket-en-7-steps8",
+          "samples": 44160,
+          "seconds": 2.743759874952957,
+          "sha256": "707f7dd50027ab4a876967658107bed9fd4b04bbca38cc9b2f2f997d639cc49e"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.1336212083697319,
+          "name": "pocket-en-8-steps2",
+          "samples": 44160,
+          "seconds": 2.5363666666671634,
+          "sha256": "15da8272cf946a76d88c6376f53e0969cfbbe4c263c9c6c9aff2f68b50b38b45"
+        },
+        {
+          "events": [
+            {
+              "accepted": 42240,
+              "end": 42240,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.13567562494426966,
+          "name": "pocket-en-9-steps4",
+          "samples": 42240,
+          "seconds": 2.475607833242975,
+          "sha256": "e70f42ecde64304727ecb929089902eb147a64b331390accf1d79b611fecfd53"
+        },
+        {
+          "events": [],
+          "firstFrameSeconds": 0,
+          "name": "pocket-en-recovered",
+          "samples": 44160,
+          "seconds": 2.8743217500159517,
+          "sha256": "ada0553dac3aca964c019f255fcc02dc4a440c65c8e529b9e636466fc3877ef7"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.3857555000577122,
+          "name": "pocket-es-0-steps1",
+          "samples": 55680,
+          "seconds": 3.3842044583288953,
+          "sha256": "fb061bc0bf06745885a04c2957b05c0638bead7ddd3633f82074488c964dd448"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.13334766670595855,
+          "name": "pocket-es-1-steps2",
+          "samples": 55680,
+          "seconds": 3.1593116666190326,
+          "sha256": "6e3bee09ec63052f9d6f51a10595b64da5c3e74e5d6918918b554f8b6ae9be64"
+        },
+        {
+          "events": [
+            {
+              "accepted": 53760,
+              "end": 53760,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.14013924996834248,
+          "name": "pocket-es-10-steps4",
+          "samples": 53760,
+          "seconds": 3.269800000009127,
+          "sha256": "8ac238bbafe70158b0476c1ab63de00fc4a50db2e9146c7f77bd9c37093230bf"
+        },
+        {
+          "events": [
+            {
+              "accepted": 159360,
+              "end": 159360,
+              "start": 0,
+              "text": "La puerta estaba abierta. Ella volvi\u00f3 a la casa. Nadie la esperaba dentro."
+            }
+          ],
+          "firstFrameSeconds": 0.1372780833626166,
+          "name": "pocket-es-11-steps4",
+          "samples": 159360,
+          "seconds": 9.62510741665028,
+          "sha256": "fcf78af4f334b1791e7b667fd0e4c69ee74034dbe3dc41ab3591050ce1e0b3fc"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.13752504158765078,
+          "name": "pocket-es-2-steps3",
+          "samples": 55680,
+          "seconds": 3.2203475416172296,
+          "sha256": "5f20d6f1cc84b0a3c77fb2b634de7cfd684f9aaf06005e0ca82b37e681c51547"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.1349543333053589,
+          "name": "pocket-es-3-steps4",
+          "samples": 55680,
+          "seconds": 3.238366208272055,
+          "sha256": "56930fa96f7778549bfc5ba107603ef59b61cc4632f3f2546cfb7a91e46f03a3"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.13618662499357015,
+          "name": "pocket-es-4-steps5",
+          "samples": 55680,
+          "seconds": 3.254820541595109,
+          "sha256": "48ed603c16e3a154ea66d44a5b4b0236eb6aa033cd16db1c9d8ad0215ebb4c00"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.14007883332669735,
+          "name": "pocket-es-5-steps6",
+          "samples": 55680,
+          "seconds": 3.343969958368689,
+          "sha256": "f915735c76a9f70a838d9f776b35b244f44823f8cfa70a156bb647774d45a30f"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.14564424997661263,
+          "name": "pocket-es-6-steps7",
+          "samples": 55680,
+          "seconds": 3.407933249953203,
+          "sha256": "68d2f81a416b9c2b1d74920b06172c11f2d348ecf7dec6a82cef7621274ab2f9"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.15232570841908455,
+          "name": "pocket-es-7-steps8",
+          "samples": 55680,
+          "seconds": 3.431125666713342,
+          "sha256": "5c8eed33871c7eca19a364931600a92bcbb4da4a117ac27a88ac1782887d067a"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.13478633342310786,
+          "name": "pocket-es-8-steps2",
+          "samples": 55680,
+          "seconds": 3.2229217083659023,
+          "sha256": "6e3bee09ec63052f9d6f51a10595b64da5c3e74e5d6918918b554f8b6ae9be64"
+        },
+        {
+          "events": [
+            {
+              "accepted": 51840,
+              "end": 51840,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.13545208342839032,
+          "name": "pocket-es-9-steps4",
+          "samples": 51840,
+          "seconds": 3.097089875023812,
+          "sha256": "7ccdee22dddd9c9def41a5851083572adb7f90aa6f7461e19c4da7df7f249587"
+        },
+        {
+          "events": [],
+          "firstFrameSeconds": 0,
+          "name": "pocket-es-recovered",
+          "samples": 57600,
+          "seconds": 3.6756738749099895,
+          "sha256": "7b9ce8601457220374168ece088e3fec6913f9b4ad2bb6679a8c57ff90958452"
+        }
+      ]
+    },
+    {
+      "backend": "gpu",
+      "revision": "baseline",
+      "rows": [
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 1.070669041655492,
+          "name": "pocket-en-0-steps1",
+          "samples": 44160,
+          "seconds": 4.434219416638371,
+          "sha256": "21add5e9d759687fde6f03e3a589ae9b586caf6ca07682c6b3e9019618e57820"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.29246749996673316,
+          "name": "pocket-en-1-steps2",
+          "samples": 44160,
+          "seconds": 3.8511919582961127,
+          "sha256": "4776706b8f14a9160d9af621b5faef6c412d51a80055fd781134150c1d121e67"
+        },
+        {
+          "events": [
+            {
+              "accepted": 34560,
+              "end": 34560,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.3750879166764207,
+          "name": "pocket-en-10-steps4",
+          "samples": 34560,
+          "seconds": 4.117453166632913,
+          "sha256": "7b25c101210ef8ddc147aafe0926e74143b1b4ce140c10027988ca4653ccfb34"
+        },
+        {
+          "events": [
+            {
+              "accepted": 163200,
+              "end": 163200,
+              "start": 0,
+              "text": "The door was open. She returned to the house. Nobody was waiting inside."
+            }
+          ],
+          "firstFrameSeconds": 0.3328491250285879,
+          "name": "pocket-en-11-steps4",
+          "samples": 163200,
+          "seconds": 16.762727333349176,
+          "sha256": "238d0aac0d49ee856ce9a74a550dbd989b9ce456b96f730ee2e3c369e00ec23b"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.3023107500048354,
+          "name": "pocket-en-2-steps3",
+          "samples": 44160,
+          "seconds": 4.400606333336327,
+          "sha256": "818a8d163fea5fd2a6bc3108da21b914ce9ff3096284570e2c9a5f4f7ddcd283"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.2129984999774024,
+          "name": "pocket-en-3-steps4",
+          "samples": 44160,
+          "seconds": 4.60804916662164,
+          "sha256": "ed2495836551d573c2ff61d8e765cf7ea9efa13c90b89479d29d83cae5ae6ed3"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.285315458313562,
+          "name": "pocket-en-4-steps5",
+          "samples": 44160,
+          "seconds": 4.619808999996167,
+          "sha256": "5bc540c8a6cb70b486b350ff9dd8f1227c8addf0a0b9bf41b91f415689a196b1"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.3471044583711773,
+          "name": "pocket-en-5-steps6",
+          "samples": 44160,
+          "seconds": 5.645728958363179,
+          "sha256": "39d0bfcd839c06ec5656b15d5d6bf2baaba9010dde642b2302258769fd2c1e0a"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.4022252500290051,
+          "name": "pocket-en-6-steps7",
+          "samples": 44160,
+          "seconds": 6.291904125013389,
+          "sha256": "84d34d4554ee75dbcfe50f084135104507c13aba97a5134674eaac58ef4e5c49"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.39861583331367,
+          "name": "pocket-en-7-steps8",
+          "samples": 44160,
+          "seconds": 7.338995250000153,
+          "sha256": "1862730c843f897b007fef51d8058898d95888ce185639d0497c4f8b2a7d758c"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.19707154168281704,
+          "name": "pocket-en-8-steps2",
+          "samples": 44160,
+          "seconds": 3.7571489166584797,
+          "sha256": "4776706b8f14a9160d9af621b5faef6c412d51a80055fd781134150c1d121e67"
+        },
+        {
+          "events": [
+            {
+              "accepted": 42240,
+              "end": 42240,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.23365558334626257,
+          "name": "pocket-en-9-steps4",
+          "samples": 42240,
+          "seconds": 4.756503749988042,
+          "sha256": "eddc806be1e0707278fc8a9a8f5515bf11965bb6f182dc41eb35a151112c8892"
+        },
+        {
+          "events": [],
+          "firstFrameSeconds": 0,
+          "name": "pocket-en-recovered",
+          "samples": 44160,
+          "seconds": 5.615815208293498,
+          "sha256": "7c8a1ea49e16d6773751bb720de1305c2d1c5e1530bd3c8dae16e1475c73621c"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 1.148443291662261,
+          "name": "pocket-es-0-steps1",
+          "samples": 55680,
+          "seconds": 5.512465291656554,
+          "sha256": "acf708b0e4e23bcf9b71b487b1cfaef1239d571662be55c6adc8dedf54046860"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.19774470833363011,
+          "name": "pocket-es-1-steps2",
+          "samples": 55680,
+          "seconds": 5.0196758332895115,
+          "sha256": "586b5add1c9b1ec5ae52ed211275771baec457628094fbe88adae3bc85db24cd"
+        },
+        {
+          "events": [
+            {
+              "accepted": 53760,
+              "end": 53760,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.3879372916999273,
+          "name": "pocket-es-10-steps4",
+          "samples": 53760,
+          "seconds": 8.217481500003487,
+          "sha256": "1ba82b86d0c7eca0fdf1fa65babf2c0c75b97fe70ae95689b69df7bb3df3b65b"
+        },
+        {
+          "events": [
+            {
+              "accepted": 159360,
+              "end": 159360,
+              "start": 0,
+              "text": "La puerta estaba abierta. Ella volvi\u00f3 a la casa. Nadie la esperaba dentro."
+            }
+          ],
+          "firstFrameSeconds": 0.5841491666506045,
+          "name": "pocket-es-11-steps4",
+          "samples": 159360,
+          "seconds": 25.752525333315134,
+          "sha256": "562b2d9049adda2a0fd4e224785bb43075f19aa334a72770316d170dabab0779"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.3130659583257511,
+          "name": "pocket-es-2-steps3",
+          "samples": 55680,
+          "seconds": 6.402818874979857,
+          "sha256": "af7ee62962523f7b5eef414cadb0a4e2ff499038860a72b6f1123f5812bfcca1"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.3426445833174512,
+          "name": "pocket-es-3-steps4",
+          "samples": 55680,
+          "seconds": 7.3231025416753255,
+          "sha256": "33b630e4e7dbf518f801e12fc35958f47e84563eaa87a5ef9fa548f7d0761607"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.3813842083327472,
+          "name": "pocket-es-4-steps5",
+          "samples": 55680,
+          "seconds": 8.977119000046514,
+          "sha256": "84947a3cef78f3edfcb7eda742c8ce32030942fb2dd80132adf3f65158547d8a"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.5280028333654627,
+          "name": "pocket-es-5-steps6",
+          "samples": 55680,
+          "seconds": 10.393281041702721,
+          "sha256": "f95ce8af3547bc53b6000f35fc7a838cc63e0709e1dbd8a5293beb92c64e773d"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.41913391661364585,
+          "name": "pocket-es-6-steps7",
+          "samples": 55680,
+          "seconds": 9.453989624977112,
+          "sha256": "cee7f8ef05e20cb74f11161030001a4d970ca84759a99d2aa1332cec5a22dfa2"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.31922608334571123,
+          "name": "pocket-es-7-steps8",
+          "samples": 55680,
+          "seconds": 10.470749875006732,
+          "sha256": "62c343e96b82d2ad5f2185b4aa3d0c2c43bf5233a0ac98f65558661320598bc8"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.3287865833262913,
+          "name": "pocket-es-8-steps2",
+          "samples": 55680,
+          "seconds": 6.112416791671421,
+          "sha256": "586b5add1c9b1ec5ae52ed211275771baec457628094fbe88adae3bc85db24cd"
+        },
+        {
+          "events": [
+            {
+              "accepted": 51840,
+              "end": 51840,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.4086995833204128,
+          "name": "pocket-es-9-steps4",
+          "samples": 51840,
+          "seconds": 6.687672875006683,
+          "sha256": "965794d524916eb023c32c735929682e6a652ef66a7804865561758c5fcbc8f8"
+        },
+        {
+          "events": [],
+          "firstFrameSeconds": 0,
+          "name": "pocket-es-recovered",
+          "samples": 57600,
+          "seconds": 10.400215083325747,
+          "sha256": "548cf2eb4e5f8afe3b3166c8cfb6a651f2559674b03824d5b0563187c680a540"
+        }
+      ]
+    },
+    {
+      "backend": "gpu",
+      "revision": "candidate",
+      "rows": [
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 2.1344546667532995,
+          "name": "pocket-en-0-steps1",
+          "samples": 44160,
+          "seconds": 6.725561166647822,
+          "sha256": "21add5e9d759687fde6f03e3a589ae9b586caf6ca07682c6b3e9019618e57820"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.4058759167091921,
+          "name": "pocket-en-1-steps2",
+          "samples": 44160,
+          "seconds": 5.7208015833748505,
+          "sha256": "4776706b8f14a9160d9af621b5faef6c412d51a80055fd781134150c1d121e67"
+        },
+        {
+          "events": [
+            {
+              "accepted": 34560,
+              "end": 34560,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.5743069583550096,
+          "name": "pocket-en-10-steps4",
+          "samples": 34560,
+          "seconds": 5.898568458389491,
+          "sha256": "7b25c101210ef8ddc147aafe0926e74143b1b4ce140c10027988ca4653ccfb34"
+        },
+        {
+          "events": [
+            {
+              "accepted": 163200,
+              "end": 163200,
+              "start": 0,
+              "text": "The door was open. She returned to the house. Nobody was waiting inside."
+            }
+          ],
+          "firstFrameSeconds": 0.47830754169262946,
+          "name": "pocket-en-11-steps4",
+          "samples": 163200,
+          "seconds": 29.237558875000104,
+          "sha256": "238d0aac0d49ee856ce9a74a550dbd989b9ce456b96f730ee2e3c369e00ec23b"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.47249645832926035,
+          "name": "pocket-en-2-steps3",
+          "samples": 44160,
+          "seconds": 7.397916041663848,
+          "sha256": "818a8d163fea5fd2a6bc3108da21b914ce9ff3096284570e2c9a5f4f7ddcd283"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.5655952499946579,
+          "name": "pocket-en-3-steps4",
+          "samples": 44160,
+          "seconds": 8.648797000059858,
+          "sha256": "ed2495836551d573c2ff61d8e765cf7ea9efa13c90b89479d29d83cae5ae6ed3"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.5572354167234153,
+          "name": "pocket-en-4-steps5",
+          "samples": 44160,
+          "seconds": 9.07772804168053,
+          "sha256": "5bc540c8a6cb70b486b350ff9dd8f1227c8addf0a0b9bf41b91f415689a196b1"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.49794191669207066,
+          "name": "pocket-en-5-steps6",
+          "samples": 44160,
+          "seconds": 9.620136291719973,
+          "sha256": "39d0bfcd839c06ec5656b15d5d6bf2baaba9010dde642b2302258769fd2c1e0a"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.6100402916781604,
+          "name": "pocket-en-6-steps7",
+          "samples": 44160,
+          "seconds": 10.789641041657887,
+          "sha256": "84d34d4554ee75dbcfe50f084135104507c13aba97a5134674eaac58ef4e5c49"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.7174067083979025,
+          "name": "pocket-en-7-steps8",
+          "samples": 44160,
+          "seconds": 11.834291125065647,
+          "sha256": "1862730c843f897b007fef51d8058898d95888ce185639d0497c4f8b2a7d758c"
+        },
+        {
+          "events": [
+            {
+              "accepted": 44160,
+              "end": 44160,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.45337241666857153,
+          "name": "pocket-en-8-steps2",
+          "samples": 44160,
+          "seconds": 6.607080375077203,
+          "sha256": "4776706b8f14a9160d9af621b5faef6c412d51a80055fd781134150c1d121e67"
+        },
+        {
+          "events": [
+            {
+              "accepted": 42240,
+              "end": 42240,
+              "start": 0,
+              "text": "The door was open."
+            }
+          ],
+          "firstFrameSeconds": 0.5172860834281892,
+          "name": "pocket-en-9-steps4",
+          "samples": 42240,
+          "seconds": 7.7832085833651945,
+          "sha256": "eddc806be1e0707278fc8a9a8f5515bf11965bb6f182dc41eb35a151112c8892"
+        },
+        {
+          "events": [],
+          "firstFrameSeconds": 0,
+          "name": "pocket-en-recovered",
+          "samples": 44160,
+          "seconds": 8.21120479167439,
+          "sha256": "7c8a1ea49e16d6773751bb720de1305c2d1c5e1530bd3c8dae16e1475c73621c"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 2.043422874994576,
+          "name": "pocket-es-0-steps1",
+          "samples": 55680,
+          "seconds": 7.769209041609429,
+          "sha256": "acf708b0e4e23bcf9b71b487b1cfaef1239d571662be55c6adc8dedf54046860"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.375099916709587,
+          "name": "pocket-es-1-steps2",
+          "samples": 55680,
+          "seconds": 7.661864791647531,
+          "sha256": "586b5add1c9b1ec5ae52ed211275771baec457628094fbe88adae3bc85db24cd"
+        },
+        {
+          "events": [
+            {
+              "accepted": 53760,
+              "end": 53760,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.5356043333886191,
+          "name": "pocket-es-10-steps4",
+          "samples": 53760,
+          "seconds": 9.691289625014178,
+          "sha256": "1ba82b86d0c7eca0fdf1fa65babf2c0c75b97fe70ae95689b69df7bb3df3b65b"
+        },
+        {
+          "events": [
+            {
+              "accepted": 159360,
+              "end": 159360,
+              "start": 0,
+              "text": "La puerta estaba abierta. Ella volvi\u00f3 a la casa. Nadie la esperaba dentro."
+            }
+          ],
+          "firstFrameSeconds": 0.5159917082637548,
+          "name": "pocket-es-11-steps4",
+          "samples": 159360,
+          "seconds": 29.755421999958344,
+          "sha256": "562b2d9049adda2a0fd4e224785bb43075f19aa334a72770316d170dabab0779"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.3469966249540448,
+          "name": "pocket-es-2-steps3",
+          "samples": 55680,
+          "seconds": 7.139381999964826,
+          "sha256": "af7ee62962523f7b5eef414cadb0a4e2ff499038860a72b6f1123f5812bfcca1"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.44517279160209,
+          "name": "pocket-es-3-steps4",
+          "samples": 55680,
+          "seconds": 8.59639191662427,
+          "sha256": "33b630e4e7dbf518f801e12fc35958f47e84563eaa87a5ef9fa548f7d0761607"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.4733232082799077,
+          "name": "pocket-es-4-steps5",
+          "samples": 55680,
+          "seconds": 9.521297249943018,
+          "sha256": "84947a3cef78f3edfcb7eda742c8ce32030942fb2dd80132adf3f65158547d8a"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.5629272082587704,
+          "name": "pocket-es-5-steps6",
+          "samples": 55680,
+          "seconds": 9.145578749943525,
+          "sha256": "f95ce8af3547bc53b6000f35fc7a838cc63e0709e1dbd8a5293beb92c64e773d"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.6271481666481122,
+          "name": "pocket-es-6-steps7",
+          "samples": 55680,
+          "seconds": 13.958363208337687,
+          "sha256": "cee7f8ef05e20cb74f11161030001a4d970ca84759a99d2aa1332cec5a22dfa2"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.7643369582947344,
+          "name": "pocket-es-7-steps8",
+          "samples": 55680,
+          "seconds": 14.678135750000365,
+          "sha256": "62c343e96b82d2ad5f2185b4aa3d0c2c43bf5233a0ac98f65558661320598bc8"
+        },
+        {
+          "events": [
+            {
+              "accepted": 55680,
+              "end": 55680,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.44009375001769513,
+          "name": "pocket-es-8-steps2",
+          "samples": 55680,
+          "seconds": 8.074322666740045,
+          "sha256": "586b5add1c9b1ec5ae52ed211275771baec457628094fbe88adae3bc85db24cd"
+        },
+        {
+          "events": [
+            {
+              "accepted": 51840,
+              "end": 51840,
+              "start": 0,
+              "text": "La puerta estaba abierta."
+            }
+          ],
+          "firstFrameSeconds": 0.6001542916055769,
+          "name": "pocket-es-9-steps4",
+          "samples": 51840,
+          "seconds": 11.594681541668251,
+          "sha256": "965794d524916eb023c32c735929682e6a652ef66a7804865561758c5fcbc8f8"
+        },
+        {
+          "events": [],
+          "firstFrameSeconds": 0,
+          "name": "pocket-es-recovered",
+          "samples": 57600,
+          "seconds": 12.368435666663572,
+          "sha256": "548cf2eb4e5f8afe3b3166c8cfb6a651f2559674b03824d5b0563187c680a540"
+        }
+      ]
+    }
+  ],
+  "binarySHA256": {
+    "baseline": "78f984ed178b3c65bc16050bd80ac8e251994bb46a7edb7aaa2fc19ab896b0e2",
+    "candidate": "0ed2421a2c9b430ca5842c7602837aac2f9762cd8ca278e354feec8dce66aac5"
+  }
+}

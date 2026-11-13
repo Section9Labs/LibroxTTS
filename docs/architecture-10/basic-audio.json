@@ -1,0 +1,66 @@
+{
+  "exactPCM": true,
+  "scope": "Basic established CPU Core ML, eight preferred language samples, speed 1; WAV format and PCM bytes compared",
+  "rows": [
+    {
+      "voice": "af_heart",
+      "exact": true,
+      "samples": 92760,
+      "baselineSHA256": "da67f677e84e21dfb0357da5331026cf660165fa71f27c18f9a3e8f5582146db",
+      "candidateSHA256": "da67f677e84e21dfb0357da5331026cf660165fa71f27c18f9a3e8f5582146db"
+    },
+    {
+      "voice": "ef_dora",
+      "exact": true,
+      "samples": 94560,
+      "baselineSHA256": "f9f845a46574e1495c7b971bbb304011b47cd63dcce9f089a0e479f88ad52d30",
+      "candidateSHA256": "f9f845a46574e1495c7b971bbb304011b47cd63dcce9f089a0e479f88ad52d30"
+    },
+    {
+      "voice": "ff_siwis",
+      "exact": true,
+      "samples": 108360,
+      "baselineSHA256": "73f8ac43d83ac13b64312945b861058bca9369a4ed41698a57d23513732b2568",
+      "candidateSHA256": "73f8ac43d83ac13b64312945b861058bca9369a4ed41698a57d23513732b2568"
+    },
+    {
+      "voice": "hf_alpha",
+      "exact": true,
+      "samples": 110160,
+      "baselineSHA256": "aa736a6a11812bcc14bf3c690a5e1706e612734862c5015b00154f39d761745f",
+      "candidateSHA256": "aa736a6a11812bcc14bf3c690a5e1706e612734862c5015b00154f39d761745f"
+    },
+    {
+      "voice": "if_sara",
+      "exact": true,
+      "samples": 102960,
+      "baselineSHA256": "5b0a0317eccd5ba09a51a995ee49ec870dc1077a9cd8724e6283cb99705204c2",
+      "candidateSHA256": "5b0a0317eccd5ba09a51a995ee49ec870dc1077a9cd8724e6283cb99705204c2"
+    },
+    {
+      "voice": "jf_alpha",
+      "exact": true,
+      "samples": 122160,
+      "baselineSHA256": "5325be79ba37117dedc80726d28606c93c6594ac42743146b41a35ab46023178",
+      "candidateSHA256": "5325be79ba37117dedc80726d28606c93c6594ac42743146b41a35ab46023178"
+    },
+    {
+      "voice": "pf_dora",
+      "exact": true,
+      "samples": 94560,
+      "baselineSHA256": "e468db77ffe95e8bc07f20cbaadbfbb7c12c4b9df43e4331d2e118cb88e82be3",
+      "candidateSHA256": "e468db77ffe95e8bc07f20cbaadbfbb7c12c4b9df43e4331d2e118cb88e82be3"
+    },
+    {
+      "voice": "zf_xiaobei",
+      "exact": true,
+      "samples": 118560,
+      "baselineSHA256": "cb148faa9fd3a81216cadffe93f830be46a1c413006ecbe9eca5f5d8c1c1a7f7",
+      "candidateSHA256": "cb148faa9fd3a81216cadffe93f830be46a1c413006ecbe9eca5f5d8c1c1a7f7"
+    }
+  ],
+  "binarySHA256": {
+    "baseline": "e8c29f1c8900f1de4cef92fdd05ac28cfd7a31b615e59548f13ad5be99f1c01d",
+    "candidate": "1878f69cc296b44f55079421b93e9facf8287ed8ae90983032720825e16a2589"
+  }
+}

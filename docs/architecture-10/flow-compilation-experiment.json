@@ -1,0 +1,146 @@
+[
+  {
+    "compiledSeconds" : 156.30276654160116,
+    "device" : "Device(cpu, 0)",
+    "differingValues" : 0,
+    "maximumAbsoluteDifference" : 0,
+    "ordinarySeconds" : 0.021382416714914143,
+    "trial" : 0,
+    "values" : 32
+  },
+  {
+    "compiledSeconds" : 0.0021317083155736327,
+    "device" : "Device(cpu, 0)",
+    "differingValues" : 0,
+    "maximumAbsoluteDifference" : 0,
+    "ordinarySeconds" : 0.0024102500174194574,
+    "trial" : 1,
+    "values" : 32
+  },
+  {
+    "compiledSeconds" : 0.003140999935567379,
+    "device" : "Device(cpu, 0)",
+    "differingValues" : 0,
+    "maximumAbsoluteDifference" : 0,
+    "ordinarySeconds" : 0.0032605000305920839,
+    "trial" : 2,
+    "values" : 32
+  },
+  {
+    "compiledSeconds" : 0.0014452500035986304,
+    "device" : "Device(cpu, 0)",
+    "differingValues" : 0,
+    "maximumAbsoluteDifference" : 0,
+    "ordinarySeconds" : 0.0032730833627283573,
+    "trial" : 3,
+    "values" : 32
+  },
+  {
+    "compiledSeconds" : 0.0035720833111554384,
+    "device" : "Device(cpu, 0)",
+    "differingValues" : 0,
+    "maximumAbsoluteDifference" : 0,
+    "ordinarySeconds" : 0.0050294999964535236,
+    "trial" : 4,
+    "values" : 32
+  },
+  {
+    "compiledSeconds" : 0.0027221250347793102,
+    "device" : "Device(cpu, 0)",
+    "differingValues" : 0,
+    "maximumAbsoluteDifference" : 0,
+    "ordinarySeconds" : 0.0037012916291132569,
+    "trial" : 5,
+    "values" : 32
+  },
+  {
+    "compiledSeconds" : 0.0024252083385363221,
+    "device" : "Device(cpu, 0)",
+    "differingValues" : 0,
+    "maximumAbsoluteDifference" : 0,
+    "ordinarySeconds" : 0.0037008333019912243,
+    "trial" : 6,
+    "values" : 32
+  },
+  {
+    "compiledSeconds" : 0.0017322083003818989,
+    "device" : "Device(cpu, 0)",
+    "differingValues" : 0,
+    "maximumAbsoluteDifference" : 0,
+    "ordinarySeconds" : 0.0033737500198185444,
+    "trial" : 7,
+    "values" : 32
+  },
+  {
+    "compiledSeconds" : 2.1029083332978189,
+    "device" : "Device(gpu, 0)",
+    "differingValues" : 0,
+    "maximumAbsoluteDifference" : 0,
+    "ordinarySeconds" : 0.076629166607744992,
+    "trial" : 0,
+    "values" : 32
+  },
+  {
+    "compiledSeconds" : 0.0063572500366717577,
+    "device" : "Device(gpu, 0)",
+    "differingValues" : 0,
+    "maximumAbsoluteDifference" : 0,
+    "ordinarySeconds" : 0.060280458303168416,
+    "trial" : 1,
+    "values" : 32
+  },
+  {
+    "compiledSeconds" : 0.025454749935306609,
+    "device" : "Device(gpu, 0)",
+    "differingValues" : 0,
+    "maximumAbsoluteDifference" : 0,
+    "ordinarySeconds" : 0.046227833372540772,
+    "trial" : 2,
+    "values" : 32
+  },
+  {
+    "compiledSeconds" : 0.034941124962642789,
+    "device" : "Device(gpu, 0)",
+    "differingValues" : 0,
+    "maximumAbsoluteDifference" : 0,
+    "ordinarySeconds" : 0.056062916642986238,
+    "trial" : 3,
+    "values" : 32
+  },
+  {
+    "compiledSeconds" : 0.034620166756212711,
+    "device" : "Device(gpu, 0)",
+    "differingValues" : 0,
+    "maximumAbsoluteDifference" : 0,
+    "ordinarySeconds" : 0.05013150000013411,
+    "trial" : 4,
+    "values" : 32
+  },
+  {
+    "compiledSeconds" : 0.04840366670396179,
+    "device" : "Device(gpu, 0)",
+    "differingValues" : 0,
+    "maximumAbsoluteDifference" : 0,
+    "ordinarySeconds" : 0.049111375003121793,
+    "trial" : 5,
+    "values" : 32
+  },
+  {
+    "compiledSeconds" : 0.051134833367541432,
+    "device" : "Device(gpu, 0)",
+    "differingValues" : 0,
+    "maximumAbsoluteDifference" : 0,
+    "ordinarySeconds" : 0.024135583313181996,
+    "trial" : 6,
+    "values" : 32
+  },
+  {
+    "compiledSeconds" : 0.045396291650831699,
+    "device" : "Device(gpu, 0)",
+    "differingValues" : 0,
+    "maximumAbsoluteDifference" : 0,
+    "ordinarySeconds" : 0.061218625050969422,
+    "trial" : 7,
+    "values" : 32
+  }
+]

@@ -1,0 +1,69 @@
+diff --git a/Integrations/PocketTTS/Sources/PocketTTSMLX/Runtime/KVCache.swift b/Integrations/PocketTTS/Sources/PocketTTSMLX/Runtime/KVCache.swift
+index 05b14e2..fc41cf3 100644
+--- a/Integrations/PocketTTS/Sources/PocketTTSMLX/Runtime/KVCache.swift
++++ b/Integrations/PocketTTS/Sources/PocketTTSMLX/Runtime/KVCache.swift
+@@ -7,12 +7,27 @@ public final class KVCacheSimple {
+     public var offset = 0
+     private var keys: MLXArray?
+     private var values: MLXArray?
++    private var engineStorage: EngineAttentionStorage?
+     public init() {}
++    init(engineStorage: EngineAttentionStorage) { self.engineStorage = engineStorage }
+     public var state: [MLXArray] {
+-        get { guard let keys, let values else { return [] }; return [keys, values] }
+-        set { precondition(newValue.count == 2); keys = newValue[0]; values = newValue[1]; offset = newValue[0].shape[2] }
++        get {
++            if let engineStorage { return engineStorage.state }
++            guard let keys, let values else { return [] }; return [keys, values]
++        }
++        set {
++            precondition(newValue.count == 2)
++            if let engineStorage { engineStorage.state = newValue }
++            else { keys = newValue[0]; values = newValue[1] }
++            offset = newValue[0].shape[2]
++        }
+     }
+     public func update(keys: MLXArray, values: MLXArray) -> (MLXArray, MLXArray) {
++        if let engineStorage {
++            let result = engineStorage.append(keys: keys, values: values)
++            offset += keys.shape[2]
++            return result
++        }
+         let k = self.keys.map { concatenated([$0, keys], axis: 2) } ?? keys
+         let v = self.values.map { concatenated([$0, values], axis: 2) } ?? values
+         self.keys = k; self.values = v; offset += keys.shape[2]
+@@ -20,6 +35,7 @@ public final class KVCacheSimple {
+     }
+     @discardableResult public func trim(_ count: Int) -> Int {
+         let n = min(offset, max(0, count)); offset -= n
++        if let engineStorage { engineStorage.truncate(to: offset); return n }
+         if offset == 0 { keys = nil; values = nil }
+         else { keys = keys?[.ellipsis, ..<offset, 0...]; values = values?[.ellipsis, ..<offset, 0...] }
+         return n
+diff --git a/Integrations/PocketTTS/Sources/PocketTTSMLX/Runtime/PocketTTSModel.swift b/Integrations/PocketTTS/Sources/PocketTTSMLX/Runtime/PocketTTSModel.swift
+index e974a21..43340f9 100644
+--- a/Integrations/PocketTTS/Sources/PocketTTSMLX/Runtime/PocketTTSModel.swift
++++ b/Integrations/PocketTTS/Sources/PocketTTSMLX/Runtime/PocketTTSModel.swift
+@@ -14,6 +14,11 @@ public final class PocketTTSModel: Module {
+     private(set) var diagnosticFrameIndex: Int?
+     public let config: PocketTTSModelConfig
+     private let modelFolder: URL
++    private var engineExecution = false
++    func enableEngineExecution() {
++        engineExecution = true
++        flow_lm.transformer.rope.enableEngineExecution()
++    }
+     @ModuleInfo(key: "flow_lm") public var flow_lm: FlowLMModel
+     @ModuleInfo(key: "mimi") public var mimi: MimiAdapter
+ 
+@@ -90,7 +95,9 @@ public final class PocketTTSModel: Module {
+     }
+ 
+     public func initState() -> PocketTTSState {
+-        PocketTTSState(flowCache: flow_lm.makeCache())
++        PocketTTSState(flowCache: engineExecution
++            ? flow_lm.makeCache().map { _ in KVCacheSimple(engineStorage: EngineAttentionStorage()) }
++            : flow_lm.makeCache())
+     }
+ 
+     private func runFlowLM(

@@ -1,0 +1,117 @@
+{
+  "exactPCM": true,
+  "runs": [
+    {
+      "revision": "baseline",
+      "rows": [
+        {
+          "events": [],
+          "firstFrameSeconds": 0,
+          "name": "plus-en-0",
+          "samples": 76800,
+          "seconds": 0.5539501250023022,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24"
+        },
+        {
+          "events": [],
+          "firstFrameSeconds": 0,
+          "name": "plus-en-1",
+          "samples": 76800,
+          "seconds": 0.414708916679956,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24"
+        },
+        {
+          "events": [],
+          "firstFrameSeconds": 0,
+          "name": "plus-en-2",
+          "samples": 76800,
+          "seconds": 0.380836124997586,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24"
+        },
+        {
+          "events": [],
+          "firstFrameSeconds": 0,
+          "name": "plus-es-0",
+          "samples": 104448,
+          "seconds": 0.5034319167025387,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a"
+        },
+        {
+          "events": [],
+          "firstFrameSeconds": 0,
+          "name": "plus-es-1",
+          "samples": 104448,
+          "seconds": 0.5174793750047684,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a"
+        },
+        {
+          "events": [],
+          "firstFrameSeconds": 0,
+          "name": "plus-es-2",
+          "samples": 104448,
+          "seconds": 0.4372146249515936,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a"
+        }
+      ]
+    },
+    {
+      "revision": "candidate",
+      "rows": [
+        {
+          "events": [],
+          "firstFrameSeconds": 0,
+          "name": "plus-en-0",
+          "samples": 76800,
+          "seconds": 0.3813436250202358,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24"
+        },
+        {
+          "events": [],
+          "firstFrameSeconds": 0,
+          "name": "plus-en-1",
+          "samples": 76800,
+          "seconds": 0.3423140833619982,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24"
+        },
+        {
+          "events": [],
+          "firstFrameSeconds": 0,
+          "name": "plus-en-2",
+          "samples": 76800,
+          "seconds": 0.327641416573897,
+          "sha256": "20f07c557379a80480d6bf9ca57903779c5b5065c8e94b48a2bd70fa84db8b24"
+        },
+        {
+          "events": [],
+          "firstFrameSeconds": 0,
+          "name": "plus-es-0",
+          "samples": 104448,
+          "seconds": 0.4065117916325107,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a"
+        },
+        {
+          "events": [],
+          "firstFrameSeconds": 0,
+          "name": "plus-es-1",
+          "samples": 104448,
+          "seconds": 0.37836041662376374,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a"
+        },
+        {
+          "events": [],
+          "firstFrameSeconds": 0,
+          "name": "plus-es-2",
+          "samples": 104448,
+          "seconds": 0.38396020827349275,
+          "sha256": "1ebf5e7eda2c62ad0af7fc4f7a2de7186f531ae2d99a6c0004f1c3db7b7a5d8a"
+        }
+      ]
+    }
+  ],
+  "noiseSource": "Frozen 0.6.2 initial noise, also verified by 0.9",
+  "backend": "Core ML CPU",
+  "languages": [
+    "en",
+    "es"
+  ]
+}

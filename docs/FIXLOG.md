@@ -43,3 +43,36 @@ and cleanup; a successful real filesystem replacement is also covered.
 
 Rule: verify replacement bytes on the destination filesystem before replacing
 the installed file; failed staging must leave the installed path intact.
+
+## 1.0 — synchronous styled rendering retained temporary memory
+
+Repeated foreground Core ML synthesis on the physical iPad exposed steadily growing
+process footprint. The unchanged 0.9 baseline reproduced the growth. Native tensor
+views made per-render ownership more important, and delivery-state validation also
+read a voice file on every render without draining autoreleased Foundation buffers.
+
+Core ML now drains temporary bridge objects when each render returns. Delivery
+validation drains each read block while retaining its original read, cancellation,
+hash and error order. Exact PCM/events are checked after the change; the isolated
+memory regression and sustained physical-device probe record the remaining growth.
+
+Rule: synchronous SDK work owns its temporary-object lifetime; correctness must not
+rely on the caller returning to a UI run loop.
+
+## 1.0 — recovery verified across real process exits
+
+Crash helpers terminate child processes before and after compiled-generation
+renames and downloaded-file adoption. Reopening validates a complete surviving
+generation, and publication retries preserve complete installed bytes. These tests
+supplement the existing injected-error, cancellation and rollback tests; they do
+not simulate a power-loss filesystem or delete another writer's staging files.
+
+## 1.0 — changed original voice archives retain legacy validation
+
+Native voice preparation initially admitted any structurally supported archive.
+A caller can replace an original voice file after engine load; the old MLX reader
+would then observe and validate every record, including unused tensors. The native
+path now requires a catalog-pinned whole-file digest on every read. Unknown or
+changed bytes use the original reader. A replacement-archive regression and all
+48 installed English/Spanish voice fixtures pass, followed by final exact audio
+and device qualification. No verification result is cached.

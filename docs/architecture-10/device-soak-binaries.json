@@ -1,0 +1,6 @@
+{
+  "baseline": "b4701128102a354d4325dd4b5ac6156c59d58642114df7bc09acabfd3fbce4cd",
+  "candidate": "3e8debdc976e145cf0b3a69c263e3494c722652a4f21552f9d5ef72a7f873f55",
+  "productionCandidate": "f1d31fa8c4c1b6e50cb7eca83f07c8fe6e526349",
+  "scope": "Final guarded candidate: fresh ABBA, warm ABBA, completed 1800-second foreground soak"
+}

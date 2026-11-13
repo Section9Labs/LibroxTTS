@@ -1,0 +1,39 @@
+import MLX
+
+/// Capacity-managed storage exclusively for models hidden inside PocketTTSEngine.
+/// The public KVCacheSimple initializer retains its original reference semantics.
+/// All inference mathematics and offset handling stay in the shared transformer.
+final class EngineAttentionStorage {
+    private var keys: MLXArray?
+    private var values: MLXArray?
+    private var length = 0
+    var state: [MLXArray] {
+        get {
+            guard let keys, let values else { return [] }
+            return [keys[.ellipsis, ..<length, 0...], values[.ellipsis, ..<length, 0...]]
+        }
+        set {
+            precondition(newValue.count == 2)
+            keys = newValue[0]; values = newValue[1]; length = newValue[0].shape[2]
+        }
+    }
+    func append(keys: MLXArray, values: MLXArray) -> (MLXArray, MLXArray) {
+        let end = length + keys.shape[2]
+        if self.keys == nil || end > self.keys!.shape[2] {
+            let capacity = ((end + 255) / 256) * 256
+            let extra = capacity - (self.keys?.shape[2] ?? 0)
+            var ks = keys.shape, vs = values.shape; ks[2] = extra; vs[2] = extra
+            let kp = MLXArray.zeros(ks, dtype: keys.dtype), vp = MLXArray.zeros(vs, dtype: values.dtype)
+            self.keys = self.keys.map { concatenated([$0, kp], axis: 2) } ?? kp
+            self.values = self.values.map { concatenated([$0, vp], axis: 2) } ?? vp
+        }
+        self.keys![.ellipsis, length..<end, 0...] = keys
+        self.values![.ellipsis, length..<end, 0...] = values
+        length = end
+        return (self.keys![.ellipsis, ..<end, 0...], self.values![.ellipsis, ..<end, 0...])
+    }
+    func truncate(to count: Int) {
+        length = min(length, max(0, count))
+        if length == 0 { keys = nil; values = nil }
+    }
+}

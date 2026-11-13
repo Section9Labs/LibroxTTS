@@ -1,0 +1,416 @@
+{
+  "order": "ABBA",
+  "runs": [
+    {
+      "revision": "baseline",
+      "probe": "Dictionary10",
+      "rows": [
+        {
+          "afterFootprint": 79561400,
+          "beforeFootprint": 2359800,
+          "british": false,
+          "coldSeconds": 0.8407483332557604,
+          "probe": "\u02c8A\u02cc\u025bl\u02ccIs\u02cci\u02cci"
+        },
+        {
+          "afterFootprint": 118915792,
+          "beforeFootprint": 79561400,
+          "british": true,
+          "coldSeconds": 0.6879413332790136,
+          "probe": "\u02c8A\u02cc\u025bl\u02ccIs\u02cci\u02d0\u02cci\u02d0"
+        }
+      ]
+    },
+    {
+      "revision": "baseline",
+      "probe": "Planning10",
+      "rows": [
+        {
+          "inputScalars": 2003,
+          "medianSeconds": 1.0259967499878258,
+          "model": "ctPlusV1-case0",
+          "planSHA256": "fbc772d845e15bbe986e8436df144cf19604ffb17c4e7950d51a187e1aaa7059",
+          "units": 7
+        },
+        {
+          "inputScalars": 1764,
+          "medianSeconds": 7.757427541655488,
+          "model": "ctPlusV1-case1",
+          "planSHA256": "689f4ddfd635a1ee54e1018792b49b2039996cda9109b31b9e3f8df1d99520b7",
+          "units": 9
+        },
+        {
+          "inputScalars": 29,
+          "medianSeconds": 0.0009287499124184251,
+          "model": "ctPlusV1-case2",
+          "planSHA256": "be6db977a9c1f8a6246ea46c274a0c2af9feea1d37d21e89799b03dec66d2edc",
+          "units": 1
+        },
+        {
+          "inputScalars": 1764,
+          "medianSeconds": 0.0053241250570863485,
+          "model": "ctPlusV1-case3",
+          "planSHA256": "b81855c5cf33d21e672dbb32c20255c14eee594dba46649ebf415c448c976ef0",
+          "units": 4
+        },
+        {
+          "inputScalars": 2003,
+          "medianSeconds": 1.3554825000464916,
+          "model": "pocketTTSV1-case0",
+          "planSHA256": "876a9438c204d53654a6a53a5a4da5808fc0ec031bfcf7dc5605d22bf1497014",
+          "units": 2
+        },
+        {
+          "inputScalars": 1764,
+          "medianSeconds": 20.63951354159508,
+          "model": "pocketTTSV1-case1",
+          "planSHA256": "45ba3b135b28d96401bc272104d00c1ad48416c797441b3d6f18b54e3a8c5761",
+          "units": 2
+        },
+        {
+          "inputScalars": 29,
+          "medianSeconds": 0.0009697499917820096,
+          "model": "pocketTTSV1-case2",
+          "planSHA256": "41a58407051d2f55c246e7062fbb72f324ebf61b0a0c9dfb038d1b39c5d8ca0d",
+          "units": 1
+        },
+        {
+          "inputScalars": 1764,
+          "medianSeconds": 0.0027405000291764736,
+          "model": "pocketTTSV1-case3",
+          "planSHA256": "4ad905ae708622fcf543dd55f1875bc9544ab76380d59ebdb2c3ede1e1abb0f4",
+          "units": 1
+        }
+      ]
+    },
+    {
+      "revision": "candidate",
+      "probe": "Dictionary10",
+      "rows": [
+        {
+          "afterFootprint": 3752608,
+          "beforeFootprint": 2343440,
+          "british": false,
+          "coldSeconds": 0.05504166672471911,
+          "probe": "\u02c8A\u02cc\u025bl\u02ccIs\u02cci\u02cci"
+        },
+        {
+          "afterFootprint": 3981984,
+          "beforeFootprint": 3752584,
+          "british": true,
+          "coldSeconds": 0.03808191663119942,
+          "probe": "\u02c8A\u02cc\u025bl\u02ccIs\u02cci\u02d0\u02cci\u02d0"
+        }
+      ]
+    },
+    {
+      "revision": "candidate",
+      "probe": "Planning10",
+      "rows": [
+        {
+          "inputScalars": 2003,
+          "medianSeconds": 0.03545095829758793,
+          "model": "ctPlusV1-case0",
+          "planSHA256": "fbc772d845e15bbe986e8436df144cf19604ffb17c4e7950d51a187e1aaa7059",
+          "units": 7
+        },
+        {
+          "inputScalars": 1764,
+          "medianSeconds": 0.17998233332764357,
+          "model": "ctPlusV1-case1",
+          "planSHA256": "689f4ddfd635a1ee54e1018792b49b2039996cda9109b31b9e3f8df1d99520b7",
+          "units": 9
+        },
+        {
+          "inputScalars": 29,
+          "medianSeconds": 0.0009360000258311629,
+          "model": "ctPlusV1-case2",
+          "planSHA256": "be6db977a9c1f8a6246ea46c274a0c2af9feea1d37d21e89799b03dec66d2edc",
+          "units": 1
+        },
+        {
+          "inputScalars": 1764,
+          "medianSeconds": 0.005423166672699153,
+          "model": "ctPlusV1-case3",
+          "planSHA256": "b81855c5cf33d21e672dbb32c20255c14eee594dba46649ebf415c448c976ef0",
+          "units": 4
+        },
+        {
+          "inputScalars": 2003,
+          "medianSeconds": 0.03532129165250808,
+          "model": "pocketTTSV1-case0",
+          "planSHA256": "876a9438c204d53654a6a53a5a4da5808fc0ec031bfcf7dc5605d22bf1497014",
+          "units": 2
+        },
+        {
+          "inputScalars": 1764,
+          "medianSeconds": 0.2112595000071451,
+          "model": "pocketTTSV1-case1",
+          "planSHA256": "45ba3b135b28d96401bc272104d00c1ad48416c797441b3d6f18b54e3a8c5761",
+          "units": 2
+        },
+        {
+          "inputScalars": 29,
+          "medianSeconds": 0.0009456666884943843,
+          "model": "pocketTTSV1-case2",
+          "planSHA256": "41a58407051d2f55c246e7062fbb72f324ebf61b0a0c9dfb038d1b39c5d8ca0d",
+          "units": 1
+        },
+        {
+          "inputScalars": 1764,
+          "medianSeconds": 0.0026209165807813406,
+          "model": "pocketTTSV1-case3",
+          "planSHA256": "4ad905ae708622fcf543dd55f1875bc9544ab76380d59ebdb2c3ede1e1abb0f4",
+          "units": 1
+        }
+      ]
+    },
+    {
+      "revision": "candidate",
+      "probe": "Dictionary10",
+      "rows": [
+        {
+          "afterFootprint": 3818168,
+          "beforeFootprint": 2392592,
+          "british": false,
+          "coldSeconds": 0.02041683334391564,
+          "probe": "\u02c8A\u02cc\u025bl\u02ccIs\u02cci\u02cci"
+        },
+        {
+          "afterFootprint": 4014776,
+          "beforeFootprint": 3818144,
+          "british": true,
+          "coldSeconds": 0.01077270822133869,
+          "probe": "\u02c8A\u02cc\u025bl\u02ccIs\u02cci\u02d0\u02cci\u02d0"
+        }
+      ]
+    },
+    {
+      "revision": "candidate",
+      "probe": "Planning10",
+      "rows": [
+        {
+          "inputScalars": 2003,
+          "medianSeconds": 0.03667816671077162,
+          "model": "ctPlusV1-case0",
+          "planSHA256": "fbc772d845e15bbe986e8436df144cf19604ffb17c4e7950d51a187e1aaa7059",
+          "units": 7
+        },
+        {
+          "inputScalars": 1764,
+          "medianSeconds": 0.1888711666688323,
+          "model": "ctPlusV1-case1",
+          "planSHA256": "689f4ddfd635a1ee54e1018792b49b2039996cda9109b31b9e3f8df1d99520b7",
+          "units": 9
+        },
+        {
+          "inputScalars": 29,
+          "medianSeconds": 0.0009366667363792658,
+          "model": "ctPlusV1-case2",
+          "planSHA256": "be6db977a9c1f8a6246ea46c274a0c2af9feea1d37d21e89799b03dec66d2edc",
+          "units": 1
+        },
+        {
+          "inputScalars": 1764,
+          "medianSeconds": 0.005492541589774191,
+          "model": "ctPlusV1-case3",
+          "planSHA256": "b81855c5cf33d21e672dbb32c20255c14eee594dba46649ebf415c448c976ef0",
+          "units": 4
+        },
+        {
+          "inputScalars": 2003,
+          "medianSeconds": 0.03708912502042949,
+          "model": "pocketTTSV1-case0",
+          "planSHA256": "876a9438c204d53654a6a53a5a4da5808fc0ec031bfcf7dc5605d22bf1497014",
+          "units": 2
+        },
+        {
+          "inputScalars": 1764,
+          "medianSeconds": 0.23899720842018723,
+          "model": "pocketTTSV1-case1",
+          "planSHA256": "45ba3b135b28d96401bc272104d00c1ad48416c797441b3d6f18b54e3a8c5761",
+          "units": 2
+        },
+        {
+          "inputScalars": 29,
+          "medianSeconds": 0.0009558750316500664,
+          "model": "pocketTTSV1-case2",
+          "planSHA256": "41a58407051d2f55c246e7062fbb72f324ebf61b0a0c9dfb038d1b39c5d8ca0d",
+          "units": 1
+        },
+        {
+          "inputScalars": 1764,
+          "medianSeconds": 0.002596041653305292,
+          "model": "pocketTTSV1-case3",
+          "planSHA256": "4ad905ae708622fcf543dd55f1875bc9544ab76380d59ebdb2c3ede1e1abb0f4",
+          "units": 1
+        }
+      ]
+    },
+    {
+      "revision": "baseline",
+      "probe": "Dictionary10",
+      "rows": [
+        {
+          "afterFootprint": 75236048,
+          "beforeFootprint": 2376184,
+          "british": false,
+          "coldSeconds": 0.6625727916834876,
+          "probe": "\u02c8A\u02cc\u025bl\u02ccIs\u02cci\u02cci"
+        },
+        {
+          "afterFootprint": 117834472,
+          "beforeFootprint": 75236048,
+          "british": true,
+          "coldSeconds": 0.5736532500013709,
+          "probe": "\u02c8A\u02cc\u025bl\u02ccIs\u02cci\u02d0\u02cci\u02d0"
+        }
+      ]
+    },
+    {
+      "revision": "baseline",
+      "probe": "Planning10",
+      "rows": [
+        {
+          "inputScalars": 2003,
+          "medianSeconds": 0.9248072083573788,
+          "model": "ctPlusV1-case0",
+          "planSHA256": "fbc772d845e15bbe986e8436df144cf19604ffb17c4e7950d51a187e1aaa7059",
+          "units": 7
+        },
+        {
+          "inputScalars": 1764,
+          "medianSeconds": 7.2979003333020955,
+          "model": "ctPlusV1-case1",
+          "planSHA256": "689f4ddfd635a1ee54e1018792b49b2039996cda9109b31b9e3f8df1d99520b7",
+          "units": 9
+        },
+        {
+          "inputScalars": 29,
+          "medianSeconds": 0.0009512499673292041,
+          "model": "ctPlusV1-case2",
+          "planSHA256": "be6db977a9c1f8a6246ea46c274a0c2af9feea1d37d21e89799b03dec66d2edc",
+          "units": 1
+        },
+        {
+          "inputScalars": 1764,
+          "medianSeconds": 0.005359875038266182,
+          "model": "ctPlusV1-case3",
+          "planSHA256": "b81855c5cf33d21e672dbb32c20255c14eee594dba46649ebf415c448c976ef0",
+          "units": 4
+        },
+        {
+          "inputScalars": 2003,
+          "medianSeconds": 1.3702340417075902,
+          "model": "pocketTTSV1-case0",
+          "planSHA256": "876a9438c204d53654a6a53a5a4da5808fc0ec031bfcf7dc5605d22bf1497014",
+          "units": 2
+        },
+        {
+          "inputScalars": 1764,
+          "medianSeconds": 19.559170999913476,
+          "model": "pocketTTSV1-case1",
+          "planSHA256": "45ba3b135b28d96401bc272104d00c1ad48416c797441b3d6f18b54e3a8c5761",
+          "units": 2
+        },
+        {
+          "inputScalars": 29,
+          "medianSeconds": 0.0009362916462123394,
+          "model": "pocketTTSV1-case2",
+          "planSHA256": "41a58407051d2f55c246e7062fbb72f324ebf61b0a0c9dfb038d1b39c5d8ca0d",
+          "units": 1
+        },
+        {
+          "inputScalars": 1764,
+          "medianSeconds": 0.002534333267249167,
+          "model": "pocketTTSV1-case3",
+          "planSHA256": "4ad905ae708622fcf543dd55f1875bc9544ab76380d59ebdb2c3ede1e1abb0f4",
+          "units": 1
+        }
+      ]
+    }
+  ],
+  "summary": [
+    {
+      "probe": "Dictionary10",
+      "case": "False",
+      "baselineSeconds": 0.751660562469624,
+      "candidateSeconds": 0.037729250034317374,
+      "speedup": 19.92248883256191
+    },
+    {
+      "probe": "Dictionary10",
+      "case": "True",
+      "baselineSeconds": 0.6307972916401923,
+      "candidateSeconds": 0.024427312426269054,
+      "speedup": 25.82344224499437
+    },
+    {
+      "probe": "Planning10",
+      "case": "ctPlusV1-case0",
+      "baselineSeconds": 0.9754019791726023,
+      "candidateSeconds": 0.036064562504179776,
+      "speedup": 27.045995055660416
+    },
+    {
+      "probe": "Planning10",
+      "case": "ctPlusV1-case1",
+      "baselineSeconds": 7.527663937478792,
+      "candidateSeconds": 0.18442674999823794,
+      "speedup": 40.816551490229664
+    },
+    {
+      "probe": "Planning10",
+      "case": "ctPlusV1-case2",
+      "baselineSeconds": 0.0009399999398738146,
+      "candidateSeconds": 0.0009363333811052144,
+      "speedup": 1.0039158689016003
+    },
+    {
+      "probe": "Planning10",
+      "case": "ctPlusV1-case3",
+      "baselineSeconds": 0.005342000047676265,
+      "candidateSeconds": 0.005457854131236672,
+      "speedup": 0.9787729608057231
+    },
+    {
+      "probe": "Planning10",
+      "case": "pocketTTSV1-case0",
+      "baselineSeconds": 1.362858270877041,
+      "candidateSeconds": 0.036205208336468786,
+      "speedup": 37.64260263914186
+    },
+    {
+      "probe": "Planning10",
+      "case": "pocketTTSV1-case1",
+      "baselineSeconds": 20.099342270754278,
+      "candidateSeconds": 0.22512835421366617,
+      "speedup": 89.27947943722039
+    },
+    {
+      "probe": "Planning10",
+      "case": "pocketTTSV1-case2",
+      "baselineSeconds": 0.0009530208189971745,
+      "candidateSeconds": 0.0009507708600722253,
+      "speedup": 1.0023664575971316
+    },
+    {
+      "probe": "Planning10",
+      "case": "pocketTTSV1-case3",
+      "baselineSeconds": 0.0026374166482128203,
+      "candidateSeconds": 0.0026084791170433164,
+      "speedup": 1.0110936411108034
+    }
+  ],
+  "os": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+  "binarySHA256": {
+    "baseline": {
+      "Dictionary10": "6e1c2bb0323ae86d7c7f059ab838ea532a4e56b109411ec7484e60b82297fe53",
+      "Planning10": "2c5da6e61300336165f1cabec9936ed01f55d58c9bbd2070248266200396f248"
+    },
+    "candidate": {
+      "Dictionary10": "0550caaba1c99af4be9ff207f144c621c3a7e54afc1d42676cd1799e75d09bb0",
+      "Planning10": "b51666eee9dce63314006f2a98b95bd878d1648f65ec2042a020aa07955acd51"
+    }
+  }
+}

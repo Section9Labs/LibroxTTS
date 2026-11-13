@@ -1,0 +1,12 @@
+{
+  "baseline": "07fcf437004027f58ad8bb16de7877d0ee74a9a8",
+  "targetsAreMeasuredReleaseGoalsNotForecasts": true,
+  "targets": [
+    {"id":"max-throughput", "metric":"baseline wall / candidate wall", "goal":2.0, "workload":"fixed 270-character English Caro/Calm passage, continuation, four steps; Core ML CPU on Mac; separate MLX CPU/GPU scorecards"},
+    {"id":"cold-first-audio", "metric":"candidate / baseline first accepted frame", "goal":0.5, "workload":"Release09Benchmark cold case; fresh processes, no preview; includes validation and model load"},
+    {"id":"peak-memory", "metric":"candidate / baseline sampled process footprint", "goal":0.7, "workload":"same fixed sidecar cases and long-run profile; sampled footprint is not allocation high-water"},
+    {"id":"contextual-planning", "metric":"baseline wall / candidate wall", "goal":10.0, "workload":"fixed English and Spanish number/dictionary/context-rich long sentences, plus short and plain controls"},
+    {"id":"cold-dictionary", "metric":"baseline wall / candidate wall", "goal":5.0, "workload":"US and GB first Lexicon creation in fresh Release probe processes"}
+  ],
+  "rules": ["Exact PCM and callback events, no tolerances", "Exact complete plans and public declarations", "ABBA order, repeated process trials, named hardware/OS/toolchain", "Do not multiply gains or extrapolate Mac measurements to iPhone", "Count all cold preparation; report setup and warmed synthesis separately", "Report misses, regressions and rejected experiments"]
+}

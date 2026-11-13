@@ -1,6 +1,8 @@
-# LibroxTTS architecture — 0.9 candidate
+# LibroxTTS architecture — 1.0 candidate
 
-Reviewed on 2026-11-11 against `f75bacfbdc86c0c6dd81f0fb11cb9bcd160e49dd` (0.6.2).
+Base architecture reviewed on 2026-11-11 against `f75bacfbdc86c0c6dd81f0fb11cb9bcd160e49dd` (0.6.2).
+The 1.0 sections below extend it against published 0.9.0; historical qualification
+limits in the 0.9 section are superseded by the linked 1.0 evidence where stated.
 The [architecture review](docs/architecture-review-2026-11-11.md) records the
 baseline and roadmap. [Implementation evidence](docs/implementation-07.md)
 distinguishes completed changes from remaining qualification.
@@ -160,3 +162,45 @@ language/listening coverage and Basic/Qwen real-model qualification remain open.
 The package suites do not turn generic client compilation into device-runtime
 acceptance. No models, sampler defaults, platform routing or audio identities
 changed; no release, tag or integration is implied by these local gates.
+
+## 1.0 candidate preparation
+
+Contextual long-text planning now has a per-plan `PreparedNarrationText` owner for
+stable clauses and unstable tails. It supplements the plain scalar budget and
+abstains where rule dependencies are not proven. Original source ranges and the
+legacy final synthesis representation remain authoritative.
+
+English dictionary owners can retain verified indexed immutable data instead of
+constructing hundreds of thousands of String dictionary entries. Generated indexes
+are tied to the exact original JSON; original loading remains the fallback.
+See [1.0 implementation evidence](docs/implementation-10.md).
+
+## 1.0 execution ownership
+
+The Core ML actor owns a `PocketCoreMLExecutionPlan`: resident graphs, immutable
+text-asset leases, and bounded position/noise/sampler inputs. Each invocation owns
+RNG progress, transformer/codec state, continuation latents and delivery counters.
+Latents remain in Core ML storage between predictions; only continuation blocks
+and caller-owned PCM materialize host arrays. Shape views retain their source
+allocation. Input workspaces are used only by synchronous prediction calls.
+
+`PocketPreparedTextAssets` shares only parsed immutable configuration/tokenizer
+state. Acquisitions still read and hash current source bytes. Weak leases and a
+bounded registry avoid process-lifetime residency; public direct models retain
+their original mutable ownership and initialization/RNG behavior.
+
+`VerifiedAssetHashing` checks every byte on every load with at most four workers.
+It selects errors in manifest order, preserves each caller's size policy, and
+joins workers before cancellation or failure returns. This is parallel validation,
+not a cache of verification results.
+
+Core ML renders own an autorelease scope, and delivery-state validation drains each
+file-read block. Repeated synchronous callers must not depend on a UI run loop to
+release Foundation/Core ML temporary objects. The device soak and isolated memory
+regression exercise this ownership boundary.
+
+The private MLX rotary context reuses one position's identical terms across layers.
+Public direct-model construction keeps the original computation path. The capacity
+storage experiment is retained as an experiment artifact, not a public API change.
+It is excluded from production because paired CPU/GPU results did not establish
+a consistent benefit. See the implementation record for measured tradeoffs.

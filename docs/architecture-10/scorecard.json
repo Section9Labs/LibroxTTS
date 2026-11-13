@@ -1,0 +1,162 @@
+{
+  "baseline": "07fcf437004027f58ad8bb16de7877d0ee74a9a8",
+  "goals": [
+    {
+      "id": "max-throughput",
+      "metric": "baseline wall / candidate wall",
+      "goal": 2.0,
+      "workload": "fixed 270-character English Caro/Calm passage, continuation, four steps; Core ML CPU on Mac; separate MLX CPU/GPU scorecards",
+      "observed": 0.9496414077560538,
+      "status": "missed",
+      "targetSeconds": 2.0781855624809396,
+      "candidateSeconds": 4.376779583340976
+    },
+    {
+      "id": "cold-first-audio",
+      "metric": "candidate / baseline first accepted frame",
+      "goal": 0.5,
+      "workload": "Fresh physical iPad setup plus first accepted audio; original design requires all preparation",
+      "observed": 0.9882644894255633,
+      "status": "missed",
+      "nominatedMacProbe": "Release09Benchmark cold case; fresh processes, no preview; includes validation and model load",
+      "measurementScope": "Installed/prepared-pack Mac process startup is supplemental; the 50% release goal retains full preparation",
+      "targetSeconds": 1.9451069270799053,
+      "candidateSeconds": 3.844560208337498
+    },
+    {
+      "id": "peak-memory",
+      "metric": "candidate / baseline sampled process footprint",
+      "goal": 0.7,
+      "workload": "same fixed sidecar cases and long-run profile; sampled footprint is not allocation high-water",
+      "observed": 0.6573157236814298,
+      "status": "met"
+    },
+    {
+      "id": "contextual-planning",
+      "metric": "baseline wall / candidate wall",
+      "goal": 10.0,
+      "workload": "fixed English and Spanish number/dictionary/context-rich long sentences, plus short and plain controls",
+      "observed": 27.045995055660416,
+      "status": "met"
+    },
+    {
+      "id": "cold-dictionary",
+      "metric": "baseline wall / candidate wall",
+      "goal": 5.0,
+      "workload": "US and GB first Lexicon creation in fresh Release probe processes",
+      "observed": 19.92248883256191,
+      "status": "met"
+    }
+  ],
+  "exactMacRecordings": 92,
+  "exactMacSamples": 5901744,
+  "installedPackMacColdRatio": 0.40443212102202253,
+  "coreMLTimingReceipt": "backend-coreml-final.json",
+  "preparationControls": [
+    {
+      "probe": "Planning10",
+      "case": "ctPlusV1-case2",
+      "baselineSeconds": 0.0009399999398738146,
+      "candidateSeconds": 0.0009363333811052144,
+      "speedup": 1.0039158689016003
+    },
+    {
+      "probe": "Planning10",
+      "case": "ctPlusV1-case3",
+      "baselineSeconds": 0.005342000047676265,
+      "candidateSeconds": 0.005457854131236672,
+      "speedup": 0.9787729608057231
+    },
+    {
+      "probe": "Planning10",
+      "case": "pocketTTSV1-case2",
+      "baselineSeconds": 0.0009530208189971745,
+      "candidateSeconds": 0.0009507708600722253,
+      "speedup": 1.0023664575971316
+    },
+    {
+      "probe": "Planning10",
+      "case": "pocketTTSV1-case3",
+      "baselineSeconds": 0.0026374166482128203,
+      "candidateSeconds": 0.0026084791170433164,
+      "speedup": 1.0110936411108034
+    }
+  ],
+  "warmPronunciation": {
+    "exact": true,
+    "baselineSeconds": 0.012954041652847081,
+    "candidateSeconds": 0.013511541648767889,
+    "speedup": 0.9587389795766462,
+    "runs": [
+      {
+        "seconds": 0.013113958295434713,
+        "sha256": "64f01a9f0507ff2ed2a7a5c9340ab6ae908721d276063840430e06b957b9748c",
+        "revision": "baseline"
+      },
+      {
+        "seconds": 0.014212666661478579,
+        "sha256": "64f01a9f0507ff2ed2a7a5c9340ab6ae908721d276063840430e06b957b9748c",
+        "revision": "candidate"
+      },
+      {
+        "seconds": 0.012810416636057198,
+        "sha256": "64f01a9f0507ff2ed2a7a5c9340ab6ae908721d276063840430e06b957b9748c",
+        "revision": "candidate"
+      },
+      {
+        "seconds": 0.01279412501025945,
+        "sha256": "64f01a9f0507ff2ed2a7a5c9340ab6ae908721d276063840430e06b957b9748c",
+        "revision": "baseline"
+      }
+    ]
+  },
+  "indexedResourceBytes": 32000763,
+  "limitations": [
+    "Measured workloads only; no universal throughput or memory claim",
+    "Shared Mac timing, two process trials per revision; descriptive medians",
+    "Cold release goal counts fresh physical-device preparation; installed/prepared-pack Mac process startup is supplemental",
+    "Sampled process footprint, not allocation high-water",
+    "Goals are unchanged; missing a goal does not permit changing audio or contracts"
+  ],
+  "deviceTiming": {
+    "baseline": {
+      "freshSetupPlusFirstAudioSeconds": 3.8902138541598106,
+      "freshSetupSeconds": 2.4542746458173497,
+      "warmPassageMedianSeconds": 3.7127849583048373,
+      "warmThermalStates": [
+        0
+      ]
+    },
+    "candidate": {
+      "freshSetupPlusFirstAudioSeconds": 3.844560208337498,
+      "freshSetupSeconds": 2.3945164583419682,
+      "warmPassageMedianSeconds": 4.4724466250045225,
+      "warmThermalStates": [
+        0
+      ]
+    },
+    "warmSpeedup": 0.8301462867208802,
+    "freshColdRatio": 0.9882644894255633
+  },
+  "device": {
+    "exactPCMAndEvents": true,
+    "qualificationSamples": 1006080,
+    "baselineRenders": 53,
+    "candidateRenders": 393,
+    "candidateRenderSeconds": 1799.0855911250983,
+    "baselinePeakBytes": 1552632088,
+    "candidateMatchedCountPeakBytes": 92833016,
+    "candidateFullSoakPeakBytes": 93897976,
+    "matchedCountFootprintRatio": 0.05979073646454227,
+    "candidateFinalHalfMinimumBytes": 82773240,
+    "candidateFinalHalfMaximumBytes": 93897976,
+    "baselineThermal": {
+      "0": 17,
+      "2": 36
+    },
+    "candidateThermal": {
+      "0": 16,
+      "2": 377
+    }
+  }
+}

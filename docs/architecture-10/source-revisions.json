@@ -1,0 +1,13 @@
+{
+  "baseline": "07fcf437004027f58ad8bb16de7877d0ee74a9a8",
+  "productionCandidate": "f1d31fa8c4c1b6e50cb7eca83f07c8fe6e526349",
+  "branch": "codex/1.0-architecture-review",
+  "published": false,
+  "candidateTrees": {
+    "Sources": "0077d2aa41bad44c40ce7b98cae02fa68c05f7d3",
+    "Integrations": "9eb6b685a4fc609e67dc18d624b3ddfd4286ed0c",
+    "Package.swift": "c5ae94fe134e88230bd1ce590d245f1581d1f345"
+  },
+  "packageResolvedSHA256": "ba43a3127689820e0ac58fe4c4b09d8cb11fbf0e7be98a765bcd4d17ba77069c",
+  "note": "Executable hashes are in individual receipts; test-only harnesses and documentation were added after the production source commit. Baseline production files were unchanged."
+}
