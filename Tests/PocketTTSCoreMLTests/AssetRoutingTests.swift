@@ -16,7 +16,7 @@ final class AssetRoutingTests: XCTestCase {
         XCTAssertEqual(PocketTTSBackend.platform, .mlx)
         #endif
         XCTAssertEqual(NarrationAssets.repositoryID(.pocket), PocketTTSBackend.platform.repositoryID)
-        XCTAssertEqual(NarrationModel.pocket.deliveryIdentity, PocketTTSBackend.platform.runtimeIdentity)
+        XCTAssertEqual(NarrationModel.pocket.deliveryIdentity, PocketTTSBackend.platform.runtimeIdentity + ":" + PocketNarrationLevel.revision)
         XCTAssertNotEqual(PocketTTSBackend.mlx.runtimeIdentity, PocketTTSBackend.coreML.runtimeIdentity)
         let other = PocketTTSBackend.platform == .mlx ? PocketTTSBackend.coreML : .mlx
         XCTAssertThrowsError(try NarrationAssets.manifest(.pocket, repositoryID: other.repositoryID))

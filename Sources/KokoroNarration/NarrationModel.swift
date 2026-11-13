@@ -44,7 +44,7 @@ public enum NarrationModel: String, CaseIterable, Codable, Sendable, Identifiabl
     public var outputSampleRate: Int { nativeSampleRate }
     public var nativeSampleRate: Int { self == .plus ? 44_100 : 24_000 }
     public var deliveryIdentity: String {
-        self == .pocket ? PocketTTSBackend.platform.runtimeIdentity : self == .plus ? "dk-delivery-v1:native44100:source-boundaries:native-dynamics" : "profiled-narration-runtime-1"
+        self == .pocket ? PocketTTSBackend.platform.runtimeIdentity + ":" + PocketNarrationLevel.revision : self == .plus ? "dk-delivery-v1:native44100:source-boundaries:native-dynamics" : "profiled-narration-runtime-1"
     }
     public func renderIdentity(for unit: BookNarrationUnit) -> String {
         self == .pocket ? deliveryIdentity + ":" + (unit.pocketChunking ?? .init()).cacheIdentity

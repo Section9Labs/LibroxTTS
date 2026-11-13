@@ -230,7 +230,12 @@ public actor NarrationRenderer {
         guard current == .pocket else { throw RenderError.unavailable("Load Max before streaming its audio.") }
         guard let maxBackend else { throw RenderError.invalidAudio }
         if !maxBackend.isCoreML { try validateGPUAuthorization(executionContext) }
-        do { try await maxBackend.renderFrames(unit, onTextChunk: onTextChunk, receive: receive) }
+        let gain = PocketNarrationLevel.gain(voiceID: unit.voiceID, style: unit.pocketDeliveryStyle ?? .original)
+        do {
+            try await maxBackend.renderFrames(unit, onTextChunk: onTextChunk, receive: { frame in
+                try receive(PocketNarrationLevel.apply(frame, gain: gain))
+            })
+        }
         catch { try rethrowMaxError(error) }
     }
 
@@ -252,7 +257,11 @@ public actor NarrationRenderer {
             try validateGPUAuthorization(executionContext)
         }
         if let maxBackend {
-            do { return try await maxBackend.synthesize(unit) }
+            do {
+                let samples = try await maxBackend.synthesize(unit)
+                let gain = PocketNarrationLevel.gain(voiceID: unit.voiceID, style: unit.pocketDeliveryStyle ?? .original)
+                return PocketNarrationLevel.apply(consume samples, gain: gain)
+            }
             catch { try rethrowMaxError(error) }
         }
         if let plus {

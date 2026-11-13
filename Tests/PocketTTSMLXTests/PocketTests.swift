@@ -92,7 +92,8 @@ import LibroxTTS
 
 @Test func pocketSamplingDefaultsToQualityAndCarriesExplicitFallbacksIntoCache() async throws {
     #expect(PocketTTSSamplingOptions().samplerSteps == 4)
-    #expect(PocketTTSEngine.runtimeIdentity == NarrationModel.pocket.deliveryIdentity)
+    #expect(PocketTTSEngine.runtimeIdentity == PocketTTSBackend.mlx.runtimeIdentity)
+    #expect(NarrationModel.pocket.deliveryIdentity == PocketTTSBackend.platform.runtimeIdentity + ":" + PocketNarrationLevel.revision)
     let pipeline = NarrationPipeline()
     let source = "Clara was her sister. James was her brother.\n“Please stay,” said Clara.\n“No,” said James."
     let quality = try await pipeline.plan(source, model: .pocket, bookID: "book", chapterID: "one",

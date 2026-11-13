@@ -1,5 +1,6 @@
 import XCTest
 import Synchronization
+import KokoroNarration
 import PocketTTSMLX
 @testable import LibroxTTS
 
@@ -51,6 +52,34 @@ private actor ControlledMax: NarrationMaxBackend {
         while !(await condition()), ContinuousClock.now < deadline { await Task.yield() }
         let result = await condition()
         XCTAssertTrue(result)
+    }
+
+    func testDefaultLevelUsesVoiceAndStyleWithoutChangingFrameAcceptance() async throws {
+        let engine = ControlledMax()
+        let renderer = NarrationRenderer(compactDirectory: .temporaryDirectory, admission: .init(), maxFactory: { _, _ in engine })
+        try await renderer.load(.pocket, directory: .temporaryDirectory)
+        for voice in ["caro_davy", "bill_boerst", "peter_yearsley", "stuart_bell"] {
+            for style: PocketTTSDeliveryStyle in [.original, .neutral, .calm, .shout] {
+                var passage = BookNarrationUnit(sourceText: "Hello.", sourceRange: NSRange(location: 0, length: 6),
+                    narratorID: "pocket-\(voice)-en-v1", boundaryAfter: .sentence)
+                passage.pocketDeliveryStyle = style
+                let gain = PocketNarrationLevel.gain(voiceID: passage.voiceID, style: style)
+                let expected = PocketNarrationLevel.apply([Float](repeating: 0.25, count: 1920), gain: gain)
+                let buffered = try await renderer.render(passage)
+                XCTAssertEqual(buffered, expected)
+                let capture = Mutex((samples: [Float](), events: 0))
+                try await renderer.renderPocketFrames(passage, onTextChunk: { event in
+                    capture.withLock {
+                        XCTAssertEqual(event.startSample, 0)
+                        XCTAssertEqual(event.endSample, $0.samples.count)
+                        $0.events += 1
+                    }
+                }, receive: { frame in capture.withLock { $0.samples += frame } })
+                XCTAssertEqual(capture.withLock { $0.samples }, buffered)
+                XCTAssertEqual(capture.withLock { $0.events }, 1)
+            }
+        }
+        await renderer.unload()
     }
 
     func testQueuedCancellationAndUnloadCannotOvertakeActiveFrames() async throws {

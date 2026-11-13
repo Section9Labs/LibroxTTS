@@ -1,5 +1,6 @@
 import Foundation
 import MLX
+import KokoroNarration
 import PocketTTSCoreML
 import PocketTTSMLX
 import Synchronization
@@ -15,7 +16,7 @@ final class NarrationBackendParityTests: XCTestCase {
     }
     private struct Receipt: Decodable { let events: [Event] }
 
-    func testMLXFacadeMatchesDirectEngineOnCPUAndGPU() async throws {
+    func testMLXFacadeAppliesOnlyFrozenLevelOnCPUAndGPU() async throws {
         guard let assets = ProcessInfo.processInfo.environment["LIBROX_08_MLX_ASSETS"] else {
             throw XCTSkip("Verified local MLX assets are required")
         }
@@ -33,6 +34,7 @@ final class NarrationBackendParityTests: XCTestCase {
         unit.pocketChunking = .carefulReading
         unit.pocketSampling = .init(temperature: 0.3, samplerSteps: 4)
         await renderer.setCPUBudget(fraction: nil)
+        let gain = PocketNarrationLevel.gain(voiceID: unit.voiceID, style: .original)
         for context: NarrationRenderer.ExecutionContext in [.foreground, .background] {
             try await renderer.load(.pocket, directory: root, executionContext: context)
             await engine.setRandomSeed(42)
@@ -43,22 +45,22 @@ final class NarrationBackendParityTests: XCTestCase {
             await engine.unload()
             await engine.setRandomSeed(42)
             let coldComplete = try await renderer.render(unit)
-            XCTAssertEqual(coldComplete.withUnsafeBytes { Data($0) }, coldReference.withUnsafeBytes { Data($0) })
+            XCTAssertEqual(coldComplete.withUnsafeBytes { Data($0) }, PocketNarrationLevel.apply(coldReference, gain: gain).withUnsafeBytes { Data($0) })
             await engine.setRandomSeed(42)
             let reference = try await engine.synthesize(text, voiceID: unit.voiceID, chunking: .carefulReading,
                                                        samplerSteps: 4).samples
             await engine.setRandomSeed(42)
             let complete = try await renderer.render(unit)
-            XCTAssertEqual(complete.withUnsafeBytes { Data($0) }, reference.withUnsafeBytes { Data($0) })
+            XCTAssertEqual(complete.withUnsafeBytes { Data($0) }, PocketNarrationLevel.apply(reference, gain: gain).withUnsafeBytes { Data($0) })
             await engine.setRandomSeed(42)
             let frames = Mutex([Float]())
             try await renderer.renderPocketFrames(unit, receive: { frame in frames.withLock { $0 += frame } })
-            XCTAssertEqual(frames.withLock { $0.withUnsafeBytes { Data($0) } }, reference.withUnsafeBytes { Data($0) })
+            XCTAssertEqual(frames.withLock { $0.withUnsafeBytes { Data($0) } }, PocketNarrationLevel.apply(reference, gain: gain).withUnsafeBytes { Data($0) })
         }
         await renderer.unload()
     }
 
-    func testRealFacadeMatches062PCMEventsAndRecoversAfterReceiverCancellation() async throws {
+    func testRealFacadeCalibratesFrozenPCMRetainsEventsAndRecoversAfterCancellation() async throws {
         let env = ProcessInfo.processInfo.environment
         guard let assets = env["LIBROX_08_POCKET_ASSETS"], let recordings = env["LIBROX_07_AUDIO_BASELINE"] else {
             throw XCTSkip("Verified Core ML assets and the frozen 0.6.2 recordings are required")
@@ -75,7 +77,13 @@ final class NarrationBackendParityTests: XCTestCase {
             unit.pocketChunking = .carefulReading; unit.pocketDeliveryStyle = .calm
             try await renderer.load(.pocket, directory: root, executionContext: .foreground)
             let name = "pocket-\(language)-3-steps4"
-            let expected = try Data(contentsOf: baseline.appendingPathComponent(name + ".f32"))
+            let frozen = try Data(contentsOf: baseline.appendingPathComponent(name + ".f32"))
+            await engine.setRandomSeed(42)
+            let raw = try await engine.synthesize(text, voiceID: unit.voiceID, chunking: .carefulReading,
+                                                  deliveryStyle: .calm).samples
+            XCTAssertEqual(raw.withUnsafeBytes { Data($0) }, frozen, "Raw engine audio changed")
+            let gain = PocketNarrationLevel.gain(voiceID: unit.voiceID, style: .calm)
+            let expected = PocketNarrationLevel.apply(raw, gain: gain).withUnsafeBytes { Data($0) }
             await engine.setRandomSeed(42)
             let complete = try await renderer.render(unit)
             XCTAssertEqual(complete.withUnsafeBytes { Data($0) }, expected)
