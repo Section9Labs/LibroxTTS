@@ -222,7 +222,7 @@ public actor PocketTTSVoiceStore {
         try Task.checkCancellation()
         try bytes.write(to: destination, options: .atomic)
         #if os(iOS)
-        try FileManager.default.setAttributes([.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication], atPath: destination.path)
+        try FileManager.default.setAttributes([.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication], ofItemAtPath: destination.path)
         #endif
         let voice = try PocketTTSImportedVoice.inspect(data: bytes, at: destination)
         PocketTTSVoiceRegistry.shared.register(voice, in: directory)
