@@ -11,11 +11,12 @@ public enum TextNativeNarrationPlanner {
     public enum PlanningError: Error { case invalidVoice, unbreakableText }
     public static func plan(_ text: String, voiceID: String,
                             lexicon: SpokenTextLexicon = .init(), model: NarrationModel = .plus,
-                            pocketChunking: PocketTTSChunkingOptions = .init()) throws -> [BookNarrationUnit] {
+                            pocketChunking: PocketTTSChunkingOptions = .init(),
+                            importedVoices: [PocketTTSImportedVoice] = []) throws -> [BookNarrationUnit] {
         guard text.unicodeScalars.count <= PronunciationEngine.maximumInputScalars else {
             throw PronunciationError.inputTooLong(limit: PronunciationEngine.maximumInputScalars)
         }
-        guard let voice = model.nativeVoices.first(where: { $0.id == voiceID }) else {
+        guard let voice = model.nativeVoices(importedVoices: importedVoices).first(where: { $0.id == voiceID }) else {
             throw PlanningError.invalidVoice
         }
         if model == .pocket { try pocketChunking.validate() }

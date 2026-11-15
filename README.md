@@ -33,6 +33,14 @@ original 2x synthesis goal remains unmet. Technical qualification does not repla
 host-app integration or human listening; the published release retains these
 explicit gaps in its [qualification record](docs/validation/release-1.0.0.json).
 
+### Imported voices (unreleased)
+
+This branch adds prepared `.libroxvoice` imports through `PocketTTSVoiceStore`,
+with explicit imported-voice snapshots for narration planning and both native
+backends. See the [SDK contract and validation](docs/validation/imported-voices/README.md)
+and [Librox import-flow prompt](docs/IMPORTED-VOICES-LIBROX-HANDOFF.md).
+This imports an existing model-specific voice state; it does not clone raw audio.
+
 ## Install
 
 Add the versioned Swift package:

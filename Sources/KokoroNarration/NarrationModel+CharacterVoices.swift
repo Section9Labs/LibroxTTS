@@ -10,11 +10,11 @@ extension NarrationModel {
         public let gender: BookVoiceCast.Gender
     }
 
-    public func characterVoiceCatalog(language: String) -> [CharacterVoice] {
+    public func characterVoiceCatalog(language: String, importedVoices: [PocketTTSImportedVoice] = []) -> [CharacterVoice] {
         guard supportsCharacterVoices, let language = NarrationLanguage.normalize(language),
               supportedLanguageCodes.contains(language) else { return [] }
         if usesTextNativePlanning {
-            return nativeVoices.filter { $0.language == language }.map {
+            return nativeVoices(importedVoices: importedVoices).filter { $0.language == language }.map {
                 CharacterVoice(id: $0.id, name: $0.name, gender: self == .pocket
                     ? PocketTTSCatalog.voice(id: $0.id).flatMap { BookVoiceCast.Gender(rawValue: $0.gender.rawValue) } ?? .unknown
                     : ($0.styleID.hasPrefix("F") ? .female : .male))
@@ -35,12 +35,12 @@ extension NarrationModel {
     /// Persist the returned cast before playback and retain it between chapters.
     /// BookVoiceCast stores a language code independent of the phoneme catalog.
     /// Localized explicit speech tags and labels share the same persisted cast.
-    public func makeVoiceCast(bookID: String, language: String, narratorVoiceID: String) throws -> BookVoiceCast {
+    public func makeVoiceCast(bookID: String, language: String, narratorVoiceID: String, importedVoices: [PocketTTSImportedVoice] = []) throws -> BookVoiceCast {
         guard let code = NarrationLanguage.normalize(language),
               supportedLanguageCodes.contains(code) else {
             throw NarrationPipeline.PlanningError.unsupportedLanguage(language)
         }
-        let voices = characterVoiceCatalog(language: code)
+        let voices = characterVoiceCatalog(language: code, importedVoices: importedVoices)
         guard voices.contains(where: { $0.id == narratorVoiceID }) else {
             throw NarrationPipeline.PlanningError.invalidVoice
         }
@@ -52,8 +52,8 @@ extension NarrationModel {
 
     /// Add newly available voices without changing identities, assignments or
     /// explicit narrator fallbacks. Reject a cast from a different model catalog.
-    public func expandingVoiceCatalog(in cast: BookVoiceCast) throws -> BookVoiceCast {
-        let voices = characterVoiceCatalog(language: cast.language.rawValue)
+    public func expandingVoiceCatalog(in cast: BookVoiceCast, importedVoices: [PocketTTSImportedVoice] = []) throws -> BookVoiceCast {
+        let voices = characterVoiceCatalog(language: cast.language.rawValue, importedVoices: importedVoices)
         let available = Set(voices.map(\.id))
         let existing = Set(cast.voicePool + [cast.narratorVoiceID] + Array(cast.characterVoices.values))
         guard existing.isSubset(of: available) else { throw NarrationPipeline.PlanningError.invalidVoice }

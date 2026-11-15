@@ -22,11 +22,11 @@ enum PocketNarrationBackend: NarrationMaxBackend {
     case coreML(PocketTTSCoreMLEngine)
     case mlx(PocketTTSEngine)
 
-    static func make(directory: URL, context: NarrationRenderer.ExecutionContext) -> Self {
+    static func make(directory: URL, context: NarrationRenderer.ExecutionContext, importedVoices: [PocketTTSImportedVoice] = []) -> Self {
         if PocketTTSBackend.platform == .coreML {
-            return .coreML(PocketTTSCoreMLEngine(directory: directory, placement: .cpu))
+            return .coreML(PocketTTSCoreMLEngine(directory: directory, placement: .cpu, importedVoices: importedVoices))
         }
-        return .mlx(PocketTTSEngine(directory: directory, backend: context == .background ? .cpu : .gpu))
+        return .mlx(PocketTTSEngine(directory: directory, backend: context == .background ? .cpu : .gpu, importedVoices: importedVoices))
     }
     var isCoreML: Bool { if case .coreML = self { true } else { false } }
     var loadedLanguage: String? {

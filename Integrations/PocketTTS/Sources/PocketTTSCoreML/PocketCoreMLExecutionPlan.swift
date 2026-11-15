@@ -96,7 +96,13 @@ final class PocketCoreMLExecutionPlan {
             prepare: { try PocketTTSTextUtils.prepareTextPrompt($0, config: self.config, preserveSentenceBoundaries: options.grouping == .adaptive).0 },
             tokenCount: { self.tokenizer.encode($0).count })
     }
-    func voice(_ name: String) throws -> [MLMultiArray] {
+    func voice(_ name: String, imported: PocketTTSImportedVoiceState? = nil) throws -> [MLMultiArray] {
+        if let imported {
+            return try imported.layers.flatMap { layer in
+                try [PocketTTSCoreMLEngine.floats(layer.key, shape: [1,16,imported.frames,64]),
+                     PocketTTSCoreMLEngine.floats(layer.value, shape: [1,16,imported.frames,64])]
+            }
+        }
         if let native = try? PocketVoiceArchive.read(root.appendingPathComponent("embeddings/\(name).safetensors")) { return native }
         return try Device.withDefaultDevice(.cpu) {
             let arrays = try MLX.loadArrays(url: root.appendingPathComponent("embeddings/\(name).safetensors"))

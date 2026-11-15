@@ -16,13 +16,14 @@ public actor PocketTTSCoreMLEngine {
     public struct Output: Sendable { public let samples: [Float]; public let sampleRate: Int }
     public enum Failure: Error { case incompatibleModel, unsupportedSampler(Int), cacheLimit, invalidShape, missingOutput(String), generationLimit(tokens: Int, frames: Int) }
     private let assets: URL
+    private let importedVoices: [PocketTTSImportedVoice]
     private let models: URL?
     private let placement: Placement
     private var loaded: PocketCoreMLExecutionPlan?
     private var seed: UInt64?
     private var random: MLXRandom.RandomState?
-    public init(directory: URL, modelsDirectory: URL? = nil, placement: Placement = .cpu) {
-        assets = directory; models = modelsDirectory; self.placement = placement
+    public init(directory: URL, modelsDirectory: URL? = nil, placement: Placement = .cpu, importedVoices: [PocketTTSImportedVoice] = []) {
+        assets = directory; models = modelsDirectory; self.placement = placement; self.importedVoices = importedVoices
     }
     private var resourceObserver: (@Sendable (PocketTTSResourceSnapshot) -> Void)?
     public func setResourceObserver(_ observer: (@Sendable (PocketTTSResourceSnapshot) -> Void)?) {
@@ -46,8 +47,9 @@ public actor PocketTTSCoreMLEngine {
     public func previewChunks(_ text: String, voiceID: String,
                               chunking: PocketTTSChunkingOptions = .init(),
                               role: PocketTTSPassageRole = .narration) throws -> [PocketTTSTextChunk] {
-        guard let voice = PocketTTSCatalog.voice(id: voiceID) else { throw PocketTTSError.invalidVoice }
-        return try load(voice.language).chunks(text, options: chunking, role: role)
+        guard let language = PocketTTSImportedVoice.resolve(voiceID, in: importedVoices)?.language
+            ?? PocketTTSCatalog.voice(id: voiceID)?.language else { throw PocketTTSError.invalidVoice }
+        return try load(language).chunks(text, options: chunking, role: role)
     }
     public func synthesize(_ text: String, voiceID: String, temperature: Float = 0.3,
                            continueChunks: Bool = true, chunking: PocketTTSChunkingOptions = .init(),
@@ -75,9 +77,17 @@ public actor PocketTTSCoreMLEngine {
         try chunking.validate()
         try PocketTTSSamplingOptions(temperature: temperature, samplerSteps: samplerSteps).validate()
         guard (1...8).contains(samplerSteps) else { throw Failure.unsupportedSampler(samplerSteps) }
-        guard let voice = PocketTTSCatalog.voice(id: voiceID) else { throw PocketTTSError.invalidVoice }
-        try PocketTTSDeliveryCatalog.validate(deliveryStyle, voiceID: voiceID, in: assets)
-        let name = try PocketTTSDeliveryCatalog.stateName(voiceID: voiceID, style: deliveryStyle)
+        let imported = PocketTTSImportedVoice.resolve(voiceID, in: importedVoices)
+        guard let language = imported?.language ?? PocketTTSCatalog.voice(id: voiceID)?.language else { throw PocketTTSError.invalidVoice }
+        let name: String
+        if imported != nil {
+            guard deliveryStyle == .original else { throw PocketTTSImportedVoice.ImportError.unsupportedStyle }
+            name = voiceID
+        } else {
+            try PocketTTSDeliveryCatalog.validate(deliveryStyle, voiceID: voiceID, in: assets)
+            name = try PocketTTSDeliveryCatalog.stateName(voiceID: voiceID, style: deliveryStyle)
+        }
+        let importedState = try imported?.state()
         // Synchronous actor work can be called repeatedly without a run-loop
         // autorelease drain. Bound Foundation/Core ML bridge lifetimes to one
         // render, including retained-output views and native voice preparation.
@@ -88,10 +98,10 @@ public actor PocketTTSCoreMLEngine {
                 do {
                     try PocketTTSResourceChecks.checkpoint("operation-start", backend: "coreml-cpu", samplerSteps: samplerSteps, observer: resourceObserver)
                     let budget = PocketCPUWorkBudget.backgroundBudget(cpu: placement == .cpu || placement == .cpuANE, fraction: cpuBudgetFraction)
-                    let m = try load(voice.language)
+                    let m = try load(language)
                     m.timings = [:]
                     let flow = try m.flow(samplerSteps)
-                    let prompt = try m.voice(name)
+                    let prompt = try m.voice(name, imported: importedState)
                     let chunks = try m.chunks(text, options: chunking, role: role)
                     var previousText: String?
                     var previous: [MLMultiArray] = []

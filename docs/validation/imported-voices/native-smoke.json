@@ -1,0 +1,63 @@
+{
+  "platform": "macOS",
+  "renders": [
+    {
+      "backend": "mlx",
+      "audioSeconds": 29.68,
+      "sampleRate": 24000,
+      "peak": 0.38602414727211,
+      "wordsMatch": true,
+      "finite": true,
+      "chunking": {
+        "grouping": "adaptive",
+        "narrationTargetTokens": 32,
+        "dialogueTargetTokens": 32,
+        "maximumTokens": 32,
+        "shortSentenceTokens": 0,
+        "maximumUnitScalars": 2400
+      },
+      "voiceID": "pocket-custom-es-0H9MYgoHMqnhYVXlO6o8A-zUk4pKBMsGhp4e-gP8x_o",
+      "packageSHA256": "d07f4c620a0732a9e16155e53baa3c03ecd4938a4a04cb06869e1efa03fcc7fa"
+    },
+    {
+      "backend": "coreml",
+      "audioSeconds": 28.32,
+      "sampleRate": 24000,
+      "peak": 0.3581435978412628,
+      "wordsMatch": true,
+      "finite": true,
+      "chunking": {
+        "grouping": "adaptive",
+        "narrationTargetTokens": 32,
+        "dialogueTargetTokens": 32,
+        "maximumTokens": 32,
+        "shortSentenceTokens": 0,
+        "maximumUnitScalars": 2400
+      },
+      "voiceID": "pocket-custom-es-0H9MYgoHMqnhYVXlO6o8A-zUk4pKBMsGhp4e-gP8x_o",
+      "packageSHA256": "d07f4c620a0732a9e16155e53baa3c03ecd4938a4a04cb06869e1efa03fcc7fa"
+    },
+    {
+      "backend": "renderer-stream",
+      "audioSeconds": 29.36,
+      "sampleRate": 24000,
+      "peak": 0.3728981018066406,
+      "wordsMatch": true,
+      "finite": true,
+      "chunking": {
+        "grouping": "adaptive",
+        "narrationTargetTokens": 32,
+        "dialogueTargetTokens": 32,
+        "maximumTokens": 32,
+        "shortSentenceTokens": 0,
+        "maximumUnitScalars": 2400
+      },
+      "voiceID": "pocket-custom-es-0H9MYgoHMqnhYVXlO6o8A-zUk4pKBMsGhp4e-gP8x_o",
+      "packageSHA256": "d07f4c620a0732a9e16155e53baa3c03ecd4938a4a04cb06869e1efa03fcc7fa"
+    }
+  ],
+  "physicalDeviceTested": false,
+  "appIntegrated": false,
+  "tensorPayloadUnchanged": true,
+  "initialDefaultGroupingOmittedSentence": true
+}

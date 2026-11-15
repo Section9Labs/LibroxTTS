@@ -197,7 +197,7 @@ public final class PocketTTSModel: Module {
 
     /// Synchronous callback supplies natural 80 ms codec frames and backpressure.
     /// Keep this object inside one actor; a model contains mutable decoder state.
-    public func render(text: String, voice: String, continuation: Bool = true,
+    public func render(text: String, voice: String, importedVoice: PocketTTSImportedVoice? = nil, continuation: Bool = true,
                        chunking: PocketTTSChunkingOptions = .init(),
                        role: PocketTTSPassageRole = .narration, language: String = "en",
                        checkpoint: (String) throws -> Void = { _ in },
@@ -206,7 +206,16 @@ public final class PocketTTSModel: Module {
         try validateSampling()
         defer { mimi.resetState(); diagnosticTokenCount = nil; diagnosticFrameIndex = nil }
         try checkpoint("before-voice")
-        var state = try loadVoiceState(voice)
+        var state: PocketTTSState
+        if let importedVoice {
+            guard importedVoice.language == language else { throw PocketTTSError.unsupportedLanguage }
+            let imported = try importedVoice.state()
+            state = initState()
+            guard state.flowCache.count == imported.layers.count else { throw PocketTTSError.invalidVoice }
+            for (cache, layer) in zip(state.flowCache, imported.layers) {
+                cache.state = [MLXArray(layer.key, [1,16,imported.frames,64]), MLXArray(layer.value, [1,16,imported.frames,64])]
+            }
+        } else { state = try loadVoiceState(voice) }
         let promptFrames = getFlowCacheNumFrames(state)
         let chunks = try chunkPlan(text: text, language: language, role: role, options: chunking)
         var previousText: String?
