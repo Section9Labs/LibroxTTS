@@ -1,0 +1,159 @@
+{
+  "version": "1.1.1",
+  "featureCommit": "0e5dbd84dcd0667dcf2dd4feca9bc0e46c9e35ec",
+  "implementationCommit": "552e543b9a0c6e61bc27c062ecfb388d5dc9bfdd",
+  "scope": "Register validated .libroxvoice packages in the existing catalog and load their state through existing native backend APIs. Import/reopen/delete are voice management operations.",
+  "preserved": [
+    "All 2826 prior public declarations",
+    "Existing planner, renderer and engine signatures",
+    "Stock catalog ordering, IDs, installed hashes and download transport",
+    "Phrasing, sampling, delivery and memory policies",
+    "1.0 Max loudness revision and stock audio-cache identities"
+  ],
+  "api": {
+    "baseline": 2826,
+    "newImportDeclarations": 60,
+    "total": 2886,
+    "missing": 0,
+    "changed": 0,
+    "inventory": "api-1.1.1-additions.json"
+  },
+  "tests": {
+    "focusedImportLifecycleDebug": {
+      "tests": 9,
+      "failures": 0
+    },
+    "focusedImportLifecycleRelease": {
+      "tests": 9,
+      "failures": 0
+    },
+    "fullDebug": {
+      "status": "passed",
+      "xctestReported": 171,
+      "xctestSkipped": 36,
+      "swiftTestingReported": 559,
+      "failures": 0
+    },
+    "fullRelease": {
+      "status": "passed",
+      "xctestReported": 171,
+      "xctestSkipped": 36,
+      "swiftTestingReported": 559,
+      "failures": 0
+    },
+    "apiCheckerUnitTests": {
+      "tests": 4,
+      "failures": 0
+    },
+    "macTestsCommit": "27d69adf3f7f61dba89b2c3754f9a39390e40e18",
+    "platformFixScope": "552e543 changes only the #if os(iOS) FileManager.setAttributes argument label; both affected platform builds pass locally."
+  },
+  "ci": {
+    "url": "https://github.com/Section9Labs/LibroxTTS/actions/runs/43775033541",
+    "status": "in_progress at publication",
+    "previousRun": {
+      "url": "https://github.com/Section9Labs/LibroxTTS/actions/runs/43772343386",
+      "passed": [
+        "API inventory",
+        "Debug tests",
+        "Release tests",
+        "Python checks"
+      ],
+      "failure": "iOS-only FileManager.setAttributes argument label; corrected in 552e543."
+    }
+  },
+  "localToolchain": {
+    "swift": "6.4.2",
+    "xcode": "27.2 (27B52)",
+    "macOS": "27.0.1 (26A434)",
+    "architecture": "arm64"
+  },
+  "reproduction": [
+    "swift package --build-system swiftbuild dump-symbol-graph --minimum-access-level public --skip-synthesized-members",
+    "python3 Scripts/check-public-api.py --additions docs/validation/api-1.1.1-additions.json",
+    "POCKET_METALLIB=$PWD/.build/out/Products/Debug/mlx-swift_Cmlx.bundle/Contents/Resources/default.metallib swift test --build-system swiftbuild",
+    "POCKET_METALLIB=$PWD/.build/out/Products/Release/mlx-swift_Cmlx.bundle/Contents/Resources/default.metallib swift test --build-system swiftbuild -c release"
+  ],
+  "nativeImportedVoice": [
+    {
+      "backend": "coreml",
+      "sampleRate": 24000,
+      "audioSeconds": 28.32,
+      "peak": 0.3581435978412628,
+      "wavSHA256": "2c1461e78452a04ca25dfbdb1439baa762b68dd6b1e2bf51b84eb3e653d92ef5",
+      "exactPriorWAV": true,
+      "engineCreatedBeforeImport": true,
+      "explicitChunking": {
+        "grouping": "adaptive",
+        "narrationTargetTokens": 32,
+        "dialogueTargetTokens": 32,
+        "maximumTokens": 32,
+        "shortSentenceTokens": 0,
+        "maximumUnitScalars": 2400
+      },
+      "wordAccuracy": "same bytes as prior ASR-checked audition",
+      "finite": true
+    },
+    {
+      "backend": "mlx",
+      "sampleRate": 24000,
+      "audioSeconds": 29.68,
+      "peak": 0.38602414727211,
+      "wavSHA256": "7e4f6807667c01c0d3c52a702232df22f3c1ccc350c135a5642c0fd44ecd8eae",
+      "exactPriorWAV": true,
+      "engineCreatedBeforeImport": true,
+      "explicitChunking": {
+        "grouping": "adaptive",
+        "narrationTargetTokens": 32,
+        "dialogueTargetTokens": 32,
+        "maximumTokens": 32,
+        "shortSentenceTokens": 0,
+        "maximumUnitScalars": 2400
+      },
+      "wordAccuracy": "same bytes as prior ASR-checked audition",
+      "finite": true
+    },
+    {
+      "backend": "renderer-stream",
+      "sampleRate": 24000,
+      "audioSeconds": 29.04,
+      "peak": 0.34473156929016113,
+      "wavSHA256": "753e4096cf43f0c6db42edf82800fdfa495f75417ec01c6630320317687e2761",
+      "exactPriorWAV": null,
+      "engineCreatedBeforeImport": true,
+      "explicitChunking": {
+        "grouping": "adaptive",
+        "narrationTargetTokens": 32,
+        "dialogueTargetTokens": 32,
+        "maximumTokens": 32,
+        "shortSentenceTokens": 0,
+        "maximumUnitScalars": 2400
+      },
+      "wordAccuracy": "not rechecked; nondeterministic seed",
+      "finite": true
+    }
+  ],
+  "stockCoreML": {
+    "voiceID": "pocket-caro_davy-en-v1",
+    "style": "calm",
+    "seed": 42,
+    "steps": 4,
+    "exactReleasedWAV": true,
+    "wavSHA256": "a46f061acd241fd011fd6e18034f57d651c903e78a736f709bd7753156c7360d",
+    "reference": "../architecture-10-speed/profile-stability.json"
+  },
+  "limits": [
+    "No app UI or physical-device acceptance performed by this SDK release.",
+    "Private audition files are not published.",
+    "Native import audition uses explicit 32-token settings; default settings are unchanged. Earlier 48-token sample omission is documented in imported-voices/README.md. Import validation does not guarantee spoken-word accuracy.",
+    "Imported states currently provide Original delivery, through ordinary capability APIs. Unknown loudness profiles use the existing unity-gain fallback.",
+    "This is integration/audio-equivalence qualification, not a new synthesis speed or memory benchmark."
+  ],
+  "localPlatformBuilds": {
+    "commit": "552e543b9a0c6e61bc27c062ecfb388d5dc9bfdd",
+    "iOS": "passed",
+    "MacCatalyst": "passed",
+    "configuration": "Release; CODE_SIGNING_ALLOWED=NO",
+    "deviceRun": false
+  }
+}
