@@ -31,13 +31,11 @@ public struct PocketTTSBookDelivery: Codable, Hashable, Sendable {
         return PocketTTSDeliveryCatalog.resolvedStyle(requested, voiceID: unit.voiceID)
     }
 
-    public func applying(to units: [BookNarrationUnit], importedVoices: [PocketTTSImportedVoice] = []) throws -> [BookNarrationUnit] {
+    public func applying(to units: [BookNarrationUnit]) throws -> [BookNarrationUnit] {
         try units.map { unit in
             try Task.checkCancellation()
             let style = style(for: unit)
-            if PocketTTSImportedVoice.resolve(unit.voiceID, in: importedVoices) == nil {
-                _ = try PocketTTSDeliveryCatalog.stateName(voiceID: unit.voiceID, style: style)
-            }
+            _ = try PocketTTSDeliveryCatalog.stateName(voiceID: unit.voiceID, style: style)
             var result = unit
             result.pocketDeliveryStyle = style == .original ? nil : style
             return result

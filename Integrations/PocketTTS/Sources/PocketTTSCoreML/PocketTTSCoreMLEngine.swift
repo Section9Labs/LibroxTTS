@@ -16,14 +16,13 @@ public actor PocketTTSCoreMLEngine {
     public struct Output: Sendable { public let samples: [Float]; public let sampleRate: Int }
     public enum Failure: Error { case incompatibleModel, unsupportedSampler(Int), cacheLimit, invalidShape, missingOutput(String), generationLimit(tokens: Int, frames: Int) }
     private let assets: URL
-    private let importedVoices: [PocketTTSImportedVoice]
     private let models: URL?
     private let placement: Placement
     private var loaded: PocketCoreMLExecutionPlan?
     private var seed: UInt64?
     private var random: MLXRandom.RandomState?
-    public init(directory: URL, modelsDirectory: URL? = nil, placement: Placement = .cpu, importedVoices: [PocketTTSImportedVoice] = []) {
-        assets = directory; models = modelsDirectory; self.placement = placement; self.importedVoices = importedVoices
+    public init(directory: URL, modelsDirectory: URL? = nil, placement: Placement = .cpu) {
+        assets = directory; models = modelsDirectory; self.placement = placement
     }
     private var resourceObserver: (@Sendable (PocketTTSResourceSnapshot) -> Void)?
     public func setResourceObserver(_ observer: (@Sendable (PocketTTSResourceSnapshot) -> Void)?) {
@@ -47,7 +46,7 @@ public actor PocketTTSCoreMLEngine {
     public func previewChunks(_ text: String, voiceID: String,
                               chunking: PocketTTSChunkingOptions = .init(),
                               role: PocketTTSPassageRole = .narration) throws -> [PocketTTSTextChunk] {
-        guard let language = PocketTTSImportedVoice.resolve(voiceID, in: importedVoices)?.language
+        guard let language = PocketTTSImportedVoice.resolve(voiceID)?.language
             ?? PocketTTSCatalog.voice(id: voiceID)?.language else { throw PocketTTSError.invalidVoice }
         return try load(language).chunks(text, options: chunking, role: role)
     }
@@ -77,7 +76,7 @@ public actor PocketTTSCoreMLEngine {
         try chunking.validate()
         try PocketTTSSamplingOptions(temperature: temperature, samplerSteps: samplerSteps).validate()
         guard (1...8).contains(samplerSteps) else { throw Failure.unsupportedSampler(samplerSteps) }
-        let imported = PocketTTSImportedVoice.resolve(voiceID, in: importedVoices)
+        let imported = PocketTTSImportedVoice.resolve(voiceID)
         guard let language = imported?.language ?? PocketTTSCatalog.voice(id: voiceID)?.language else { throw PocketTTSError.invalidVoice }
         let name: String
         if imported != nil {

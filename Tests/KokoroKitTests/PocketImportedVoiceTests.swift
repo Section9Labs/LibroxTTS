@@ -7,6 +7,22 @@ import PocketTTSMLX
 import PocketTTSCoreML
 
 final class PocketImportedVoiceTests: XCTestCase {
+    func testLegacyFunctionReferencesRemainAvailable() throws {
+        // Default arguments on a replacement signature do not preserve these
+        // function values. Keep the original overloads callable by old clients.
+        let mlxFactory: (URL, PocketTTSEngine.Backend) -> PocketTTSEngine = PocketTTSEngine.init(directory:backend:)
+        let coreFactory: (URL, URL?, PocketTTSCoreMLEngine.Placement) -> PocketTTSCoreMLEngine = PocketTTSCoreMLEngine.init(directory:modelsDirectory:placement:)
+        let rendererFactory: (URL, Bundle, URL?) -> NarrationRenderer = NarrationRenderer.init(storageRoot:resources:expressionDirectory:)
+        let directory = try folder()
+        _ = mlxFactory(directory, .cpu)
+        _ = coreFactory(directory, nil, .cpu)
+        _ = rendererFactory(directory, .main, nil)
+        let resolve: (String?, String) -> String? = NarrationModel.pocket.resolvedVoiceID(_:language:)
+        let catalog: (String) -> [NarrationModel.CharacterVoice] = NarrationModel.pocket.characterVoiceCatalog(language:)
+        XCTAssertNotNil(resolve(nil, "es"))
+        XCTAssertFalse(catalog("es").isEmpty)
+    }
+
     private func fixture(language: String = "es", name: String = "Victoria") throws -> Data {
         var header: [String: Any] = [:], body = Data()
         for layer in 0..<6 {
@@ -42,9 +58,12 @@ final class PocketImportedVoiceTests: XCTestCase {
         return try archive(header: header, body: body)
     }
     private func folder() throws -> URL {
-        let url = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let url = FileManager.default.temporaryDirectory.resolvingSymlinksInPath().appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
-        addTeardownBlock { try? FileManager.default.removeItem(at: url) }
+        addTeardownBlock {
+            PocketTTSVoiceRegistry.shared.replace([], in: url.appendingPathComponent("voices"))
+            try? FileManager.default.removeItem(at: url)
+        }
         return url
     }
     func testImportReopenDeduplicateAndRemove() async throws {
@@ -57,8 +76,17 @@ final class PocketImportedVoiceTests: XCTestCase {
         let duplicate = try await store.importVoice(from: file)
         XCTAssertEqual(duplicate, voice)
         try FileManager.default.removeItem(at: file) // Installed file is owned by the store.
+        // Simulate a new process: persisted files register with the normal catalog on reopen.
+        PocketTTSVoiceRegistry.shared.replace([], in: root.appendingPathComponent("voices"))
+        XCTAssertNil(PocketTTSCatalog.voice(id: voice.id))
         let reopened = try await PocketTTSVoiceStore(directory: root.appendingPathComponent("voices")).voices()
         XCTAssertEqual(reopened, [voice])
+        XCTAssertEqual(PocketTTSCatalog.voice(id: voice.id)?.name, voice.name)
+        XCTAssertEqual(NarrationModel.pocket.nativeVoices.first { $0.id == voice.id }?.engineVoiceID, voice.id)
+        XCTAssertEqual(PocketTTSDeliveryCatalog.publishedStyles(voiceID: voice.id), [.original])
+        XCTAssertEqual(try PocketTTSDeliveryCatalog.stateName(voiceID: voice.id, style: .original), voice.id)
+        XCTAssertEqual(try PocketTTSDeliveryCatalog.narratorManifest(voiceID: voice.id, style: .original).installedFiles.map(\.sha256),
+                       try PocketTTSBackend.platform.manifest(language: voice.language).installedFiles.map(\.sha256))
         let state = try voice.state()
         XCTAssertEqual(state.layers.count, 6)
         XCTAssertEqual(state.layers[0].key[64], 1024)
@@ -66,6 +94,7 @@ final class PocketImportedVoiceTests: XCTestCase {
         XCTAssertEqual(state.layers[0].value[64], 3072)
         try await store.remove(voice)
         let remaining = try await store.voices(); XCTAssertTrue(remaining.isEmpty)
+        XCTAssertNil(PocketTTSCatalog.voice(id: voice.id))
         XCTAssertThrowsError(try voice.state())
     }
     func testChangedFilesFailClosedAndReimportRepairs() async throws {
@@ -107,21 +136,27 @@ final class PocketImportedVoiceTests: XCTestCase {
     func testCatalogPlanningCastAndMissingSelection() async throws {
         let root = try folder(), file = root.appendingPathComponent("Victoria.libroxvoice")
         try fixture().write(to: file); let voice = try PocketTTSImportedVoice.inspect(at: file)
-        let model = NarrationModel.pocket, builtins = model.nativeVoices
-        XCTAssertEqual(model.nativeVoices(importedVoices: [voice]).count, builtins.count + 1)
-        XCTAssertEqual(model.nativeVoices.count, builtins.count)
-        XCTAssertEqual(model.nativeVoices(importedVoices: [voice, voice]).count, builtins.count + 1)
-        XCTAssertNil(model.resolvedVoiceID(voice.id, language: "en", importedVoices: [voice]))
+        let model = NarrationModel.pocket
+        let builtins = model.nativeVoices
+        let store = PocketTTSVoiceStore(directory: root.appendingPathComponent("voices"))
+        _ = try await store.importVoice(from: file)
+        XCTAssertEqual(model.nativeVoices.count, builtins.count + 1)
+        XCTAssertEqual(model.nativeVoices.filter { $0.id == voice.id }.count, 1)
+        _ = try await store.importVoice(from: file)
+        XCTAssertEqual(model.nativeVoices.count, builtins.count + 1)
+        XCTAssertNil(model.resolvedVoiceID(voice.id, language: "en"))
         let pipeline = NarrationPipeline()
         let plan = try await pipeline.plan("Clara abrió la ventana. El mar estaba en calma.", model: .pocket,
             bookID: "test", chapterID: "1", narratorVoiceID: voice.id, language: "es",
-            pocketDelivery: .init(narratorStyle: .happy), importedVoices: [voice])
+            pocketDelivery: .init(narratorStyle: .happy))
         XCTAssertFalse(plan.units.isEmpty)
+        XCTAssertTrue(plan.units.allSatisfy { $0.pocketChunking == .init() })
         XCTAssertTrue(plan.units.allSatisfy { $0.voiceID == voice.id && ($0.pocketDeliveryStyle ?? .original) == .original })
-        let cast = try model.makeVoiceCast(bookID: "test", language: "es", narratorVoiceID: voice.id, importedVoices: [voice])
+        let cast = try model.makeVoiceCast(bookID: "test", language: "es", narratorVoiceID: voice.id)
         let castPlan = try await pipeline.plan("Clara miró al mar.", model: .pocket, bookID: "test", chapterID: "2",
-            narratorVoiceID: voice.id, language: "es", cast: cast, characterVoices: true, importedVoices: [voice])
+            narratorVoiceID: voice.id, language: "es", cast: cast, characterVoices: true)
         XCTAssertEqual(castPlan.cast?.narratorVoiceID, voice.id)
+        try await store.remove(voice)
         do {
             _ = try await pipeline.plan("Hola.", model: .pocket, bookID: "test", chapterID: "3", narratorVoiceID: voice.id, language: "es")
             XCTFail("Missing custom voice must not become a preset")
@@ -133,9 +168,11 @@ final class PocketImportedVoiceTests: XCTestCase {
     func testBackendsRejectUnsupportedDeliveryBeforeModelLoad() async throws {
         let root = try folder(), file = root.appendingPathComponent("Victoria.libroxvoice")
         try fixture().write(to: file)
-        let voice = try PocketTTSImportedVoice.inspect(at: file)
-        let mlx = PocketTTSEngine(directory: root, importedVoices: [voice])
-        let coreML = PocketTTSCoreMLEngine(directory: root, importedVoices: [voice])
+        // Engines created before import must resolve the newly registered ID.
+        let mlx = PocketTTSEngine(directory: root)
+        let coreML = PocketTTSCoreMLEngine(directory: root)
+        let store = PocketTTSVoiceStore(directory: root.appendingPathComponent("voices"))
+        let voice = try await store.importVoice(from: file)
         do {
             _ = try await mlx.synthesize("Hola.", voiceID: voice.id, deliveryStyle: .happy)
             XCTFail("Unsupported style must fail")
@@ -144,25 +181,72 @@ final class PocketImportedVoiceTests: XCTestCase {
             _ = try await coreML.synthesize("Hola.", voiceID: voice.id, deliveryStyle: .happy)
             XCTFail("Unsupported style must fail")
         } catch PocketTTSImportedVoice.ImportError.unsupportedStyle {}
+        try await store.remove(voice)
+        do { _ = try await mlx.synthesize("Hola.", voiceID: voice.id); XCTFail("Removed voice") }
+        catch PocketTTSError.invalidVoice {}
+        do { _ = try await coreML.synthesize("Hola.", voiceID: voice.id); XCTFail("Removed voice") }
+        catch PocketTTSError.invalidVoice {}
     }
+    func testDisplayNameCannotSelectStockStylesOrReplaceStockVoice() async throws {
+        let root = try folder(), file = root.appendingPathComponent("custom.libroxvoice")
+        try fixture(name: "caro_davy").write(to: file)
+        let stockID = "pocket-caro_davy-es-v1"
+        let before = try await NarrationPipeline().plan("Hola.", model: .pocket, bookID: "test",
+            chapterID: "1", narratorVoiceID: stockID, language: "es")
+        let voice = try await PocketTTSVoiceStore(directory: root.appendingPathComponent("voices")).importVoice(from: file)
+        XCTAssertFalse(PocketTTSDeliveryCatalog.offersStyles(voiceID: voice.id))
+        XCTAssertEqual(PocketTTSCatalog.voice(id: voice.id)?.gender, .unknown)
+        XCTAssertEqual(NarrationModel.pocket.resolvedVoiceID(stockID, language: "es"), stockID)
+        XCTAssertEqual(NarrationModel.pocket.resolvedVoiceID(voice.id, language: "es"), voice.id)
+        XCTAssertThrowsError(try PocketTTSDeliveryCatalog.stateName(voiceID: voice.id, style: .calm))
+        let after = try await NarrationPipeline().plan("Hola.", model: .pocket, bookID: "test",
+            chapterID: "1", narratorVoiceID: stockID, language: "es")
+        XCTAssertEqual(before.units.first?.voiceID, after.units.first?.voiceID)
+        XCTAssertEqual(before.units.first?.pocketChunking, after.units.first?.pocketChunking)
+        XCTAssertEqual(NarrationModel.pocket.renderIdentity(for: before.units[0]),
+                       NarrationModel.pocket.renderIdentity(for: after.units[0]))
+    }
+
+    func testDeletingUnusedVoiceDoesNotBreakExistingCast() async throws {
+        let root = try folder(), file = root.appendingPathComponent("custom.libroxvoice")
+        try fixture().write(to: file)
+        let store = PocketTTSVoiceStore(directory: root.appendingPathComponent("voices"))
+        let voice = try await store.importVoice(from: file)
+        let model = NarrationModel.pocket, narrator = "pocket-caro_davy-es-v1"
+        let cast = try model.makeVoiceCast(bookID: "test", language: "es", narratorVoiceID: narrator)
+        XCTAssertTrue(cast.voicePool.contains(voice.id))
+        try await store.remove(voice)
+        let plan = try await NarrationPipeline().plan("Clara abrió la ventana.", model: model,
+            bookID: "test", chapterID: "1", narratorVoiceID: narrator, language: "es", cast: cast, characterVoices: true)
+        XCTAssertEqual(plan.narratorVoiceID, narrator)
+        XCTAssertFalse(try XCTUnwrap(plan.cast).voicePool.contains(voice.id))
+        XCTAssertFalse(try model.expandingVoiceCatalog(in: cast).voicePool.contains(voice.id))
+    }
+
     func testCustomCharacterAssignmentSurvivesCastRestore() async throws {
         let root = try folder(), file = root.appendingPathComponent("Victoria.libroxvoice")
         try fixture().write(to: file)
-        let voice = try PocketTTSImportedVoice.inspect(at: file), model = NarrationModel.pocket
+        let voice = try await PocketTTSVoiceStore(directory: root.appendingPathComponent("voices")).importVoice(from: file), model = NarrationModel.pocket
         let narrator = try XCTUnwrap(model.nativeVoices.first { $0.language == "es" }?.id)
-        let initial = try model.makeVoiceCast(bookID: "test", language: "es", narratorVoiceID: narrator, importedVoices: [voice])
+        let initial = try model.makeVoiceCast(bookID: "test", language: "es", narratorVoiceID: narrator)
         let text = "«Buenos días», dijo Clara. Clara abrió la ventana."
         let pipeline = NarrationPipeline()
         let discovered = try await pipeline.plan(text, model: model, bookID: "test", chapterID: "1",
-            narratorVoiceID: narrator, language: "es", cast: initial, characterVoices: true, importedVoices: [voice])
+            narratorVoiceID: narrator, language: "es", cast: initial, characterVoices: true)
         var cast = try XCTUnwrap(discovered.cast)
         let character = try XCTUnwrap(cast.characters.first)
         try cast.setVoice(voice.id, for: character.id)
         let restored = try BookVoiceCast.restore(cast.encoded(), bookID: "test")
         let final = try await pipeline.plan(text, model: model, bookID: "test", chapterID: "2",
-            narratorVoiceID: narrator, language: "es", cast: restored, characterVoices: true, importedVoices: [voice])
+            narratorVoiceID: narrator, language: "es", cast: restored, characterVoices: true)
         XCTAssertTrue(final.units.contains { $0.role == .dialogue && $0.voiceID == voice.id })
         XCTAssertEqual(final.cast?.characterVoices[character.id], voice.id)
+        try await PocketTTSVoiceStore(directory: root.appendingPathComponent("voices")).remove(voice)
+        do {
+            _ = try await pipeline.plan(text, model: model, bookID: "test", chapterID: "3",
+                narratorVoiceID: narrator, language: "es", cast: restored, characterVoices: true)
+            XCTFail("A selected deleted voice must not be silently replaced")
+        } catch NarrationPipeline.PlanningError.invalidVoice {}
     }
 
 }

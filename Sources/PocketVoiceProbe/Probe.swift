@@ -53,6 +53,13 @@ private final class VoiceFrames: @unchecked Sendable {
         let request = try JSONDecoder().decode(Request.self, from: Data(contentsOf: URL(fileURLWithPath: args[2])))
         guard ["renderer", "renderer-stream", "mlx", "coreml"].contains(request.backend) else { throw PocketTTSError.invalidAssets }
         if let path = ProcessInfo.processInfo.environment["POCKET_METALLIB"] { GPU.metallib = URL(fileURLWithPath: path) }
+        // Create the normal backends before import: no snapshot injection or
+        // renderer recreation should be necessary when the catalog changes.
+        let assets = URL(fileURLWithPath: request.assets)
+        let renderer = NarrationRenderer(compactDirectory: assets, harmonicSource: nil)
+        let mlx = PocketTTSEngine(directory: assets)
+        let coreML = PocketTTSCoreMLEngine(directory: assets,
+            modelsDirectory: request.models.map { URL(fileURLWithPath: $0) })
         let storeURL = URL(fileURLWithPath: request.store)
         let imported = try await PocketTTSVoiceStore(directory: storeURL).importVoice(from: URL(fileURLWithPath: request.package))
         // Exercise relaunch/reopen, then use the exact persisted ID in planning and rendering.
@@ -60,11 +67,10 @@ private final class VoiceFrames: @unchecked Sendable {
         guard let voice = voices.first(where: { $0.id == imported.id }) else { throw PocketTTSError.invalidVoice }
         let plan = try await NarrationPipeline().plan(request.text, model: .pocket, bookID: "voice-import-probe",
             chapterID: "1", narratorVoiceID: voice.id, language: voice.language,
-            pocketChunking: request.chunking, importedVoices: voices)
-        let assets = URL(fileURLWithPath: request.assets), start = Date()
+            pocketChunking: request.chunking)
+        let start = Date()
         var samples: [Float] = []
         if request.backend.hasPrefix("renderer") {
-            let renderer = NarrationRenderer(compactDirectory: assets, harmonicSource: nil, importedVoices: voices)
             try await renderer.load(.pocket, directory: assets, executionContext: .foreground)
             for unit in plan.units {
                 if request.backend == "renderer-stream" {
@@ -75,14 +81,13 @@ private final class VoiceFrames: @unchecked Sendable {
             }
             await renderer.unload()
         } else if request.backend == "mlx" {
-            let engine = PocketTTSEngine(directory: assets, importedVoices: voices)
+            let engine = mlx
             await engine.setRandomSeed(request.seed ?? 42)
             for unit in plan.units { samples += try await engine.synthesize(unit.synthesisText, voiceID: unit.voiceID,
                 chunking: unit.pocketChunking ?? .init()).samples }
             await engine.unload()
         } else {
-            let engine = PocketTTSCoreMLEngine(directory: assets,
-                modelsDirectory: request.models.map { URL(fileURLWithPath: $0) }, importedVoices: voices)
+            let engine = coreML
             await engine.setRandomSeed(request.seed ?? 42)
             for unit in plan.units { samples += try await engine.synthesize(unit.synthesisText, voiceID: unit.voiceID,
                 chunking: unit.pocketChunking ?? .init()).samples }

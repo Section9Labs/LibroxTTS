@@ -24,7 +24,7 @@ public enum PocketTTSDeliveryCatalog {
     /// Whether this voice has exported delivery styles. Only the reference
     /// speakers do (in every language); every other voice is Original only.
     public static func offersStyles(voiceID: String) -> Bool {
-        PocketTTSCatalog.voice(id: voiceID).map { referenceVoiceNames.contains($0.name) } ?? false
+        PocketTTSCatalog.voice(id: voiceID).map { $0.importedID == nil && referenceVoiceNames.contains($0.name) } ?? false
     }
 
     /// The style a voice actually reads with: the requested style when the voice
@@ -57,8 +57,12 @@ public enum PocketTTSDeliveryCatalog {
     }
 
     public static func stateName(voiceID: String, style: PocketTTSDeliveryStyle) throws -> String {
-        guard let voice = PocketTTSCatalog.voice(id: voiceID),
-              style == .original || referenceVoiceNames.contains(voice.name) else {
+        guard let voice = PocketTTSCatalog.voice(id: voiceID) else { throw DeliveryError.unsupportedVoice }
+        if voice.importedID != nil {
+            guard style == .original else { throw DeliveryError.unsupportedVoice }
+            return voice.id
+        }
+        guard style == .original || referenceVoiceNames.contains(voice.name) else {
             throw DeliveryError.unsupportedVoice
         }
         return style == .original ? voice.name : voice.name + "__" + style.rawValue
@@ -78,8 +82,8 @@ public enum PocketTTSDeliveryCatalog {
     /// A single performance plus provenance, avoiding a whole-language download.
     public static func manifest(voiceID: String, style: PocketTTSDeliveryStyle, backend: PocketTTSBackend = .platform) throws -> AssetManifest {
         let name = try stateName(voiceID: voiceID, style: style)
-        guard style != .original else { return try backend.manifest(language: PocketTTSCatalog.voice(id: voiceID)!.language) }
-        let voice = PocketTTSCatalog.voice(id: voiceID)!
+        guard let voice = PocketTTSCatalog.voice(id: voiceID) else { throw DeliveryError.unsupportedVoice }
+        guard style != .original else { return try backend.manifest(language: voice.language) }
         let full = try manifest(language: voice.language)
         let path = "\(voice.language)/embeddings/\(name).safetensors"
         guard full.installedFiles.contains(where: { $0.path == path }) else {
@@ -117,7 +121,7 @@ public enum PocketTTSDeliveryCatalog {
     public static func validate(_ style: PocketTTSDeliveryStyle, voiceID: String, in directory: URL) throws {
         let name = try stateName(voiceID: voiceID, style: style)
         guard style != .original else { return }
-        let voice = PocketTTSCatalog.voice(id: voiceID)!
+        guard let voice = PocketTTSCatalog.voice(id: voiceID) else { throw DeliveryError.unsupportedVoice }
         let manifest = try manifest(language: voice.language)
         guard let file = manifest.installedFiles.first(where: {
             $0.path == "\(voice.language)/embeddings/\(name).safetensors"

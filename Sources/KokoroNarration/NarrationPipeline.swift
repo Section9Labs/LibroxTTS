@@ -26,13 +26,12 @@ public actor NarrationPipeline {
                      lexicon: SpokenTextLexicon = .init(), nativeExpression: Bool = false, repositoryID: String? = nil,
                      pocketChunking: PocketTTSChunkingOptions? = nil,
                      pocketSampling: PocketTTSSamplingOptions = .init(),
-                     pocketDelivery: PocketTTSBookDelivery? = nil,
-                     importedVoices: [PocketTTSImportedVoice] = []) async throws -> Plan {
+                     pocketDelivery: PocketTTSBookDelivery? = nil) async throws -> Plan {
         try Task.checkCancellation()
         if model == .pocket { try pocketSampling.validate() }
         let delivery = model.resolvedDeliveryOptions(delivery)
         let preferredLanguage = narratorVoiceID.flatMap { id in
-            model.nativeVoices(importedVoices: importedVoices).first { $0.id == id }?.language ?? Voice.named(id)?.language.rawValue
+            model.nativeVoices.first { $0.id == id }?.language ?? Voice.named(id)?.language.rawValue
         }
         let language = NarrationLanguage.normalize(language)
             ?? NarrationLanguage.detect(metadata: metadataLanguage, sample: text) ?? preferredLanguage ?? "en"
@@ -43,7 +42,7 @@ public actor NarrationPipeline {
             ? try PocketTTSNarratorPreset.defaultNarrator(language: language) : nil
         let pocketChunking = pocketChunking ?? preset?.chunking ?? .init()
         let pocketDelivery = pocketDelivery ?? preset?.delivery ?? .init()
-        guard let voiceID = model.resolvedVoiceID(narratorVoiceID, language: language, importedVoices: importedVoices) else { throw PlanningError.invalidVoice }
+        guard let voiceID = model.resolvedVoiceID(narratorVoiceID, language: language) else { throw PlanningError.invalidVoice }
         var units: [BookNarrationUnit]
         let updatedCast: BookVoiceCast?
         var originalPlan: BookNarrationPlan?
@@ -51,14 +50,14 @@ public actor NarrationPipeline {
             let nativeCast: BookVoiceCast?
             if let cast { nativeCast = cast }
             else if characterVoices && model.supportsAutomaticCharacterAttribution(language: language) {
-                nativeCast = try model.makeVoiceCast(bookID: bookID, language: language, narratorVoiceID: voiceID, importedVoices: importedVoices)
+                nativeCast = try model.makeVoiceCast(bookID: bookID, language: language, narratorVoiceID: voiceID)
             } else { nativeCast = nil }
             if let nativeCast {
                 let plan = try TextNativeCharacterPlanner.plan(text, bookID: bookID, chapterID: chapterID,
-                    language: language, cast: nativeCast, characterVoices: characterVoices, lexicon: lexicon, model: model, pocketChunking: pocketChunking, importedVoices: importedVoices)
+                    language: language, cast: nativeCast, characterVoices: characterVoices, lexicon: lexicon, model: model, pocketChunking: pocketChunking)
                 units = plan.units; updatedCast = plan.cast; originalPlan = plan
             } else {
-                units = try TextNativeNarrationPlanner.plan(text, voiceID: voiceID, lexicon: lexicon, model: model, pocketChunking: pocketChunking, importedVoices: importedVoices)
+                units = try TextNativeNarrationPlanner.plan(text, voiceID: voiceID, lexicon: lexicon, model: model, pocketChunking: pocketChunking)
                 updatedCast = nil
             }
         } else {
@@ -66,7 +65,7 @@ public actor NarrationPipeline {
             let original: BookVoiceCast
             if let cast { original = cast }
             else if characterVoices && model.supportsCharacterVoices {
-                original = try model.makeVoiceCast(bookID: bookID, language: language, narratorVoiceID: voiceID, importedVoices: importedVoices)
+                original = try model.makeVoiceCast(bookID: bookID, language: language, narratorVoiceID: voiceID)
             } else {
                 original = try BookVoiceCast(bookID: bookID, language: phoneticLanguage,
                                             narratorVoiceID: voiceID, voicePool: [])
@@ -98,7 +97,7 @@ public actor NarrationPipeline {
         }
         if model == .pocket {
             for index in units.indices { units[index].pocketSampling = pocketSampling }
-            units = try pocketDelivery.applying(to: units, importedVoices: importedVoices)
+            units = try pocketDelivery.applying(to: units)
         }
         return Plan(units: units, narratorVoiceID: updatedCast?.narratorVoiceID ?? voiceID,
                     language: language, cast: updatedCast,

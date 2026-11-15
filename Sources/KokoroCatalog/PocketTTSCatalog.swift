@@ -26,18 +26,28 @@ public enum PocketTTSCatalog {
     public struct Voice: Sendable, Identifiable {
         public let name: String
         public let language: String
-        public var id: String { "pocket-\(name)-\(language)-v1" }
+        package let importedID: String?
+        init(name: String, language: String) {
+            self.name = name; self.language = language; importedID = nil
+        }
+        init(imported: PocketTTSImportedVoice) {
+            name = imported.name; language = imported.language; importedID = imported.id
+        }
+        public var id: String { importedID ?? "pocket-\(name)-\(language)-v1" }
         public var gender: VoiceGender {
-            PocketTTSCatalog.gender(for: name)
+            importedID == nil ? PocketTTSCatalog.gender(for: name) : .unknown
         }
         /// License of the source recording. Model/voice-state distribution also
         /// retains Kyutai's CC BY 4.0 terms; this does not relicense the weights.
-        public var sourceRecordingLicense: String { cc0Voices.contains(name) ? "CC0-1.0" : "CC-BY-4.0" }
+        public var sourceRecordingLicense: String { importedID != nil ? "See imported voice attribution" : cc0Voices.contains(name) ? "CC0-1.0" : "CC-BY-4.0" }
     }
     private static func gender(for name: String) -> VoiceGender {
         vctkFemale.contains(name) ? .female : vctkMale.contains(name) ? .male : .unknown
     }
-    public static var voices: [Voice] { languages.flatMap { language in voiceNames.map { Voice(name: $0, language: language) } } }
+    public static var voices: [Voice] {
+        languages.flatMap { language in voiceNames.map { Voice(name: $0, language: language) } }
+            + PocketTTSVoiceRegistry.shared.voices.map { Voice(imported: $0) }
+    }
     public static func voice(id: String) -> Voice? { voices.first { $0.id == id } }
     public static func manifest(language: String? = nil) throws -> AssetManifest {
         let selected = language.map { [$0] } ?? languages

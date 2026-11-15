@@ -4,7 +4,12 @@ Offline speech synthesis and book narration for iPhone, iPad and Mac. **Librox P
 
 [![Swift](https://github.com/Section9Labs/LibroxTTS/actions/workflows/swift.yml/badge.svg)](https://github.com/Section9Labs/LibroxTTS/actions/workflows/swift.yml)
 
-**LibroxTTS 1.1.0** adds optional lossless compressed Max downloads: 37.5% fewer
+**LibroxTTS 1.1.1** adds validated `.libroxvoice` import, reopen and deletion.
+Imported voices appear in the existing catalog and use the same voice-ID planning,
+casting and backend APIs. Existing signatures and synthesis settings are unchanged.
+See the [app integration handoff](docs/IMPORTED-VOICES-LIBROX-HANDOFF.md).
+
+Version 1.1 also provides optional lossless compressed Max downloads: 37.5% fewer
 bytes for the complete Core ML packs and 14.2% fewer for MLX. All seven languages
 and all published voices/styles are included. Installed bytes, synthesis memory,
 1.0 Max loudness defaults and audio-cache identities stay unchanged.
@@ -33,11 +38,11 @@ original 2x synthesis goal remains unmet. Technical qualification does not repla
 host-app integration or human listening; the published release retains these
 explicit gaps in its [qualification record](docs/validation/release-1.0.0.json).
 
-### Imported voices (unreleased)
+### Imported voices
 
-This branch adds prepared `.libroxvoice` imports through `PocketTTSVoiceStore`,
-with explicit imported-voice snapshots for narration planning and both native
-backends. See the [SDK contract and validation](docs/validation/imported-voices/README.md)
+Import prepared `.libroxvoice` files through `PocketTTSVoiceStore`. Import and
+reopen register voices with the normal catalog; deletion removes them. Existing
+planners, renderers and both native backends resolve their IDs automatically. See the [SDK contract and validation](docs/validation/imported-voices/README.md)
 and [Librox import-flow prompt](docs/IMPORTED-VOICES-LIBROX-HANDOFF.md).
 This imports an existing model-specific voice state; it does not clone raw audio.
 
@@ -46,7 +51,7 @@ This imports an existing model-specific voice state; it does not clone raw audio
 Add the versioned Swift package:
 
 ```swift
-.package(url: "https://github.com/Section9Labs/LibroxTTS.git", exact: "1.1.0")
+.package(url: "https://github.com/Section9Labs/LibroxTTS.git", exact: "1.1.1")
 ```
 
 Products include `LibroxTTS` (host-facing synthesis/install API), `LibroxCTNative` (Core ML CT runtime), `KokoroCatalog` (Kokoro voices/assets), and `KokoroPronunciation` (Kokoro text to model phonemes). The shared runtime depends on MLX Swift 0.32.3. Swift 6.3 or newer, **iOS/Catalyst 18+ or macOS 15+** are required. Apple system language facilities are required, so Linux is not supported.
@@ -55,7 +60,7 @@ Products include `LibroxTTS` (host-facing synthesis/install API), `LibroxCTNativ
 
 See [the narrator integration API](docs/book-planning.md), [casting rules](docs/story-narrator.md), and [enhancement API and validation limits](docs/audio-enhancement.md). The optional, separately imported `QwenANE` product retains the Qwen renderer work; its existence does not establish device eligibility or sustained background performance. The shared LibroxTTS product now links the Pocket TTS MLX runtime; KokoroCatalog, KokoroPronunciation and KokoroNarration remain independent of MLX. Rejected model auditions are not app dependencies.
 
-Version **1.1.0** preserves the new-book default **Caro Davy / Calm**, Careful
+Version **1.1.1** preserves the new-book default **Caro Davy / Calm**, Careful
 reading, temperature 0.3 and four sampler steps. Saved choices and supported
 sampler counts 1–8 remain unchanged. It also includes the 0.4.1–0.5.0 CPU-budget,
 per-language uninstall and Original-only voice/style APIs. This SDK release does

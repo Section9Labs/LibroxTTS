@@ -74,8 +74,8 @@ public struct PocketTTSImportedVoice: Identifiable, Sendable, Equatable {
         return try Self.decode(data).state
     }
 
-    package static func resolve(_ id: String, in voices: [Self]) -> Self? {
-        voices.first { $0.id == id }
+    package static func resolve(_ id: String) -> Self? {
+        PocketTTSVoiceRegistry.shared.voices.first { $0.id == id }
     }
 
     fileprivate static func inspect(data: Data, at url: URL) throws -> Self {
@@ -201,8 +201,9 @@ package struct PocketTTSImportedVoiceState: Sendable {
     package let layers: [Layer]
 }
 
-/// App-owned storage, separate from downloaded language packs. Import/reopen
-/// operations validate all tensors and return immutable renderer/planner inputs.
+/// App-owned storage, separate from downloaded language packs. Successful import
+/// and reopen register validated voices with the existing catalog and backends.
+/// Call `voices()` at launch before restoring persisted voice selections.
 public actor PocketTTSVoiceStore {
     private let directory: URL
     public init(directory: URL) { self.directory = directory.standardizedFileURL.resolvingSymlinksInPath() }
@@ -214,27 +215,38 @@ public actor PocketTTSVoiceStore {
         try prepareDirectory()
         let destination = directory.appendingPathComponent(inspected.sha256 + ".safetensors")
         if FileManager.default.fileExists(atPath: destination.path),
-           let existing = try? PocketTTSImportedVoice.inspect(at: destination), existing.id == inspected.id { return existing }
+           let existing = try? PocketTTSImportedVoice.inspect(at: destination), existing.id == inspected.id {
+            PocketTTSVoiceRegistry.shared.register(existing, in: directory)
+            return existing
+        }
         try Task.checkCancellation()
         try bytes.write(to: destination, options: .atomic)
         #if os(iOS)
         try FileManager.default.setAttributes([.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication], atPath: destination.path)
         #endif
-        return try PocketTTSImportedVoice.inspect(data: bytes, at: destination)
+        let voice = try PocketTTSImportedVoice.inspect(data: bytes, at: destination)
+        PocketTTSVoiceRegistry.shared.register(voice, in: directory)
+        return voice
     }
 
     /// A corrupt file is an error, not a silent substitution or disappearance.
     public func voices() throws -> [PocketTTSImportedVoice] {
-        guard FileManager.default.fileExists(atPath: directory.path) else { return [] }
+        guard FileManager.default.fileExists(atPath: directory.path) else {
+            PocketTTSVoiceRegistry.shared.replace([], in: directory)
+            return []
+        }
         try prepareDirectory()
-        return try FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil)
-            .filter { $0.pathExtension == "safetensors" }.map { url in
+        let files = try FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil)
+        let voices: [PocketTTSImportedVoice] = try files
+            .filter { $0.pathExtension == "safetensors" }.map { url -> PocketTTSImportedVoice in
                 let voice = try PocketTTSImportedVoice.inspect(at: url)
                 guard url.deletingPathExtension().lastPathComponent == voice.sha256 else {
                     throw PocketTTSImportedVoice.ImportError.missingOrChangedVoice
                 }
                 return voice
             }.sorted { $0.name == $1.name ? $0.id < $1.id : $0.name < $1.name }
+        PocketTTSVoiceRegistry.shared.replace(voices, in: directory)
+        return voices
     }
 
     /// Does not rewrite saved book selections; a removed ID remains unavailable.
@@ -242,6 +254,7 @@ public actor PocketTTSVoiceStore {
         try prepareDirectory()
         let url = directory.appendingPathComponent(voice.sha256 + ".safetensors")
         if FileManager.default.fileExists(atPath: url.path) { try FileManager.default.removeItem(at: url) }
+        PocketTTSVoiceRegistry.shared.remove(voice.id, in: directory)
     }
 
     private func prepareDirectory() throws {
@@ -249,5 +262,38 @@ public actor PocketTTSVoiceStore {
         guard directory.resolvingSymlinksInPath().path == directory.path,
               try directory.resourceValues(forKeys: [.isDirectoryKey, .isSymbolicLinkKey]).isSymbolicLink != true
         else { throw PocketTTSImportedVoice.ImportError.invalidPackage }
+    }
+}
+
+/// Synchronous catalog reads must work from existing nonisolated public APIs.
+/// Only validated descriptors are registered; disk/tensor work stays outside the
+/// lock. Store ownership keeps one directory's refresh/removal from affecting
+/// another. Every backend still verifies the selected file at render time.
+package final class PocketTTSVoiceRegistry: @unchecked Sendable {
+    package static let shared = PocketTTSVoiceRegistry()
+    private let lock = NSLock()
+    private var stores: [String: [String: PocketTTSImportedVoice]] = [:]
+    package var voices: [PocketTTSImportedVoice] {
+        lock.withLock {
+            var seen = Set<String>()
+            return stores.keys.sorted().flatMap { stores[$0]!.values }
+                .filter { seen.insert($0.id).inserted }
+                .sorted { $0.name == $1.name ? $0.id < $1.id : $0.name < $1.name }
+        }
+    }
+    func register(_ voice: PocketTTSImportedVoice, in directory: URL) {
+        lock.withLock { stores[directory.path, default: [:]][voice.id] = voice }
+    }
+    package func replace(_ voices: [PocketTTSImportedVoice], in directory: URL) {
+        lock.withLock {
+            if voices.isEmpty { stores.removeValue(forKey: directory.path) }
+            else { stores[directory.path] = Dictionary(uniqueKeysWithValues: voices.map { ($0.id, $0) }) }
+        }
+    }
+    func remove(_ id: String, in directory: URL) {
+        lock.withLock {
+            stores[directory.path]?.removeValue(forKey: id)
+            if stores[directory.path]?.isEmpty == true { stores.removeValue(forKey: directory.path) }
+        }
     }
 }

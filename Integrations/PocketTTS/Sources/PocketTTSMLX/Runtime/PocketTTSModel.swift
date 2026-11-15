@@ -142,6 +142,16 @@ public final class PocketTTSModel: Module {
     // Kyutai ships language/model-specific prefilled KV states, not raw voice vectors.
     // These already include BOS-before-voice. Never prepend it a second time.
     public func loadVoiceState(_ name: String) throws -> PocketTTSState {
+        if let voice = PocketTTSImportedVoice.resolve(name) {
+            let imported = try voice.state()
+            let state = initState()
+            guard state.flowCache.count == imported.layers.count else { throw PocketTTSError.invalidVoice }
+            for (cache, layer) in zip(state.flowCache, imported.layers) {
+                cache.state = [MLXArray(layer.key, [1,16,imported.frames,64]),
+                               MLXArray(layer.value, [1,16,imported.frames,64])]
+            }
+            return state
+        }
         guard !name.isEmpty, name.allSatisfy({ $0.isASCII && ($0.isLetter || $0.isNumber || $0 == "_") }) else {
             throw Self.modelError("Invalid voice name")
         }
@@ -197,25 +207,19 @@ public final class PocketTTSModel: Module {
 
     /// Synchronous callback supplies natural 80 ms codec frames and backpressure.
     /// Keep this object inside one actor; a model contains mutable decoder state.
-    public func render(text: String, voice: String, importedVoice: PocketTTSImportedVoice? = nil, continuation: Bool = true,
+    public func render(text: String, voice: String, continuation: Bool = true,
                        chunking: PocketTTSChunkingOptions = .init(),
                        role: PocketTTSPassageRole = .narration, language: String = "en",
                        checkpoint: (String) throws -> Void = { _ in },
                        onTextChunk: (PocketTTSChunkProgress) throws -> Void = { _ in },
                        onChunk: ([Float]) throws -> Void) throws {
         try validateSampling()
+        if let imported = PocketTTSImportedVoice.resolve(voice), imported.language != language {
+            throw PocketTTSError.unsupportedLanguage
+        }
         defer { mimi.resetState(); diagnosticTokenCount = nil; diagnosticFrameIndex = nil }
         try checkpoint("before-voice")
-        var state: PocketTTSState
-        if let importedVoice {
-            guard importedVoice.language == language else { throw PocketTTSError.unsupportedLanguage }
-            let imported = try importedVoice.state()
-            state = initState()
-            guard state.flowCache.count == imported.layers.count else { throw PocketTTSError.invalidVoice }
-            for (cache, layer) in zip(state.flowCache, imported.layers) {
-                cache.state = [MLXArray(layer.key, [1,16,imported.frames,64]), MLXArray(layer.value, [1,16,imported.frames,64])]
-            }
-        } else { state = try loadVoiceState(voice) }
+        var state = try loadVoiceState(voice)
         let promptFrames = getFlowCacheNumFrames(state)
         let chunks = try chunkPlan(text: text, language: language, role: role, options: chunking)
         var previousText: String?

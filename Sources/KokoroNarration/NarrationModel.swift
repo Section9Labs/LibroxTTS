@@ -62,16 +62,17 @@ public enum NarrationModel: String, CaseIterable, Codable, Sendable, Identifiabl
         public let styleID: String
         public var engineVoiceID: String { id.hasPrefix("pocket-") ? styleID : "dk-" + styleID.lowercased() + "-v1" }
     }
-    public var nativeVoices: [NativeVoice] { nativeVoices(importedVoices: []) }
-    public func nativeVoices(importedVoices: [PocketTTSImportedVoice]) -> [NativeVoice] {
+    public var nativeVoices: [NativeVoice] {
         if self == .pocket {
-            var seen = Set<String>()
-            let custom = importedVoices.filter { seen.insert($0.id).inserted }.map {
-                NativeVoice(id: $0.id, name: $0.name, language: $0.language, styleID: $0.id)
-            }
-            return custom + PocketTTSCatalog.voices.map {
-                NativeVoice(id: $0.id, name: $0.name.replacingOccurrences(of: "_", with: " ").capitalized
-                    + " · " + NarrationLanguage.name($0.language), language: $0.language, styleID: $0.name)
+            return PocketTTSCatalog.voices.map { voice in
+                if voice.importedID != nil {
+                    return NativeVoice(id: voice.id, name: voice.name,
+                        language: voice.language, styleID: voice.id)
+                }
+                return NativeVoice(id: voice.id,
+                    name: voice.name.replacingOccurrences(of: "_", with: " ").capitalized
+                        + " · " + NarrationLanguage.name(voice.language),
+                    language: voice.language, styleID: voice.name)
             }
         }
         return self == .plus ? CTAssets.styles.flatMap { style in
@@ -84,15 +85,13 @@ public enum NarrationModel: String, CaseIterable, Codable, Sendable, Identifiabl
     public var supportedLanguageCodes: [String] {
         self == .pocket ? PocketTTSCatalog.languages : self == .plus ? NarrationLanguage.textNativeCodes : Language.allCases.map(\.rawValue)
     }
-    public func resolvedVoiceID(_ preferred: String?, language: String, importedVoices: [PocketTTSImportedVoice] = []) -> String? {
+    public func resolvedVoiceID(_ preferred: String?, language: String) -> String? {
         guard let language = NarrationLanguage.normalize(language), supportedLanguageCodes.contains(language) else { return nil }
         if self == .pocket {
             let name: String?
             if let preferred {
-                if let imported = PocketTTSImportedVoice.resolve(preferred, in: importedVoices) {
-                    return imported.language == language ? imported.id : nil
-                }
                 guard let voice = PocketTTSCatalog.voice(id: preferred) else { return nil }
+                if voice.importedID != nil { return voice.language == language ? voice.id : nil }
                 name = voice.name
             } else { name = PocketTTSCatalog.defaultVoices[language] }
             return nativeVoices.first { $0.language == language && $0.styleID == name }?.id

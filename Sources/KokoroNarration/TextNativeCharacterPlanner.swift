@@ -15,18 +15,18 @@ enum TextNativeCharacterPlanner {
     static func plan(_ text: String, bookID: String, chapterID: String, language: String,
                      cast original: BookVoiceCast, characterVoices: Bool,
                      lexicon: SpokenTextLexicon, model: NarrationModel = .plus,
-                     pocketChunking: PocketTTSChunkingOptions = .init(),
-                     importedVoices: [PocketTTSImportedVoice] = []) throws -> BookNarrationPlan {
+                     pocketChunking: PocketTTSChunkingOptions = .init()) throws -> BookNarrationPlan {
         _ = try original.encoded()
         guard original.bookID == bookID else { throw BookVoiceCast.CastError.wrongBook }
         guard original.language.rawValue == language else { throw BookNarrationPlanner.PlanningError.languageMismatch }
-        let catalog = Set(model.characterVoiceCatalog(language: language, importedVoices: importedVoices).map(\.id))
+        let catalog = Set(model.characterVoiceCatalog(language: language).map(\.id))
+        let original = try model.removingUnavailableImportedVoices(in: original, available: catalog)
         let requested = Set(original.voicePool + [original.narratorVoiceID] + Array(original.characterVoices.values))
         guard requested.isSubset(of: catalog) else { throw NarrationPipeline.PlanningError.invalidVoice }
         let supported = model.supportsAutomaticCharacterAttribution(language: language)
         guard characterVoices && supported else {
             return BookNarrationPlan(units: try TextNativeNarrationPlanner.plan(text,
-                voiceID: original.narratorVoiceID, lexicon: lexicon, model: model, pocketChunking: pocketChunking, importedVoices: importedVoices), cast: original,
+                voiceID: original.narratorVoiceID, lexicon: lexicon, model: model, pocketChunking: pocketChunking), cast: original,
                 attribution: nil, characterAttributionSupported: supported)
         }
 
@@ -59,7 +59,7 @@ enum TextNativeCharacterPlanner {
         var fragments: [(BookNarrationUnit, Span)] = []
         for span in spans {
             try Task.checkCancellation()
-            for unit in try TextNativeNarrationPlanner.plan(span.text, voiceID: span.voiceID, lexicon: lexicon, model: model, pocketChunking: pocketChunking, importedVoices: importedVoices) {
+            for unit in try TextNativeNarrationPlanner.plan(span.text, voiceID: span.voiceID, lexicon: lexicon, model: model, pocketChunking: pocketChunking) {
                 fragments.append((unit, span))
             }
         }

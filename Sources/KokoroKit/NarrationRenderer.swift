@@ -64,9 +64,9 @@ public actor NarrationRenderer {
     private let logger = Logger(subsystem: "com.section9labs.Libros", category: "NarrationRenderer")
 
     /// Host-facing initializer: storage and bundled resources, with no model graph knowledge.
-    public init(storageRoot: URL, resources: Bundle, expressionDirectory: URL? = nil, importedVoices: [PocketTTSImportedVoice] = []) {
+    public init(storageRoot: URL, resources: Bundle, expressionDirectory: URL? = nil) {
         admission = NarrationAdmission()
-        maxFactory = { PocketNarrationBackend.make(directory: $0, context: $1, importedVoices: importedVoices) }
+        maxFactory = { PocketNarrationBackend.make(directory: $0, context: $1) }
         compactDirectory = storageRoot.appendingPathComponent(
             NarrationAssets.repositoryID(.compact).replacingOccurrences(of: "/", with: "_"), isDirectory: true)
         harmonicSource = resources.url(forResource: "NarrationSource", withExtension: "mlmodelc")
@@ -74,9 +74,9 @@ public actor NarrationRenderer {
     }
 
     public init(compactDirectory: URL, harmonicSource: URL?,
-                contextStyleDiagnostic: CTContextStyleDiagnostic.Configuration? = nil, importedVoices: [PocketTTSImportedVoice] = []) {
+                contextStyleDiagnostic: CTContextStyleDiagnostic.Configuration? = nil) {
         admission = NarrationAdmission()
-        maxFactory = { PocketNarrationBackend.make(directory: $0, context: $1, importedVoices: importedVoices) }
+        maxFactory = { PocketNarrationBackend.make(directory: $0, context: $1) }
         self.compactDirectory = compactDirectory
         self.harmonicSource = harmonicSource
         self.contextStyleDiagnostic = contextStyleDiagnostic

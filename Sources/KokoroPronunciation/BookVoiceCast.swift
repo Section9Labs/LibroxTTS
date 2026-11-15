@@ -118,6 +118,21 @@ public struct BookVoiceCast: Codable, Sendable, Equatable {
         return result
     }
 
+    /// Used when a removable catalog entry disappears. Never recast a selected
+    /// narrator/character, or discard character identities and manual choices.
+    package func removingUnusedVoices(_ removed: Set<String>) throws -> Self {
+        guard removed.isDisjoint(with: [narratorVoiceID] + Array(characterVoices.values)) else {
+            throw CastError.invalidState
+        }
+        guard !removed.isEmpty else { return self }
+        var result = try Self(bookID: bookID, languageCode: language.rawValue, narratorVoiceID: narratorVoiceID,
+            voicePool: voicePool.filter { !removed.contains($0) }, styleRow: styleRow,
+            voiceGenders: voiceGenders.filter { !removed.contains($0.key) }, voiceSharing: voiceSharing)
+        result.characters = characters; result.aliases = aliases
+        try result.validate()
+        return result
+    }
+
     public func encoded() throws -> Data {
         try validate()
         let encoder = JSONEncoder(); encoder.outputFormatting = [.sortedKeys]

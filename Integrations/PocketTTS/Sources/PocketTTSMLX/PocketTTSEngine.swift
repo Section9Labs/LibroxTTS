@@ -39,7 +39,6 @@ public actor PocketTTSEngine {
     }
     public struct Output: Sendable { public let samples: [Float]; public let sampleRate: Int }
     private let directory: URL
-    private let importedVoices: [PocketTTSImportedVoice]
     private var model: PocketTTSModel?
     private var language: String?
     /// The language whose model is held in memory, or nil.
@@ -47,8 +46,8 @@ public actor PocketTTSEngine {
     /// CPU duty cycle for `.cpu` renders on iOS; nil = unmetered. Default 0.5.
     public private(set) var cpuBudgetFraction: Double? = PocketCPUWorkBudget.defaultFraction
     public func setCPUBudgetFraction(_ fraction: Double?) { cpuBudgetFraction = fraction }
-    public init(directory: URL, backend: Backend = .gpu, importedVoices: [PocketTTSImportedVoice] = []) {
-        self.directory = directory; self.backend = backend; self.importedVoices = importedVoices
+    public init(directory: URL, backend: Backend = .gpu) {
+        self.directory = directory; self.backend = backend
     }
     public func unload() {
         model = nil; language = nil; randomState = nil
@@ -104,9 +103,9 @@ public actor PocketTTSEngine {
                            samplerSteps: Int = PocketTTSSamplingOptions.defaultSamplerSteps,
                            deliveryStyle: PocketTTSDeliveryStyle = .original) throws -> Output {
         return try withPreparedRequest(text, voiceID: voiceID, temperature: temperature, chunking: chunking,
-            samplerSteps: samplerSteps, deliveryStyle: deliveryStyle) { model, budget, stateName, language, imported in
+            samplerSteps: samplerSteps, deliveryStyle: deliveryStyle) { model, budget, stateName, language in
             var samples: [Float] = []
-            try model.render(text: text, voice: stateName, importedVoice: imported, continuation: continueChunks, chunking: chunking,
+            try model.render(text: text, voice: stateName, continuation: continueChunks, chunking: chunking,
                              role: role, language: language, checkpoint: { try self.resources.checkpoint($0) }) { chunk in
                 guard samples.count + chunk.count <= 24_000 * 300 else { throw PocketTTSError.textTooLong }
                 samples += chunk
@@ -127,9 +126,9 @@ public actor PocketTTSEngine {
                              onTextChunk: @Sendable (PocketTTSChunkProgress) throws -> Void = { _ in },
                              receive: @Sendable ([Float]) throws -> Void) throws {
         return try withPreparedRequest(text, voiceID: voiceID, temperature: temperature, chunking: chunking,
-            samplerSteps: samplerSteps, deliveryStyle: deliveryStyle) { model, budget, stateName, language, imported in
+            samplerSteps: samplerSteps, deliveryStyle: deliveryStyle) { model, budget, stateName, language in
             var sampleCount = 0
-            try model.render(text: text, voice: stateName, importedVoice: imported, continuation: continueChunks,
+            try model.render(text: text, voice: stateName, continuation: continueChunks,
                              chunking: chunking, role: role, language: language, checkpoint: { try self.resources.checkpoint($0) },
                              onTextChunk: onTextChunk) { chunk in
                 guard sampleCount + chunk.count <= 24_000 * 300 else { throw PocketTTSError.textTooLong }
@@ -143,11 +142,11 @@ public actor PocketTTSEngine {
     /// bodies retain their existing budget/callback ordering and error handling.
     private func withPreparedRequest<R>(_ text: String, voiceID: String, temperature: Float,
         chunking: PocketTTSChunkingOptions, samplerSteps: Int, deliveryStyle: PocketTTSDeliveryStyle,
-        body: (PocketTTSModel, PocketCPUWorkBudget?, String, String, PocketTTSImportedVoice?) throws -> R) throws -> R {
+        body: (PocketTTSModel, PocketCPUWorkBudget?, String, String) throws -> R) throws -> R {
         try chunking.validate()
         guard (1...8).contains(samplerSteps) else { throw PocketTTSError.invalidSamplerSteps }
         try PocketTTSSamplingOptions(temperature: temperature, samplerSteps: samplerSteps).validate()
-        let imported = PocketTTSImportedVoice.resolve(voiceID, in: importedVoices)
+        let imported = PocketTTSImportedVoice.resolve(voiceID)
         guard let language = imported?.language ?? PocketTTSCatalog.voice(id: voiceID)?.language else { throw PocketTTSError.invalidVoice }
         let stateName: String
         if imported != nil {
@@ -165,7 +164,7 @@ public actor PocketTTSEngine {
             let model = try loadedModel(language: language)
             model.temp = temperature
             model.lsd_decode_steps = samplerSteps
-            return try body(model, budget, stateName, language, imported)
+            return try body(model, budget, stateName, language)
         }
     }
 
@@ -175,7 +174,7 @@ public actor PocketTTSEngine {
                               role: PocketTTSPassageRole = .narration) throws -> [PocketTTSTextChunk] {
         return try onBackend { _ in
             try chunking.validate()
-            guard let language = PocketTTSImportedVoice.resolve(voiceID, in: importedVoices)?.language
+            guard let language = PocketTTSImportedVoice.resolve(voiceID)?.language
                 ?? PocketTTSCatalog.voice(id: voiceID)?.language else { throw PocketTTSError.invalidVoice }
             return try loadedModel(language: language).chunkPlan(text: text, language: language,
                                                                       role: role, options: chunking)
